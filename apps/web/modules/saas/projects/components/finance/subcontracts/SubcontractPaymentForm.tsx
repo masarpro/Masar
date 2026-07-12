@@ -213,7 +213,7 @@ export function SubcontractPaymentForm({
 
 						{/* Term info card */}
 						{selectedTerm && (
-							<div className="mt-4 rounded-xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
+							<div className="mt-4 rounded-xl border border-chart-4/50 bg-chart-4/15 p-4 dark:border-chart-4/30 dark:bg-chart-4/20">
 								<div className="grid grid-cols-3 gap-3 text-center text-xs">
 									<div>
 										<p className="text-chart-4">

@@ -298,9 +298,9 @@ export function ClientForm({
 	return (
 		<form onSubmit={handleSubmit} className="pb-28 lg:pb-6 space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-chart-4 via-chart-4 to-transparent border border-border/50">
+			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-chart-4/10 via-chart-4/5 to-transparent border border-border/50">
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 rounded-xl bg-chart-4 flex items-center justify-center">
+					<div className="w-10 h-10 rounded-xl bg-chart-4/10 flex items-center justify-center">
 						<User className="h-5 w-5 text-chart-4" />
 					</div>
 					<div>
@@ -541,9 +541,9 @@ export function ClientForm({
 						<button
 							type="submit"
 							disabled={isPending}
-							className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-chart-4 hover:bg-chart-4 text-foreground transition-all duration-200 disabled:opacity-50"
+							className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-chart-4/10 hover:bg-chart-4/20 text-foreground transition-all duration-200 disabled:opacity-50"
 						>
-							<div className="w-8 h-8 rounded-lg bg-chart-4 flex items-center justify-center">
+							<div className="w-8 h-8 rounded-lg bg-chart-4/20 flex items-center justify-center">
 								{isPending ? (
 									<Loader2 className="h-4 w-4 text-chart-4 dark:text-chart-4 animate-spin" />
 								) : (

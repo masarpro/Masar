@@ -389,7 +389,7 @@ export function AssistantPanel() {
         </div>
 
         {/* Gradient line */}
-        <div className="h-[1px] bg-gradient-to-r from-transparent via-chart-4 to-transparent" />
+        <div className="h-[1px] bg-gradient-to-r from-transparent via-chart-4/30 to-transparent" />
 
         {/* Context Badge */}
         <AssistantContextBadge pageContext={pageContext} />

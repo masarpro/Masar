@@ -10,6 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
+import { BotlyHero } from "./sections/BotlyHero";
+import { ProjectsDonutCard } from "./sections/ProjectsDonutCard";
 import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
 import { OperationalSection } from "./sections/OperationalSection";
@@ -107,35 +109,70 @@ export function Dashboard({
 				<WelcomeSection organizationSlug={organizationSlug} />
 			)}
 
-			{/* Row 1: Finance (right/start) + Projects (left/end) — swapped for RTL */}
+			{/* Row 1 — Botly Dashboard/Light 120:11546: hero (2/3) + widget stack (1/3) */}
 			{(showFinance || showProjects) && (
-				<div
-					className={`grid grid-cols-1 gap-3 sm:gap-6 ${
-						showFinance && showProjects ? "lg:grid-cols-2" : ""
-					}`}
-				>
-					{showFinance &&
-						(finLoading || statsLoading ? (
+				<div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
+					<div className="lg:col-span-2">
+						{finLoading || statsLoading ? (
 							sectionSkeleton
 						) : (
-							<FinancePanel
-								bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
-								cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
-								financialTrend={dashboardData?.financialTrend ?? []}
+							<BotlyHero
 								organizationSlug={organizationSlug}
+								orgName={activeOrganization?.name ?? ""}
+								activeProjects={
+									showProjects ? (stats?.projects?.active ?? 0) : null
+								}
+								bankBalance={
+									showFinance
+										? (orgFinance?.balances?.totalBankBalance ?? 0)
+										: null
+								}
+								cashBalance={
+									showFinance
+										? (orgFinance?.balances?.totalCashBalance ?? 0)
+										: null
+								}
+								showFinance={showFinance}
+								showProjects={showProjects}
 							/>
-						))}
-					{showProjects &&
-						(projLoading ? (
-							sectionSkeleton
-						) : (
-							<ActiveProjectsSection
-								projects={projects}
-								organizationSlug={organizationSlug}
-							/>
-						))}
+						)}
+					</div>
+					<div className="flex flex-col gap-3 sm:gap-6">
+						{showFinance &&
+							(finLoading || statsLoading ? (
+								cardSkeleton
+							) : (
+								<FinancePanel
+									bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
+									cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
+									financialTrend={dashboardData?.financialTrend ?? []}
+									organizationSlug={organizationSlug}
+								/>
+							))}
+						{showProjects &&
+							(statsLoading ? (
+								cardSkeleton
+							) : (
+								<ProjectsDonutCard
+									activeProjects={stats?.projects?.active ?? 0}
+									completedProjects={stats?.projects?.completed ?? 0}
+									onHoldProjects={stats?.projects?.onHold ?? 0}
+								/>
+							))}
+					</div>
 				</div>
 			)}
+
+			{/* Row 1.5 — Botly Earnings table: active projects */}
+			{showProjects &&
+				(projLoading ? (
+					sectionSkeleton
+				) : (
+					<ActiveProjectsSection
+						projects={projects}
+						organizationSlug={organizationSlug}
+					/>
+				))}
 
 			{/* Row 2: Quick Actions — على الجوال تظهر أسفل المشاريع النشطة كصفوف */}
 			<QuickActionsGrid organizationSlug={organizationSlug} />

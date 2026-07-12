@@ -162,7 +162,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 							<p className="text-xs font-medium text-chart-4 dark:text-chart-4 uppercase tracking-wide">{t("pricing.studies.stats.completed")}</p>
 							<p className="text-3xl font-semibold mt-2 text-chart-4 dark:text-chart-4">{stats.completed}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-chart-4/15 dark:bg-chart-4">
+						<div className="p-3 rounded-2xl bg-chart-4/15 dark:bg-chart-4/30">
 							<CheckCircle2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>

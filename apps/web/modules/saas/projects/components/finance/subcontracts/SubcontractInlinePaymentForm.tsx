@@ -107,7 +107,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 	}
 
 	return (
-		<div className="border-t border-chart-4 bg-chart-4/15 p-5 dark:border-chart-4 dark:bg-chart-4/20">
+		<div className="border-t border-chart-4 bg-chart-4/15 p-5 dark:border-chart-4/30 dark:bg-chart-4/20">
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<h3 className="text-sm font-semibold text-chart-4 dark:text-chart-4">
 					{t("subcontracts.detail.newPaymentForm")}

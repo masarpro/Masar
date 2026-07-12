@@ -3,9 +3,7 @@
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { Button } from "@ui/components/button";
 import {
-	Banknote,
 	BarChart3,
-	Calendar,
 	ChevronLeft,
 	FileText,
 	FolderOpen,
@@ -18,9 +16,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-
-const glassCard =
-	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
 
 function daysRemaining(endDate: Date | string | null): number | null {
 	if (!endDate) return null;
@@ -46,6 +41,11 @@ interface ActiveProjectsSectionProps {
 	organizationSlug: string;
 }
 
+/**
+ * Botly Earnings table (Figma 71:4242 / 71:4085 Bot row): white 32px card,
+ * gray small column labels, rows separated by 2px Stroke borders — avatar
+ * chip + name/sub, semibold value, yellow progress bar, trailing figure.
+ */
 export function ActiveProjectsSection({
 	projects,
 	organizationSlug,
@@ -55,35 +55,33 @@ export function ActiveProjectsSection({
 	// Empty state
 	if (projects.length === 0) {
 		return (
-			<div
-				className={`${glassCard} flex flex-col items-center justify-center p-4 text-center`}
-			>
-				<div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+			<div className="flex flex-col items-center justify-center rounded-[var(--botly-radius-card)] border-2 bg-card p-6 text-center">
+				<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
 					<FolderPlus className="h-8 w-8 text-primary" />
 				</div>
-				<h3 className="text-lg font-bold mb-2">
+				<h3 className="mb-2 text-lg font-bold">
 					{t("dashboard.addFirstProject")}
 				</h3>
-				<p className="text-sm text-muted-foreground mb-4 max-w-xs">
+				<p className="mb-4 max-w-xs text-sm text-muted-foreground">
 					{t("dashboard.addFirstProjectDesc")}
 				</p>
-				<div className="grid grid-cols-2 gap-2 mb-4 w-full max-w-sm">
+				<div className="mb-4 grid w-full max-w-sm grid-cols-2 gap-2">
 					{[
 						{ icon: BarChart3, label: t("dashboard.feature.tracking"), color: "text-chart-4" },
-						{ icon: Receipt, label: t("dashboard.feature.invoicing"), color: "text-green-500" },
-						{ icon: Users, label: t("dashboard.feature.team"), color: "text-purple-500" },
-						{ icon: FileText, label: t("dashboard.feature.documents"), color: "text-amber-500" },
+						{ icon: Receipt, label: t("dashboard.feature.invoicing"), color: "text-success" },
+						{ icon: Users, label: t("dashboard.feature.team"), color: "text-chart-2" },
+						{ icon: FileText, label: t("dashboard.feature.documents"), color: "text-chart-1" },
 					].map((feat, i) => {
 						const Icon = feat.icon;
 						return (
-							<div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-start">
+							<div key={i} className="flex items-center gap-2 rounded-lg bg-muted/50 p-2.5 text-start">
 								<Icon className={`h-4 w-4 ${feat.color} shrink-0`} />
 								<span className="text-xs">{feat.label}</span>
 							</div>
 						);
 					})}
 				</div>
-				<Button asChild size="sm">
+				<Button asChild variant="primary" size="md">
 					<Link href={`/app/${organizationSlug}/projects/new`}>
 						<Plus className="h-4 w-4 me-1" />
 						{t("dashboard.createFirstProject")}
@@ -93,116 +91,91 @@ export function ActiveProjectsSection({
 		);
 	}
 
-	const MAX_VISIBLE = 3;
+	const MAX_VISIBLE = 4;
 	const visibleProjects = projects.slice(0, MAX_VISIBLE);
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
+		<div className="flex flex-col overflow-hidden rounded-[var(--botly-radius-card)] border-2 bg-card p-6">
 			{/* Header */}
-			<div className="flex items-center justify-between mb-3 shrink-0 -mx-4 -mt-4 px-4 py-2.5 rounded-t-2xl bg-gradient-to-l from-chart-4/15 via-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:via-chart-4/20 dark:to-chart-4/20 border-b border-chart-4 dark:border-chart-4">
-				<div className="flex items-center gap-2">
-					<div className="p-1.5 rounded-lg bg-chart-4">
-						<FolderOpen className="h-4 w-4 text-chart-4 dark:text-chart-4" />
-					</div>
-					<h2 className="text-sm sm:text-base font-bold text-foreground">
-						{t("dashboard.activeProjects")}
-					</h2>
-					<span className="text-xs font-bold text-chart-4 dark:text-chart-4 bg-chart-4 px-2 py-0.5 rounded-full">
-						{projects.length}
-					</span>
-				</div>
+			<div className="flex shrink-0 items-center justify-between">
+				<p className="text-xl font-semibold leading-6 text-card-foreground">
+					{t("dashboard.activeProjects")}
+				</p>
 				<Link
 					href={`/app/${organizationSlug}/projects`}
-					className="flex items-center gap-1 text-xs font-medium text-chart-4 dark:text-chart-4 hover:underline"
+					className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
 				>
 					{t("dashboard.viewAll")}
-					<ChevronLeft className="h-3 w-3" />
+					<ChevronLeft className="h-3 w-3 rtl-flip" />
 				</Link>
 			</div>
 
-			{/* Project list */}
-			<div className="flex-1 overflow-y-auto min-h-0 space-y-1.5">
-				{visibleProjects.map((project, i) => {
+			{/* Column labels (Botly table title row) */}
+			<div className="mt-4 hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)] gap-3 border-b-2 pb-3 text-sm font-medium text-muted-foreground sm:grid">
+				<span>{t("dashboard.activeProjects")}</span>
+				<span>{t("projects.contractBar.contractValue")}</span>
+				<span>{t("projects.overview.progress")}</span>
+			</div>
+
+			{/* Rows */}
+			<div className="min-h-0 flex-1 overflow-y-auto">
+				{visibleProjects.map((project) => {
 					const progress = Math.round(Number(project.progress ?? 0));
 					const contractValue = Number(project.contractValue ?? 0);
 					const days = daysRemaining(project.endDate);
-
-					const healthBarColor =
-						progress >= 70
-							? "bg-emerald-500"
-							: progress >= 40
-								? "bg-amber-500"
-								: "bg-red-500";
 
 					return (
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group relative flex items-center gap-3 p-3 rounded-xl border border-border/30 bg-card/50 hover:bg-card hover:border-border/60 hover:shadow-md transition-all duration-300"
-							style={{ animationDelay: `${80 + i * 50}ms` }}
+							className="group grid grid-cols-1 items-center gap-3 border-b-2 py-4 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
 						>
-							{/* Health side bar */}
-							<div
-								className={`absolute top-2 bottom-2 start-0 w-1 rounded-full ${healthBarColor}`}
-							/>
-
-							{/* Project photo */}
-							<div className="relative h-10 w-10 shrink-0 ms-2 rounded-lg overflow-hidden bg-muted/30">
-								<ProjectThumb
-									src={
-										project.coverPhoto?.url ??
-										project.photos?.[0]?.url ??
-										null
-									}
-									alt={project.name || ""}
-								/>
-							</div>
-
-							{/* Info */}
-							<div className="flex-1 min-w-0">
-								<div className="flex items-center gap-2">
-									<p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
-										{project.name || t("projects.unnamed")}
-									</p>
-									<span className={`text-[10px] font-bold shrink-0 ${progress >= 70 ? "text-emerald-600" : progress >= 40 ? "text-amber-600" : "text-red-600"}`}>
-										{progress}%
-									</span>
-								</div>
-								{/* Progress bar */}
-								<div className="h-1.5 w-full bg-muted/30 rounded-full mt-1 overflow-hidden">
-									<div
-										className={`h-full rounded-full transition-all ${progress >= 70 ? "bg-emerald-500" : progress >= 40 ? "bg-amber-500" : "bg-red-500"}`}
-										style={{ width: `${progress}%` }}
+							{/* Project: avatar chip + name/client */}
+							<div className="flex min-w-0 items-center gap-3">
+								<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-chart-4/15">
+									<ProjectThumb
+										src={
+											project.coverPhoto?.url ??
+											project.photos?.[0]?.url ??
+											null
+										}
+										alt={project.name || ""}
 									/>
 								</div>
-
-								{/* سطر بيانات واحد لا يلتف: العميل يُقتطع والقيمة والأيام لا تنكسر */}
-								<div className="flex min-w-0 items-center gap-2 sm:gap-3 mt-1">
-									<span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+								<div className="min-w-0">
+									<p className="truncate text-base font-semibold text-card-foreground">
+										{project.name || t("projects.unnamed")}
+									</p>
+									<p className="truncate text-sm font-medium text-muted-foreground">
 										{project.clientName || t("dashboard.noClient")}
-									</span>
-									<div className="flex shrink-0 items-center gap-1">
-										<Banknote className="h-3 w-3 text-emerald-500" />
-										<span className="whitespace-nowrap text-xs font-bold text-foreground tabular-nums">
-											<Currency amount={contractValue} />
-										</span>
-									</div>
-									{days !== null && (
-										<div className="flex shrink-0 items-center gap-1">
-											<Calendar className="h-3 w-3 text-chart-4" />
-											<span className="whitespace-nowrap text-xs text-muted-foreground">
-												{days > 0
-													? `${days} ${t("dashboard.alerts.daysRemaining")}`
-													: t("dashboard.projectEnded")}
-											</span>
-										</div>
-									)}
+									</p>
 								</div>
 							</div>
 
-							{/* Arrow */}
-							<ChevronLeft className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary shrink-0 transition-colors" />
+							{/* Contract value */}
+							<p className="truncate text-base font-semibold tabular-nums text-card-foreground">
+								<Currency amount={contractValue} />
+							</p>
+
+							{/* Progress bar + trailing figure */}
+							<div className="flex items-center gap-3">
+								<div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[4px] bg-muted">
+									<div
+										className="h-full rounded-[4px] bg-chart-1"
+										style={{ width: `${Math.min(progress, 100)}%` }}
+									/>
+								</div>
+								<p className="shrink-0 text-base font-semibold tabular-nums text-card-foreground">
+									{progress}
+									<span className="text-muted-foreground">%</span>
+								</p>
+								{days !== null && days > 0 && (
+									<p className="hidden shrink-0 text-xs text-muted-foreground lg:block">
+										{days} {t("dashboard.alerts.daysRemaining")}
+									</p>
+								)}
+							</div>
 						</Link>
 					);
 				})}
@@ -211,7 +184,7 @@ export function ActiveProjectsSection({
 			{hasMore && (
 				<Link
 					href={`/app/${organizationSlug}/projects`}
-					className="text-center text-xs text-primary hover:underline mt-2 pt-2 border-t border-border/50 shrink-0"
+					className="mt-2 shrink-0 pt-2 text-center text-xs font-medium text-muted-foreground hover:text-foreground"
 				>
 					{t("dashboard.viewAll")} ({projects.length})
 				</Link>
@@ -229,8 +202,8 @@ function ProjectThumb({ src, alt }: { src: string | null; alt: string }) {
 
 	if (!src || failed) {
 		return (
-			<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-chart-4 to-chart-4">
-				<FolderOpen className="h-4 w-4 text-chart-4" />
+			<div className="flex h-full w-full items-center justify-center bg-chart-4/15">
+				<FolderOpen className="h-5 w-5 text-chart-4" />
 			</div>
 		);
 	}
@@ -241,7 +214,7 @@ function ProjectThumb({ src, alt }: { src: string | null; alt: string }) {
 			alt={alt}
 			fill
 			className="object-cover"
-			sizes="40px"
+			sizes="48px"
 			unoptimized
 			onError={() => setFailed(true)}
 		/>

@@ -384,7 +384,7 @@ export function CreateProjectForm({
 							/>
 						) : clientId && clientName ? (
 							<div className="rounded-xl border border-indigo-200/60 bg-gradient-to-br from-chart-4/15 to-indigo-50/50 dark:from-chart-4/20 dark:to-indigo-950/30 overflow-hidden">
-								<div className="flex items-center justify-between p-3 border-b border-chart-4 dark:border-chart-4">
+								<div className="flex items-center justify-between p-3 border-b border-chart-4 dark:border-chart-4/50">
 									<div className="flex items-center gap-3">
 										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-chart-4 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
 											{clientName.charAt(0).toUpperCase()}

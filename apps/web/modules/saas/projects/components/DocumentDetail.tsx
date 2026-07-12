@@ -630,7 +630,7 @@ export function DocumentDetail({
 										key={version.id}
 										className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
 											version.versionNumber === versionsData.currentVersion
-												? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
+												? "border-chart-4 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
 												: "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/30"
 										}`}
 									>

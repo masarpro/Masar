@@ -177,7 +177,7 @@ export function InvoiceItemsTable({
 									)}
 									{isColumnVisible("total") && (
 										<td className="p-2 text-center">
-											<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4 text-chart-4 dark:text-chart-4" : "text-muted-foreground"}`}>
+											<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4/30 text-chart-4 dark:text-chart-4" : "text-muted-foreground"}`}>
 												{formatCurrency(item.quantity * item.unitPrice)}
 											</div>
 										</td>

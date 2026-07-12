@@ -42,7 +42,7 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 			iconColor: "text-chart-4 dark:text-chart-4",
 			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 			hoverBg: "hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
-			borderColor: "border-chart-4 dark:border-chart-4",
+			borderColor: "border-chart-4/50 dark:border-chart-4/50",
 		},
 		{
 			id: "quotations",

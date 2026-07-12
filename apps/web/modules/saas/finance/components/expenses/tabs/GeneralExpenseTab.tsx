@@ -556,7 +556,7 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Selected account info */}
 			{selectedAccount && !isObligation && (
-				<div className="rounded-xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+				<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 					<div className="flex items-center gap-2.5 min-w-0">
 						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20 shrink-0">
 							{selectedAccount.accountType === "BANK" ? (

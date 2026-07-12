@@ -318,11 +318,11 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							))}
 						</div>
 					) : (
-						<div className="rounded-xl border border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20 p-4 text-center">
+						<div className="rounded-xl border border-chart-4/50 dark:border-chart-4/30 bg-chart-4/15 dark:bg-chart-4/20 p-4 text-center">
 							<p className="text-sm font-medium text-chart-4 dark:text-chart-4">
 								{t("company.employees.generalBudget")}
 							</p>
-							<p className="text-xs text-chart-4 dark:text-chart-4 mt-1">
+							<p className="text-xs text-chart-4/70 dark:text-chart-4/70 mt-1">
 								{t("company.employees.generalBudgetDesc")}
 							</p>
 						</div>

@@ -138,9 +138,9 @@ function MilestoneCard({
 	const [isOpen, setIsOpen] = useState(false);
 
 	const statusColor = term.isComplete
-		? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
+		? "border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
 		: isNext
-			? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
+			? "border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
 			: "border-slate-200/50 bg-slate-50/80 dark:border-slate-700/30 dark:bg-slate-900/20";
 
 	const progressColor = term.isComplete

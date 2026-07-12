@@ -61,8 +61,8 @@ export const ContractDetailsSection = React.memo(
 		const t = useTranslations();
 
 		return (
-			<div className="overflow-hidden rounded-2xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20">
-				<div className="border-b border-chart-4 p-5 dark:border-chart-4">
+			<div className="overflow-hidden rounded-2xl border border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20">
+				<div className="border-b border-chart-4/50 p-5 dark:border-chart-4/30">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
@@ -103,7 +103,7 @@ export const ContractDetailsSection = React.memo(
 										)
 									}
 									placeholder="0.00"
-									className="rounded-xl border-chart-4 bg-white pe-12 dark:border-chart-4 dark:bg-slate-900/50"
+									className="rounded-xl border-chart-4/60 bg-white pe-12 dark:border-chart-4/40 dark:bg-slate-900/50"
 								/>
 								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
 									{t("common.sar")}
@@ -121,7 +121,7 @@ export const ContractDetailsSection = React.memo(
 									onFieldChange("contractStatus", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50">
+								<SelectTrigger className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -142,7 +142,7 @@ export const ContractDetailsSection = React.memo(
 					</div>
 
 					{/* VAT toggle */}
-					<div className="rounded-xl border border-chart-4 bg-white/60 p-4 dark:border-chart-4 dark:bg-slate-900/30">
+					<div className="rounded-xl border border-chart-4/40 bg-white/60 p-4 dark:border-chart-4/30 dark:bg-slate-900/30">
 						<div className="flex items-center justify-between">
 							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
 								{t("projects.createProject.vatToggle")}
@@ -201,7 +201,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("signedDate", e.target.value)
 								}
-								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -214,7 +214,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("startDate", e.target.value)
 								}
-								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -227,7 +227,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("endDate", e.target.value)
 								}
-								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50"
 							/>
 						</div>
 					</div>
@@ -244,7 +244,7 @@ export const ContractDetailsSection = React.memo(
 									onFieldChange("paymentMethod", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50">
+								<SelectTrigger className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50">
 									<SelectValue
 										placeholder={t(
 											"projects.createProject.paymentMethod",
@@ -282,7 +282,7 @@ export const ContractDetailsSection = React.memo(
 								"projects.createProject.scopeOfWorkPlaceholder",
 							)}
 							rows={3}
-							className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
+							className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50"
 						/>
 					</div>
 
@@ -297,7 +297,7 @@ export const ContractDetailsSection = React.memo(
 								onFieldChange("contractNotes", e.target.value)
 							}
 							rows={2}
-							className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
+							className="rounded-xl border-chart-4/60 bg-white dark:border-chart-4/40 dark:bg-slate-900/50"
 						/>
 					</div>
 				</div>

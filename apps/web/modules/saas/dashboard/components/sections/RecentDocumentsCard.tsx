@@ -111,7 +111,7 @@ export function RecentDocumentsCard({
 	}
 
 	return (
-		<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4 shadow-lg shadow-black/5 flex flex-col p-3.5">
+		<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4/30 dark:border-chart-4/20 shadow-lg shadow-black/5 flex flex-col p-3.5">
 			<h3 className="text-sm font-bold text-foreground mb-2">
 				{t("recentDocs.title")}
 			</h3>

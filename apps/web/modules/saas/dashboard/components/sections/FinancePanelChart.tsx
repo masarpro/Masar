@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import {
 	type ChartConfig,
 	ChartContainer,
@@ -9,18 +8,16 @@ import {
 	ChartTooltipContent,
 } from "@ui/components/chart";
 import { useLocale, useTranslations } from "next-intl";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 interface FinancePanelChartProps {
 	financialTrend: Array<{ month: string; expenses: number; claims: number }>;
 }
 
 /**
- * The Recharts area chart of the finance panel, split into its own chunk so
- * recharts stays OUT of the org-home initial bundle (same pattern as
- * PricingPipelineChart). Loaded via next/dynamic with ssr:false from
- * FinancePanel — the parent reserves the exact box, so it fades in with zero
- * layout shift.
+ * Botly Membership bar chart (Figma 69:3172): rounded 12px bars in
+ * Brand/01 (yellow) + Brand/02 (coral), no grid, small gray month labels.
+ * Split into its own chunk so recharts stays out of the initial bundle.
  */
 export default function FinancePanelChart({
 	financialTrend,
@@ -31,11 +28,11 @@ export default function FinancePanelChart({
 	const chartConfig: ChartConfig = {
 		claims: {
 			label: t("dashboard.financial.revenueLabel"),
-			color: CHART_SEMANTIC.primary,
+			color: "var(--chart-1)",
 		},
 		expenses: {
 			label: t("dashboard.financial.expensesLabel"),
-			color: CHART_SEMANTIC.negative,
+			color: "var(--chart-2)",
 		},
 	};
 
@@ -69,39 +66,13 @@ export default function FinancePanelChart({
 	return (
 		<ChartContainer
 			config={chartConfig}
-			className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none aspect-auto"
+			className="w-full flex-1 min-h-[140px] max-h-44 sm:max-h-none aspect-auto"
 		>
-			<AreaChart
+			<BarChart
 				data={chartData}
 				margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
+				barGap={4}
 			>
-				<defs>
-					<linearGradient id="fpIncGrad" x1="0" y1="0" x2="0" y2="1">
-						<stop
-							offset="0%"
-							stopColor={CHART_SEMANTIC.primary}
-							stopOpacity={0.4}
-						/>
-						<stop
-							offset="100%"
-							stopColor={CHART_SEMANTIC.primary}
-							stopOpacity={0}
-						/>
-					</linearGradient>
-					<linearGradient id="fpExpGrad" x1="0" y1="0" x2="0" y2="1">
-						<stop
-							offset="0%"
-							stopColor={CHART_SEMANTIC.negative}
-							stopOpacity={0.15}
-						/>
-						<stop
-							offset="100%"
-							stopColor={CHART_SEMANTIC.negative}
-							stopOpacity={0}
-						/>
-					</linearGradient>
-				</defs>
-				<CartesianGrid vertical={false} />
 				<XAxis
 					dataKey="month"
 					tickLine={false}
@@ -118,23 +89,19 @@ export default function FinancePanelChart({
 						/>
 					}
 				/>
-				<Area
-					type="natural"
+				<Bar
 					dataKey="claims"
-					stroke={CHART_SEMANTIC.primary}
-					fill="url(#fpIncGrad)"
-					strokeWidth={2}
-					dot={false}
+					fill="var(--chart-1)"
+					radius={[12, 12, 12, 12]}
+					maxBarSize={28}
 				/>
-				<Area
-					type="natural"
+				<Bar
 					dataKey="expenses"
-					stroke={CHART_SEMANTIC.negative}
-					fill="url(#fpExpGrad)"
-					strokeWidth={1.5}
-					dot={false}
+					fill="var(--chart-2)"
+					radius={[12, 12, 12, 12]}
+					maxBarSize={28}
 				/>
-			</AreaChart>
+			</BarChart>
 		</ChartContainer>
 	);
 }

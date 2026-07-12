@@ -43,7 +43,7 @@ export function PaymentsSummaryCards({
 			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
 			iconColor: "text-chart-4 dark:text-chart-4",
 			textColor: "text-chart-4 dark:text-chart-4",
-			labelColor: "text-chart-4 dark:text-chart-4",
+			labelColor: "text-chart-4/80 dark:text-chart-4/80",
 		},
 		{
 			title: t("projectPayments.remaining"),

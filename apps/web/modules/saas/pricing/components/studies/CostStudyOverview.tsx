@@ -269,7 +269,7 @@ export function CostStudyOverview({
 
 			{/* Linked Lead Card */}
 			{(study as any).lead && (
-				<Card className="border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20">
+				<Card className="border-chart-4 dark:border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">

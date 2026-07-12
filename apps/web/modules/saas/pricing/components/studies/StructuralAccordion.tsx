@@ -224,7 +224,7 @@ export function StructuralAccordion({
 								"border-green-500/50 bg-green-50/30 dark:bg-green-950/20",
 							hasItems &&
 								!isSaved &&
-								"border-chart-4 bg-chart-4/15 dark:bg-chart-4/20",
+								"border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20",
 							!hasItems && !isSaved && "border-border",
 						)}
 					>

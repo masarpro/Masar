@@ -272,7 +272,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				<Button
 					variant="outline"
 					onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-chart-4 dark:border-chart-4 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
+					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-chart-4/50 dark:border-chart-4/30 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
 				>
 					<Send className="me-1 h-4 w-4" />
 					{t("company.expenses.postToFinance")}
@@ -327,7 +327,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					<Button
 						variant="outline"
 						onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-						className="rounded-xl border-chart-4 dark:border-chart-4 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
+						className="rounded-xl border-chart-4/50 dark:border-chart-4/30 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
 					>
 						<Send className="ms-2 h-4 w-4" />
 						{t("company.expenses.postToFinance")}

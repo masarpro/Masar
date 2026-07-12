@@ -227,7 +227,7 @@ export function PayExpenseDialog({
 
 						{/* Selected account balance preview */}
 						{selectedAccount && (
-							<div className="rounded-xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20 px-4 py-2.5 flex items-center justify-between">
+							<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-4 py-2.5 flex items-center justify-between">
 								<div className="flex items-center gap-2.5">
 									<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
 										{selectedAccount.accountType === "BANK" ? (

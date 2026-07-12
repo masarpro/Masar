@@ -54,7 +54,7 @@ export function InvoiceClientCard({
 	return (
 		<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
 			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-				<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4 flex items-center justify-center">
+				<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
 					<User className="h-[15px] w-[15px] text-chart-4" />
 				</div>
 				<span className="text-sm font-semibold text-foreground">{t("finance.invoices.clientInfo")}</span>

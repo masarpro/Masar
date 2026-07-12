@@ -264,7 +264,7 @@ export function ProjectPaymentForm({
 
 			{/* Term Info Card */}
 			{selectedTerm && (
-				<div className="overflow-hidden rounded-2xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20">
+				<div className="overflow-hidden rounded-2xl border border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20">
 					<div className="p-5">
 						<div className="mb-3 flex items-center gap-3">
 							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">

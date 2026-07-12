@@ -139,7 +139,7 @@ export function SlabsSection({
 						key={floor.id}
 						className={`border rounded-lg overflow-hidden transition-all ${
 							hasItems
-								? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
+								? "border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
 						} ${
 							floor.isRepeated && hasItems

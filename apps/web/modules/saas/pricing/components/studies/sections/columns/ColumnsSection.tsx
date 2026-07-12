@@ -172,7 +172,7 @@ export function ColumnsSection({
 						key={floor.id}
 						className={`border rounded-lg overflow-hidden transition-all ${
 							hasItems
-								? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
+								? "border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
 						} ${floor.isRepeated && hasItems ? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10" : ""}`}
 					>

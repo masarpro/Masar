@@ -450,8 +450,8 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 	return (
 		<div className="space-y-6">
 			{/* Contract Details */}
-			<div className="overflow-hidden rounded-2xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20">
-				<div className="border-b border-chart-4 p-5 dark:border-chart-4">
+			<div className="overflow-hidden rounded-2xl border border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20">
+				<div className="border-b border-chart-4/50 p-5 dark:border-chart-4/30">
 					<div className="flex items-center justify-between">
 						<h3 className="text-lg font-medium text-chart-4 dark:text-chart-4">
 							{t("projects.createProject.contractInfo")}
@@ -530,7 +530,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 				</div>
 
 				{contract.scopeOfWork && (
-					<div className="border-t border-chart-4 p-5 dark:border-chart-4">
+					<div className="border-t border-chart-4/50 p-5 dark:border-chart-4/30">
 						<p className="mb-1 text-xs text-slate-500">
 							{t("projects.createProject.scopeOfWork")}
 						</p>
