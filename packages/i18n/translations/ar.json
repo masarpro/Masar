@@ -611,7 +611,6 @@
       "unknown": "عام"
     },
     "shortcut": "Ctrl+K",
-    "hint": "اسأل مسار عن مشاريعك",
     "expand": "تكبير",
     "collapse": "تصغير",
     "copy": "نسخ",
@@ -1914,14 +1913,7 @@
       "dueOn": "الاستحقاق: {date}",
       "remaining": "المتبقي",
       "inProject": "مشروع: {project}",
-      "claimsDesc": "مطالبات مقاولي باطن بانتظار المراجعة والاعتماد",
-      "overdueInvoiceItem": "فاتورة متأخرة",
-      "overdueBy": "متأخر {days} يوم",
-      "dueInDays": "يستحق خلال {days} يوم",
-      "dueToday": "يستحق اليوم",
-      "viewAction": "عرض",
-      "pendingClaimsCount": "{count} مطالبات مقاولي باطن بانتظار الاعتماد",
-      "moreAlerts": "+{count} تنبيهات أخرى"
+      "claimsDesc": "مطالبات مقاولي باطن بانتظار المراجعة والاعتماد"
     },
     "financial": {
       "title": "الملخص المالي",
@@ -1954,9 +1946,7 @@
       "goToFinance": "المالية",
       "income": "المقبوضات",
       "expenses": "المصروفات",
-      "net": "صافي",
-      "netTitle": "صافي التدفق النقدي خلال آخر ٦ أشهر",
-      "empty": "لا توجد حركات نقدية خلال آخر ٦ أشهر"
+      "net": "صافي"
     },
     "expenseBreakdown": {
       "title": "مصاريف المنشأة",
@@ -2034,21 +2024,6 @@
     "financePanel": {
       "cashFlowTitle": "التدفق النقدي"
     },
-    "header": {
-      "greeting": "مرحباً، هذه أهم مستجدات منشأتك اليوم",
-      "lastUpdated": "آخر تحديث: {time}"
-    },
-    "projectCard": {
-      "inProgress": "قيد التنفيذ",
-      "onHold": "متوقف مؤقتاً",
-      "delayed": "متأخر {days} يوم",
-      "progressLabel": "نسبة الإنجاز",
-      "lastUpdate": "آخر تحديث: {date}"
-    },
-    "error": {
-      "title": "تعذر تحميل بيانات هذا القسم",
-      "retry": "إعادة المحاولة"
-    },
     "didYouKnow": {
       "title": "هل تعلم؟",
       "tryIt": "جرّبها الآن",
@@ -2086,7 +2061,7 @@
       }
     },
     "recentDocs": {
-      "title": "آخر العمليات",
+      "title": "آخر الملفات",
       "invoice": "فاتورة",
       "quotation": "عرض سعر",
       "study": "دراسة كميات",

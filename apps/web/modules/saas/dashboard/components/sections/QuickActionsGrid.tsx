@@ -1,9 +1,6 @@
 "use client";
 
-import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
-import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
-import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
-import { usePermission } from "@saas/permissions/hooks/use-permission";
+import { useState } from "react";
 import {
 	Calculator,
 	FileText,
@@ -15,14 +12,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
+import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
+import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 
 interface QuickActionsGridProps {
 	organizationSlug: string;
 }
-
-const focusRing =
-	"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1";
 
 export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const t = useTranslations();
@@ -42,32 +39,32 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		leads: isOwner || can("pricing", "leads"),
 	};
 
-	// الترتيب حسب رحلة عمل المقاول (من اليمين لليسار في RTL):
-	// عملاء محتملون ← دراسات كميات ← عروض أسعار ← فواتير ← مقبوضات ← مصروفات
 	const quickActions = [
 		{
-			icon: Users,
-			visible: allowed.leads,
-			sectionLabel: t("dashboard.actions.leads"),
-			actionLabel: t("dashboard.actions.newLead"),
-			browsePath: `/app/${organizationSlug}/pricing/leads`,
-			createPath: `/app/${organizationSlug}/pricing/leads/new`,
-			iconColor: "text-orange-500 dark:text-orange-400",
-			bgColor: "bg-orange-50/80 dark:bg-orange-950/30",
-			hoverBg: "hover:bg-orange-100 dark:hover:bg-orange-900/50",
-			borderColor: "border-orange-200/50 dark:border-orange-800/50",
+			icon: TrendingDown,
+			visible: allowed.expenses,
+			sectionLabel: t("dashboard.actions.expenses"),
+			actionLabel: t("dashboard.actions.addExpense"),
+			browsePath: `/app/${organizationSlug}/finance/expenses`,
+			createPath: "",
+			iconColor: "text-rose-500 dark:text-rose-400",
+			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
+			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
+			borderColor: "border-rose-200/50 dark:border-rose-800/50",
+			onCreateClick: () => setExpenseDialogOpen(true),
 		},
 		{
-			icon: Calculator,
-			visible: allowed.studies,
-			sectionLabel: t("dashboard.actions.quantityStudies"),
-			actionLabel: t("dashboard.actions.calculateQuantities"),
-			browsePath: `/app/${organizationSlug}/pricing/studies`,
-			createPath: `/app/${organizationSlug}/pricing/studies/new`,
-			iconColor: "text-violet-500 dark:text-violet-400",
-			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
-			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",
-			borderColor: "border-violet-200/50 dark:border-violet-800/50",
+			icon: TrendingUp,
+			visible: allowed.payments,
+			sectionLabel: t("dashboard.actions.payments"),
+			actionLabel: t("dashboard.actions.addPayment"),
+			browsePath: `/app/${organizationSlug}/finance/payments`,
+			createPath: "",
+			iconColor: "text-emerald-500 dark:text-emerald-400",
+			bgColor: "bg-emerald-50/80 dark:bg-emerald-950/30",
+			hoverBg: "hover:bg-emerald-100 dark:hover:bg-emerald-900/50",
+			borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
+			onCreateClick: () => setPaymentDialogOpen(true),
 		},
 		{
 			icon: FileText,
@@ -94,30 +91,28 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			borderColor: "border-sky-200/50 dark:border-sky-800/50",
 		},
 		{
-			icon: TrendingUp,
-			visible: allowed.payments,
-			sectionLabel: t("dashboard.actions.payments"),
-			actionLabel: t("dashboard.actions.addPayment"),
-			browsePath: `/app/${organizationSlug}/finance/payments`,
-			createPath: "",
-			iconColor: "text-emerald-500 dark:text-emerald-400",
-			bgColor: "bg-emerald-50/80 dark:bg-emerald-950/30",
-			hoverBg: "hover:bg-emerald-100 dark:hover:bg-emerald-900/50",
-			borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
-			onCreateClick: () => setPaymentDialogOpen(true),
+			icon: Calculator,
+			visible: allowed.studies,
+			sectionLabel: t("dashboard.actions.quantityStudies"),
+			actionLabel: t("dashboard.actions.calculateQuantities"),
+			browsePath: `/app/${organizationSlug}/pricing/studies`,
+			createPath: `/app/${organizationSlug}/pricing/studies/new`,
+			iconColor: "text-violet-500 dark:text-violet-400",
+			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
+			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",
+			borderColor: "border-violet-200/50 dark:border-violet-800/50",
 		},
 		{
-			icon: TrendingDown,
-			visible: allowed.expenses,
-			sectionLabel: t("dashboard.actions.expenses"),
-			actionLabel: t("dashboard.actions.addExpense"),
-			browsePath: `/app/${organizationSlug}/finance/expenses`,
-			createPath: "",
-			iconColor: "text-rose-500 dark:text-rose-400",
-			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
-			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
-			borderColor: "border-rose-200/50 dark:border-rose-800/50",
-			onCreateClick: () => setExpenseDialogOpen(true),
+			icon: Users,
+			visible: allowed.leads,
+			sectionLabel: t("dashboard.actions.leads"),
+			actionLabel: t("dashboard.actions.newLead"),
+			browsePath: `/app/${organizationSlug}/pricing/leads`,
+			createPath: `/app/${organizationSlug}/pricing/leads/new`,
+			iconColor: "text-orange-500 dark:text-orange-400",
+			bgColor: "bg-orange-50/80 dark:bg-orange-950/30",
+			hoverBg: "hover:bg-orange-100 dark:hover:bg-orange-900/50",
+			borderColor: "border-orange-200/50 dark:border-orange-800/50",
 		},
 	];
 
@@ -129,6 +124,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 
 	return (
 		<>
+			{/* الجوال: شبكة مضغوطة — أيقونة + عنوان صغير لكل قسم */}
 			{/* الجوال: صف كامل العرض لكل إجراء — نفس نمط صفوف المالية */}
 			<div className="flex flex-col gap-2 sm:hidden">
 				{visibleActions.map((action, i) => {
@@ -140,14 +136,14 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 						>
 							<Link
 								href={action.browsePath}
-								className={`flex min-w-0 flex-1 items-center gap-3 rounded-lg ${focusRing}`}
+								className="flex min-w-0 flex-1 items-center gap-3"
 							>
 								<div
 									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
 								>
 									<Icon className="h-5 w-5" />
 								</div>
-								<span className="truncate text-sm font-medium text-foreground/90">
+								<span className="truncate text-sm font-medium text-foreground/80">
 									{action.sectionLabel}
 								</span>
 							</Link>
@@ -156,7 +152,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 									type="button"
 									aria-label={action.actionLabel}
 									onClick={action.onCreateClick}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor} ${focusRing}`}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
 								>
 									<Plus className="h-5 w-5" />
 								</button>
@@ -164,7 +160,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 								<Link
 									href={action.createPath}
 									aria-label={action.actionLabel}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor} ${focusRing}`}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
 								>
 									<Plus className="h-5 w-5" />
 								</Link>
@@ -174,56 +170,45 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 				})}
 			</div>
 
-			{/* الديسكتوب: بطاقات موحّدة الارتفاع — كامل الجزء العلوي قابل للنقر */}
+			{/* الديسكتوب كما هو */}
 			<div className="hidden gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-6">
 				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
 					return (
 						<div
 							key={i}
-							className="flex h-full flex-col backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
+							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
 							style={{ animationDelay: `${200 + i * 30}ms` }}
 						>
 							<Link
 								href={action.browsePath}
-								className={`flex flex-1 flex-col items-center justify-start gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor} ${focusRing}`}
+								className={`flex flex-col items-center gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor}`}
 							>
-								<div
-									className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}
-								>
+								<div className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}>
 									<Icon className="h-6 w-6" />
 								</div>
-								<span className="text-center text-sm font-medium text-foreground/90">
+								<span className="text-center text-sm font-medium text-foreground/80">
 									{action.sectionLabel}
 								</span>
 							</Link>
-							{"onCreateClick" in action &&
-							action.onCreateClick ? (
+							{"onCreateClick" in action && action.onCreateClick ? (
 								<button
 									type="button"
 									onClick={action.onCreateClick}
-									className={`flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors ${focusRing}`}
+									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
 								>
-									<Plus
-										className={`h-4 w-4 ${action.iconColor}`}
-									/>
-									<span
-										className={`text-xs font-medium ${action.iconColor}`}
-									>
+									<Plus className={`h-4 w-4 ${action.iconColor}`} />
+									<span className={`text-xs font-medium ${action.iconColor}`}>
 										{action.actionLabel}
 									</span>
 								</button>
 							) : (
 								<Link
 									href={action.createPath}
-									className={`flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors ${focusRing}`}
+									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
 								>
-									<Plus
-										className={`h-4 w-4 ${action.iconColor}`}
-									/>
-									<span
-										className={`text-xs font-medium ${action.iconColor}`}
-									>
+									<Plus className={`h-4 w-4 ${action.iconColor}`} />
+									<span className={`text-xs font-medium ${action.iconColor}`}>
 										{action.actionLabel}
 									</span>
 								</Link>
