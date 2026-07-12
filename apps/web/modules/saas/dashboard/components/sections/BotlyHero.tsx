@@ -8,9 +8,10 @@ import { useTranslations } from "next-intl";
 
 /**
  * Botly hero card (Figma: Unlock pro insights + Dashboard/Light 120:11546):
- * pastel-gradient 32px-radius card, bold title, black pill CTA, and a white
- * inner strip of large stats. Gradient is derived from Botly Brand tints —
- * the Figma gradient variable serializes empty via MCP (documented).
+ * pastel-gradient card, bold title, Botly primary button (48px / 12px
+ * radius, Figma 43:12), and an inner surface strip of large stats.
+ * Gradient derived from Botly Brand tints — the Figma gradient variable
+ * serializes empty via MCP (documented).
  */
 export function BotlyHero({
 	organizationSlug,
@@ -52,22 +53,22 @@ export function BotlyHero({
 	}
 
 	return (
-		<div className="relative flex flex-col justify-between gap-6 overflow-hidden rounded-[var(--botly-radius-card)] bg-gradient-to-bl from-chart-1/25 via-chart-3/15 to-chart-2/20 p-6 sm:p-8 dark:from-chart-1/10 dark:via-transparent dark:to-chart-2/10">
-			<div>
-				<h2 className="max-w-md text-3xl font-bold leading-snug text-foreground sm:text-4xl">
+		<div className="relative flex h-full min-h-0 flex-col justify-between gap-4 overflow-hidden rounded-3xl bg-gradient-to-bl from-chart-1/25 via-chart-3/15 to-chart-2/20 p-5 sm:p-6 dark:from-chart-1/10 dark:via-transparent dark:to-chart-2/10">
+			<div className="flex min-h-0 flex-col items-start gap-4">
+				<h2 className="max-w-xl text-2xl font-bold leading-snug text-foreground xl:text-3xl">
 					{t("dashboard.welcome.greeting", { name: orgName })}
 				</h2>
-				<Button asChild variant="primary" size="lg" className="mt-6 w-fit rounded-full">
+				<Button asChild variant="primary" size="lg">
 					<Link href={`/app/${organizationSlug}/finance`}>
 						{t("dashboard.cashFlow.goToFinance")}
-						<ChevronLeft className="size-5 rtl-flip" />
+						<ChevronLeft className="rtl-flip" />
 					</Link>
 				</Button>
 			</div>
 
 			{stats.length > 0 && (
 				<div
-					className="grid gap-4 rounded-[20px] bg-card p-5 sm:p-6"
+					className="grid shrink-0 gap-3 rounded-2xl bg-card p-4 sm:p-5"
 					style={{
 						gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
 					}}
@@ -77,7 +78,7 @@ export function BotlyHero({
 							<p className="truncate text-xs text-muted-foreground sm:text-sm">
 								{s.label}
 							</p>
-							<p className="mt-1 truncate text-2xl font-bold tabular-nums text-card-foreground sm:text-4xl">
+							<p className="mt-0.5 truncate text-xl font-bold tabular-nums text-card-foreground xl:text-3xl">
 								{s.value}
 							</p>
 						</div>

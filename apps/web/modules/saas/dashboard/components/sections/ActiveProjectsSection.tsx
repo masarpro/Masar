@@ -96,10 +96,10 @@ export function ActiveProjectsSection({
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className="flex flex-col overflow-hidden rounded-[var(--botly-radius-card)] border-2 bg-card p-6">
+		<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border-2 bg-card p-5">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between">
-				<p className="text-xl font-semibold leading-6 text-card-foreground">
+				<p className="text-base font-semibold text-card-foreground">
 					{t("dashboard.activeProjects")}
 				</p>
 				<Link
@@ -112,7 +112,7 @@ export function ActiveProjectsSection({
 			</div>
 
 			{/* Column labels (Botly table title row) */}
-			<div className="mt-4 hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)] gap-3 border-b-2 pb-3 text-sm font-medium text-muted-foreground sm:grid">
+			<div className="mt-3 hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)] gap-3 border-b-2 pb-2 text-sm font-medium text-muted-foreground sm:grid">
 				<span>{t("dashboard.activeProjects")}</span>
 				<span>{t("projects.contractBar.contractValue")}</span>
 				<span>{t("projects.overview.progress")}</span>
@@ -129,11 +129,11 @@ export function ActiveProjectsSection({
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group grid grid-cols-1 items-center gap-3 border-b-2 py-4 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
+							className="group grid grid-cols-1 items-center gap-3 border-b-2 py-3 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
 						>
 							{/* Project: avatar chip + name/client */}
 							<div className="flex min-w-0 items-center gap-3">
-								<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-chart-4/15">
+								<div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-chart-4/15 xl:h-11 xl:w-11">
 									<ProjectThumb
 										src={
 											project.coverPhoto?.url ??

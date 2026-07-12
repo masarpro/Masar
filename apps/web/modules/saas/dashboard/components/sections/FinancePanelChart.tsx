@@ -14,6 +14,11 @@ interface FinancePanelChartProps {
 	financialTrend: Array<{ month: string; expenses: number; claims: number }>;
 }
 
+const compactTick = new Intl.NumberFormat("en-US", {
+	notation: "compact",
+	maximumFractionDigits: 0,
+});
+
 /**
  * Botly Membership bar chart (Figma 69:3172): rounded 12px bars in
  * Brand/01 (yellow) + Brand/02 (coral), no grid, small gray month labels.
@@ -66,12 +71,12 @@ export default function FinancePanelChart({
 	return (
 		<ChartContainer
 			config={chartConfig}
-			className="w-full flex-1 min-h-[140px] max-h-44 sm:max-h-none aspect-auto"
+			className="w-full flex-1 min-h-[96px] aspect-auto"
 		>
 			<BarChart
 				data={chartData}
-				margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
-				barGap={4}
+				margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
+				barGap={3}
 			>
 				<XAxis
 					dataKey="month"
@@ -81,7 +86,16 @@ export default function FinancePanelChart({
 					tickMargin={6}
 					tickFormatter={formatMonth}
 				/>
-				<YAxis hide />
+				{/* Botly Membership: axis figures beside the bars (1000/500/0) */}
+				<YAxis
+					orientation="right"
+					tickLine={false}
+					axisLine={false}
+					fontSize={10}
+					width={38}
+					tickCount={3}
+					tickFormatter={(v: number) => compactTick.format(v)}
+				/>
 				<ChartTooltip
 					content={
 						<ChartTooltipContent
@@ -92,14 +106,14 @@ export default function FinancePanelChart({
 				<Bar
 					dataKey="claims"
 					fill="var(--chart-1)"
-					radius={[12, 12, 12, 12]}
-					maxBarSize={28}
+					radius={[10, 10, 10, 10]}
+					maxBarSize={22}
 				/>
 				<Bar
 					dataKey="expenses"
 					fill="var(--chart-2)"
-					radius={[12, 12, 12, 12]}
-					maxBarSize={28}
+					radius={[10, 10, 10, 10]}
+					maxBarSize={22}
 				/>
 			</BarChart>
 		</ChartContainer>

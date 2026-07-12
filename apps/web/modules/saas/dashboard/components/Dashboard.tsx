@@ -12,12 +12,7 @@ import { useTranslations } from "next-intl";
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
 import { BotlyHero } from "./sections/BotlyHero";
 import { ProjectsDonutCard } from "./sections/ProjectsDonutCard";
-import { QuickActionsGrid } from "./sections/QuickActionsGrid";
-import { AlertsSection } from "./sections/AlertsSection";
-import { OperationalSection } from "./sections/OperationalSection";
-import { DidYouKnowCard } from "./sections/DidYouKnowCard";
 import { FinancePanel } from "./sections/FinancePanel";
-import { RecentDocumentsCard } from "./sections/RecentDocumentsCard";
 import { WelcomeSection } from "./sections/WelcomeSection";
 
 // FinancePanel is imported statically (not next/dynamic with ssr:false). Its
@@ -102,17 +97,23 @@ export function Dashboard({
 		<div className="h-[220px] animate-pulse rounded-lg bg-muted" />
 	);
 
+	// Botly Dashboard/Light (Figma 120:11546) is a SINGLE viewport — hero (2/3)
+	// + widget stack (1/3) on top, one table below, nothing else. All previous
+	// below-the-fold sections (quick actions, alerts, operational, docs, tips)
+	// are intentionally not rendered here anymore (components kept on disk).
 	return (
-		<div className="flex flex-col gap-3 sm:gap-5 p-3 pt-2 sm:p-4 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
-			{/* Row 0: welcome fallback when both main panels are hidden */}
+		<div className="flex flex-col gap-4 p-3 sm:p-4 xl:grid xl:h-[calc(100dvh-10.5rem)] xl:min-h-[560px] xl:grid-cols-3 xl:grid-rows-[minmax(0,58fr)_minmax(0,42fr)] xl:overflow-hidden xl:p-0">
+			{/* Fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
-				<WelcomeSection organizationSlug={organizationSlug} />
+				<div className="xl:col-span-3 xl:row-span-2">
+					<WelcomeSection organizationSlug={organizationSlug} />
+				</div>
 			)}
 
-			{/* Row 1 — Botly Dashboard/Light 120:11546: hero (2/3) + widget stack (1/3) */}
 			{(showFinance || showProjects) && (
-				<div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
-					<div className="lg:col-span-2">
+				<>
+					{/* Hero — 2/3 of row 1 */}
+					<div className="min-h-0 xl:col-span-2">
 						{finLoading || statsLoading ? (
 							sectionSkeleton
 						) : (
@@ -137,7 +138,9 @@ export function Dashboard({
 							/>
 						)}
 					</div>
-					<div className="flex flex-col gap-3 sm:gap-6">
+
+					{/* Widget stack — 1/3 of row 1 */}
+					<div className="flex min-h-0 flex-col gap-4">
 						{showFinance &&
 							(finLoading || statsLoading ? (
 								cardSkeleton
@@ -160,73 +163,22 @@ export function Dashboard({
 								/>
 							))}
 					</div>
-				</div>
+
+					{/* Projects table — full-width row 2 (Botly Earnings) */}
+					{showProjects && (
+						<div className="min-h-0 xl:col-span-3">
+							{projLoading ? (
+								sectionSkeleton
+							) : (
+								<ActiveProjectsSection
+									projects={projects}
+									organizationSlug={organizationSlug}
+								/>
+							)}
+						</div>
+					)}
+				</>
 			)}
-
-			{/* Row 1.5 — Botly Earnings table: active projects */}
-			{showProjects &&
-				(projLoading ? (
-					sectionSkeleton
-				) : (
-					<ActiveProjectsSection
-						projects={projects}
-						organizationSlug={organizationSlug}
-					/>
-				))}
-
-			{/* Row 2: Quick Actions — على الجوال تظهر أسفل المشاريع النشطة كصفوف */}
-			<QuickActionsGrid organizationSlug={organizationSlug} />
-
-			<hr className="hidden border-border/50 sm:block" />
-
-			{/* Row 3: Operational + Recent Docs + (Alerts + DidYouKnow stacked) */}
-			<div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
-				{showProjects &&
-					(statsLoading ? (
-						cardSkeleton
-					) : (
-						<OperationalSection
-							activeProjects={stats?.projects?.active ?? 0}
-							completedProjects={stats?.projects?.completed ?? 0}
-							onHoldProjects={stats?.projects?.onHold ?? 0}
-							openIssues={stats?.milestones?.overdue ?? 0}
-							leadsPipeline={dashboardData?.leadsPipeline ?? {}}
-						/>
-					))}
-				{showProjects && (
-					<RecentDocumentsCard
-						organizationId={organizationId}
-						organizationSlug={organizationSlug}
-					/>
-				)}
-				<div className="flex flex-col gap-3 lg:h-full">
-					{(showFinance || showProjects) &&
-						(statsLoading ? (
-							cardSkeleton
-						) : (
-							<AlertsSection
-								overdueInvoices={
-									showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
-								}
-								overdueMilestones={
-									showProjects
-										? (dashboardData?.overdue?.milestones ?? [])
-										: []
-								}
-								pendingSubcontractClaims={
-									showFinance
-										? (dashboardData?.pendingSubcontractClaims ?? 0)
-										: 0
-								}
-								upcomingPayments={
-									showFinance ? (dashboardData?.upcoming ?? []) : []
-								}
-								organizationSlug={organizationSlug}
-							/>
-						))}
-					<DidYouKnowCard organizationSlug={organizationSlug} />
-				</div>
-			</div>
 		</div>
 	);
 }

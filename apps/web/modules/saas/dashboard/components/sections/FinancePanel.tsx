@@ -3,16 +3,15 @@
 import { ChevronLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 // The chart (and with it the whole recharts library) loads as its own chunk
 // AFTER the panel frame has painted — recharts stays out of the org-home
-// initial bundle. The loading placeholder reserves the chart's exact box.
+// initial bundle. The loading placeholder reserves the chart's box.
 const FinancePanelChart = dynamic(() => import("./FinancePanelChart"), {
 	ssr: false,
-	loading: () => (
-		<div className="w-full flex-1 min-h-[140px] max-h-44 sm:max-h-none" />
-	),
+	loading: () => <div className="w-full flex-1 min-h-[96px]" />,
 });
 
 interface FinancePanelProps {
@@ -22,10 +21,15 @@ interface FinancePanelProps {
 	organizationSlug: string;
 }
 
+const compact = new Intl.NumberFormat("en-US", {
+	notation: "compact",
+	maximumFractionDigits: 1,
+});
+
 /**
- * Botly Membership widget (Figma 69:3172): white 32px card, title, rounded
- * bar chart in Brand/01+02. Balances moved to the BotlyHero strip — props
- * kept for API stability.
+ * Botly Membership widget (Figma 69:3172): surface card, title, rounded bar
+ * chart in Brand/01+02 with Y-axis figures, plus 6-month totals in the
+ * header so the chart reads as real numbers at a glance.
  */
 export function FinancePanel({
 	financialTrend,
@@ -33,19 +37,50 @@ export function FinancePanel({
 }: FinancePanelProps) {
 	const t = useTranslations();
 
+	const totals = useMemo(() => {
+		const claims = financialTrend.reduce((s, m) => s + Number(m.claims || 0), 0);
+		const expenses = financialTrend.reduce(
+			(s, m) => s + Number(m.expenses || 0),
+			0,
+		);
+		return { claims, expenses };
+	}, [financialTrend]);
+
 	return (
-		<div className="flex flex-1 flex-col gap-4 rounded-[var(--botly-radius-card)] border-2 bg-card p-6 overflow-hidden">
-			<div className="flex shrink-0 items-center justify-between">
-				<p className="text-xl font-semibold leading-6 text-card-foreground">
+		<div className="flex h-full min-h-0 flex-1 flex-col gap-3 overflow-hidden rounded-3xl border-2 bg-card p-5">
+			<div className="flex shrink-0 items-center justify-between gap-2">
+				<p className="truncate text-base font-semibold text-card-foreground">
 					{t("dashboard.financePanel.cashFlowTitle")}
 				</p>
 				<Link
 					href={`/app/${organizationSlug}/finance`}
-					className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+					className="flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+					aria-label={t("dashboard.cashFlow.goToFinance")}
 				>
-					<span>{t("dashboard.cashFlow.goToFinance")}</span>
-					<ChevronLeft className="h-3 w-3 rtl-flip" />
+					<ChevronLeft className="h-3.5 w-3.5 rtl-flip" />
 				</Link>
+			</div>
+
+			{/* 6-month totals — the "useful numbers" beside the bars */}
+			<div className="flex shrink-0 items-center gap-4 text-xs">
+				<span className="flex items-center gap-1.5">
+					<i className="size-2.5 rounded-[3px] bg-chart-1" />
+					<span className="text-muted-foreground">
+						{t("dashboard.financial.revenueLabel")}
+					</span>
+					<b className="font-semibold tabular-nums text-card-foreground" dir="ltr">
+						{compact.format(totals.claims)}
+					</b>
+				</span>
+				<span className="flex items-center gap-1.5">
+					<i className="size-2.5 rounded-[3px] bg-chart-2" />
+					<span className="text-muted-foreground">
+						{t("dashboard.financial.expensesLabel")}
+					</span>
+					<b className="font-semibold tabular-nums text-card-foreground" dir="ltr">
+						{compact.format(totals.expenses)}
+					</b>
+				</span>
 			</div>
 
 			<div className="flex min-h-0 flex-1 flex-col">
