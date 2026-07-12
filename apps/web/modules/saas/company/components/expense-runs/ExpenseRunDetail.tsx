@@ -51,13 +51,13 @@ interface ExpenseRunDetailProps {
 
 const STATUS_STYLES: Record<string, string> = {
 	DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
-	POSTED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
+	POSTED: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
 };
 
 const FINANCE_STATUS_STYLES: Record<string, string> = {
 	PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-	COMPLETED: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+	COMPLETED: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
 };
 
@@ -232,8 +232,8 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 			{/* Header Card */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-						<FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<FileText className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.expenseRuns.runDetail")}
@@ -288,7 +288,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										{t("company.expenseRuns.populate")}
 									</Button>
 									<Button
-										className="rounded-xl bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+										className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 										onClick={() => setShowPostDialog(true)}
 										disabled={postMutation.isPending}
 									>
@@ -340,14 +340,14 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
 					<div className="flex items-center justify-between mb-2 sm:mb-3">
-						<div className="p-1.5 sm:p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+						<div className="p-1.5 sm:p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.expenseRuns.itemCount")}
 					</p>
-					<p className="truncate text-base sm:text-lg font-bold text-blue-700 dark:text-blue-300">
+					<p className="truncate text-base sm:text-lg font-bold text-chart-4 dark:text-chart-4">
 						{items.length}
 					</p>
 				</div>
@@ -432,7 +432,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-blue-100 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-chart-4/15 hover:text-chart-4 dark:text-slate-400 dark:hover:bg-chart-4/20 dark:hover:text-chart-4"
 													onClick={() => setEditItem(item)}
 													title={t("company.common.edit")}
 												>
@@ -488,7 +488,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 						<AlertDialogAction
 							onClick={() => postMutation.mutate()}
 							disabled={postMutation.isPending}
-							className="rounded-xl bg-blue-600 hover:bg-blue-700"
+							className="rounded-xl bg-chart-4 hover:bg-chart-4"
 						>
 							{postMutation.isPending ? (
 								<>

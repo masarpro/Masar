@@ -27,7 +27,7 @@ export const SECTION_COLORS: Record<string, string> = {
 };
 
 export const SECTION_BG_COLORS: Record<string, string> = {
-	STRUCTURAL: "bg-blue-50 border-r-blue-500",
+	STRUCTURAL: "bg-chart-4/15 border-r-chart-4",
 	FINISHING: "bg-amber-50 border-r-amber-500",
 	MEP: "bg-emerald-50 border-r-emerald-500",
 	LABOR: "bg-purple-50 border-r-purple-500",

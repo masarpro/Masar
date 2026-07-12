@@ -47,8 +47,8 @@ export function FinancePanel({
 					className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-xl shadow-sm p-3 hover:shadow-md transition-all"
 				>
 					<div className="flex items-center gap-2 mb-1.5">
-						<div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+						<div className="p-1.5 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Building2 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
 						<span className="text-xs font-medium text-slate-500 dark:text-slate-400">
 							{t("dashboard.kpi.bankBalance")}

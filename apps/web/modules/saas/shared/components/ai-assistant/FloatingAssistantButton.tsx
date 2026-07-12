@@ -22,7 +22,7 @@ export function FloatingAssistantButton() {
       aria-haspopup="dialog"
       title={`${t("title")} (${t("shortcut")})`}
       className={cn(
-        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
+        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-chart-4 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
       )}
     >
       <span

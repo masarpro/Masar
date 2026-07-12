@@ -38,7 +38,7 @@ export function PaymentsClaimsHub({
 					<Button
 						asChild
 						size="sm"
-						className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+						className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 					>
 						<Link href={`${basePath}/finance/payments/new`}>
 							<Plus className="me-1.5 h-4 w-4" />

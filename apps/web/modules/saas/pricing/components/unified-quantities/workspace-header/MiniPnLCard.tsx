@@ -51,7 +51,7 @@ export function MiniPnLCard({
 
 			<Card className="p-4">
 				<div className="flex items-start gap-3">
-					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
+					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 						<DollarSign className="h-5 w-5" />
 					</div>
 					<div className="min-w-0 flex-1">

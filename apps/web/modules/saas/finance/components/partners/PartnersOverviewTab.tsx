@@ -126,8 +126,8 @@ export function PartnersOverviewTab({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-xl shrink-0">
-									<Wallet className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+								<div className="p-2 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl shrink-0">
+									<Wallet className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 								</div>
 								<div className="min-w-0">
 									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">

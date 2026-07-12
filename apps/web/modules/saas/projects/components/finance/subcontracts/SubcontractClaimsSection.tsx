@@ -12,7 +12,7 @@ import { Button } from "@ui/components/button";
 import { ClipboardCheck, Plus, Printer, Eye, Loader2 } from "lucide-react";
 
 const CLAIM_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
-	INTERIM: { bg: "bg-sky-50", text: "text-sky-700" },
+	INTERIM: { bg: "bg-chart-4/15", text: "text-chart-4" },
 	FINAL: { bg: "bg-purple-50", text: "text-purple-700" },
 	RETENTION: { bg: "bg-orange-50", text: "text-orange-700" },
 };

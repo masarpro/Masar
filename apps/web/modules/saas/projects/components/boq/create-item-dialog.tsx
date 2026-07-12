@@ -145,7 +145,7 @@ export function CreateItemDialog({
 						{isEdit ? t("editDialog.title") : t("createDialog.title")}
 					</DialogTitle>
 					{!isEdit && defaultPhaseId && defaultPhaseTitle && (
-						<p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+						<p className="text-xs text-chart-4 dark:text-chart-4 mt-1">
 							{t("createDialog.boundToPhase", { title: defaultPhaseTitle })}
 						</p>
 					)}

@@ -434,9 +434,9 @@ export function MaterialsCostingTab({
 						return (
 							<div
 								key={g.grade}
-								className="rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800 p-3 min-w-[140px] flex-1 max-w-[200px]"
+								className="rounded-xl border border-chart-4 bg-chart-4/15 dark:bg-chart-4/20 dark:border-chart-4 p-3 min-w-[140px] flex-1 max-w-[200px]"
 							>
-								<div className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
+								<div className="text-xs text-chart-4 dark:text-chart-4 font-medium mb-1">
 									خرسانة {g.grade}
 								</div>
 								{isEditing ? (
@@ -463,7 +463,7 @@ export function MaterialsCostingTab({
 										<button
 											type="button"
 											onClick={() => setEditingCard(`concrete-${g.grade}`)}
-											className="text-blue-400 hover:text-blue-600 transition-colors"
+											className="text-chart-4 hover:text-chart-4 transition-colors"
 										>
 											<Pencil className="h-3.5 w-3.5" />
 										</button>

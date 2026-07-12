@@ -19,12 +19,12 @@ import { toast } from "sonner";
 
 export const FOLDER_COLORS = [
 	{ key: "slate", swatch: "bg-slate-400" },
-	{ key: "blue", swatch: "bg-blue-500" },
+	{ key: "blue", swatch: "bg-chart-4" },
 	{ key: "purple", swatch: "bg-purple-500" },
 	{ key: "green", swatch: "bg-green-500" },
 	{ key: "amber", swatch: "bg-amber-500" },
 	{ key: "pink", swatch: "bg-pink-500" },
-	{ key: "cyan", swatch: "bg-cyan-500" },
+	{ key: "cyan", swatch: "bg-chart-4" },
 	{ key: "red", swatch: "bg-red-500" },
 ];
 

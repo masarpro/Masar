@@ -465,7 +465,7 @@ export function StructuralSpecs({
 				{/* ═══ القسم ب: نوع الحديد ═══ */}
 				<div className="border rounded-lg p-4 space-y-4">
 					<div className="flex items-center gap-2">
-						<Shield className="h-4 w-4 text-blue-600" />
+						<Shield className="h-4 w-4 text-chart-4" />
 						<h3 className="font-medium text-sm">{t("pricing.pipeline.specsSteelGrade")}</h3>
 					</div>
 
@@ -503,10 +503,10 @@ export function StructuralSpecs({
 						</div>
 
 						{specs.hasIsolatedSteel && isolatedSteelQuantities && (
-							<div className="border rounded-lg overflow-hidden bg-blue-50/30">
+							<div className="border rounded-lg overflow-hidden bg-chart-4/15">
 								<table className="w-full text-sm">
 									<thead>
-										<tr className="bg-blue-100/50">
+										<tr className="bg-chart-4/15">
 											<th className="text-start py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.element")}</th>
 											<th className="text-center py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.steelQuantityKg")}</th>
 										</tr>
@@ -530,7 +530,7 @@ export function StructuralSpecs({
 												{formatNumber(isolatedSteelQuantities.necks)}
 											</td>
 										</tr>
-										<tr className="border-t bg-blue-100/30 font-bold">
+										<tr className="border-t bg-chart-4/15 font-bold">
 											<td className="py-2 px-4">{t("pricing.pipeline.costingTotal")}</td>
 											<td className="py-2 px-4 text-center">
 												{formatNumber(

@@ -36,7 +36,7 @@ function getDaysLeft(
 
 const STATUS_BADGE: Record<string, string> = {
 	PLANNED: "bg-slate-100 text-slate-700 border-slate-300",
-	IN_PROGRESS: "bg-blue-100 text-blue-700 border-blue-300",
+	IN_PROGRESS: "bg-chart-4/15 text-chart-4 border-chart-4",
 	COMPLETED: "bg-green-100 text-green-700 border-green-300",
 	DELAYED: "bg-red-100 text-red-700 border-red-300",
 	CANCELLED: "bg-gray-100 text-gray-500 border-gray-300",
@@ -234,7 +234,7 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 											<div className="flex items-center gap-2">
 												<div className="flex-1 h-2 bg-slate-200 rounded overflow-hidden">
 													<div
-														className="h-full bg-blue-600"
+														className="h-full bg-chart-4"
 														style={{ width: `${progress}%` }}
 													/>
 												</div>

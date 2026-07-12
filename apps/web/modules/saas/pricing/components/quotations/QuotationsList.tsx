@@ -267,7 +267,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 											{quotation.status === "CONVERTED" && (quotation as any).invoices?.[0] && (
 												<Link
 													href={`/app/${organizationSlug}/finance/invoices/${(quotation as any).invoices[0].id}`}
-													className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+													className="inline-flex items-center gap-1 text-xs text-chart-4 dark:text-chart-4 hover:underline"
 												>
 													<FileText className="h-3 w-3" />
 													{(quotation as any).invoices[0].invoiceNo}

@@ -227,21 +227,21 @@ export function CostStudyOverview({
 						ملخص سريع
 					</h3>
 					<div className="grid grid-cols-2 gap-4">
-						<div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+						<div className="p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
 							<div className="flex items-start justify-between">
 								<div>
 									<p className="text-sm text-muted-foreground">
 										إجمالي الخرسانة
 									</p>
-									<p className="text-2xl font-bold text-blue-600 mt-1">
+									<p className="text-2xl font-bold text-chart-4 mt-1">
 										—
 									</p>
 									<p className="text-xs text-muted-foreground mt-1">
 										لم يتم إدخال بيانات بعد
 									</p>
 								</div>
-								<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
-									<Box className="h-5 w-5 text-blue-600" />
+								<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+									<Box className="h-5 w-5 text-chart-4" />
 								</div>
 							</div>
 						</div>
@@ -269,12 +269,12 @@ export function CostStudyOverview({
 
 			{/* Linked Lead Card */}
 			{(study as any).lead && (
-				<Card className="border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20">
+				<Card className="border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/50">
-									<UserSearch className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+								<div className="p-2 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
+									<UserSearch className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">

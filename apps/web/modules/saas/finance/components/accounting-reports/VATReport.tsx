@@ -175,7 +175,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 											className={`text-2xl font-bold mt-1 ${
 												data.isPayable
 													? "text-red-600 dark:text-red-400"
-													: "text-blue-600 dark:text-blue-400"
+													: "text-chart-4 dark:text-chart-4"
 											}`}
 										>
 											<Currency amount={Math.abs(data.netVAT)} />
@@ -190,14 +190,14 @@ export function VATReport({ organizationId }: VATReportProps) {
 										className={`p-3 rounded-xl ${
 											data.isPayable
 												? "bg-red-100 dark:bg-red-900/30"
-												: "bg-blue-100 dark:bg-blue-900/30"
+												: "bg-chart-4/15 dark:bg-chart-4/20"
 										}`}
 									>
 										<Minus
 											className={`h-6 w-6 ${
 												data.isPayable
 													? "text-red-600 dark:text-red-400"
-													: "text-blue-600 dark:text-blue-400"
+													: "text-chart-4 dark:text-chart-4"
 											}`}
 										/>
 									</div>
@@ -357,7 +357,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 									className={`p-4 rounded-xl border-2 ${
 										data.isPayable
 											? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20"
-											: "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20"
+											: "border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
 									}`}
 								>
 									<div className="flex items-center justify-between">
@@ -368,7 +368,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 											className={`text-2xl font-bold ${
 												data.isPayable
 													? "text-red-600 dark:text-red-400"
-													: "text-blue-600 dark:text-blue-400"
+													: "text-chart-4 dark:text-chart-4"
 											}`}
 										>
 											<Currency amount={Math.abs(data.netVAT)} />{" "}

@@ -67,10 +67,10 @@ function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
 		SUBMITTED:
 			"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 		APPROVED:
-			"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+			"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 		REJECTED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 		IMPLEMENTED:
-			"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+			"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	};
 
 	return (
@@ -339,8 +339,8 @@ export function ChangeOrderDetail({
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-							<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<DollarSignIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
 							<p className="text-sm text-slate-500 dark:text-slate-400">
@@ -349,7 +349,7 @@ export function ChangeOrderDetail({
 							<p
 								className={`text-xl font-semibold ${
 									co.costImpact && Number(co.costImpact) >= 0
-										? "text-sky-600 dark:text-sky-400"
+										? "text-chart-4 dark:text-chart-4"
 										: "text-red-600 dark:text-red-400"
 								}`}
 							>
@@ -364,14 +364,14 @@ export function ChangeOrderDetail({
 
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-							<ClockIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<ClockIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
 							<p className="text-sm text-slate-500 dark:text-slate-400">
 								{t("changeOrders.fields.timeImpact")}
 							</p>
-							<p className="text-xl font-semibold text-blue-600 dark:text-blue-400">
+							<p className="text-xl font-semibold text-chart-4 dark:text-chart-4">
 								{co.timeImpactDays !== null && co.timeImpactDays !== undefined
 									? `${co.timeImpactDays > 0 ? "+" : ""}${co.timeImpactDays} ${t("common.days")}`
 									: "-"}

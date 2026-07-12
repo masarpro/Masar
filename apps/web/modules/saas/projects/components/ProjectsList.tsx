@@ -59,12 +59,12 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 }
 
 const coverGradients = [
-	"from-blue-400 to-indigo-500",
-	"from-sky-400 to-sky-500",
+	"from-chart-4 to-indigo-500",
+	"from-chart-4 to-chart-4",
 	"from-amber-400 to-orange-500",
 	"from-violet-400 to-purple-500",
 	"from-rose-400 to-pink-500",
-	"from-cyan-400 to-sky-500",
+	"from-chart-4 to-chart-4",
 ];
 
 export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
@@ -115,8 +115,8 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						label: t("projects.stats.active"),
 						value: stats.active,
 						icon: Clock,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 						hint:
 							stats.total > 0
 								? `${Math.round((stats.active / stats.total) * 100)}%`
@@ -126,8 +126,8 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						label: t("projects.stats.completed"),
 						value: stats.completed,
 						icon: CheckCircle2,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("projects.stats.totalValue"),
@@ -160,11 +160,11 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				{/* Active Projects */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Clock className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Clock className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-sky-600 dark:text-sky-400">
+							<div className="flex items-center gap-0.5 text-xs text-chart-4 dark:text-chart-4">
 								<TrendingUp className="h-3 w-3" />
 								<span>{Math.round((stats.active / stats.total) * 100)}%</span>
 							</div>
@@ -173,7 +173,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("projects.stats.active")}
 					</p>
-					<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
+					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 						{stats.active}
 					</p>
 				</div>
@@ -181,11 +181,11 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				{/* Completed Projects */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<CheckCircle2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<CheckCircle2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-sky-600 dark:text-sky-400">
+							<div className="flex items-center gap-0.5 text-xs text-chart-4 dark:text-chart-4">
 								<CheckCircle2 className="h-3 w-3" />
 								<span>{Math.round((stats.completed / stats.total) * 100)}%</span>
 							</div>
@@ -194,7 +194,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("projects.stats.completed")}
 					</p>
-					<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
+					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 						{stats.completed}
 					</p>
 				</div>
@@ -375,7 +375,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 												<span className="text-slate-500 dark:text-slate-400">
 													{t("projects.overview.progress")}
 												</span>
-												<span className="font-semibold text-sky-600 dark:text-sky-400">
+												<span className="font-semibold text-chart-4 dark:text-chart-4">
 													{Math.round(Number(project.progress))}%
 												</span>
 											</div>

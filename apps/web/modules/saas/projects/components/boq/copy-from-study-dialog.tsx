@@ -148,7 +148,7 @@ export function CopyFromStudyDialog({
 									<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
 										{study._count?.structuralItems > 0 && (
 											<span className="flex items-center gap-1">
-												<HardHat className="h-3.5 w-3.5 text-blue-500" />
+												<HardHat className="h-3.5 w-3.5 text-chart-4" />
 												{t("section.STRUCTURAL")} ({study._count.structuralItems})
 											</span>
 										)}
@@ -175,7 +175,7 @@ export function CopyFromStudyDialog({
 									{/* Linked to project badge */}
 									{study.projectId && (
 										<div className="mt-2">
-											<span className="inline-flex items-center gap-1 text-xs bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg">
+											<span className="inline-flex items-center gap-1 text-xs bg-chart-4/15 dark:bg-chart-4/20 text-chart-4 dark:text-chart-4 px-2 py-0.5 rounded-lg">
 												<Link2 className="h-3 w-3" />
 												{t("copyStudy.linkedTo", { name: study.project?.name || "" })}
 											</span>

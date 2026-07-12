@@ -68,7 +68,7 @@ export function ProjectPaymentsPage({
 					</Button>
 					<Button
 						size="sm"
-						className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+						className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 						onClick={() => setCreateOpen(true)}
 					>
 						<Plus className="me-1.5 h-4 w-4" />
@@ -80,9 +80,9 @@ export function ProjectPaymentsPage({
 			{/* Scenario 1: No contract */}
 			{!hasContract && (
 				<>
-					<div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
-						<Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
-						<p className="text-sm text-blue-700 dark:text-blue-300">
+					<div className="flex items-start gap-3 rounded-xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
+						<Info className="mt-0.5 h-5 w-5 shrink-0 text-chart-4" />
+						<p className="text-sm text-chart-4 dark:text-chart-4">
 							{t("projectPayments.noContractHint")}
 						</p>
 					</div>

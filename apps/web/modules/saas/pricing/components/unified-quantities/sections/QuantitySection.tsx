@@ -58,9 +58,9 @@ export function QuantitySection({ item }: Props) {
 		item.calculationMethod === "polygon";
 
 	return (
-		<Card className="border-sky-200 bg-sky-50/40 p-4 dark:border-sky-900 dark:bg-sky-950/20">
+		<Card className="border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
 			<div className="space-y-4">
-				<h4 className="text-sm font-semibold text-sky-700 dark:text-sky-300">
+				<h4 className="text-sm font-semibold text-chart-4 dark:text-chart-4">
 					📏 الكمية
 				</h4>
 
@@ -139,7 +139,7 @@ export function QuantitySection({ item }: Props) {
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">الفعّالة</p>
-							<p className="font-bold tabular-nums text-sky-700 dark:text-sky-300">
+							<p className="font-bold tabular-nums text-chart-4 dark:text-chart-4">
 								{fmt(item.effectiveQuantity)} {item.unit}
 							</p>
 						</div>

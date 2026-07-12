@@ -84,7 +84,7 @@ export function InvoiceFormHeader({
 								<>
 									{t("finance.invoices.create")}
 									{quotation && (
-										<span className="text-xs font-normal text-blue-600 dark:text-blue-400 ms-2">
+										<span className="text-xs font-normal text-chart-4 dark:text-chart-4 ms-2">
 											{t("finance.invoices.fromQuotation")} — {quotation.quotationNo}
 										</span>
 									)}

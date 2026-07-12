@@ -66,7 +66,7 @@ const TONE: Record<PillProps["tone"], string> = {
 	neutral:
 		"bg-muted/60 text-foreground border-border",
 	info:
-		"bg-sky-50 text-sky-900 border-sky-200 dark:bg-sky-950/30 dark:text-sky-100 dark:border-sky-900",
+		"bg-chart-4/15 text-chart-4 border-chart-4 dark:bg-chart-4/20 dark:text-chart-4 dark:border-chart-4",
 	success:
 		"bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-100 dark:border-emerald-900",
 	danger:

@@ -32,7 +32,7 @@ const EXT_GROUPS: { exts: string[]; style: Omit<FileIconStyle, "icon"> & { icon:
 	},
 	{
 		exts: ["doc", "docx", "rtf", "txt"],
-		style: { icon: FileText, bg: "bg-blue-100 dark:bg-blue-950/30", color: "text-blue-500", previewable: true },
+		style: { icon: FileText, bg: "bg-chart-4/15 dark:bg-chart-4/20", color: "text-chart-4", previewable: true },
 	},
 	{
 		exts: ["xls", "xlsx", "csv"],
@@ -53,7 +53,7 @@ const EXT_GROUPS: { exts: string[]; style: Omit<FileIconStyle, "icon"> & { icon:
 	{
 		// CAD / مخططات هندسية
 		exts: ["dwg", "dxf", "dwf", "rvt", "rfa", "rte", "ifc", "nwd", "nwc", "pln", "pla"],
-		style: { icon: PencilRuler, bg: "bg-cyan-100 dark:bg-cyan-950/30", color: "text-cyan-600", previewable: false },
+		style: { icon: PencilRuler, bg: "bg-chart-4/15 dark:bg-chart-4/20", color: "text-chart-4", previewable: false },
 	},
 	{
 		// نماذج ثلاثية الأبعاد

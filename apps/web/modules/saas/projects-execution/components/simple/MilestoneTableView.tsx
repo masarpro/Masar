@@ -89,7 +89,7 @@ export function MilestoneTableView({
 
 	const statusBadge: Record<string, { className: string; label: string }> = {
 		PLANNED: { className: "bg-slate-100 text-slate-700", label: t("timeline.status.planned") },
-		IN_PROGRESS: { className: "bg-blue-100 text-blue-700", label: t("timeline.status.inProgress") },
+		IN_PROGRESS: { className: "bg-chart-4/15 text-chart-4", label: t("timeline.status.inProgress") },
 		COMPLETED: { className: "bg-green-100 text-green-700", label: t("timeline.status.completed") },
 		DELAYED: { className: "bg-red-100 text-red-700", label: t("timeline.status.delayed") },
 		CANCELLED: { className: "bg-gray-100 text-gray-500", label: t("execution.milestone.cancelled") },

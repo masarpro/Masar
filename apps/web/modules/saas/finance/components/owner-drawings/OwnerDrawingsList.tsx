@@ -28,7 +28,7 @@ interface OwnerDrawingsListProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-	COMPANY_LEVEL: "border-blue-300 text-blue-700 bg-blue-50",
+	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15",
 	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50",
 };
 
@@ -112,13 +112,13 @@ export function OwnerDrawingsList({
 							</div>
 						</CardContent>
 					</Card>
-					<Card className="border-blue-200">
+					<Card className="border-chart-4">
 						<CardContent className="pt-3 sm:pt-4">
 							<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-								<Wallet className="h-4 w-4 text-blue-500 shrink-0" />
+								<Wallet className="h-4 w-4 text-chart-4 shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.available")}</span>
 							</div>
-							<div className="mt-1 text-base sm:text-2xl font-bold text-blue-600 tabular-nums">
+							<div className="mt-1 text-base sm:text-2xl font-bold text-chart-4 tabular-nums">
 								<Currency amount={summary.availableForDrawing} />
 							</div>
 						</CardContent>

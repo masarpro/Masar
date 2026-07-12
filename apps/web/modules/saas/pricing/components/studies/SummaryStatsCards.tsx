@@ -25,9 +25,9 @@ export function SummaryStatsCards({
 			icon: Box,
 			value: structural.concrete > 0 ? formatNumber(structural.concrete) : "—",
 			unit: structural.concrete > 0 ? t("pricing.studies.units.m3") : "",
-			color: "text-blue-600",
-			bgColor: "bg-blue-50 dark:bg-blue-950/30",
-			borderColor: "border-blue-200 dark:border-blue-800",
+			color: "text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
+			borderColor: "border-chart-4 dark:border-chart-4",
 		},
 		{
 			title: t("pricing.studies.summary.totalRebar"),

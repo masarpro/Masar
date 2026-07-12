@@ -57,8 +57,8 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 			{/* Monthly Summary */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-						<BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<BarChart3 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.reports.monthlySummary")}
@@ -145,19 +145,19 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 			{/* Workforce Summary */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
 				<div className="flex items-center gap-3 mb-5">
-					<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-						<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.reports.workforceSummary")}
 					</h3>
 				</div>
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div className="text-center p-4 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+					<div className="text-center p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{dashboard.employees.totalActive}</p>
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">{dashboard.employees.totalActive}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.active")}</p>
 					</div>
 					<div className="text-center p-4 rounded-xl bg-amber-50/80 dark:bg-amber-900/20 border border-amber-100/50 dark:border-amber-800/30">
@@ -174,11 +174,11 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 						<p className="text-2xl font-bold text-slate-600 dark:text-slate-300">{dashboard.employees.totalTerminated}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.terminated")}</p>
 					</div>
-					<div className="text-center p-4 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-							<Banknote className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="text-center p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<Banknote className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(Number(dashboard.employees.totalMonthlyCost))}</p>
+						<p className="text-xl font-bold text-chart-4 dark:text-chart-4">{formatCurrency(Number(dashboard.employees.totalMonthlyCost))}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.reports.totalLabor")}</p>
 					</div>
 				</div>
@@ -187,26 +187,26 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 			{/* Asset Overview */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
 				<div className="flex items-center gap-3 mb-5">
-					<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-						<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<Package className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.reports.assetOverview")}
 					</h3>
 				</div>
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div className="text-center p-4 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+					<div className="text-center p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{dashboard.assets.available}</p>
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">{dashboard.assets.available}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.available")}</p>
 					</div>
-					<div className="text-center p-4 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-							<Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="text-center p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<Package className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{dashboard.assets.inUse}</p>
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">{dashboard.assets.inUse}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.inUse")}</p>
 					</div>
 					<div className="text-center p-4 rounded-xl bg-indigo-50/80 dark:bg-indigo-900/20 border border-indigo-100/50 dark:border-indigo-800/30">

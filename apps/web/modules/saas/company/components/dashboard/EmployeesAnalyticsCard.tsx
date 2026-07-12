@@ -70,8 +70,8 @@ export function EmployeesAnalyticsCard({
 		<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
 			{/* Header */}
 			<div className="flex items-center gap-3 mb-5">
-				<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-					<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+				<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+					<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 				</div>
 				<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 					{t("company.dashboard.employeeAnalytics")}

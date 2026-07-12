@@ -81,9 +81,9 @@ function formatNumber(value: number, decimals = 2): string {
 
 const statusColors: Record<string, string> = {
 	DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
-	SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200",
+	SUBMITTED: "bg-chart-4/15 text-chart-4 border-chart-4",
 	UNDER_REVIEW: "bg-orange-50 text-orange-700 border-orange-200",
-	APPROVED: "bg-sky-50 text-sky-700 border-sky-200",
+	APPROVED: "bg-chart-4/15 text-chart-4 border-chart-4",
 	PARTIALLY_PAID: "bg-yellow-50 text-yellow-700 border-yellow-200",
 	PAID: "bg-green-100 text-green-800 border-green-300",
 	REJECTED: "bg-red-50 text-red-700 border-red-200",

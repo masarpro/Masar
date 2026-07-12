@@ -207,8 +207,8 @@ export function AgedReceivablesReport({
 									</span>
 								</p>
 							</div>
-							<div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-								<Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+							<div className="p-3 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<Clock className="h-6 w-6 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 					</CardContent>

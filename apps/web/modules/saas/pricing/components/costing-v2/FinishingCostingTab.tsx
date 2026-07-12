@@ -508,7 +508,7 @@ export function FinishingCostingTab({
 														"text-[10px] px-1.5 py-0.5 rounded-md border transition-colors",
 														isLumpSum
 															? "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400"
-															: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-400",
+															: "bg-chart-4/15 border-chart-4 text-chart-4 dark:bg-chart-4/20 dark:border-chart-4 dark:text-chart-4",
 													)}
 												>
 													{isLumpSum ? t("common.lumpSum") : t("common.detailed")}

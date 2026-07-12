@@ -25,7 +25,7 @@ export function PricingStatsCards({
 		<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
 			<GlassStatCard
 				colorScheme="sky"
-				icon={<Users className="h-4 w-4 text-sky-600 dark:text-sky-400" />}
+				icon={<Users className="h-4 w-4 text-chart-4 dark:text-chart-4" />}
 				title={t("pricing.dashboard.stats.activeClients")}
 				value={activeClients}
 				subtitle={t("pricing.dashboard.stats.activeClientsSubtitle")}
@@ -39,7 +39,7 @@ export function PricingStatsCards({
 			/>
 			<GlassStatCard
 				colorScheme="blue"
-				icon={<TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
+				icon={<TrendingUp className="h-4 w-4 text-chart-4 dark:text-chart-4" />}
 				title={t("pricing.dashboard.stats.conversionRate")}
 				value={`${conversionRate}%`}
 				subtitle={t("pricing.dashboard.stats.conversionRateSubtitle")}

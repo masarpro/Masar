@@ -295,7 +295,7 @@ export function CostStudyCard({
 								<span>{study._count.finishingItems}</span>
 							</div>
 							<div className="flex items-center gap-1" title={t("pricing.studies.mep.title")}>
-								<Wrench className="h-3 w-3 text-sky-500" />
+								<Wrench className="h-3 w-3 text-chart-4" />
 								<span>{study._count.mepItems}</span>
 							</div>
 						</div>

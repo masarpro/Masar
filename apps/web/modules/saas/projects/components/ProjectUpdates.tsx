@@ -125,7 +125,7 @@ export function ProjectUpdates({
 						{draftData?.draft && (
 							<div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
 								<div className="flex items-center gap-2">
-									<Megaphone className="h-5 w-5 text-sky-500" />
+									<Megaphone className="h-5 w-5 text-chart-4" />
 									<span className="font-medium text-slate-900 dark:text-slate-100">
 										{t("projects.updates.preview")}
 									</span>
@@ -147,7 +147,7 @@ export function ProjectUpdates({
 													value={Number(draftData.draft.progress)}
 													className="h-2 w-24"
 												/>
-												<span className="font-medium text-sky-600">
+												<span className="font-medium text-chart-4">
 													{Number(draftData.draft.progress)}%
 												</span>
 											</div>
@@ -292,7 +292,7 @@ export function ProjectUpdates({
 												value={Number(draftData?.draft.progress || 0)}
 												className="h-3"
 											/>
-											<span className="font-bold text-sky-600">
+											<span className="font-bold text-chart-4">
 												{Number(draftData?.draft.progress || 0)}%
 											</span>
 										</div>
@@ -322,14 +322,14 @@ export function ProjectUpdates({
 			</div>
 
 			{/* Info Card */}
-			<div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-800 dark:bg-sky-950/30">
+			<div className="rounded-2xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
 				<div className="flex items-start gap-3">
-					<Megaphone className="mt-0.5 h-5 w-5 text-sky-600 dark:text-sky-400" />
+					<Megaphone className="mt-0.5 h-5 w-5 text-chart-4 dark:text-chart-4" />
 					<div>
-						<p className="font-medium text-sky-800 dark:text-sky-200">
+						<p className="font-medium text-chart-4 dark:text-chart-4">
 							{t("projects.updates.whatIsUpdate")}
 						</p>
-						<p className="text-sm text-sky-700 dark:text-sky-300">
+						<p className="text-sm text-chart-4 dark:text-chart-4">
 							{t("projects.updates.updateExplanation")}
 						</p>
 					</div>

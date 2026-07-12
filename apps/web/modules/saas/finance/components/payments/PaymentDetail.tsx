@@ -264,7 +264,7 @@ export function PaymentDetail({
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
 								{payment.destinationAccount?.accountType === "BANK" ? (
-									<Building className="h-6 w-6 text-blue-500" />
+									<Building className="h-6 w-6 text-chart-4" />
 								) : (
 									<Wallet className="h-6 w-6 text-green-500" />
 								)}
@@ -277,7 +277,7 @@ export function PaymentDetail({
 									)}
 								</div>
 							</div>
-							<Badge className="rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400">
+							<Badge className="rounded-lg bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 								{getPaymentMethodLabel(payment.paymentMethod)}
 							</Badge>
 						</div>

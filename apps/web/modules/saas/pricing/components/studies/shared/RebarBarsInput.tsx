@@ -29,9 +29,9 @@ const CUSTOM_COUNT_SENTINEL = "__custom__";
 
 const COLOR_SCHEMES = {
 	blue: {
-		bg: "bg-blue-50 dark:bg-blue-950",
-		border: "border-blue-200 dark:border-blue-800",
-		text: "text-blue-700 dark:text-blue-300",
+		bg: "bg-chart-4/15 dark:bg-chart-4/20",
+		border: "border-chart-4 dark:border-chart-4",
+		text: "text-chart-4 dark:text-chart-4",
 	},
 	green: {
 		bg: "bg-green-50 dark:bg-green-950",

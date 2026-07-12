@@ -39,7 +39,7 @@ export function FreePaymentsSection({
 				<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
 					{t("projectPayments.freePayments")}
 				</h3>
-				<span className="text-sm font-medium text-sky-600 dark:text-sky-400">
+				<span className="text-sm font-medium text-chart-4 dark:text-chart-4">
 					{t("projectPayments.total")}: {formatSAR(totalCollected)}
 				</span>
 			</div>

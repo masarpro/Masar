@@ -69,7 +69,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 			<div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
 				<GlassStatCard
 					colorScheme="blue"
-					icon={<Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+					icon={<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />}
 					title={t("company.dashboard.totalSalaries")}
 					value={formatCurrency(Number(data.employees.totalMonthlyCost))}
 					badge={<>{data.employees.totalActive} {t("company.dashboard.activeEmployees")}</>}
@@ -83,7 +83,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 				/>
 				<GlassStatCard
 					colorScheme="sky"
-					icon={<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />}
+					icon={<Package className="h-5 w-5 text-chart-4 dark:text-chart-4" />}
 					title={t("company.dashboard.assetValue")}
 					value={formatCurrency(Number(data.assets.totalValue))}
 					badge={<>{data.assets.total} {t("company.dashboard.totalAssets")}</>}
@@ -169,18 +169,18 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 					{t("company.dashboard.assetOverview")}
 				</h3>
 				<div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-4">
-					<div className="text-center p-3 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+					<div className="text-center p-3 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{data.assets.available}</p>
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">{data.assets.available}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.available")}</p>
 					</div>
-					<div className="text-center p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-							<Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="text-center p-3 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+							<Package className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 						</div>
-						<p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{data.assets.inUse}</p>
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">{data.assets.inUse}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.inUse")}</p>
 					</div>
 					<div className="text-center p-3 rounded-xl bg-orange-50/80 dark:bg-orange-900/20 border border-orange-100/50 dark:border-orange-800/30">

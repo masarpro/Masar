@@ -672,7 +672,7 @@ function ZatcaStatusIcon({ status }: { status?: string | null }) {
 	}
 	// PENDING, SUBMITTED
 	return (
-		<span title="Pending" className="text-blue-500 animate-pulse">
+		<span title="Pending" className="text-chart-4 animate-pulse">
 			<FileCheck className="h-4 w-4 inline-block" />
 		</span>
 	);

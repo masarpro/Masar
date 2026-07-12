@@ -38,7 +38,7 @@ function getSeverityBadge(severity: string, t: (key: string) => string) {
 			);
 		case "INFO":
 			return (
-				<Badge className="border-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+				<Badge className="border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 					{t("projects.insights.info")}
 				</Badge>
 			);
@@ -54,7 +54,7 @@ function getSeverityIcon(severity: string) {
 		case "WARN":
 			return <AlertTriangle className="h-5 w-5 text-amber-500" />;
 		case "INFO":
-			return <Info className="h-5 w-5 text-blue-500" />;
+			return <Info className="h-5 w-5 text-chart-4" />;
 		default:
 			return <Info className="h-5 w-5 text-slate-500" />;
 	}
@@ -136,9 +136,9 @@ export function ProjectInsights({
 						label: t("projects.insights.info"),
 						value: data?.stats.info || 0,
 						icon: Info,
-						iconClassName: "text-blue-600 dark:text-blue-400",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/50",
-						valueClassName: "text-blue-700 dark:text-blue-300",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						valueClassName: "text-chart-4 dark:text-chart-4",
 					},
 				]}
 			/>
@@ -175,16 +175,16 @@ export function ProjectInsights({
 					</div>
 				</div>
 
-				<div className="rounded-2xl bg-blue-50 p-5 dark:bg-blue-950/30">
+				<div className="rounded-2xl bg-chart-4/15 p-5 dark:bg-chart-4/20">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-							<Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<Info className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
-							<p className="text-xs text-blue-600 dark:text-blue-400">
+							<p className="text-xs text-chart-4 dark:text-chart-4">
 								{t("projects.insights.info")}
 							</p>
-							<p className="text-2xl font-semibold text-blue-700 dark:text-blue-300">
+							<p className="text-2xl font-semibold text-chart-4 dark:text-chart-4">
 								{data?.stats.info || 0}
 							</p>
 						</div>
@@ -235,8 +235,8 @@ export function ProjectInsights({
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<div className="mb-4 rounded-2xl bg-sky-100 p-4 dark:bg-sky-900/30">
-							<Check className="h-8 w-8 text-sky-600 dark:text-sky-400" />
+						<div className="mb-4 rounded-2xl bg-chart-4/15 p-4 dark:bg-chart-4/20">
+							<Check className="h-8 w-8 text-chart-4 dark:text-chart-4" />
 						</div>
 						<p className="text-slate-600 dark:text-slate-400">
 							{t("projects.insights.noAlerts")}
@@ -258,7 +258,7 @@ export function ProjectInsights({
 								key={alert.id}
 								className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 dark:bg-slate-800/30"
 							>
-								<Check className="h-4 w-4 text-sky-500" />
+								<Check className="h-4 w-4 text-chart-4" />
 								<span>{alert.title}</span>
 								<span className="ms-auto text-xs">
 									{alert.acknowledgedAt

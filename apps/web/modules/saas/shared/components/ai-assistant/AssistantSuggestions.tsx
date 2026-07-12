@@ -61,7 +61,7 @@ export function AssistantSuggestions({
           key={text}
           type="button"
           onClick={() => onSuggestion(text)}
-          className="whitespace-nowrap rounded-full border border-blue-200 bg-blue-50/50 px-3 py-1.5 text-xs text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+          className="whitespace-nowrap rounded-full border border-chart-4 bg-chart-4/15 px-3 py-1.5 text-xs text-chart-4 transition-colors hover:bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4 dark:hover:bg-chart-4/20"
         >
           {text}
         </button>

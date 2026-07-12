@@ -172,8 +172,8 @@ export function FinanceReports({
 									{conversionRate?.converted ?? 0} / {conversionRate?.total ?? 0}
 								</p>
 							</div>
-							<div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-								<Percent className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+							<div className="p-3 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<Percent className="h-6 w-6 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
@@ -222,8 +222,8 @@ export function FinanceReports({
 					<Card className="rounded-2xl hover:shadow-md transition-shadow cursor-pointer">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-									<ArrowUpDown className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+								<div className="p-3 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+									<ArrowUpDown className="h-6 w-6 text-chart-4 dark:text-chart-4" />
 								</div>
 								<div>
 									<p className="font-medium text-slate-900 dark:text-slate-100">
@@ -516,12 +516,12 @@ function StatusIndicator({
 	const colors: Record<string, string> = {
 		// Quotation statuses
 		DRAFT: "bg-slate-400",
-		SENT: "bg-blue-500",
+		SENT: "bg-chart-4",
 		VIEWED: "bg-purple-500",
 		ACCEPTED: "bg-green-500",
 		REJECTED: "bg-red-500",
 		EXPIRED: "bg-amber-500",
-		CONVERTED: "bg-sky-500",
+		CONVERTED: "bg-chart-4",
 		// Invoice statuses
 		PARTIALLY_PAID: "bg-amber-500",
 		PAID: "bg-green-500",

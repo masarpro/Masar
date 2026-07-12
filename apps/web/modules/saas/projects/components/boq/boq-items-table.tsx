@@ -23,7 +23,7 @@ import { formatNumber } from "@shared/lib/formatters";
 
 const sourceBadgeColors: Record<string, string> = {
 	MANUAL: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-	COST_STUDY: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+	COST_STUDY: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	IMPORTED: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
 	CONTRACT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
 	QUOTATION: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
@@ -162,7 +162,7 @@ export function BOQItemsTable({
 								items.map((item, idx) => (
 									<TableRow
 										key={item.id}
-										className={selectedIds.has(item.id) ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}
+										className={selectedIds.has(item.id) ? "bg-chart-4/15 dark:bg-chart-4/20" : ""}
 									>
 										<TableCell>
 											<Checkbox

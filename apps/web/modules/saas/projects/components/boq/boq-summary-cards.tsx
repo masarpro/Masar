@@ -15,7 +15,7 @@ const sectionIcons: Record<string, any> = {
 };
 
 const sectionColors: Record<string, string> = {
-	STRUCTURAL: "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950",
+	STRUCTURAL: "text-chart-4 bg-chart-4/15 dark:text-chart-4 dark:bg-chart-4/20",
 	FINISHING: "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950",
 	MEP: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950",
 	LABOR: "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-950",

@@ -39,7 +39,7 @@ const PROJECT_TYPES = [
 	{
 		value: "RESIDENTIAL",
 		labelKey: "projects.type.RESIDENTIAL",
-		color: "bg-sky-500",
+		color: "bg-chart-4",
 	},
 	{
 		value: "COMMERCIAL",
@@ -56,7 +56,7 @@ const PROJECT_TYPES = [
 		labelKey: "projects.type.INFRASTRUCTURE",
 		color: "bg-slate-500",
 	},
-	{ value: "MIXED", labelKey: "projects.type.MIXED", color: "bg-sky-500" },
+	{ value: "MIXED", labelKey: "projects.type.MIXED", color: "bg-chart-4" },
 ];
 
 export function CreateProjectForm({
@@ -383,10 +383,10 @@ export function CreateProjectForm({
 								onCancel={() => setShowInlineClientForm(false)}
 							/>
 						) : clientId && clientName ? (
-							<div className="rounded-xl border border-indigo-200/60 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 overflow-hidden">
-								<div className="flex items-center justify-between p-3 border-b border-blue-100 dark:border-blue-900/50">
+							<div className="rounded-xl border border-indigo-200/60 bg-gradient-to-br from-chart-4/15 to-indigo-50/50 dark:from-chart-4/20 dark:to-indigo-950/30 overflow-hidden">
+								<div className="flex items-center justify-between p-3 border-b border-chart-4 dark:border-chart-4">
 									<div className="flex items-center gap-3">
-										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-chart-4 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
 											{clientName.charAt(0).toUpperCase()}
 										</div>
 										<div>
@@ -413,8 +413,8 @@ export function CreateProjectForm({
 									<div className="p-3 flex flex-wrap gap-3">
 										{clientPhone && (
 											<div className="flex items-center gap-2 text-sm">
-												<div className="w-6 h-6 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
-													<Phone className="h-3 w-3 text-sky-600 dark:text-sky-400" />
+												<div className="w-6 h-6 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
+													<Phone className="h-3 w-3 text-chart-4 dark:text-chart-4" />
 												</div>
 												<span className="text-muted-foreground text-xs">{clientPhone}</span>
 											</div>

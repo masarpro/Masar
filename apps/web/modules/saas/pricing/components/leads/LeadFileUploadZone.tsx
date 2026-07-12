@@ -60,7 +60,7 @@ function getFileIcon(mimeType: string) {
 	if (mimeType.startsWith("image/")) {
 		return <Image className="h-8 w-8 text-pink-500" />;
 	}
-	return <File className="h-8 w-8 text-blue-500" />;
+	return <File className="h-8 w-8 text-chart-4" />;
 }
 
 type UploadState = "idle" | "uploading" | "success" | "error";

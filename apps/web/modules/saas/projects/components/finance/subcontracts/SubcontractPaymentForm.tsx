@@ -213,21 +213,21 @@ export function SubcontractPaymentForm({
 
 						{/* Term info card */}
 						{selectedTerm && (
-							<div className="mt-4 rounded-xl border border-blue-200/50 bg-blue-50/50 p-4 dark:border-blue-800/30 dark:bg-blue-950/20">
+							<div className="mt-4 rounded-xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
 								<div className="grid grid-cols-3 gap-3 text-center text-xs">
 									<div>
-										<p className="text-blue-500">
+										<p className="text-chart-4">
 											{t("subcontracts.payment.required")}
 										</p>
-										<p className="font-semibold text-blue-700 dark:text-blue-300">
+										<p className="font-semibold text-chart-4 dark:text-chart-4">
 											{formatSARPrecise(selectedTerm.amount)}
 										</p>
 									</div>
 									<div>
-										<p className="text-sky-500">
+										<p className="text-chart-4">
 											{t("subcontracts.payment.alreadyPaid")}
 										</p>
-										<p className="font-semibold text-sky-700 dark:text-sky-300">
+										<p className="font-semibold text-chart-4 dark:text-chart-4">
 											{formatSARPrecise(
 												selectedTerm.paidAmount,
 											)}

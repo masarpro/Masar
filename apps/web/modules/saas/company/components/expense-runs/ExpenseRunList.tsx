@@ -47,7 +47,7 @@ const EXPENSE_RUN_STATUSES = ["DRAFT", "POSTED", "CANCELLED"] as const;
 
 const STATUS_STYLES: Record<string, string> = {
 	DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
-	POSTED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
+	POSTED: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
 };
 
@@ -134,8 +134,8 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 						label: t("company.expenseRuns.totalRuns"),
 						value: runs.length,
 						icon: FileText,
-						iconClassName: "text-blue-600 dark:text-blue-400",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("company.expenseRuns.currentMonthStatus"),
@@ -143,8 +143,8 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 							? getStatusBadge(currentMonthRun.status)
 							: t("company.expenseRuns.noRuns"),
 						icon: CalendarRange,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("company.expenseRuns.totalAmount"),
@@ -161,22 +161,22 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-3">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<FileText className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.expenseRuns.totalRuns")}
 					</p>
-					<p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 						{runs.length}
 					</p>
 				</div>
 
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<CalendarRange className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<CalendarRange className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">

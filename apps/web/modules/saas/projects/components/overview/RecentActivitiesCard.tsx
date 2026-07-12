@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 const typeConfig: Record<string, { dot: string; label: string }> = {
-	DAILY_REPORT: { dot: "bg-blue-500", label: "projects.field.dailyReport" },
+	DAILY_REPORT: { dot: "bg-chart-4", label: "projects.field.dailyReport" },
 	ISSUE: { dot: "bg-red-500", label: "projects.field.issue" },
 	PHOTO: { dot: "bg-purple-500", label: "projects.field.photo" },
 	PROGRESS_UPDATE: { dot: "bg-amber-500", label: "projects.field.progressUpdate" },
@@ -39,8 +39,8 @@ export function RecentActivitiesCard({
 		<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 flex flex-col">
 			<div className="flex items-center justify-between mb-3">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-blue-100 dark:bg-blue-900/50 p-2">
-						<Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="rounded-xl bg-chart-4/15 dark:bg-chart-4/20 p-2">
+						<Clock className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{t("projects.commandCenter.recentActivities")}

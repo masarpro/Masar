@@ -149,7 +149,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 						<Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-0 text-[10px] px-2 py-0.5">
 							{t(`company.expenses.categories.${expense.category}`)}
 						</Badge>
-						<Badge className={`border-0 text-[10px] px-2 py-0.5 ${expense.isActive ? "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"}`}>
+						<Badge className={`border-0 text-[10px] px-2 py-0.5 ${expense.isActive ? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"}`}>
 							{expense.isActive ? t("company.common.active") : t("company.common.inactive")}
 						</Badge>
 					</div>
@@ -167,8 +167,8 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 			{/* Info Card */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-						<Receipt className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<Receipt className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.expenses.basicInfo")}
@@ -178,7 +178,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.expenses.amount")}</p>
-							<p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(Number(expense.amount))}</p>
+							<p className="text-lg font-bold text-chart-4 dark:text-chart-4">{formatCurrency(Number(expense.amount))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.expenses.recurrence")}</p>
@@ -214,8 +214,8 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center justify-between p-5 border-b border-white/10 dark:border-slate-700/30">
 					<div className="flex items-center gap-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 							{t("company.expenses.paymentHistory")}
@@ -254,7 +254,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 									<TableCell className="text-slate-700 dark:text-slate-300">{new Date(payment.dueDate).toLocaleDateString("ar-SA")}</TableCell>
 									<TableCell>
 										{payment.isPaid ? (
-											<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
+											<Badge className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-0 text-[10px] px-2 py-0.5">
 												{t("company.expenses.paid")}
 											</Badge>
 										) : (
@@ -268,20 +268,20 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 											<Button
 												size="sm"
 												variant="ghost"
-												className="rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20"
+												className="rounded-xl hover:bg-chart-4/15 dark:hover:bg-chart-4/20"
 												onClick={() => setMarkPaidPaymentId(payment.id)}
 											>
-												<CheckCircle className="ms-1 h-4 w-4 text-sky-600" />
+												<CheckCircle className="ms-1 h-4 w-4 text-chart-4" />
 												{t("company.expenses.markPaid")}
 											</Button>
 										) : payment.financeExpenseId ? (
 											<Button
 												size="sm"
 												variant="ghost"
-												className="rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20"
+												className="rounded-xl hover:bg-chart-4/15 dark:hover:bg-chart-4/20"
 												onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/${payment.financeExpenseId}`)}
 											>
-												<ExternalLink className="ms-1 h-4 w-4 text-blue-600" />
+												<ExternalLink className="ms-1 h-4 w-4 text-chart-4" />
 												{t("company.expenses.viewInFinance")}
 											</Button>
 										) : null}
@@ -369,7 +369,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 									{bankAccounts.map((account: any) => (
 										<SelectItem key={account.id} value={account.id}>
 											<div className="flex items-center gap-2">
-												<Building className="h-4 w-4 text-blue-500" />
+												<Building className="h-4 w-4 text-chart-4" />
 												<span>{account.name}</span>
 											</div>
 										</SelectItem>

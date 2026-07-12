@@ -385,7 +385,7 @@ export function OwnerDrawingForm({
 
 					{/* Other Partners Card */}
 					{cr && cr.otherPartners && cr.otherPartners.length > 0 && (
-						<Card className="border-blue-100">
+						<Card className="border-chart-4">
 							<CardHeader className="pb-2">
 								<CardTitle className="flex items-center gap-2 text-base">
 									<Users className="h-4 w-4" />

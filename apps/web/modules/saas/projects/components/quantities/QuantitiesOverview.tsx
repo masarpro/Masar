@@ -157,8 +157,8 @@ export function QuantitiesOverview({
 			label: t("summary.structural"),
 			value: summary?.totals?.structural ?? 0,
 			icon: Hammer,
-			iconBg: "bg-blue-100 dark:bg-blue-900/50",
-			iconColor: "text-blue-600 dark:text-blue-400",
+			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
 		},
 		{
 			label: t("summary.finishing"),

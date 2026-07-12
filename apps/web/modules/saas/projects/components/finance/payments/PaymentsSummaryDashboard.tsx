@@ -71,11 +71,11 @@ export function PaymentsSummaryDashboard({
 			title: t("paymentsHub.totalCollected"),
 			value: totalCollected,
 			icon: TrendingUp,
-			bgColor: "bg-sky-50 dark:bg-sky-950/30",
-			iconBg: "bg-sky-100 dark:bg-sky-900/50",
-			iconColor: "text-sky-600 dark:text-sky-400",
-			textColor: "text-sky-700 dark:text-sky-300",
-			labelColor: "text-sky-600/80 dark:text-sky-400/80",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
+			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
+			textColor: "text-chart-4 dark:text-chart-4",
+			labelColor: "text-chart-4 dark:text-chart-4",
 		},
 		{
 			title: t("paymentsHub.totalClaims"),
@@ -141,13 +141,13 @@ export function PaymentsSummaryDashboard({
 						<span className="text-slate-600 dark:text-slate-400">
 							{t("projectPayments.summary")}
 						</span>
-						<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
+						<span className="font-mono font-semibold text-chart-4 dark:text-chart-4">
 							{collectionPercent.toFixed(0)}%
 						</span>
 					</div>
 					<Progress
 						value={collectionPercent}
-						className="h-2.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-sky-500"
+						className="h-2.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-chart-4"
 					/>
 					<div className="mt-2 flex items-center justify-between text-xs text-slate-500">
 						<span>

@@ -57,7 +57,7 @@ function getFileIcon(mimeType: string) {
 	if (mimeType.startsWith("image/")) {
 		return <Image className="h-5 w-5 text-pink-500 shrink-0" />;
 	}
-	return <File className="h-5 w-5 text-blue-500 shrink-0" />;
+	return <File className="h-5 w-5 text-chart-4 shrink-0" />;
 }
 
 export function PendingFilesUpload({ files, onFilesChange }: PendingFilesUploadProps) {

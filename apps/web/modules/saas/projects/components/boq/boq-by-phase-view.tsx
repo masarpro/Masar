@@ -219,7 +219,7 @@ function PhaseCard({
 						{isUnassigned ? (
 							<Inbox className="h-4 w-4 text-slate-400 shrink-0" />
 						) : (
-							<Flag className="h-4 w-4 text-blue-500 shrink-0" />
+							<Flag className="h-4 w-4 text-chart-4 shrink-0" />
 						)}
 						<span className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
 							{m.title}

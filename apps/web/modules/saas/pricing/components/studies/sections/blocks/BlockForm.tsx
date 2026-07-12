@@ -687,7 +687,7 @@ export function BlockForm({
 
 								{/* ملخص الفتحات */}
 								{calculations.openingsArea > 0 && (
-									<div className="bg-blue-50 rounded p-3">
+									<div className="bg-chart-4/15 rounded p-3">
 										<h6 className="font-medium text-sm mb-2">{t("pricing.studies.structural.sections.blocks.openingsSummary")}</h6>
 										<div className="flex flex-wrap gap-2">
 											<Badge variant="outline" className="bg-white">

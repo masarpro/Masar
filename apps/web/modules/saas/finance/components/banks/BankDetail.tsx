@@ -215,11 +215,11 @@ export function BankDetail({
 						<div className="flex items-center gap-4">
 							<div className={`p-3 rounded-xl ${
 								account.accountType === "BANK"
-									? "bg-blue-100 dark:bg-blue-900/50"
+									? "bg-chart-4/15 dark:bg-chart-4/20"
 									: "bg-green-100 dark:bg-green-900/50"
 							}`}>
 								{account.accountType === "BANK" ? (
-									<Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+									<Building className="h-8 w-8 text-chart-4 dark:text-chart-4" />
 								) : (
 									<Wallet className="h-8 w-8 text-green-600 dark:text-green-400" />
 								)}
@@ -304,7 +304,7 @@ export function BankDetail({
 					</Card>
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+							<div className="flex items-center gap-2 text-chart-4 dark:text-chart-4">
 								<ArrowDownLeft className="h-4 w-4" />
 								<span className="text-xs text-slate-500">{t("finance.banks.ledger.transfersIn")}</span>
 							</div>
@@ -371,7 +371,7 @@ export function BankDetail({
 					className="h-auto py-4 rounded-xl justify-start"
 					onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/transfer`)}
 				>
-					<ArrowLeftRight className="h-5 w-5 me-3 text-blue-500" />
+					<ArrowLeftRight className="h-5 w-5 me-3 text-chart-4" />
 					<div className="text-start">
 						<div className="font-medium">{t("finance.banks.transfer")}</div>
 						<div className="text-xs text-slate-500">{t("finance.banks.transferBetweenAccounts")}</div>

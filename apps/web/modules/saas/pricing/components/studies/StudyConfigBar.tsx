@@ -8,10 +8,10 @@ import { useTranslations } from "next-intl";
 import { SCOPE_ICONS } from "../../lib/study-create-config";
 
 const STUDY_TYPE_COLORS: Record<string, string> = {
-	FULL_STUDY: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+	FULL_STUDY: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	COST_PRICING: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
 	QUICK_PRICING: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
-	FULL_PROJECT: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+	FULL_PROJECT: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	CUSTOM_ITEMS: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
 	LUMP_SUM_ANALYSIS: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
 };

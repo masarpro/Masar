@@ -48,12 +48,12 @@ interface DocumentsExplorerProps {
 // خرائط ألوان مجلدات (مفتاح اللون → أصناف Tailwind)
 const FOLDER_COLOR_MAP: Record<string, { bg: string; icon: string }> = {
 	slate: { bg: "bg-slate-100 dark:bg-slate-800", icon: "text-slate-500" },
-	blue: { bg: "bg-blue-100 dark:bg-blue-950/40", icon: "text-blue-500" },
+	blue: { bg: "bg-chart-4/15 dark:bg-chart-4/20", icon: "text-chart-4" },
 	purple: { bg: "bg-purple-100 dark:bg-purple-950/40", icon: "text-purple-500" },
 	green: { bg: "bg-green-100 dark:bg-green-950/40", icon: "text-green-500" },
 	amber: { bg: "bg-amber-100 dark:bg-amber-950/40", icon: "text-amber-600" },
 	pink: { bg: "bg-pink-100 dark:bg-pink-950/40", icon: "text-pink-500" },
-	cyan: { bg: "bg-cyan-100 dark:bg-cyan-950/40", icon: "text-cyan-600" },
+	cyan: { bg: "bg-chart-4/15 dark:bg-chart-4/20", icon: "text-chart-4" },
 	red: { bg: "bg-red-100 dark:bg-red-950/40", icon: "text-red-500" },
 };
 

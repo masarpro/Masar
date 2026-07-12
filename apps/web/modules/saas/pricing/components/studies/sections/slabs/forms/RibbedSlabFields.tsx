@@ -185,7 +185,7 @@ export function RibbedSlabFields({
 
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<div className="space-y-1.5">
-						<Label className="text-sm text-blue-700">
+						<Label className="text-sm text-chart-4">
 							عدد أسياخ القاع
 						</Label>
 						<Select
@@ -197,7 +197,7 @@ export function RibbedSlabFields({
 								})
 							}
 						>
-							<SelectTrigger className="border-blue-200">
+							<SelectTrigger className="border-chart-4">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -210,7 +210,7 @@ export function RibbedSlabFields({
 						</Select>
 					</div>
 					<div className="space-y-1.5">
-						<Label className="text-sm text-blue-700">
+						<Label className="text-sm text-chart-4">
 							قطر سيخ القاع
 						</Label>
 						<Select
@@ -222,7 +222,7 @@ export function RibbedSlabFields({
 								})
 							}
 						>
-							<SelectTrigger className="border-blue-200">
+							<SelectTrigger className="border-chart-4">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -378,7 +378,7 @@ export function RibbedSlabFields({
 
 				{/* تسليح الطبقة العلوية */}
 				<div className="space-y-3 border-t pt-3">
-					<h5 className="text-sm font-medium text-blue-700">
+					<h5 className="text-sm font-medium text-chart-4">
 						تسليح الطبقة العلوية
 					</h5>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -456,7 +456,7 @@ export function RibbedSlabFields({
 							</Label>
 						</div>
 						{showFormwork && calculations.formworkArea > 0 && (
-							<div className="flex items-center gap-2 text-blue-600">
+							<div className="flex items-center gap-2 text-chart-4">
 								<LayoutGrid className="h-4 w-4" />
 								<span className="font-bold">
 									{formatNumber(calculations.formworkArea)}{" "}

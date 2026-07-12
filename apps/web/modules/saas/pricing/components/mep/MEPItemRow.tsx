@@ -50,7 +50,7 @@ export function MEPItemRow({
 					<TooltipProvider delayDuration={200}>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Bot className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+								<Bot className="h-3.5 w-3.5 shrink-0 text-chart-4" />
 							</TooltipTrigger>
 							<TooltipContent side="top" className="max-w-xs text-xs">
 								<p className="font-medium mb-1">{t("item.autoDerived")}</p>

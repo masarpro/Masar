@@ -26,7 +26,7 @@ interface LeavesMiniSectionProps {
 type LeaveSection = "requests" | "balances" | "types";
 
 const SECTION_CONFIG: { id: LeaveSection; icon: typeof ClipboardList; color: string; bg: string }[] = [
-	{ id: "requests", icon: ClipboardList, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/30" },
+	{ id: "requests", icon: ClipboardList, color: "text-chart-4 dark:text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20" },
 	{ id: "balances", icon: Wallet, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
 	{ id: "types", icon: Settings, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-900/30" },
 ];
@@ -51,8 +51,8 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 						label: t("company.leaves.dashboard.onLeaveToday"),
 						value: isLoading ? "..." : data?.onLeaveToday?.length ?? 0,
 						icon: Users,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("company.leaves.dashboard.pendingRequests"),
@@ -75,14 +75,14 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.leaves.dashboard.onLeaveToday")}
 					</p>
-					<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
+					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 						{isLoading ? "..." : data?.onLeaveToday?.length ?? 0}
 					</p>
 				</div>

@@ -61,21 +61,21 @@ export const ContractDetailsSection = React.memo(
 		const t = useTranslations();
 
 		return (
-			<div className="overflow-hidden rounded-2xl border border-sky-200/50 bg-sky-50/50 dark:border-sky-800/30 dark:bg-sky-950/20">
-				<div className="border-b border-sky-200/50 p-5 dark:border-sky-800/30">
+			<div className="overflow-hidden rounded-2xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20">
+				<div className="border-b border-chart-4 p-5 dark:border-chart-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-								<FileSignature className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+								<FileSignature className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
-							<h2 className="text-lg font-medium text-sky-900 dark:text-sky-100">
+							<h2 className="text-lg font-medium text-chart-4 dark:text-chart-4">
 								{t("projects.createProject.contractInfo")}
 							</h2>
 						</div>
 						{contractNo && (
 							<Badge
 								variant="outline"
-								className="rounded-lg border-sky-200 bg-sky-50 px-3 py-1 font-mono text-sm text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300"
+								className="rounded-lg border-chart-4 bg-chart-4/15 px-3 py-1 font-mono text-sm text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 							>
 								{contractNo}
 							</Badge>
@@ -103,7 +103,7 @@ export const ContractDetailsSection = React.memo(
 										)
 									}
 									placeholder="0.00"
-									className="rounded-xl border-sky-200/60 bg-white pe-12 dark:border-sky-800/40 dark:bg-slate-900/50"
+									className="rounded-xl border-chart-4 bg-white pe-12 dark:border-chart-4 dark:bg-slate-900/50"
 								/>
 								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
 									{t("common.sar")}
@@ -121,7 +121,7 @@ export const ContractDetailsSection = React.memo(
 									onFieldChange("contractStatus", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50">
+								<SelectTrigger className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -142,7 +142,7 @@ export const ContractDetailsSection = React.memo(
 					</div>
 
 					{/* VAT toggle */}
-					<div className="rounded-xl border border-sky-200/40 bg-white/60 p-4 dark:border-sky-800/30 dark:bg-slate-900/30">
+					<div className="rounded-xl border border-chart-4 bg-white/60 p-4 dark:border-chart-4 dark:bg-slate-900/30">
 						<div className="flex items-center justify-between">
 							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
 								{t("projects.createProject.vatToggle")}
@@ -156,7 +156,7 @@ export const ContractDetailsSection = React.memo(
 						</div>
 						{includesVat && numericContractValue > 0 && (
 							<div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-								<div className="rounded-lg bg-sky-50 p-3 dark:bg-sky-950/30">
+								<div className="rounded-lg bg-chart-4/15 p-3 dark:bg-chart-4/20">
 									<p className="text-xs text-slate-500">
 										{t(
 											"projects.createProject.valueBeforeVat",
@@ -166,22 +166,22 @@ export const ContractDetailsSection = React.memo(
 										{formatNumber(numericContractValue)}
 									</p>
 								</div>
-								<div className="rounded-lg bg-sky-50 p-3 dark:bg-sky-950/30">
+								<div className="rounded-lg bg-chart-4/15 p-3 dark:bg-chart-4/20">
 									<p className="text-xs text-slate-500">
 										{t("projects.createProject.vatAmount")}{" "}
 										(15%)
 									</p>
-									<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
+									<p className="font-mono text-sm font-semibold text-chart-4 dark:text-chart-4">
 										+{formatNumber(vatAmount)}
 									</p>
 								</div>
-								<div className="rounded-lg bg-sky-100 p-3 dark:bg-sky-900/40">
+								<div className="rounded-lg bg-chart-4/15 p-3 dark:bg-chart-4/20">
 									<p className="text-xs text-slate-500">
 										{t(
 											"projects.createProject.valueWithVat",
 										)}
 									</p>
-									<p className="font-mono text-sm font-bold text-sky-800 dark:text-sky-200">
+									<p className="font-mono text-sm font-bold text-chart-4 dark:text-chart-4">
 										{formatNumber(totalWithVat)}
 									</p>
 								</div>
@@ -201,7 +201,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("signedDate", e.target.value)
 								}
-								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -214,7 +214,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("startDate", e.target.value)
 								}
-								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -227,7 +227,7 @@ export const ContractDetailsSection = React.memo(
 								onChange={(e: any) =>
 									onFieldChange("endDate", e.target.value)
 								}
-								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
+								className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
 							/>
 						</div>
 					</div>
@@ -244,7 +244,7 @@ export const ContractDetailsSection = React.memo(
 									onFieldChange("paymentMethod", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50">
+								<SelectTrigger className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50">
 									<SelectValue
 										placeholder={t(
 											"projects.createProject.paymentMethod",
@@ -282,7 +282,7 @@ export const ContractDetailsSection = React.memo(
 								"projects.createProject.scopeOfWorkPlaceholder",
 							)}
 							rows={3}
-							className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
+							className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
 						/>
 					</div>
 
@@ -297,7 +297,7 @@ export const ContractDetailsSection = React.memo(
 								onFieldChange("contractNotes", e.target.value)
 							}
 							rows={2}
-							className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
+							className="rounded-xl border-chart-4 bg-white dark:border-chart-4 dark:bg-slate-900/50"
 						/>
 					</div>
 				</div>

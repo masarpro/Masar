@@ -63,7 +63,7 @@ export function BeamInputRow({
 				<div className="flex items-center gap-4 text-xs text-muted-foreground">
 					<span>
 						خرسانة:{" "}
-						<span className="font-semibold text-blue-600">
+						<span className="font-semibold text-chart-4">
 							{formatNumber(calc.concreteVolume)} م³
 						</span>
 					</span>
@@ -166,11 +166,11 @@ export function BeamInputRow({
 								className="h-8 text-sm"
 							/>
 						</div>
-						<div className="bg-blue-50/50 dark:bg-blue-950/20 rounded p-2 flex flex-col justify-center items-center">
+						<div className="bg-chart-4/15 dark:bg-chart-4/20 rounded p-2 flex flex-col justify-center items-center">
 							<span className="text-xs text-muted-foreground">
 								حجم الخرسانة
 							</span>
-							<span className="font-bold text-sm text-blue-700">
+							<span className="font-bold text-sm text-chart-4">
 								{formatNumber(calc.concreteVolume)} م³
 							</span>
 						</div>

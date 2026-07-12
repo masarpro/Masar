@@ -80,8 +80,8 @@ export function AccountingDashboard({
 						label: t("finance.accounting.totalAssets"),
 						value: formatAccounting(data.totalAssets),
 						icon: DollarSign,
-						iconClassName: "text-blue-600",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("finance.accounting.totalLiabilities"),
@@ -121,8 +121,8 @@ export function AccountingDashboard({
 									{formatAccounting(data.totalAssets)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-								<DollarSign className="h-5 w-5 text-blue-600" />
+							<div className="p-2.5 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<DollarSign className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
@@ -201,9 +201,9 @@ export function AccountingDashboard({
 						label: t("finance.accounting.dashboard.accountsReceivable"),
 						value: formatAccounting(data.accountsReceivable),
 						icon: Users,
-						iconClassName: "text-blue-600",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
-						valueClassName: "text-blue-600",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						valueClassName: "text-chart-4",
 					},
 					{
 						label: t("finance.accounting.dashboard.accountsPayable"),
@@ -255,12 +255,12 @@ export function AccountingDashboard({
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.accountsReceivable")}</p>
-								<p className="text-lg font-bold text-blue-600 mt-1">
+								<p className="text-lg font-bold text-chart-4 mt-1">
 									{formatAccounting(data.accountsReceivable)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-								<Users className="h-5 w-5 text-blue-600" />
+							<div className="p-2.5 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<Users className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
 					</CardContent>

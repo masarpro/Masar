@@ -46,7 +46,7 @@ export function OwnerPaymentMilestonesGrid({
 							term.isComplete
 								? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/20"
 								: isCurrent
-									? "border-sky-300 bg-sky-50 ring-1 ring-sky-300 dark:border-sky-800 dark:bg-sky-950/30"
+									? "border-chart-4 bg-chart-4/15 ring-1 ring-chart-4 dark:border-chart-4 dark:bg-chart-4/20"
 									: "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900",
 						)}
 					>
@@ -62,7 +62,7 @@ export function OwnerPaymentMilestonesGrid({
 							{term.isComplete ? (
 								<CheckCircle2 className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
 							) : isCurrent ? (
-								<span className="shrink-0 rounded-full bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white">
+								<span className="shrink-0 rounded-full bg-chart-4 px-2 py-0.5 text-[10px] font-medium text-white">
 									{t("ownerPortal.payments.currentStage")}
 								</span>
 							) : null}

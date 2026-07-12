@@ -41,7 +41,7 @@ export function OperationalSection({
 	const t = useTranslations();
 
 	const miniStats = [
-		{ label: t("dashboard.operational.activeProjects"), value: activeProjects, color: "text-blue-600 dark:text-blue-400", bgColor: "bg-blue-50 dark:bg-blue-950/20", icon: FolderOpen },
+		{ label: t("dashboard.operational.activeProjects"), value: activeProjects, color: "text-chart-4 dark:text-chart-4", bgColor: "bg-chart-4/15 dark:bg-chart-4/20", icon: FolderOpen },
 		{ label: t("dashboard.operational.completedProjects"), value: completedProjects, color: "text-green-600 dark:text-green-400", bgColor: "bg-green-50 dark:bg-green-950/20", icon: CheckCircle },
 		{ label: t("dashboard.operational.onHoldProjects"), value: onHoldProjects, color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-950/20", icon: PauseCircle },
 		{ label: t("dashboard.operational.openIssues"), value: openIssues, color: "text-red-600 dark:text-red-400", bgColor: "bg-red-50 dark:bg-red-950/20", icon: AlertTriangle },

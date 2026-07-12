@@ -68,7 +68,7 @@ function getCategoryBadge(
 	const categoryConfig: Record<string, { className: string; label: string }> = {
 		MATERIALS: {
 			className:
-				"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			label: t("finance.category.MATERIALS"),
 		},
 		LABOR: {
@@ -83,7 +83,7 @@ function getCategoryBadge(
 		},
 		SUBCONTRACTOR: {
 			className:
-				"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			label: t("finance.category.SUBCONTRACTOR"),
 		},
 		TRANSPORT: {
@@ -103,7 +103,7 @@ function getCategoryBadge(
 		<div className="flex items-center gap-1.5">
 			<Badge className={`border-0 ${config.className}`}>{config.label}</Badge>
 			{_type === "subcontract_payment" && (
-				<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 px-1.5">
+				<Badge className="border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 px-1.5">
 					<Hammer className="h-3 w-3" />
 				</Badge>
 			)}

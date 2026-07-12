@@ -64,11 +64,11 @@ export function FinanceSummary({
 			title: t("finance.summary.remaining"),
 			value: remaining,
 			icon: Wallet,
-			bgColor: "bg-sky-50 dark:bg-sky-950/30",
-			iconBg: "bg-sky-100 dark:bg-sky-900/50",
-			iconColor: "text-sky-600 dark:text-sky-400",
-			textColor: "text-sky-700 dark:text-sky-300",
-			labelColor: "text-sky-600 dark:text-sky-400",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
+			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
+			textColor: "text-chart-4 dark:text-chart-4",
+			labelColor: "text-chart-4 dark:text-chart-4",
 		},
 		{
 			title: t("finance.summary.claimsPaid"),
@@ -105,7 +105,7 @@ export function FinanceSummary({
 								adjustedContractValue !== undefined &&
 								adjustedContractValue > 0 &&
 								changeOrdersImpact !== 0 && (
-									<p className="mt-0.5 truncate text-xs text-sky-600 dark:text-sky-400">
+									<p className="mt-0.5 truncate text-xs text-chart-4 dark:text-chart-4">
 										{t("projects.contract.summary.adjustedValue")}:{" "}
 										{formatSAR(adjustedContractValue)}
 									</p>

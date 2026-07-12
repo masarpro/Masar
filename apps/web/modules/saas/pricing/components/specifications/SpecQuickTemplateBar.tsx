@@ -33,9 +33,9 @@ const TEMPLATES = [
 		value: "medium" as const,
 		label: "متوسط",
 		icon: Sparkles,
-		color: "text-blue-600",
-		bg: "bg-blue-50 dark:bg-blue-950/30",
-		border: "border-blue-200 dark:border-blue-800",
+		color: "text-chart-4",
+		bg: "bg-chart-4/15 dark:bg-chart-4/20",
+		border: "border-chart-4 dark:border-chart-4",
 	},
 	{
 		value: "luxury" as const,

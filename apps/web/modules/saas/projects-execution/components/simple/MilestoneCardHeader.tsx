@@ -43,7 +43,7 @@ function StatusBadge({ status }: { status: ExecutionMilestone["status"] }) {
 			label: t("timeline.status.planned"),
 		},
 		IN_PROGRESS: {
-			className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+			className: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			label: t("timeline.status.inProgress"),
 		},
 		COMPLETED: {

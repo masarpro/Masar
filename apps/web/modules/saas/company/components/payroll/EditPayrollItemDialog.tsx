@@ -208,7 +208,7 @@ export function EditPayrollItemDialog({
 							</Button>
 							<Button
 								type="submit"
-								className="rounded-xl bg-blue-600 hover:bg-blue-700"
+								className="rounded-xl bg-chart-4 hover:bg-chart-4"
 								disabled={isLoading}
 							>
 								{isLoading ? (

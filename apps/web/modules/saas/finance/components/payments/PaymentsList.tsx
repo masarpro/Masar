@@ -265,7 +265,7 @@ export function PaymentsList({
 		const colors: Record<string, string> = {
 			CASH: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400",
 			BANK_TRANSFER:
-				"bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			CHEQUE: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
 			CREDIT_CARD:
 				"bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400",
@@ -619,15 +619,15 @@ export function PaymentsList({
 						label: t("finance.payments.paymentsCount"),
 						value: paymentsCount,
 						icon: Hash,
-						iconClassName: "text-blue-600 dark:text-blue-400",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/50",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("finance.payments.monthTotal"),
 						value: <Currency amount={monthTotal} />,
 						icon: CalendarDays,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/50",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("finance.payments.completedTotal"),
@@ -656,7 +656,7 @@ export function PaymentsList({
 				<GlassStatCard
 					colorScheme="blue"
 					icon={
-						<Hash className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<Hash className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					}
 					title={t("finance.payments.paymentsCount")}
 					value={paymentsCount}
@@ -664,7 +664,7 @@ export function PaymentsList({
 				<GlassStatCard
 					colorScheme="sky"
 					icon={
-						<CalendarDays className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<CalendarDays className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					}
 					title={t("finance.payments.monthTotal")}
 					value={<Currency amount={monthTotal} />}
@@ -810,7 +810,7 @@ export function PaymentsList({
 												{payment.paymentNo}
 											</span>
 											{payment._source === "project" && (
-												<Badge className="rounded-lg border-0 bg-sky-100 px-1.5 py-0 text-[10px] text-sky-700 dark:bg-sky-900/50 dark:text-sky-400">
+												<Badge className="rounded-lg border-0 bg-chart-4/15 px-1.5 py-0 text-[10px] text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 													<FolderKanban className="h-3 w-3 me-1" />
 													{t(
 														"finance.payments.projectPayment",
@@ -968,7 +968,7 @@ export function PaymentsList({
 													</Badge>
 													{payment._source ===
 														"project" && (
-														<Badge className="rounded-lg bg-sky-100 px-1.5 py-0 text-[10px] text-sky-700 dark:bg-sky-900/50 dark:text-sky-400">
+														<Badge className="rounded-lg bg-chart-4/15 px-1.5 py-0 text-[10px] text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 															<FolderKanban className="h-3 w-3 me-1" />
 															{t(
 																"finance.payments.projectPayment",

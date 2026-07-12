@@ -213,8 +213,8 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 						label: t("finance.banks.totalBankBalance"),
 						value: <Currency amount={summaryData?.totalBankBalance ?? 0} />,
 						icon: Building,
-						iconClassName: "text-blue-600 dark:text-blue-400",
-						iconBgClassName: "bg-blue-100 dark:bg-blue-900/50",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 					},
 					{
 						label: t("finance.banks.totalCashBalance"),
@@ -238,8 +238,8 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-								<Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							<div className="p-2 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<Building className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
 								<p className="text-sm text-slate-500 dark:text-slate-400">
@@ -414,11 +414,11 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 											<div className="flex items-center gap-3">
 												<div className={`p-1.5 rounded-lg ${
 													account.accountType === "BANK"
-														? "bg-blue-100 dark:bg-blue-900/50"
+														? "bg-chart-4/15 dark:bg-chart-4/20"
 														: "bg-green-100 dark:bg-green-900/50"
 												}`}>
 													{account.accountType === "BANK" ? (
-														<Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+														<Building className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 													) : (
 														<Wallet className="h-4 w-4 text-green-600 dark:text-green-400" />
 													)}

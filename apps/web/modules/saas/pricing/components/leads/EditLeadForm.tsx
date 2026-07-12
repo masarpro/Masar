@@ -133,11 +133,11 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 		<form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
 			{/* Section 1: Client Information */}
 			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
-				<div className="h-1 w-full bg-blue-500" />
+				<div className="h-1 w-full bg-chart-4" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/30">
-							<User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="p-2.5 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
+							<User className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
 							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
@@ -221,7 +221,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 								onClick={() => update("clientType", "INDIVIDUAL")}
 								className={`flex-1 flex items-center justify-center gap-2 rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
 									formData.clientType === "INDIVIDUAL"
-										? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400"
+										? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20 text-chart-4 dark:text-chart-4"
 										: "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
 								}`}
 							>
@@ -345,11 +345,11 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 
 			{/* Section 3: Management Settings */}
 			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
-				<div className="h-1 w-full bg-sky-500" />
+				<div className="h-1 w-full bg-chart-4" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/30">
-							<Settings2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-2.5 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
+							<Settings2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
 							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">

@@ -141,8 +141,8 @@ export function SubcontractClaimsListView({
 					<Card>
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="rounded-lg bg-blue-50 p-2.5">
-									<TrendingUp className="h-5 w-5 text-blue-600" />
+								<div className="rounded-lg bg-chart-4/15 p-2.5">
+									<TrendingUp className="h-5 w-5 text-chart-4" />
 								</div>
 								<div>
 									<p className="text-sm text-muted-foreground">

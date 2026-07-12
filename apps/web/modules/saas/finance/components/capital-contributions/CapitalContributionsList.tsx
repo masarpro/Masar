@@ -28,7 +28,7 @@ interface CapitalContributionsListProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-	INITIAL: "border-blue-300 text-blue-700 bg-blue-50",
+	INITIAL: "border-chart-4 text-chart-4 bg-chart-4/15",
 	ADDITIONAL: "border-green-300 text-green-700 bg-green-50",
 	IN_KIND: "border-purple-300 text-purple-700 bg-purple-50",
 };

@@ -139,7 +139,7 @@ export function MilestoneActivityChecklist({
 
 	const statusBadgeClass: Record<string, string> = {
 		NOT_STARTED: "bg-slate-100 text-slate-600",
-		IN_PROGRESS: "bg-blue-100 text-blue-600",
+		IN_PROGRESS: "bg-chart-4/15 text-chart-4",
 		COMPLETED: "bg-green-100 text-green-600",
 		DELAYED: "bg-red-100 text-red-600",
 		ON_HOLD: "bg-yellow-100 text-yellow-600",

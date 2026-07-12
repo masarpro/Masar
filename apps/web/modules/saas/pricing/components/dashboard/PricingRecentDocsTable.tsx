@@ -38,8 +38,8 @@ interface PricingRecentDocsTableProps {
 
 const studyStatusConfig: Record<string, { bg: string; text: string }> = {
 	draft: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	in_review: { bg: "bg-blue-100 dark:bg-blue-900/50", text: "text-blue-600 dark:text-blue-400" },
-	in_progress: { bg: "bg-blue-100 dark:bg-blue-900/50", text: "text-blue-600 dark:text-blue-400" },
+	in_review: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
+	in_progress: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
 	completed: { bg: "bg-emerald-100 dark:bg-emerald-900/50", text: "text-emerald-600 dark:text-emerald-400" },
 	approved: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },
 };
@@ -55,7 +55,7 @@ const studyStatusTranslationKey: Record<string, string> = {
 
 const quotationStatusConfig: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	SENT: { bg: "bg-blue-100 dark:bg-blue-900/50", text: "text-blue-600 dark:text-blue-400" },
+	SENT: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
 	VIEWED: { bg: "bg-purple-100 dark:bg-purple-900/50", text: "text-purple-600 dark:text-purple-400" },
 	ACCEPTED: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },
 	REJECTED: { bg: "bg-red-100 dark:bg-red-900/50", text: "text-red-600 dark:text-red-400" },
@@ -132,7 +132,7 @@ export function PricingRecentDocsTable({
 										>
 											<TableCell>
 												{isStudy ? (
-													<Calculator className="h-4 w-4 text-sky-500" />
+													<Calculator className="h-4 w-4 text-chart-4" />
 												) : (
 													<FileSpreadsheet className="h-4 w-4 text-violet-500" />
 												)}

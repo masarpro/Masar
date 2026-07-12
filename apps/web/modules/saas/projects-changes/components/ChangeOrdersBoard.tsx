@@ -229,14 +229,14 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 					<Card className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-								<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+								<DollarSignIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
-								<p className="text-xs text-sky-600 dark:text-sky-400">
+								<p className="text-xs text-chart-4 dark:text-chart-4">
 									{t("changeOrders.stats.costImpact")}
 								</p>
-								<p className="text-lg font-semibold text-sky-700 dark:text-sky-300">
+								<p className="text-lg font-semibold text-chart-4 dark:text-chart-4">
 									{formatSAR(stats.totalCostImpact)}
 								</p>
 							</div>
@@ -245,18 +245,18 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 					<Card className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
+							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
 								{stats.totalTimeImpact >= 0 ? (
-									<TrendingUpIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+									<TrendingUpIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 								) : (
-									<TrendingDownIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+									<TrendingDownIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 								)}
 							</div>
 							<div>
-								<p className="text-xs text-blue-600 dark:text-blue-400">
+								<p className="text-xs text-chart-4 dark:text-chart-4">
 									{t("changeOrders.stats.timeImpact")}
 								</p>
-								<p className="text-xl font-semibold text-blue-700 dark:text-blue-300">
+								<p className="text-xl font-semibold text-chart-4 dark:text-chart-4">
 									{stats.totalTimeImpact > 0 ? "+" : ""}
 									{stats.totalTimeImpact} {t("common.days")}
 								</p>
@@ -370,7 +370,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 											<span
 												className={
 													Number(co.costImpact) >= 0
-														? "text-sky-600 dark:text-sky-400"
+														? "text-chart-4 dark:text-chart-4"
 														: "text-red-600 dark:text-red-400"
 												}
 											>
@@ -386,7 +386,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 											<span
 												className={
 													co.timeImpactDays >= 0
-														? "text-blue-600 dark:text-blue-400"
+														? "text-chart-4 dark:text-chart-4"
 														: "text-orange-600 dark:text-orange-400"
 												}
 											>

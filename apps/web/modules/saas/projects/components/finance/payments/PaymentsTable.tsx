@@ -61,7 +61,7 @@ interface PaymentsTableProps {
 
 const PAYMENT_METHOD_COLORS: Record<string, string> = {
 	CASH: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-	BANK_TRANSFER: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+	BANK_TRANSFER: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	CHEQUE: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
 	CREDIT_CARD: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
 	OTHER: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
@@ -132,7 +132,7 @@ export function PaymentsTable({
 											day: "numeric",
 										})}
 									</TableCell>
-									<TableCell className="font-semibold text-sky-700 dark:text-sky-400">
+									<TableCell className="font-semibold text-chart-4 dark:text-chart-4">
 										<div className="flex flex-col gap-1">
 											<span>{formatSARPrecise(payment.amount)}</span>
 											{payment.splitGroupTotal != null && (

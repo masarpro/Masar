@@ -535,7 +535,7 @@ export const GeneralExpenseTab = forwardRef<
 							<SelectItem key={account.id} value={account.id}>
 								<div className="flex items-center gap-2">
 									{account.accountType === "BANK" ? (
-										<Building className="h-3.5 w-3.5 text-blue-500" />
+										<Building className="h-3.5 w-3.5 text-chart-4" />
 									) : (
 										<Wallet className="h-3.5 w-3.5 text-green-500" />
 									)}
@@ -556,11 +556,11 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Selected account info */}
 			{selectedAccount && !isObligation && (
-				<div className="rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-800/30 dark:bg-blue-950/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+				<div className="rounded-xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 					<div className="flex items-center gap-2.5 min-w-0">
-						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 shrink-0">
+						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20 shrink-0">
 							{selectedAccount.accountType === "BANK" ? (
-								<Building className="h-3.5 w-3.5 text-blue-600" />
+								<Building className="h-3.5 w-3.5 text-chart-4" />
 							) : (
 								<Wallet className="h-3.5 w-3.5 text-green-600" />
 							)}

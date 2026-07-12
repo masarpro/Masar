@@ -172,7 +172,7 @@ export function ColumnsSection({
 						key={floor.id}
 						className={`border rounded-lg overflow-hidden transition-all ${
 							hasItems
-								? "border-blue-200/50 bg-blue-50/20 dark:bg-blue-950/10"
+								? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
 						} ${floor.isRepeated && hasItems ? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10" : ""}`}
 					>
@@ -217,7 +217,7 @@ export function ColumnsSection({
 									{displayConcrete > 0 && (
 										<span>
 											{t("pricing.studies.structural.sections.common.concrete")}:{" "}
-											<span className="font-semibold text-blue-600">
+											<span className="font-semibold text-chart-4">
 												{formatNumber(displayConcrete)} م³
 											</span>
 										</span>
@@ -420,7 +420,7 @@ export function ColumnsSection({
 																	<div className="flex items-center gap-3 text-xs text-muted-foreground">
 																		<span>
 																			{t("pricing.studies.structural.sections.common.concrete")}:{" "}
-																			<span className="font-semibold text-blue-600">
+																			<span className="font-semibold text-chart-4">
 																				{formatNumber(perFloorConcrete)} م³
 																			</span>
 																		</span>
@@ -507,7 +507,7 @@ export function ColumnsSection({
 																			<span>
 																				{t("pricing.studies.structural.sections.columns.floorTotal", { number: floorNum })}:{" "}
 																			</span>
-																			<span className="font-bold text-blue-600">
+																			<span className="font-bold text-chart-4">
 																				{formatNumber(perFloorConcrete)} م³ {t("pricing.studies.structural.sections.common.concrete")}
 																			</span>
 																			<span className="font-bold text-orange-600">
@@ -531,7 +531,7 @@ export function ColumnsSection({
 														<div className="flex gap-4 text-sm">
 															<span>
 																{t("pricing.studies.structural.sections.common.concrete")}:{" "}
-																<span className="font-bold text-blue-600">
+																<span className="font-bold text-chart-4">
 																	{formatNumber(repeatedConcrete)} م³
 																</span>
 															</span>

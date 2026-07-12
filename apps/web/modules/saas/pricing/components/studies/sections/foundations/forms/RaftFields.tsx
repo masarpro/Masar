@@ -46,7 +46,7 @@ export function RaftFields({
 
 				{/* الشبكة السفلية */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-blue-700">الشبكة السفلية</h5>
+					<h5 className="text-sm font-medium text-chart-4">الشبكة السفلية</h5>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						<RebarMeshInput title="الشبكة السفلية" direction="اتجاه X"
 							diameter={formData.bottomXDiameter}

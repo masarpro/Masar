@@ -31,7 +31,7 @@ const roleIcons: Record<ProjectRole, typeof UserCircle> = {
 
 const roleColors: Record<ProjectRole, string> = {
 	MANAGER: "text-purple-600 dark:text-purple-400",
-	ENGINEER: "text-blue-600 dark:text-blue-400",
+	ENGINEER: "text-chart-4 dark:text-chart-4",
 	SUPERVISOR: "text-orange-600 dark:text-orange-400",
 	ACCOUNTANT: "text-green-600 dark:text-green-400",
 	VIEWER: "text-slate-600 dark:text-slate-400",

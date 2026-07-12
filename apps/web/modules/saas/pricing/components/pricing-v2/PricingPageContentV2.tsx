@@ -430,29 +430,29 @@ export function PricingPageContentV2({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* ═══ Hero cost summary card ═══ */}
-			<div className="rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-6">
+			<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4 p-6">
 				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 					<div className="space-y-1">
-						<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+						<p className="text-sm text-chart-4 dark:text-chart-4 font-medium">
 							{t("hero.directCost")}
 						</p>
-						<p className="text-3xl font-bold text-blue-700 dark:text-blue-300" dir="ltr">
+						<p className="text-3xl font-bold text-chart-4 dark:text-chart-4" dir="ltr">
 							{profitData ? `${formatNum(totalCost)} ر.س` : "—"}
 						</p>
 					</div>
 					<div className="flex gap-6">
 						{buildingArea > 0 && (
-							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
+							<div className="text-center px-4 py-2 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
 								<p className="text-xs text-muted-foreground mb-1">
 									{t("hero.costPerSqm")}
 								</p>
-								<p className="text-lg font-bold text-blue-700 dark:text-blue-300" dir="ltr">
+								<p className="text-lg font-bold text-chart-4 dark:text-chart-4" dir="ltr">
 									{formatNum(costPerSqm)} ر.س/م²
 								</p>
 							</div>
 						)}
 						{buildingArea > 0 && (
-							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
+							<div className="text-center px-4 py-2 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
 								<p className="text-xs text-muted-foreground mb-1">
 									{t("hero.buildingArea")}
 								</p>

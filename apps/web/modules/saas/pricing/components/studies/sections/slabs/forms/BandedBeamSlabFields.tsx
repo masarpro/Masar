@@ -283,7 +283,7 @@ export function BandedBeamSlabFields({
 
 				{/* الشبكة السفلية */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-blue-700">
+					<h5 className="text-sm font-medium text-chart-4">
 						الشبكة السفلية (الفرش)
 					</h5>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -433,7 +433,7 @@ export function BandedBeamSlabFields({
 							<Badge variant="outline" className={
 								calculations.structuralType === 'ONE_WAY'
 									? 'border-amber-500 text-amber-700'
-									: 'border-blue-500 text-blue-700'
+									: 'border-chart-4 text-chart-4'
 							}>
 								{calculations.structuralType === 'ONE_WAY'
 									? t('pricing.studies.structural.oneWaySlab')
@@ -474,7 +474,7 @@ export function BandedBeamSlabFields({
 							</Label>
 						</div>
 						{showFormwork && calculations.formworkArea > 0 && (
-							<div className="flex items-center gap-2 text-blue-600">
+							<div className="flex items-center gap-2 text-chart-4">
 								<LayoutGrid className="h-4 w-4" />
 								<span className="font-bold">
 									{formatNumber(calculations.formworkArea)}{" "}

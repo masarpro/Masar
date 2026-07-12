@@ -561,7 +561,7 @@ export function FoundationsSection({
 												}}
 												title="نسخ القاعدة"
 											>
-												<Copy className="h-4 w-4 text-blue-600" />
+												<Copy className="h-4 w-4 text-chart-4" />
 											</Button>
 											<Button
 												variant="ghost"

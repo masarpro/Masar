@@ -419,7 +419,7 @@ export function ImportExcelDialog({
 						<span
 							className={`px-2.5 py-1 rounded-lg font-medium ${
 								step === 1
-									? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+									? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 									: "bg-slate-100 dark:bg-slate-800"
 							}`}
 						>
@@ -429,7 +429,7 @@ export function ImportExcelDialog({
 						<span
 							className={`px-2.5 py-1 rounded-lg font-medium ${
 								step === 2
-									? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+									? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 									: "bg-slate-100 dark:bg-slate-800"
 							}`}
 						>
@@ -439,7 +439,7 @@ export function ImportExcelDialog({
 						<span
 							className={`px-2.5 py-1 rounded-lg font-medium ${
 								step === 3
-									? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+									? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 									: "bg-slate-100 dark:bg-slate-800"
 							}`}
 						>
@@ -456,10 +456,10 @@ export function ImportExcelDialog({
 								onDrop={handleDrop}
 								onDragOver={handleDragOver}
 								onClick={() => fileInputRef.current?.click()}
-								className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
+								className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer hover:border-chart-4 dark:hover:border-chart-4 transition-colors"
 							>
 								{isProcessing ? (
-									<Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-3" />
+									<Loader2 className="h-10 w-10 text-chart-4 animate-spin mb-3" />
 								) : (
 									<Upload className="h-10 w-10 text-slate-400 mb-3" />
 								)}

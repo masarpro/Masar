@@ -78,7 +78,7 @@ export function ChatPanel({
 			label: t("projects.chat.teamChannel"),
 			icon: Users,
 			note: t("projects.chat.teamChannelNote"),
-			noteColor: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+			noteColor: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 		},
 		{
 			key: "OWNER" as MessageChannel,

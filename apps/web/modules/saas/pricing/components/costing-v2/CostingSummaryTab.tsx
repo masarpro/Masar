@@ -39,7 +39,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 const SECTION_DOT_COLORS: Record<string, string> = {
-	STRUCTURAL: "bg-blue-500",
+	STRUCTURAL: "bg-chart-4",
 	FINISHING: "bg-green-500",
 	MEP: "bg-orange-500",
 	LABOR: "bg-purple-500",
@@ -118,7 +118,7 @@ export function CostingSummaryTab({
 				{/* Materials card */}
 				<div className="rounded-xl border border-border bg-card p-3 sm:p-4">
 					<div className="flex items-center gap-2 mb-1 sm:mb-2">
-						<Package className="h-4 w-4 text-blue-500" />
+						<Package className="h-4 w-4 text-chart-4" />
 						<span className="text-xs sm:text-sm font-medium">المواد</span>
 					</div>
 					<p className="text-base sm:text-xl font-bold" dir="ltr">
@@ -157,7 +157,7 @@ export function CostingSummaryTab({
 					<div className="h-6 rounded-full overflow-hidden flex" dir="ltr">
 						{materialPct > 0 && (
 							<div
-								className="bg-blue-500 relative transition-all duration-500"
+								className="bg-chart-4 relative transition-all duration-500"
 								style={{ width: `${materialPct}%` }}
 							>
 								{materialPct > 12 && (
@@ -183,7 +183,7 @@ export function CostingSummaryTab({
 					{/* Legend */}
 					<div className="flex flex-wrap gap-x-6 gap-y-1 mt-3">
 						<div className="flex items-center gap-1.5 text-xs">
-							<span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500" />
+							<span className="inline-block w-2.5 h-2.5 rounded-full bg-chart-4" />
 							<span>المواد</span>
 							<span className="text-muted-foreground" dir="ltr">
 								({formatNum(materialPct)}%)

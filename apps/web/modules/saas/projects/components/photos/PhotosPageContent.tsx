@@ -110,11 +110,11 @@ interface PhotosPageContentProps {
 function getCategoryColor(category: string) {
 	switch (category) {
 		case "PROGRESS":
-			return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
+			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-chart-4 dark:border-chart-4";
 		case "ISSUE":
 			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
 		case "EQUIPMENT":
-			return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
+			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-chart-4 dark:border-chart-4";
 		case "MATERIAL":
 			return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800";
 		case "SAFETY":

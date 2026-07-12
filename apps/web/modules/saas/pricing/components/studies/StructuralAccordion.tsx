@@ -224,7 +224,7 @@ export function StructuralAccordion({
 								"border-green-500/50 bg-green-50/30 dark:bg-green-950/20",
 							hasItems &&
 								!isSaved &&
-								"border-blue-200/50 bg-blue-50/30 dark:bg-blue-950/20",
+								"border-chart-4 bg-chart-4/15 dark:bg-chart-4/20",
 							!hasItems && !isSaved && "border-border",
 						)}
 					>
@@ -253,7 +253,7 @@ export function StructuralAccordion({
 											{sectionConcrete > 0 && (
 												<span className="flex items-center gap-1">
 													خرسانة:{" "}
-													<span className="font-semibold text-blue-600">
+													<span className="font-semibold text-chart-4">
 														{formatNumber(
 															sectionConcrete,
 														)}{" "}

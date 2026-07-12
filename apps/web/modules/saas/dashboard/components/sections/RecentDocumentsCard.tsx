@@ -65,8 +65,8 @@ export function RecentDocumentsCard({
 			createdAt: (inv as any).createdAt,
 			href: `${basePath}/finance/invoices/${inv.id}`,
 			icon: Receipt,
-			iconColor: "text-sky-600 dark:text-sky-400",
-			bgColor: "bg-sky-50 dark:bg-sky-950/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		});
 	}
 
@@ -78,8 +78,8 @@ export function RecentDocumentsCard({
 			createdAt: (q as any).createdAt,
 			href: `${basePath}/pricing/quotations/${q.id}`,
 			icon: FileText,
-			iconColor: "text-blue-600 dark:text-blue-400",
-			bgColor: "bg-blue-50 dark:bg-blue-950/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		});
 	}
 
@@ -111,7 +111,7 @@ export function RecentDocumentsCard({
 	}
 
 	return (
-		<div className="rounded-2xl bg-sky-50/30 dark:bg-sky-950/10 border border-sky-200/30 dark:border-sky-800/20 shadow-lg shadow-black/5 flex flex-col p-3.5">
+		<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4 shadow-lg shadow-black/5 flex flex-col p-3.5">
 			<h3 className="text-sm font-bold text-foreground mb-2">
 				{t("recentDocs.title")}
 			</h3>

@@ -174,8 +174,8 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 				<div className="flex flex-col gap-3 border-b border-slate-100 p-5 dark:border-slate-800">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="rounded-lg bg-sky-100 p-2 dark:bg-sky-900/30">
-								<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+							<div className="rounded-lg bg-chart-4/15 p-2 dark:bg-chart-4/20">
+								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
 								<h2 className="font-semibold text-slate-800 dark:text-slate-200">
@@ -188,7 +188,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 						</div>
 						<Button
 							size="sm"
-							className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+							className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 							onClick={() => setShowPaymentForm(!showPaymentForm)}
 						>
 							<Plus className="me-1.5 h-4 w-4" />
@@ -311,7 +311,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 								</span>
 								<span>
 									<span className="text-slate-500">{t("subcontracts.detail.remaining")}: </span>
-									<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-sky-600"}`}>{formatCurrency(remaining)}</span>
+									<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-chart-4"}`}>{formatCurrency(remaining)}</span>
 								</span>
 							</div>
 						</div>

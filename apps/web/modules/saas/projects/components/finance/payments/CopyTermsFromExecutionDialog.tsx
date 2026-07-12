@@ -238,7 +238,7 @@ export function CopyTermsFromExecutionDialog({
 												key={milestone.id}
 												className={`rounded-xl border bg-white dark:bg-slate-900 p-4 transition-colors ${
 													isSelected
-														? "border-sky-300 dark:border-sky-700"
+														? "border-chart-4 dark:border-chart-4"
 														: "border-slate-200 dark:border-slate-700"
 												}`}
 											>
@@ -252,7 +252,7 @@ export function CopyTermsFromExecutionDialog({
 													/>
 													<div className="min-w-0 flex-1 space-y-2">
 														<div className="flex items-center gap-2">
-															<Flag className="h-4 w-4 text-blue-500 shrink-0" />
+															<Flag className="h-4 w-4 text-chart-4 shrink-0" />
 															<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
 																{milestone.title}
 															</h4>
@@ -295,7 +295,7 @@ export function CopyTermsFromExecutionDialog({
 								<span className="text-slate-500">
 									{t("projectPayments.copyExecution.totalPreview")}:{" "}
 								</span>
-								<span className="font-semibold text-sky-600 dark:text-sky-400">
+								<span className="font-semibold text-chart-4 dark:text-chart-4">
 									{formatCurrency(grandTotal, "SAR", "en-US")}
 								</span>
 							</div>
@@ -310,7 +310,7 @@ export function CopyTermsFromExecutionDialog({
 								</Button>
 								<Button
 									type="button"
-									className="rounded-xl h-10 bg-sky-600 text-white hover:bg-sky-700"
+									className="rounded-xl h-10 bg-chart-4 text-white hover:bg-chart-4"
 									disabled={
 										selectedRows.length === 0 ||
 										copyMutation.isPending

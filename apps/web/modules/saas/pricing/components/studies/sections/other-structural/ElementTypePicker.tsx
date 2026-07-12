@@ -8,8 +8,8 @@ import type { OtherStructuralElementType } from "../../../../types/other-structu
 
 const COLOR_MAP: Record<string, string> = {
 	amber: "border-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/30 dark:hover:bg-amber-950/50",
-	blue: "border-blue-300 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50",
-	sky: "border-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/30 dark:hover:bg-sky-950/50",
+	blue: "border-chart-4 bg-chart-4/15 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:hover:bg-chart-4/20",
+	sky: "border-chart-4 bg-chart-4/15 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:hover:bg-chart-4/20",
 	slate: "border-slate-300 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/30 dark:hover:bg-slate-800/50",
 	orange: "border-orange-300 bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/30 dark:hover:bg-orange-950/50",
 	stone: "border-stone-300 bg-stone-50 hover:bg-stone-100 dark:bg-stone-800/30 dark:hover:bg-stone-800/50",

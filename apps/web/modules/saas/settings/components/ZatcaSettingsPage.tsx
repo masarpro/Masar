@@ -70,7 +70,7 @@ interface ZatcaStatusData {
 
 const STATUS_COLORS: Record<string, string> = {
 	DISABLED: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-	ONBOARDING: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+	ONBOARDING: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	COMPLIANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 	ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 	EXPIRED: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
@@ -301,7 +301,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 					<div className="grid grid-cols-2 sm:grid-cols-5 gap-4 p-5">
 						<StatCard label={t("stats.total")} value={stats.total} icon={<FileCheck className="h-4 w-4" />} color="text-slate-600" />
 						<StatCard label={t("stats.cleared")} value={stats.cleared} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
-						<StatCard label={t("stats.reported")} value={stats.reported} icon={<CheckCircle2 className="h-4 w-4" />} color="text-blue-600" />
+						<StatCard label={t("stats.reported")} value={stats.reported} icon={<CheckCircle2 className="h-4 w-4" />} color="text-chart-4" />
 						<StatCard label={t("stats.rejected")} value={stats.rejected} icon={<XCircle className="h-4 w-4" />} color="text-red-600" />
 						<StatCard label={t("stats.pending")} value={stats.pending} icon={<Clock className="h-4 w-4" />} color="text-amber-600" />
 					</div>

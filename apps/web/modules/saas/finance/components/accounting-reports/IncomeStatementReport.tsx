@@ -414,8 +414,8 @@ function KPICard({
 			icon: TrendingDown,
 		},
 		blue: {
-			text: "text-blue-600 dark:text-blue-400",
-			bg: "bg-blue-100 dark:bg-blue-900/30",
+			text: "text-chart-4 dark:text-chart-4",
+			bg: "bg-chart-4/15 dark:bg-chart-4/20",
 			icon: DollarSign,
 		},
 	};

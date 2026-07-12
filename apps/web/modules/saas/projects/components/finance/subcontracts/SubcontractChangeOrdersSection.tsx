@@ -83,7 +83,7 @@ export const SubcontractChangeOrdersSection = React.memo(function SubcontractCha
 										</p>
 									</div>
 									<div className="flex items-center gap-2">
-										<span className={`font-semibold ${co.amount >= 0 ? "text-sky-600" : "text-red-600"}`}>
+										<span className={`font-semibold ${co.amount >= 0 ? "text-chart-4" : "text-red-600"}`}>
 											{co.amount >= 0 ? "+" : ""}
 											{formatCurrency(co.amount)}
 										</span>

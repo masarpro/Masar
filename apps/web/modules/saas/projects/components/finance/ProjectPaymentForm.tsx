@@ -197,9 +197,9 @@ export function ProjectPaymentForm({
 						{termsData.terms.map((term: any) => {
 							const isActive = term.id === selectedTermId;
 							const progressColor = term.isComplete
-								? "bg-sky-500"
+								? "bg-chart-4"
 								: term.id === termsData.nextIncompleteTermId
-									? "bg-blue-500"
+									? "bg-chart-4"
 									: "bg-slate-300 dark:bg-slate-600";
 							return (
 								<button
@@ -208,7 +208,7 @@ export function ProjectPaymentForm({
 									onClick={() => handleTermChange(term.id)}
 									className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs transition-colors ${
 										isActive
-											? "bg-blue-100 text-blue-700 ring-1 ring-blue-300 dark:bg-blue-900/40 dark:text-blue-300 dark:ring-blue-700"
+											? "bg-chart-4/15 text-chart-4 ring-1 ring-chart-4 dark:bg-chart-4/20 dark:text-chart-4 dark:ring-chart-4"
 											: "bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
 									}`}
 								>
@@ -264,20 +264,20 @@ export function ProjectPaymentForm({
 
 			{/* Term Info Card */}
 			{selectedTerm && (
-				<div className="overflow-hidden rounded-2xl border border-blue-200/50 bg-blue-50/50 dark:border-blue-800/30 dark:bg-blue-950/20">
+				<div className="overflow-hidden rounded-2xl border border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20">
 					<div className="p-5">
 						<div className="mb-3 flex items-center gap-3">
-							<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-								<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
-								<h3 className="text-base font-medium text-blue-900 dark:text-blue-100">
+								<h3 className="text-base font-medium text-chart-4 dark:text-chart-4">
 									{t("projectPayments.payingForPhase")}
 								</h3>
 								<div className="mt-1 flex items-center gap-2">
 									<Badge
 										variant="outline"
-										className="rounded-lg border-blue-200 bg-blue-50 text-xs text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
+										className="rounded-lg border-chart-4 bg-chart-4/15 text-xs text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 									>
 										{t(
 											`projects.createProject.termTypes.${selectedTerm.type}`,
@@ -305,18 +305,18 @@ export function ProjectPaymentForm({
 								<p className="text-xs text-slate-500">
 									{t("projectPayments.alreadyPaid")}
 								</p>
-								<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
+								<p className="font-mono text-sm font-semibold text-chart-4 dark:text-chart-4">
 									{formatNumber(
 										Number(selectedTerm.paidAmount),
 									)}{" "}
 									{t("common.sar")}
 								</p>
 							</div>
-							<div className="rounded-xl bg-blue-100/60 p-3 dark:bg-blue-900/30">
+							<div className="rounded-xl bg-chart-4/15 p-3 dark:bg-chart-4/20">
 								<p className="text-xs text-slate-500">
 									{t("projectPayments.remaining")}
 								</p>
-								<p className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
+								<p className="font-mono text-sm font-bold text-chart-4 dark:text-chart-4">
 									{formatNumber(
 										Number(selectedTerm.remainingAmount),
 									)}{" "}
@@ -332,8 +332,8 @@ export function ProjectPaymentForm({
 			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
 				<div className="border-b border-slate-200/50 p-5 dark:border-slate-700/30">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<TrendingUp className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
 							{t("projectPayments.paymentDetails")}
@@ -434,8 +434,8 @@ export function ProjectPaymentForm({
 			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
 				<div className="border-b border-slate-200/50 p-5 dark:border-slate-700/30">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-							<Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<Building className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
 							{t("finance.payments.destinationAccount")}
@@ -472,7 +472,7 @@ export function ProjectPaymentForm({
 										<div className="flex items-center gap-2">
 											{account.accountType ===
 											"BANK" ? (
-												<Building className="h-4 w-4 text-blue-500" />
+												<Building className="h-4 w-4 text-chart-4" />
 											) : (
 												<Wallet className="h-4 w-4 text-green-500" />
 											)}
@@ -490,7 +490,7 @@ export function ProjectPaymentForm({
 								<div className="flex items-center gap-2">
 									{selectedAccount.accountType ===
 									"BANK" ? (
-										<Building className="h-5 w-5 text-blue-500" />
+										<Building className="h-5 w-5 text-chart-4" />
 									) : (
 										<Wallet className="h-5 w-5 text-green-500" />
 									)}
@@ -632,7 +632,7 @@ export function ProjectPaymentForm({
 				<Button
 					type="submit"
 					disabled={createMutation.isPending}
-					className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+					className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 				>
 					{createMutation.isPending ? (
 						<>

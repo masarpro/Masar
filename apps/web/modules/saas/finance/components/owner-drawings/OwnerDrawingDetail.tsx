@@ -31,7 +31,7 @@ interface OwnerDrawingDetailProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-	COMPANY_LEVEL: "border-blue-300 text-blue-700 bg-blue-50",
+	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15",
 	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50",
 };
 

@@ -27,9 +27,9 @@ const STATUS_COLORS: Record<string, { bar: string; fill: string; text: string }>
 		text: "text-slate-700",
 	},
 	IN_PROGRESS: {
-		bar: "bg-blue-100 border-blue-500",
-		fill: "bg-blue-600",
-		text: "text-blue-700",
+		bar: "bg-chart-4/15 border-chart-4",
+		fill: "bg-chart-4",
+		text: "text-chart-4",
 	},
 	COMPLETED: {
 		bar: "bg-green-100 border-green-500",

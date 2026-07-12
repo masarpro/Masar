@@ -121,8 +121,8 @@ export function DigestSubscriptionsSection({
 		<div className="space-y-6" dir="rtl">
 			{/* Header */}
 			<div className="flex items-center gap-3">
-				<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-					<Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+				<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+					<Mail className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 				</div>
 				<div>
 					<h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">

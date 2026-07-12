@@ -393,7 +393,7 @@ export function EmptySectionTable({
 								return (
 									<tr
 										key={item.id as string}
-										className="border-b bg-blue-50/50 dark:bg-blue-950/20"
+										className="border-b bg-chart-4/15 dark:bg-chart-4/20"
 									>
 										<td className="px-3 py-1.5 text-muted-foreground">
 											{idx + 1}

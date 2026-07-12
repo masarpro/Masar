@@ -209,7 +209,7 @@ export function HollowCoreSlabFields({
 							</Label>
 						</div>
 						{showFormwork && calculations.formworkArea > 0 && (
-							<div className="flex items-center gap-2 text-blue-600">
+							<div className="flex items-center gap-2 text-chart-4">
 								<LayoutGrid className="h-4 w-4" />
 								<span className="font-bold">
 									{formatNumber(calculations.formworkArea)}{" "}

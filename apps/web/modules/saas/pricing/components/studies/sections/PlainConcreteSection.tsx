@@ -445,7 +445,7 @@ export function PlainConcreteSection({
 								<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 									<div className="bg-background rounded-lg p-3 text-center">
 										<p className="text-xs text-muted-foreground">المساحة</p>
-										<p className="text-lg font-bold text-blue-600">
+										<p className="text-lg font-bold text-chart-4">
 											{formatNumber(calculations.area)} م²
 										</p>
 									</div>

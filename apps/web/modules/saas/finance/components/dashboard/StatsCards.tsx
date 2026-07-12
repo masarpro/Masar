@@ -39,9 +39,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
 						label: t("finance.stats.invoices"),
 						value: stats?.invoices.total ?? 0,
 						icon: Receipt,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
-						valueClassName: "text-sky-700 dark:text-sky-300",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						valueClassName: "text-chart-4 dark:text-chart-4",
 					},
 					{
 						label: t("finance.stats.outstanding"),
@@ -55,9 +55,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
 						label: t("finance.stats.clients"),
 						value: stats?.clients.total ?? 0,
 						icon: Users,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
-						valueClassName: "text-sky-700 dark:text-sky-300",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						valueClassName: "text-chart-4 dark:text-chart-4",
 					},
 				]}
 			/>
@@ -66,7 +66,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
 			<div className="hidden sm:grid sm:grid-cols-3 gap-3">
 			<GlassStatCard
 				colorScheme="sky"
-				icon={<Receipt className="h-4 w-4 text-sky-600 dark:text-sky-400" />}
+				icon={<Receipt className="h-4 w-4 text-chart-4 dark:text-chart-4" />}
 				title={t("finance.stats.invoices")}
 				value={stats?.invoices.total ?? 0}
 				subtitle={<Currency amount={stats?.invoices.totalValue ?? 0} />}
@@ -80,7 +80,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
 			/>
 			<GlassStatCard
 				colorScheme="sky"
-				icon={<Users className="h-4 w-4 text-sky-600 dark:text-sky-400" />}
+				icon={<Users className="h-4 w-4 text-chart-4 dark:text-chart-4" />}
 				title={t("finance.stats.clients")}
 				value={stats?.clients.total ?? 0}
 				subtitle={t("finance.stats.activeClients")}

@@ -72,7 +72,7 @@ export function StripFields({
 					</h4>
 
 					<div className="space-y-3">
-						<h5 className="text-sm font-medium text-blue-700">الحديد الطولي الرئيسي (سفلي)</h5>
+						<h5 className="text-sm font-medium text-chart-4">الحديد الطولي الرئيسي (سفلي)</h5>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 							<RebarBarsInput
 								title="الحديد الطولي الرئيسي"
@@ -91,8 +91,8 @@ export function StripFields({
 						<div className="flex items-center gap-2">
 							<input type="checkbox" id="hasBottomSecondary" checked={formData.hasBottomSecondary}
 								onChange={(e: any) => setFormData({ ...formData, hasBottomSecondary: e.target.checked })}
-								className="rounded border-blue-500" />
-							<Label htmlFor="hasBottomSecondary" className="text-sm font-medium text-blue-600">
+								className="rounded border-chart-4" />
+							<Label htmlFor="hasBottomSecondary" className="text-sm font-medium text-chart-4">
 								{t("pricing.studies.structural.strip.bottomSecondary")}
 							</Label>
 						</div>
@@ -162,7 +162,7 @@ export function StripFields({
 					</h4>
 
 					<div className="space-y-3">
-						<h5 className="text-sm font-medium text-blue-700">{t("pricing.studies.structural.strip.bottomMesh")}</h5>
+						<h5 className="text-sm font-medium text-chart-4">{t("pricing.studies.structural.strip.bottomMesh")}</h5>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 							<RebarMeshInput title={t("pricing.studies.structural.strip.bottomMesh")} direction="اتجاه X"
 								diameter={formData.stripBottomMeshXDiameter}

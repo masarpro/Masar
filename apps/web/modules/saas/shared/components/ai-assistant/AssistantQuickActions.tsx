@@ -96,11 +96,11 @@ export function AssistantQuickActions({
             key={action.id}
             type="button"
             onClick={() => onAction(action.prompt)}
-            className="group flex flex-col items-start gap-2 rounded-xl border border-border/50 bg-gradient-to-br from-background to-muted/30 p-3 text-start transition-all duration-200 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-sm dark:hover:bg-blue-950/20 animate-fade-in-up"
+            className="group flex flex-col items-start gap-2 rounded-xl border border-border/50 bg-gradient-to-br from-background to-muted/30 p-3 text-start transition-all duration-200 hover:border-chart-4 hover:bg-chart-4/15 hover:shadow-sm dark:hover:bg-chart-4/20 animate-fade-in-up"
             style={{ animationDelay: `${index * 50}ms` }}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 transition-colors group-hover:bg-blue-200 dark:bg-blue-900/30">
-              <Icon className="h-4 w-4 text-blue-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chart-4/15 transition-colors group-hover:bg-chart-4/15 dark:bg-chart-4/20">
+              <Icon className="h-4 w-4 text-chart-4" />
             </div>
             <span className="text-xs font-medium leading-tight text-foreground">
               {isAr ? action.labelAr : action.labelEn}

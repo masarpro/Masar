@@ -105,7 +105,7 @@ export function MilestoneStatusBadge({
 			return (
 				<Badge
 					variant="default"
-					className={`bg-blue-500 hover:bg-blue-600 ${sizeClasses[size]}`}
+					className={`bg-chart-4 hover:bg-chart-4 ${sizeClasses[size]}`}
 				>
 					{t("timeline.status.inProgress")}
 				</Badge>

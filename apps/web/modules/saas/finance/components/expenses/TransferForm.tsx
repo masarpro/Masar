@@ -196,7 +196,7 @@ export function TransferForm({
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
-												<Building className="h-4 w-4 text-blue-500" />
+												<Building className="h-4 w-4 text-chart-4" />
 											) : (
 												<Wallet className="h-4 w-4 text-green-500" />
 											)}
@@ -215,7 +215,7 @@ export function TransferForm({
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{fromAccount.accountType === "BANK" ? (
-										<Building className="h-5 w-5 text-blue-500" />
+										<Building className="h-5 w-5 text-chart-4" />
 									) : (
 										<Wallet className="h-5 w-5 text-green-500" />
 									)}
@@ -273,7 +273,7 @@ export function TransferForm({
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
-												<Building className="h-4 w-4 text-blue-500" />
+												<Building className="h-4 w-4 text-chart-4" />
 											) : (
 												<Wallet className="h-4 w-4 text-green-500" />
 											)}
@@ -292,7 +292,7 @@ export function TransferForm({
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{toAccount.accountType === "BANK" ? (
-										<Building className="h-5 w-5 text-blue-500" />
+										<Building className="h-5 w-5 text-chart-4" />
 									) : (
 										<Wallet className="h-5 w-5 text-green-500" />
 									)}

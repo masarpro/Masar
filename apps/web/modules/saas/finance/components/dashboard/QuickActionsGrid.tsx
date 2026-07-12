@@ -52,8 +52,8 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			id: "reports",
 			icon: BarChart3,
 			href: `${basePath}/reports`,
-			color: "text-sky-600 dark:text-sky-400",
-			bgColor: "bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200 dark:hover:bg-sky-900/50",
+			color: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20 hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
 		},
 		{
 			id: "settings",

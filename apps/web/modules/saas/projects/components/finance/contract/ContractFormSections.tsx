@@ -376,8 +376,8 @@ export const ContractFormSections = forwardRef<
 							{t("projects.createProject.summaryStrip")}:
 						</span>
 
-						<div className="shrink-0 rounded-md bg-sky-50 px-2.5 py-1 dark:bg-sky-950/30">
-							<span className="font-mono text-xs font-semibold text-sky-700 dark:text-sky-300">
+						<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
+							<span className="font-mono text-xs font-semibold text-chart-4 dark:text-chart-4">
 								{formatNumber(contractValue)}
 							</span>
 						</div>
@@ -387,19 +387,19 @@ export const ContractFormSections = forwardRef<
 								<span className="text-xs text-slate-400">
 									+
 								</span>
-								<div className="shrink-0 rounded-md bg-sky-50 px-2.5 py-1 dark:bg-sky-950/30">
+								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
 									<span className="text-[10px] text-slate-400">
 										VAT{" "}
 									</span>
-									<span className="font-mono text-xs font-semibold text-sky-700 dark:text-sky-300">
+									<span className="font-mono text-xs font-semibold text-chart-4 dark:text-chart-4">
 										{formatNumber(vatAmount)}
 									</span>
 								</div>
 								<span className="text-xs text-slate-400">
 									=
 								</span>
-								<div className="shrink-0 rounded-md bg-sky-100 px-2.5 py-1 dark:bg-sky-900/40">
-									<span className="font-mono text-xs font-bold text-sky-800 dark:text-sky-200">
+								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
+									<span className="font-mono text-xs font-bold text-chart-4 dark:text-chart-4">
 										{formatNumber(totalWithVat)}
 									</span>
 								</div>

@@ -68,12 +68,12 @@ function getStatusBadge(
 		},
 		SUBMITTED: {
 			className:
-				"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			label: t("finance.status.SUBMITTED"),
 		},
 		APPROVED: {
 			className:
-				"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			label: t("finance.status.APPROVED"),
 		},
 		PAID: {

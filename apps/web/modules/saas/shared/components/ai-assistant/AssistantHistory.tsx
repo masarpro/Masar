@@ -56,7 +56,7 @@ function ChatListItem({
       className={cn(
         "w-full flex items-center gap-3 p-3 rounded-lg text-start transition-colors group",
         isActive
-          ? "bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800"
+          ? "bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4"
           : "hover:bg-muted/50",
       )}
     >

@@ -29,7 +29,7 @@ const TEMPLATES = [
 	{ id: "accrued_revenue", icon: TrendingUp, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/20", type: "ACCRUAL" },
 	{ id: "accrued_expense", icon: TrendingDown, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/20", type: "ACCRUAL" },
 	{ id: "depreciation", icon: Timer, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/20", type: "DEPRECIATION" },
-	{ id: "prepaid_expense", icon: CalendarClock, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/20", type: "PREPAYMENT" },
+	{ id: "prepaid_expense", icon: CalendarClock, color: "text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20", type: "PREPAYMENT" },
 	{ id: "provision", icon: ShieldCheck, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/20", type: "PROVISION" },
 	{ id: "correction", icon: Eraser, color: "text-slate-600", bg: "bg-slate-50 dark:bg-slate-800", type: "CORRECTION" },
 ] as const;

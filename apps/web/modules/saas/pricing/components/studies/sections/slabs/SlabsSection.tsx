@@ -139,7 +139,7 @@ export function SlabsSection({
 						key={floor.id}
 						className={`border rounded-lg overflow-hidden transition-all ${
 							hasItems
-								? "border-blue-200/50 bg-blue-50/20 dark:bg-blue-950/10"
+								? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
 						} ${
 							floor.isRepeated && hasItems
@@ -186,7 +186,7 @@ export function SlabsSection({
 									{displayConcrete > 0 && (
 										<span>
 											خرسانة:{" "}
-											<span className="font-semibold text-blue-600">
+											<span className="font-semibold text-chart-4">
 												{formatNumber(displayConcrete)} م³
 											</span>
 										</span>

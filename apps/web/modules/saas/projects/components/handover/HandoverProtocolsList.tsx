@@ -27,7 +27,7 @@ interface HandoverProtocolsListProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-	ITEM_ACCEPTANCE: "bg-blue-100 text-blue-700",
+	ITEM_ACCEPTANCE: "bg-chart-4/15 text-chart-4",
 	PRELIMINARY: "bg-purple-100 text-purple-700",
 	FINAL: "bg-green-100 text-green-700",
 	DELIVERY: "bg-orange-100 text-orange-700",

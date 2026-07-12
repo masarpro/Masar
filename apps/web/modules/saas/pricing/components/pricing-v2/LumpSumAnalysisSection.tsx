@@ -46,9 +46,9 @@ function getRecommendation(profitPct: number) {
 		return {
 			labelKey: "lumpSum.recommendations.good.label" as const,
 			descriptionKey: "lumpSum.recommendations.good.description" as const,
-			color: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-			borderColor: "border-blue-200 dark:border-blue-800",
-			bgColor: "bg-blue-50/50 dark:bg-blue-950/20",
+			color: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+			borderColor: "border-chart-4 dark:border-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 			icon: CheckCircle2,
 		};
 	}
@@ -273,12 +273,12 @@ export function LumpSumAnalysisSection({
 				{/* Safety margin */}
 				<div className="rounded-xl border border-border bg-card p-4 space-y-2">
 					<div className="flex items-center gap-2">
-						<Shield className="h-4 w-4 text-blue-600" />
+						<Shield className="h-4 w-4 text-chart-4" />
 						<span className="text-xs text-muted-foreground font-medium">
 							{t("lumpSum.safetyMargin")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-blue-600" dir="ltr">
+					<p className="text-xl font-bold text-chart-4" dir="ltr">
 						{formatNum(safetyMarginPct)}%
 					</p>
 				</div>

@@ -85,8 +85,8 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 
 					{/* Links — depends on */}
 					{dependsOnItem && (
-						<div className="flex items-center gap-2 text-sm text-muted-foreground rounded-lg bg-blue-50/50 dark:bg-blue-950/20 p-2.5">
-							<ArrowUp className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+						<div className="flex items-center gap-2 text-sm text-muted-foreground rounded-lg bg-chart-4/15 dark:bg-chart-4/20 p-2.5">
+							<ArrowUp className="h-3.5 w-3.5 text-chart-4 shrink-0" />
 							<Link2 className="h-3.5 w-3.5 shrink-0" />
 							<span>
 								{t("dependsOn")}: {dependsOnItem.name}

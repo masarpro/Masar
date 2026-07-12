@@ -108,9 +108,9 @@ export function ExecutionPhasesCard({
 	function getStatusDotColor(status: string): string {
 		switch (status) {
 			case "COMPLETED":
-				return "bg-sky-500";
+				return "bg-chart-4";
 			case "IN_PROGRESS":
-				return "bg-blue-500";
+				return "bg-chart-4";
 			case "DELAYED":
 				return "bg-red-500";
 			default:
@@ -122,9 +122,9 @@ export function ExecutionPhasesCard({
 	function getBarColor(status: string): string {
 		switch (status) {
 			case "COMPLETED":
-				return "bg-sky-500";
+				return "bg-chart-4";
 			case "IN_PROGRESS":
-				return "bg-blue-500";
+				return "bg-chart-4";
 			case "DELAYED":
 				return "bg-red-500";
 			default:
@@ -139,9 +139,9 @@ export function ExecutionPhasesCard({
 	> = {
 		ACTIVE: {
 			label: t("projects.commandCenter.active"),
-			bgClass: "bg-sky-50 dark:bg-sky-900/30",
-			textClass: "text-sky-700 dark:text-sky-400",
-			dotClass: "bg-sky-500",
+			bgClass: "bg-chart-4/15 dark:bg-chart-4/20",
+			textClass: "text-chart-4 dark:text-chart-4",
+			dotClass: "bg-chart-4",
 		},
 		ON_HOLD: {
 			label: t("projects.commandCenter.atRisk"),
@@ -151,9 +151,9 @@ export function ExecutionPhasesCard({
 		},
 		COMPLETED: {
 			label: t("projects.commandCenter.completedLabel"),
-			bgClass: "bg-blue-50 dark:bg-blue-900/30",
-			textClass: "text-blue-700 dark:text-blue-400",
-			dotClass: "bg-blue-500",
+			bgClass: "bg-chart-4/15 dark:bg-chart-4/20",
+			textClass: "text-chart-4 dark:text-chart-4",
+			dotClass: "bg-chart-4",
 		},
 	};
 	const statusStyle = statusMap[projectStatus] ?? statusMap.ACTIVE;
@@ -172,8 +172,8 @@ export function ExecutionPhasesCard({
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
 				<div className="flex items-center gap-2">
-					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/40">
-						<BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<BarChart3 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.executionAndPhases")}
@@ -262,7 +262,7 @@ export function ExecutionPhasesCard({
 					{/* Legend */}
 					<div className="flex flex-1 flex-col gap-1.5">
 						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-sm bg-sky-500" />
+							<span className="h-2 w-2 shrink-0 rounded-sm bg-chart-4" />
 							{t("projects.commandCenter.completedLabel")}
 							<span
 								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
@@ -272,7 +272,7 @@ export function ExecutionPhasesCard({
 							</span>
 						</div>
 						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-sm bg-blue-500" />
+							<span className="h-2 w-2 shrink-0 rounded-sm bg-chart-4" />
 							{t("projects.commandCenter.inProgressLabel")}
 							<span
 								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
@@ -352,7 +352,7 @@ export function ExecutionPhasesCard({
 			{/* Footer - Health Chips */}
 			<div className="flex flex-wrap gap-1.5 border-t border-slate-100 px-5 py-3 dark:border-slate-800">
 				{onTrackCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-chart-4/15 px-2.5 py-1 text-[11px] font-semibold text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 						<CheckCircle2 className="h-3 w-3" />
 						{onTrackCount} {t("projects.commandCenter.onTrack")}
 					</span>

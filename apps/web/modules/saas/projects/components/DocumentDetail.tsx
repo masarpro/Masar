@@ -58,7 +58,7 @@ function formatFileSize(bytes?: number | null): string {
 }
 
 const FOLDER_COLORS: Record<string, string> = {
-	CONTRACT: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+	CONTRACT: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	DRAWINGS: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
 	CLAIMS: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 	LETTERS: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
@@ -444,7 +444,7 @@ export function DocumentDetail({
 										{isImage ? (
 											<Image className="h-4 w-4 text-pink-500" />
 										) : (
-											<File className="h-4 w-4 text-blue-500" />
+											<File className="h-4 w-4 text-chart-4" />
 										)}
 									</div>
 									<div>
@@ -578,7 +578,7 @@ export function DocumentDetail({
 								<Layers className="inline h-5 w-5 me-2 text-slate-400" />
 								{t("versions.title")}
 								{document.version > 1 && (
-									<Badge className="ms-2 border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+									<Badge className="ms-2 border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 										v{document.version}
 									</Badge>
 								)}
@@ -630,7 +630,7 @@ export function DocumentDetail({
 										key={version.id}
 										className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
 											version.versionNumber === versionsData.currentVersion
-												? "border-sky-200 bg-sky-50/50 dark:border-sky-800/30 dark:bg-sky-950/20"
+												? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
 												: "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/30"
 										}`}
 									>
@@ -640,7 +640,7 @@ export function DocumentDetail({
 													v{version.versionNumber}
 												</span>
 												{version.versionNumber === versionsData.currentVersion && (
-													<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 text-[10px]">
+													<Badge className="border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 text-[10px]">
 														{t("versions.current")}
 													</Badge>
 												)}

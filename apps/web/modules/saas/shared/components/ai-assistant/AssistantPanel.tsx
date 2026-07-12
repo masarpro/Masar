@@ -336,7 +336,7 @@ export function AssistantPanel() {
         {/* Header */}
         <div className="flex items-center justify-between border-b p-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={18} className="text-blue-600" />
+            <Sparkles size={18} className="text-chart-4" />
             <span className="text-sm font-bold">{t("title")}</span>
           </div>
           <div className="flex items-center gap-1">
@@ -360,7 +360,7 @@ export function AssistantPanel() {
             >
               <History size={16} />
               {savedChats.length > 0 && (
-                <span className="absolute -top-0.5 -end-0.5 w-2 h-2 rounded-full bg-blue-500" />
+                <span className="absolute -top-0.5 -end-0.5 w-2 h-2 rounded-full bg-chart-4" />
               )}
             </button>
             {/* Expand/Collapse — desktop only */}
@@ -389,7 +389,7 @@ export function AssistantPanel() {
         </div>
 
         {/* Gradient line */}
-        <div className="h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+        <div className="h-[1px] bg-gradient-to-r from-transparent via-chart-4 to-transparent" />
 
         {/* Context Badge */}
         <AssistantContextBadge pageContext={pageContext} />

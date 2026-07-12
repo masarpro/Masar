@@ -141,7 +141,7 @@ function KPICard({ label, value, color, icon: Icon, subtitle }: { label: string;
 	const colorMap: Record<string, { text: string; bg: string }> = {
 		green: { text: "text-green-600 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/30" },
 		red: { text: "text-red-600 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/30" },
-		blue: { text: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/30" },
+		blue: { text: "text-chart-4 dark:text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20" },
 		amber: { text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/30" },
 	};
 	const c = colorMap[color] ?? colorMap.blue;

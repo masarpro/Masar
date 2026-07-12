@@ -83,8 +83,8 @@ export function TimelineScheduleCard({
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
 				<div className="flex items-center gap-2">
-					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/40">
-						<TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<TrendingUp className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.timeline")}
@@ -93,12 +93,12 @@ export function TimelineScheduleCard({
 				<span
 					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
 						isOnTrack
-							? "bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"
+							? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 							: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
 					}`}
 				>
 					<span
-						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-sky-500" : "bg-amber-500"}`}
+						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-chart-4" : "bg-amber-500"}`}
 					/>
 					{isOnTrack
 						? t("projects.commandCenter.onTrack")
@@ -111,16 +111,16 @@ export function TimelineScheduleCard({
 				{/* Legend Row */}
 				<div className="flex items-center gap-3.5">
 					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
-						<span className="inline-block h-[3px] w-5 rounded-full border-[1.5px] border-dashed border-blue-500 bg-transparent" />
+						<span className="inline-block h-[3px] w-5 rounded-full border-[1.5px] border-dashed border-chart-4 bg-transparent" />
 						{t("projects.commandCenter.plannedProgress")}
 					</div>
 					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
-						<span className="inline-block h-[3px] w-5 rounded-full bg-sky-500" />
+						<span className="inline-block h-[3px] w-5 rounded-full bg-chart-4" />
 						{t("projects.commandCenter.actualProgress")}
 					</div>
 					<span className="mr-auto text-xs text-slate-400">
 						{t("projects.commandCenter.achievement")}:{" "}
-						<strong className="text-sky-500">
+						<strong className="text-chart-4">
 							{projectProgress}%
 						</strong>
 					</span>
@@ -196,19 +196,19 @@ export function TimelineScheduleCard({
 				{/* Timeline Progress Bar */}
 				<div className="mt-1 min-w-0">
 					<div className="flex items-center gap-2.5">
-						<span className="text-xs font-semibold text-sky-600">
+						<span className="text-xs font-semibold text-chart-4">
 							{projectProgress}%
 						</span>
 						<div className="relative h-[7px] flex-1 overflow-visible rounded-full bg-slate-200 dark:bg-slate-700">
 							<div
-								className="h-full rounded-full bg-gradient-to-l from-sky-500 to-blue-500"
+								className="h-full rounded-full bg-gradient-to-l from-chart-4 to-chart-4"
 								style={{
 									width: `${projectProgress}%`,
 								}}
 							/>
 							{/* Progress indicator dot */}
 							<div
-								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-sky-500 shadow-md dark:border-slate-900"
+								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-chart-4 shadow-md dark:border-slate-900"
 								style={{
 									left: `${projectProgress}%`,
 									transform: `translateX(-50%) translateY(-50%)`,
@@ -233,7 +233,7 @@ export function TimelineScheduleCard({
 				<div className="mt-auto grid grid-cols-3 gap-1.5">
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-[17px] font-bold text-sky-600"
+							className="text-[17px] font-bold text-chart-4"
 							dir="ltr"
 						>
 							{daysRemaining}
@@ -244,7 +244,7 @@ export function TimelineScheduleCard({
 					</div>
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-[17px] font-bold text-blue-500"
+							className="text-[17px] font-bold text-chart-4"
 							dir="ltr"
 						>
 							{projectProgress}%

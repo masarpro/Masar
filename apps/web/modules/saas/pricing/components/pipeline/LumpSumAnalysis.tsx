@@ -80,9 +80,9 @@ export function LumpSumAnalysis({
 				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
 						<tbody>
-							<tr className="border-b bg-blue-50/50">
+							<tr className="border-b bg-chart-4/15">
 								<td className="px-3 py-2 font-medium">{t("pricing.pipeline.lumpSumContractValue")}</td>
-								<td className="px-3 py-2 tabular-nums text-start font-bold text-blue-700" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start font-bold text-chart-4" dir="ltr">
 									{formatAmount(contractValue)} ر.س
 								</td>
 							</tr>
@@ -123,7 +123,7 @@ export function LumpSumAnalysis({
 						</div>
 						<div className="h-6 rounded-full overflow-hidden flex bg-muted">
 							<div
-								className="bg-blue-500 h-full transition-all duration-300"
+								className="bg-chart-4 h-full transition-all duration-300"
 								style={{ width: `${Math.min(costPct, 100)}%` }}
 							/>
 							{isPositive && (

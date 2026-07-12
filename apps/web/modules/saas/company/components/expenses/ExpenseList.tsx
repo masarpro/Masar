@@ -123,7 +123,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const getStatusBadge = (active: boolean) => {
 		if (active) {
 			return (
-				<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
+				<Badge className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-0 text-[10px] px-2 py-0.5">
 					{t("company.expenses.statusActive")}
 				</Badge>
 			);
@@ -137,7 +137,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 
 	const getRecurrenceBadge = (recurrence: string) => {
 		const styles: Record<string, string> = {
-			MONTHLY: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+			MONTHLY: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			QUARTERLY: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
 			SEMI_ANNUAL: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
 			ANNUAL: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
@@ -163,9 +163,9 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								label: t("company.expenses.totalMonthly"),
 								value: formatCurrency(summary.totalMonthlyAmount),
 								icon: Banknote,
-								iconClassName: "text-blue-600 dark:text-blue-400",
-								iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
-								valueClassName: "text-blue-700 dark:text-blue-300",
+								iconClassName: "text-chart-4 dark:text-chart-4",
+								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+								valueClassName: "text-chart-4 dark:text-chart-4",
 							},
 							{
 								label: t("company.expenses.totalAnnual"),
@@ -179,9 +179,9 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								label: t("company.expenses.activeCount"),
 								value: summary.totalActiveExpenses,
 								icon: Receipt,
-								iconClassName: "text-sky-600 dark:text-sky-400",
-								iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
-								valueClassName: "text-sky-700 dark:text-sky-300",
+								iconClassName: "text-chart-4 dark:text-chart-4",
+								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+								valueClassName: "text-chart-4 dark:text-chart-4",
 							},
 						]}
 					/>
@@ -190,14 +190,14 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-3">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-								<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
 							{t("company.expenses.totalMonthly")}
 						</p>
-						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+						<p className="text-xl font-bold text-chart-4 dark:text-chart-4">
 							{formatCurrency(summary.totalMonthlyAmount)}
 						</p>
 					</div>
@@ -218,14 +218,14 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-								<Receipt className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+								<Receipt className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
 							{t("company.expenses.activeCount")}
 						</p>
-						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 							{summary.totalActiveExpenses}
 						</p>
 					</div>
@@ -272,7 +272,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				<Button
 					variant="outline"
 					onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-blue-200/50 dark:border-blue-800/30 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-chart-4 dark:border-chart-4 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
 				>
 					<Send className="me-1 h-4 w-4" />
 					{t("company.expenses.postToFinance")}
@@ -327,7 +327,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					<Button
 						variant="outline"
 						onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-						className="rounded-xl border-blue-200/50 dark:border-blue-800/30 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+						className="rounded-xl border-chart-4 dark:border-chart-4 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
 					>
 						<Send className="ms-2 h-4 w-4" />
 						{t("company.expenses.postToFinance")}

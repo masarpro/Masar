@@ -68,8 +68,8 @@ export function BalanceSheetReport({ organizationId }: Props) {
 					<div className="grid gap-6 lg:grid-cols-2">
 						{/* Assets (Right side in RTL) */}
 						<Card className="rounded-2xl">
-							<CardHeader className="bg-blue-50 dark:bg-blue-950/20 rounded-t-2xl">
-								<CardTitle className="text-blue-700 dark:text-blue-300">{t("finance.accounting.balanceSheet.assets")}</CardTitle>
+							<CardHeader className="bg-chart-4/15 dark:bg-chart-4/20 rounded-t-2xl">
+								<CardTitle className="text-chart-4 dark:text-chart-4">{t("finance.accounting.balanceSheet.assets")}</CardTitle>
 							</CardHeader>
 							<CardContent className="p-4 space-y-4">
 								{/* Current Assets */}
@@ -85,7 +85,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 									total={data.assets.fixedAssets.total}
 								/>
 								{/* Total Assets */}
-								<div className="flex justify-between py-2 border-t-2 border-double border-blue-300 dark:border-blue-700 font-bold text-blue-700 dark:text-blue-300">
+								<div className="flex justify-between py-2 border-t-2 border-double border-chart-4 dark:border-chart-4 font-bold text-chart-4 dark:text-chart-4">
 									<span>{t("finance.accounting.balanceSheet.totalAssets")}</span>
 									<span>{formatAccounting(data.assets.totalAssets)}</span>
 								</div>
@@ -117,7 +117,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 									))}
 									{/* Current Year P&L */}
 									<div className="flex justify-between py-1 text-sm">
-										<span className="text-blue-600 dark:text-blue-400 italic">{t("finance.accounting.balanceSheet.currentYearPL")}</span>
+										<span className="text-chart-4 dark:text-chart-4 italic">{t("finance.accounting.balanceSheet.currentYearPL")}</span>
 										<span className={`font-medium ${data.equity.currentYearPL >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
 											{formatAccounting(data.equity.currentYearPL)}
 										</span>

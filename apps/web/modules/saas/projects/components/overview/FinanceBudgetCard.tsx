@@ -67,14 +67,14 @@ export function FinanceBudgetCard({
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
 				<div className="flex items-center gap-2">
-					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-900/40">
-						<Wallet className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<Wallet className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.financeAndBudget")}
 					</h3>
 				</div>
-				<span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+				<span className="inline-flex items-center rounded-full bg-chart-4/15 px-3 py-1 text-xs font-semibold text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 					{t("projects.commandCenter.budget")}:{" "}
 					{formatCompact(contractValue)}
 				</span>
@@ -107,7 +107,7 @@ export function FinanceBudgetCard({
 							{t("projects.commandCenter.receipts")}
 						</div>
 						<div
-							className="text-base font-bold leading-tight text-sky-500"
+							className="text-base font-bold leading-tight text-chart-4"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
@@ -171,7 +171,7 @@ export function FinanceBudgetCard({
 					<div className="flex h-6 w-full overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
 						{budgetBarPct > 0 && (
 							<div
-								className="flex h-full items-center justify-center bg-gradient-to-l from-sky-400 to-sky-500"
+								className="flex h-full items-center justify-center bg-gradient-to-l from-chart-4 to-chart-4"
 								style={{
 									width: `${Math.max(budgetBarPct, 3)}%`,
 								}}
@@ -186,7 +186,7 @@ export function FinanceBudgetCard({
 					</div>
 					<div className="flex flex-wrap gap-2.5">
 						<div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-							<span className="h-1.5 w-1.5 rounded-sm bg-sky-500" />
+							<span className="h-1.5 w-1.5 rounded-sm bg-chart-4" />
 							{t(
 								"projects.commandCenter.actualExpensesLabel",
 							)}
@@ -206,7 +206,7 @@ export function FinanceBudgetCard({
 							{t("projects.commandCenter.expectedProfit")}
 						</div>
 						<div
-							className={`text-base font-bold leading-tight ${expectedProfit >= 0 ? "text-sky-700 dark:text-sky-400" : "text-red-500"}`}
+							className={`text-base font-bold leading-tight ${expectedProfit >= 0 ? "text-chart-4 dark:text-chart-4" : "text-red-500"}`}
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
@@ -223,7 +223,7 @@ export function FinanceBudgetCard({
 							{t("projects.commandCenter.cashFlow")}
 						</div>
 						<div
-							className={`text-base font-bold leading-tight ${cashFlow >= 0 ? "text-sky-500" : "text-red-500"}`}
+							className={`text-base font-bold leading-tight ${cashFlow >= 0 ? "text-chart-4" : "text-red-500"}`}
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
@@ -239,21 +239,21 @@ export function FinanceBudgetCard({
 				</div>
 
 				{/* Next Payment */}
-				<div className="relative mt-auto overflow-hidden rounded-xl border border-sky-200 bg-gradient-to-bl from-sky-50 to-sky-50/50 p-3.5 dark:border-sky-800/30 dark:from-sky-950/30 dark:to-sky-950/10">
-					<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-sky-500/10" />
+				<div className="relative mt-auto overflow-hidden rounded-xl border border-chart-4 bg-gradient-to-bl from-chart-4/15 to-chart-4/15 p-3.5 dark:border-chart-4 dark:from-chart-4/20 dark:to-chart-4/20">
+					<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-chart-4" />
 					<div className="relative flex items-center justify-between">
 						<div className="flex items-center gap-1.5">
-							<CreditCard className="h-3.5 w-3.5 text-sky-700 dark:text-sky-400" />
-							<span className="text-xs font-semibold text-sky-700 dark:text-sky-400">
+							<CreditCard className="h-3.5 w-3.5 text-chart-4 dark:text-chart-4" />
+							<span className="text-xs font-semibold text-chart-4 dark:text-chart-4">
 								{t("projects.commandCenter.nextPayment")}
 							</span>
 						</div>
-						<span className="rounded-full bg-sky-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+						<span className="rounded-full bg-chart-4 px-2 py-0.5 text-[10px] font-semibold text-white">
 							{t("projects.commandCenter.milestonePayment")}
 						</span>
 					</div>
 					<div
-						className="relative mt-1.5 text-xl font-bold text-sky-700 dark:text-sky-400"
+						className="relative mt-1.5 text-xl font-bold text-chart-4 dark:text-chart-4"
 						dir="ltr"
 						style={{ textAlign: "right" }}
 					>

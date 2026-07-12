@@ -40,8 +40,8 @@ export function IsolatedCombinedFields({
 
 			{/* معلومات الأعمدة - للمشتركة فقط */}
 			{formData.type === "combined" && (
-				<div className="border rounded-lg p-3 space-y-3 bg-blue-50/50">
-					<h5 className="text-sm font-medium text-blue-700">
+				<div className="border rounded-lg p-3 space-y-3 bg-chart-4/15">
+					<h5 className="text-sm font-medium text-chart-4">
 						{t("pricing.studies.structural.combined.columnInfo")}
 					</h5>
 					<div className="grid grid-cols-2 gap-3 max-w-sm">
@@ -83,7 +83,7 @@ export function IsolatedCombinedFields({
 
 				{/* الفرش السفلي */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-blue-700">الشبكة السفلية (الفرش)</h5>
+					<h5 className="text-sm font-medium text-chart-4">الشبكة السفلية (الفرش)</h5>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						<RebarMeshInput
 							title="الفرش السفلي"

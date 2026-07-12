@@ -70,8 +70,8 @@ const ACCOUNTING_REPORTS: ReportItem[] = [
 		// same journal-based report.
 		id: "income-statement",
 		icon: TrendingUp,
-		color: "text-blue-600 dark:text-blue-400",
-		bgColor: "bg-blue-100 dark:bg-blue-900/30",
+		color: "text-chart-4 dark:text-chart-4",
+		bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		labelKey: "finance.accountingReports.incomeStatement",
 		descKey: "finance.accountingReports.incomeStatementDesc",
 	},

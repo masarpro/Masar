@@ -32,11 +32,11 @@ export function CascadeNotification({
 	const manualChanges = changes.filter((c) => c.isManual);
 
 	return (
-		<Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 rounded-xl p-5 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+		<Card className="border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl p-5 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex items-center gap-2 text-sm font-semibold">
-					<RefreshCw className="h-4 w-4 text-blue-600 shrink-0" />
+					<RefreshCw className="h-4 w-4 text-chart-4 shrink-0" />
 					<span>{t("title")}</span>
 				</div>
 				<Button
@@ -61,7 +61,7 @@ export function CascadeNotification({
 								key={change.itemKey}
 								className="flex items-center gap-2 text-muted-foreground"
 							>
-								<ArrowDown className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+								<ArrowDown className="h-3.5 w-3.5 text-chart-4 shrink-0" />
 								<span className="truncate">
 									{change.itemName}
 								</span>

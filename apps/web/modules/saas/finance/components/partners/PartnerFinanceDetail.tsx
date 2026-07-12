@@ -131,8 +131,8 @@ export function PartnerFinanceDetail({
 				}`}
 			>
 				<SummaryCard
-					icon={<Wallet className="h-5 w-5 text-sky-600" />}
-					bg="bg-sky-100 dark:bg-sky-900/50"
+					icon={<Wallet className="h-5 w-5 text-chart-4" />}
+					bg="bg-chart-4/15 dark:bg-chart-4/20"
 					label={t("finance.partners.totalContributions")}
 					value={summary.totalContributions}
 					hint={`${summary.contributionsCount} ${t("finance.partners.detail.contributionsCount")}`}

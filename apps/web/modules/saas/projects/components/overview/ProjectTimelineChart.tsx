@@ -53,8 +53,8 @@ export function ProjectTimelineChart({
 		<div className="flex h-full flex-col rounded-2xl border border-white/20 bg-white/70 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/30 dark:bg-slate-900/70 sm:p-6">
 			<div className="mb-4 flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-blue-100 p-2 dark:bg-blue-900/50">
-						<Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="rounded-xl bg-chart-4/15 p-2 dark:bg-chart-4/20">
+						<Calendar className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{t("projects.commandCenter.timelineChart")}

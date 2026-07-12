@@ -77,7 +77,7 @@ const STATUS_ICON_MAP: Record<string, typeof CheckCircle2> = {
 const STATUS_COLOR_MAP: Record<string, string> = {
 	PENDING: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
 	PARTIALLY_PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-	FULLY_PAID: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+	FULLY_PAID: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 };
 
 export function PaymentTermsSection({
@@ -140,7 +140,7 @@ export function PaymentTermsSection({
 										<span className="text-slate-500">
 											{formatSAR(term.paidAmount)} / {formatSAR(termAmount)}
 										</span>
-										<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
+										<span className="font-mono font-semibold text-chart-4 dark:text-chart-4">
 											{paidPercent}%
 										</span>
 									</div>
@@ -148,7 +148,7 @@ export function PaymentTermsSection({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="h-9 w-9 shrink-0 text-slate-400 hover:text-sky-600"
+									className="h-9 w-9 shrink-0 text-slate-400 hover:text-chart-4"
 									onClick={() => setEditTerm(term)}
 									aria-label={t("projectPayments.editTerm")}
 								>
@@ -169,7 +169,7 @@ export function PaymentTermsSection({
 								<div className="border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-800">
 									<Progress
 										value={paidPercent}
-										className="mb-4 h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-sky-500"
+										className="mb-4 h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-chart-4"
 									/>
 									<PaymentsTable
 										organizationId={organizationId}

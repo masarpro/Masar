@@ -209,7 +209,7 @@ export function CopyFromExecutionDialog({
 											/>
 											<div className="min-w-0 flex-1">
 												<div className="flex items-center gap-2">
-													<Flag className="h-4 w-4 text-blue-500 shrink-0" />
+													<Flag className="h-4 w-4 text-chart-4 shrink-0" />
 													<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
 														{milestone.title}
 													</h4>

@@ -154,7 +154,7 @@ export function ProfitAnalysis({
 						</div>
 						<div className="h-6 rounded-full overflow-hidden flex bg-muted">
 							<div
-								className="bg-blue-500 h-full transition-all duration-300"
+								className="bg-chart-4 h-full transition-all duration-300"
 								style={{ width: `${costPct}%` }}
 							/>
 							<div
@@ -166,7 +166,7 @@ export function ProfitAnalysis({
 							/>
 						</div>
 						<div className="flex items-center justify-between text-xs">
-							<span className="text-blue-600 tabular-nums" dir="ltr">{formatPercent(costPct)}%</span>
+							<span className="text-chart-4 tabular-nums" dir="ltr">{formatPercent(costPct)}%</span>
 							<span className={cn("tabular-nums", isPositive ? "text-emerald-600" : "text-red-600")} dir="ltr">
 								{formatPercent(profitPct)}%
 							</span>

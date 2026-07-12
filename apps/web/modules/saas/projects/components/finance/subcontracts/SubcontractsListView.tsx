@@ -47,16 +47,16 @@ const STATUS_STYLES: Record<
 		text: "text-slate-600 dark:text-slate-400",
 	},
 	ACTIVE: {
-		bg: "bg-sky-100 dark:bg-sky-900/40",
-		text: "text-sky-700 dark:text-sky-300",
+		bg: "bg-chart-4/15 dark:bg-chart-4/20",
+		text: "text-chart-4 dark:text-chart-4",
 	},
 	SUSPENDED: {
 		bg: "bg-amber-100 dark:bg-amber-900/40",
 		text: "text-amber-700 dark:text-amber-300",
 	},
 	COMPLETED: {
-		bg: "bg-blue-100 dark:bg-blue-900/40",
-		text: "text-blue-700 dark:text-blue-300",
+		bg: "bg-chart-4/15 dark:bg-chart-4/20",
+		text: "text-chart-4 dark:text-chart-4",
 	},
 	TERMINATED: {
 		bg: "bg-red-100 dark:bg-red-900/40",
@@ -206,16 +206,16 @@ export function SubcontractsListView({
 							</div>
 						</div>
 					</div>
-					<div className="rounded-xl bg-sky-50 p-4 dark:bg-sky-950/30">
+					<div className="rounded-xl bg-chart-4/15 p-4 dark:bg-chart-4/20">
 						<div className="flex items-center gap-2">
-							<div className="rounded-lg bg-sky-100 p-2 dark:bg-sky-900/50">
-								<Wallet className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+							<div className="rounded-lg bg-chart-4/15 p-2 dark:bg-chart-4/20">
+								<Wallet className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-sky-600 dark:text-sky-400">
+								<p className="text-xs text-chart-4 dark:text-chart-4">
 									{t("subcontracts.summary.remaining")}
 								</p>
-								<p className="truncate text-sm font-semibold text-sky-700 dark:text-sky-300">
+								<p className="truncate text-sm font-semibold text-chart-4 dark:text-chart-4">
 									{formatSAR(summary.remaining)}
 								</p>
 							</div>

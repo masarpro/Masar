@@ -69,7 +69,7 @@ export function ActiveProjectsSection({
 				</p>
 				<div className="grid grid-cols-2 gap-2 mb-4 w-full max-w-sm">
 					{[
-						{ icon: BarChart3, label: t("dashboard.feature.tracking"), color: "text-blue-500" },
+						{ icon: BarChart3, label: t("dashboard.feature.tracking"), color: "text-chart-4" },
 						{ icon: Receipt, label: t("dashboard.feature.invoicing"), color: "text-green-500" },
 						{ icon: Users, label: t("dashboard.feature.team"), color: "text-purple-500" },
 						{ icon: FileText, label: t("dashboard.feature.documents"), color: "text-amber-500" },
@@ -100,21 +100,21 @@ export function ActiveProjectsSection({
 	return (
 		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
 			{/* Header */}
-			<div className="flex items-center justify-between mb-3 shrink-0 -mx-4 -mt-4 px-4 py-2.5 rounded-t-2xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 border-b border-blue-200/30 dark:border-blue-500/15">
+			<div className="flex items-center justify-between mb-3 shrink-0 -mx-4 -mt-4 px-4 py-2.5 rounded-t-2xl bg-gradient-to-l from-chart-4/15 via-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:via-chart-4/20 dark:to-chart-4/20 border-b border-chart-4 dark:border-chart-4">
 				<div className="flex items-center gap-2">
-					<div className="p-1.5 rounded-lg bg-blue-500/10">
-						<FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					<div className="p-1.5 rounded-lg bg-chart-4">
+						<FolderOpen className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h2 className="text-sm sm:text-base font-bold text-foreground">
 						{t("dashboard.activeProjects")}
 					</h2>
-					<span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">
+					<span className="text-xs font-bold text-chart-4 dark:text-chart-4 bg-chart-4 px-2 py-0.5 rounded-full">
 						{projects.length}
 					</span>
 				</div>
 				<Link
 					href={`/app/${organizationSlug}/projects`}
-					className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+					className="flex items-center gap-1 text-xs font-medium text-chart-4 dark:text-chart-4 hover:underline"
 				>
 					{t("dashboard.viewAll")}
 					<ChevronLeft className="h-3 w-3" />
@@ -190,7 +190,7 @@ export function ActiveProjectsSection({
 									</div>
 									{days !== null && (
 										<div className="flex shrink-0 items-center gap-1">
-											<Calendar className="h-3 w-3 text-blue-500" />
+											<Calendar className="h-3 w-3 text-chart-4" />
 											<span className="whitespace-nowrap text-xs text-muted-foreground">
 												{days > 0
 													? `${days} ${t("dashboard.alerts.daysRemaining")}`
@@ -229,8 +229,8 @@ function ProjectThumb({ src, alt }: { src: string | null; alt: string }) {
 
 	if (!src || failed) {
 		return (
-			<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500/20 to-sky-500/20">
-				<FolderOpen className="h-4 w-4 text-blue-400/60" />
+			<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-chart-4 to-chart-4">
+				<FolderOpen className="h-4 w-4 text-chart-4" />
 			</div>
 		);
 	}

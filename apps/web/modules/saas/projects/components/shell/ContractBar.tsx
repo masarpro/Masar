@@ -122,7 +122,7 @@ function ContractBarInner({
 									<span className="text-muted-foreground">
 										{t("projects.contractBar.adjustedValue")}:
 									</span>
-									<span className="font-semibold text-sky-600 dark:text-sky-400">
+									<span className="font-semibold text-chart-4 dark:text-chart-4">
 										{formatSAR(Number(summary?.adjustedValue ?? 0))}
 									</span>
 								</>

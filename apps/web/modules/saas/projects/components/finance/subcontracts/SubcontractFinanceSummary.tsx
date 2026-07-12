@@ -47,19 +47,19 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 						{coImpact >= 0 ? "+" : ""}{formatCurrency(coImpact)}
 					</p>
 				</div>
-				<div className="min-w-0 rounded-xl bg-sky-50 p-2.5 sm:p-3 dark:bg-sky-950/20">
-					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">
+				<div className="min-w-0 rounded-xl bg-chart-4/15 p-2.5 sm:p-3 dark:bg-chart-4/20">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-chart-4 dark:text-chart-4">
 						{t("subcontracts.detail.totalPaid")}
 					</p>
-					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-sky-700 dark:text-sky-300">
+					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-chart-4 dark:text-chart-4">
 						{formatCurrency(totalPaid)}
 					</p>
 				</div>
-				<div className={`min-w-0 rounded-xl p-2.5 sm:p-3 ${isOverBudget ? "bg-red-50 dark:bg-red-950/20" : "rounded-xl bg-blue-50 dark:bg-blue-950/20"}`}>
-					<p className={`truncate text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"}`}>
+				<div className={`min-w-0 rounded-xl p-2.5 sm:p-3 ${isOverBudget ? "bg-red-50 dark:bg-red-950/20" : "rounded-xl bg-chart-4/15 dark:bg-chart-4/20"}`}>
+					<p className={`truncate text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-red-600 dark:text-red-400" : "text-chart-4 dark:text-chart-4"}`}>
 						{t("subcontracts.detail.remaining")}
 					</p>
-					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${isOverBudget ? "text-red-700 dark:text-red-300" : "text-blue-700 dark:text-blue-300"}`}>
+					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${isOverBudget ? "text-red-700 dark:text-red-300" : "text-chart-4 dark:text-chart-4"}`}>
 						{formatCurrency(remaining)}
 					</p>
 				</div>
@@ -71,13 +71,13 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 					<span className="text-slate-500">
 						{t("subcontracts.detail.adjustedValue")}: <span className="font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(adjustedValue)}</span>
 					</span>
-					<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-sky-600"}`}>
+					<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-chart-4"}`}>
 						{progress.toFixed(1)}%
 					</span>
 				</div>
 				<div className="h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
 					<div
-						className={`h-full rounded-full transition-all ${isOverBudget ? "bg-red-500" : progress >= 100 ? "bg-sky-500" : "bg-orange-500"}`}
+						className={`h-full rounded-full transition-all ${isOverBudget ? "bg-red-500" : progress >= 100 ? "bg-chart-4" : "bg-orange-500"}`}
 						style={{ width: `${Math.min(progress, 100)}%` }}
 					/>
 				</div>

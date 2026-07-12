@@ -8,9 +8,9 @@ export interface CompactStatItem {
 	label: string;
 	value: ReactNode;
 	icon: LucideIcon;
-	/** لون الأيقونة، مثال: "text-sky-600 dark:text-sky-400" */
+	/** لون الأيقونة، مثال: "text-chart-4 dark:text-chart-4" */
 	iconClassName?: string;
-	/** خلفية رقاقة الأيقونة، مثال: "bg-sky-100 dark:bg-sky-900/30" */
+	/** خلفية رقاقة الأيقونة، مثال: "bg-chart-4/15 dark:bg-chart-4/20" */
 	iconBgClassName?: string;
 	/** لون قيمة مخصص (اختياري) */
 	valueClassName?: string;

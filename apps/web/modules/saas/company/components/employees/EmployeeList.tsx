@@ -122,7 +122,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 		switch (status) {
 			case "ACTIVE":
 				return (
-					<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
+					<Badge className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-0 text-[10px] px-2 py-0.5">
 						{t("company.employees.statusActive")}
 					</Badge>
 				);
@@ -156,8 +156,8 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 								label: t("company.employees.active"),
 								value: summary.totalActive,
 								icon: Users,
-								iconClassName: "text-sky-600 dark:text-sky-400",
-								iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+								iconClassName: "text-chart-4 dark:text-chart-4",
+								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 							},
 							{
 								label: t("company.employees.onLeave"),
@@ -170,9 +170,9 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 								label: t("company.employees.totalSalaries"),
 								value: formatCurrency(summary.totalMonthlySalaries),
 								icon: Banknote,
-								iconClassName: "text-blue-600 dark:text-blue-400",
-								iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
-								valueClassName: "text-blue-700 dark:text-blue-300",
+								iconClassName: "text-chart-4 dark:text-chart-4",
+								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+								valueClassName: "text-chart-4 dark:text-chart-4",
 							},
 							{
 								label: t("company.employees.totalGosi"),
@@ -189,14 +189,14 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-								<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+								<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 							{t("company.employees.active")}
 						</p>
-						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
+						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 							{summary.totalActive}
 						</p>
 					</div>
@@ -217,14 +217,14 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-								<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 							{t("company.employees.totalSalaries")}
 						</p>
-						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+						<p className="text-xl font-bold text-chart-4 dark:text-chart-4">
 							{formatCurrency(summary.totalMonthlySalaries)}
 						</p>
 					</div>
@@ -415,7 +415,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 												))}
 											</div>
 										) : (
-											<Badge className="bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border-0 text-[10px] px-2 py-0.5">
+											<Badge className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-0 text-[10px] px-2 py-0.5">
 												{t("company.employees.generalBudget")}
 											</Badge>
 										)}

@@ -22,8 +22,8 @@ export function AssistantWelcome({
 
   return (
     <div className="flex h-full flex-col items-center overflow-y-auto px-4 py-6 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10">
-        <Sparkles className="h-8 w-8 text-blue-600" />
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-chart-4 to-indigo-500/10">
+        <Sparkles className="h-8 w-8 text-chart-4" />
       </div>
 
       <h3 className="mb-1 text-lg font-bold">

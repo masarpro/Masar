@@ -20,8 +20,8 @@ export function BOQBulkActions({
 	if (selectedCount === 0) return null;
 
 	return (
-		<div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950/30">
-			<span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+		<div className="flex items-center gap-3 rounded-xl border border-chart-4 bg-chart-4/15 p-3 dark:border-chart-4 dark:bg-chart-4/20">
+			<span className="text-sm font-medium text-chart-4 dark:text-chart-4">
 				{selectedCount} {t("summary.totalItems").toLowerCase()}
 			</span>
 			<div className="flex items-center gap-2">

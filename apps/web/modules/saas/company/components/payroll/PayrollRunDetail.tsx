@@ -252,8 +252,8 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 			{/* Header Card */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-						<FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+						<FileText className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.payroll.runDetail")}
@@ -308,7 +308,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										{t("company.payroll.populate")}
 									</Button>
 									<Button
-										className="rounded-xl bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+										className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 										onClick={() => setShowApproveDialog(true)}
 										disabled={approveMutation.isPending}
 									>
@@ -346,28 +346,28 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 			<div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
 					<div className="flex items-center justify-between mb-2 sm:mb-3">
-						<div className="p-1.5 sm:p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<Banknote className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+						<div className="p-1.5 sm:p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Banknote className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.totalBaseSalary")}
 					</p>
-					<p className="truncate text-base sm:text-lg font-bold text-blue-700 dark:text-blue-300">
+					<p className="truncate text-base sm:text-lg font-bold text-chart-4 dark:text-chart-4">
 						{formatCurrency(totalBaseSalary)}
 					</p>
 				</div>
 
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
 					<div className="flex items-center justify-between mb-2 sm:mb-3">
-						<div className="p-1.5 sm:p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600 dark:text-sky-400" />
+						<div className="p-1.5 sm:p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+							<Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 					</div>
 					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.totalAllowances")}
 					</p>
-					<p className="truncate text-base sm:text-lg font-bold text-sky-700 dark:text-sky-300">
+					<p className="truncate text-base sm:text-lg font-bold text-chart-4 dark:text-chart-4">
 						{formatCurrency(totalAllowances)}
 					</p>
 				</div>
@@ -498,7 +498,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-blue-100 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-chart-4/15 hover:text-chart-4 dark:text-slate-400 dark:hover:bg-chart-4/20 dark:hover:text-chart-4"
 													onClick={() => setEditItem(item)}
 													title={t("company.common.edit")}
 													aria-label={t("company.common.edit")}
@@ -575,7 +575,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 						<AlertDialogAction
 							onClick={() => approveMutation.mutate()}
 							disabled={approveMutation.isPending}
-							className="rounded-xl bg-blue-600 hover:bg-blue-700"
+							className="rounded-xl bg-chart-4 hover:bg-chart-4"
 						>
 							{approveMutation.isPending ? (
 								<>

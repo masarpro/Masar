@@ -231,7 +231,7 @@ export function StudyPipelineStepper({
 									"hover:bg-emerald-50 dark:hover:bg-emerald-950/30",
 								!isCurrent &&
 									isDraft &&
-									"hover:bg-blue-50 dark:hover:bg-blue-950/30",
+									"hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
 								!isCurrent &&
 									isInReview &&
 									"hover:bg-amber-50 dark:hover:bg-amber-950/30",
@@ -251,7 +251,7 @@ export function StudyPipelineStepper({
 									isApproved &&
 										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
 									isDraft &&
-										"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
+										"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 									isInReview &&
 										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
 									isLocked &&
@@ -277,7 +277,7 @@ export function StudyPipelineStepper({
 									isApproved &&
 										"text-emerald-700 dark:text-emerald-400",
 									isDraft &&
-										"text-blue-600 dark:text-blue-400",
+										"text-chart-4 dark:text-chart-4",
 									isInReview &&
 										"text-amber-600 dark:text-amber-400",
 									isLocked && "text-muted-foreground",
@@ -297,7 +297,7 @@ export function StudyPipelineStepper({
 											: isApproved
 												? "text-emerald-500 dark:text-emerald-500"
 												: isDraft
-													? "text-blue-500 dark:text-blue-400"
+													? "text-chart-4 dark:text-chart-4"
 													: "text-muted-foreground",
 									)}
 								>
@@ -367,7 +367,7 @@ export function StudyPipelineStepper({
 									isApproved &&
 										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
 									isDraft &&
-										"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
+										"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 									isInReview &&
 										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
 									isLocked &&
@@ -391,7 +391,7 @@ export function StudyPipelineStepper({
 									isApproved &&
 										"text-emerald-600 dark:text-emerald-400",
 									isDraft &&
-										"text-blue-600 dark:text-blue-400",
+										"text-chart-4 dark:text-chart-4",
 									isLocked && "text-muted-foreground/40",
 								)}
 							>

@@ -128,16 +128,16 @@ export function CalculationResultsPanel({
 			{/* القسم الأول: ملخص النتائج الرئيسية */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 				{/* حجم الخرسانة */}
-				<div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+				<div className="bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 rounded-xl p-4 border border-chart-4 dark:border-chart-4">
 					<div className="flex items-center gap-2 mb-2">
-						<div className="p-2 bg-blue-500 rounded-lg">
+						<div className="p-2 bg-chart-4 rounded-lg">
 							<Box className="h-4 w-4 text-white" />
 						</div>
-						<span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+						<span className="text-sm font-medium text-chart-4 dark:text-chart-4">
 							{tCalc("concreteVolume")}
 						</span>
 					</div>
-					<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
 						{formatNumber(concreteVolume)}
 						<span className="text-sm font-normal ms-1">م³</span>
 					</p>
@@ -217,10 +217,10 @@ export function CalculationResultsPanel({
 						</div>
 						<div className="bg-background rounded-lg p-3 text-center border">
 							<div className="flex items-center justify-center gap-1 mb-1">
-								<TrendingUp className="h-3 w-3 text-blue-600" />
+								<TrendingUp className="h-3 w-3 text-chart-4" />
 								<span className="text-xs text-muted-foreground">{t("grossWeight")}</span>
 							</div>
-							<p className="text-lg font-bold text-blue-600">
+							<p className="text-lg font-bold text-chart-4">
 								{formatNumber(totals.grossWeight)}
 							</p>
 							<p className="text-xs text-muted-foreground">كجم</p>
@@ -348,8 +348,8 @@ export function CalculationResultsPanel({
 
 					{/* الأسياخ المطلوبة من المصنع */}
 					{totals.stocksNeeded.length > 0 && (
-						<div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-blue-800 dark:text-blue-200">
+						<div className="bg-gradient-to-r from-chart-4/15 to-indigo-50 dark:from-chart-4/20 dark:to-indigo-950 rounded-lg p-4 border border-chart-4 dark:border-chart-4">
+							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-chart-4 dark:text-chart-4">
 								<Package className="h-4 w-4" />
 								{t("stocksFromFactory")}
 							</h6>
@@ -357,9 +357,9 @@ export function CalculationResultsPanel({
 								{totals.stocksNeeded.map((stock, idx) => (
 									<div
 										key={idx}
-										className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-100 dark:border-blue-900 text-center"
+										className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-chart-4 dark:border-chart-4 text-center"
 									>
-										<p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+										<p className="text-lg font-bold text-chart-4 dark:text-chart-4">
 											{stock.count}
 										</p>
 										<p className="text-xs text-muted-foreground">

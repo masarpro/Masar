@@ -24,12 +24,12 @@ function getWeatherIcon(weather: string) {
 		case "CLOUDY":
 			return <Cloud className="h-4 w-4 text-slate-500" />;
 		case "RAINY":
-			return <CloudRain className="h-4 w-4 text-blue-500" />;
+			return <CloudRain className="h-4 w-4 text-chart-4" />;
 		case "WINDY":
 		case "DUSTY":
 			return <Wind className="h-4 w-4 text-slate-500" />;
 		case "COLD":
-			return <Thermometer className="h-4 w-4 text-cyan-500" />;
+			return <Thermometer className="h-4 w-4 text-chart-4" />;
 		default:
 			return <Sun className="h-4 w-4 text-amber-500" />;
 	}
@@ -54,7 +54,7 @@ export function DailyReportCard({ report }: DailyReportCardProps) {
 					<div className="flex items-center gap-2">
 						<Badge
 							variant="secondary"
-							className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+							className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 						>
 							{t("projects.field.dailyReport")}
 						</Badge>

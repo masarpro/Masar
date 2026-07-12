@@ -36,7 +36,7 @@ interface RecentDocumentsTableProps {
 
 const invoiceStatusConfig: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	SENT: { bg: "bg-blue-100 dark:bg-blue-900/50", text: "text-blue-600 dark:text-blue-400" },
+	SENT: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
 	VIEWED: { bg: "bg-purple-100 dark:bg-purple-900/50", text: "text-purple-600 dark:text-purple-400" },
 	PARTIALLY_PAID: { bg: "bg-amber-100 dark:bg-amber-900/50", text: "text-amber-600 dark:text-amber-400" },
 	PAID: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },

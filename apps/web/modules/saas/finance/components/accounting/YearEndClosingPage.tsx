@@ -334,7 +334,7 @@ export function YearEndClosingPage({
 								const severity: string = typeof warning === "string" ? "WARNING" : warning.severity;
 								const message = typeof warning === "string" ? warning : warning.message;
 								const colorMap: Record<string, string> = {
-									INFO: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300",
+									INFO: "bg-chart-4/15 dark:bg-chart-4/20 border-chart-4 dark:border-chart-4 text-chart-4 dark:text-chart-4",
 									WARNING: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",
 									ERROR: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300",
 								};

@@ -18,7 +18,7 @@ import { QuantityRowExpanded } from "./QuantityRowExpanded";
 
 /** Map group color names to Tailwind color classes */
 const GROUP_COLOR_CLASSES: Record<string, { bg: string; border: string; badge: string }> = {
-	blue: { bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-500", badge: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
+	blue: { bg: "bg-chart-4/15 dark:bg-chart-4/20", border: "border-chart-4", badge: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4" },
 	green: { bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-500", badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" },
 	purple: { bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-500", badge: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
 	orange: { bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-500", badge: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" },
@@ -371,7 +371,7 @@ export function QuantitiesTable({
 
 const SOURCE_BADGE_STYLES: Record<string, string> = {
 	auto_building: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-	auto_linked: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+	auto_linked: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 	auto_derived: "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300",
 	manual: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
 	estimated: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",

@@ -57,9 +57,9 @@ export const SubcontractPaymentTermsProgress = React.memo(function SubcontractPa
 						<div key={term.id} className="flex items-center gap-4 px-5 py-3">
 							{/* Status icon */}
 							{term.isComplete ? (
-								<CheckCircle2 className="h-5 w-5 shrink-0 text-sky-500" />
+								<CheckCircle2 className="h-5 w-5 shrink-0 text-chart-4" />
 							) : isNext ? (
-								<Clock className="h-5 w-5 shrink-0 text-blue-500" />
+								<Clock className="h-5 w-5 shrink-0 text-chart-4" />
 							) : (
 								<div className="h-5 w-5 shrink-0 rounded-full border-2 border-slate-300 dark:border-slate-600" />
 							)}
@@ -71,7 +71,7 @@ export const SubcontractPaymentTermsProgress = React.memo(function SubcontractPa
 										{term.label || t(`subcontracts.termTypes.${term.type}`)}
 									</span>
 									{isNext && (
-										<Badge className="border-0 bg-blue-100 text-[10px] text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+										<Badge className="border-0 bg-chart-4/15 text-[10px] text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 											{t("subcontracts.detail.currentTerm")}
 										</Badge>
 									)}
@@ -80,7 +80,7 @@ export const SubcontractPaymentTermsProgress = React.memo(function SubcontractPa
 								<div className="mt-1 flex items-center gap-2">
 									<div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
 										<div
-											className={`h-full rounded-full transition-all ${term.isComplete ? "bg-sky-500" : isNext ? "bg-blue-500" : "bg-slate-400"}`}
+											className={`h-full rounded-full transition-all ${term.isComplete ? "bg-chart-4" : isNext ? "bg-chart-4" : "bg-slate-400"}`}
 											style={{ width: `${term.progressPercent}%` }}
 										/>
 									</div>

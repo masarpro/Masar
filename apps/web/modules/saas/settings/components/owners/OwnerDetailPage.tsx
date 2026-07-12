@@ -152,13 +152,13 @@ function InfoRow({
 }
 
 const CONTRIBUTION_TYPE_COLORS: Record<string, string> = {
-	INITIAL: "border-blue-300 text-blue-700 bg-blue-50 dark:border-blue-700 dark:text-blue-300 dark:bg-blue-900/30",
+	INITIAL: "border-chart-4 text-chart-4 bg-chart-4/15 dark:border-chart-4 dark:text-chart-4 dark:bg-chart-4/20",
 	ADDITIONAL: "border-green-300 text-green-700 bg-green-50 dark:border-green-700 dark:text-green-300 dark:bg-green-900/30",
 	IN_KIND: "border-purple-300 text-purple-700 bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:bg-purple-900/30",
 };
 
 const DRAWING_TYPE_COLORS: Record<string, string> = {
-	COMPANY_LEVEL: "border-blue-300 text-blue-700 bg-blue-50 dark:border-blue-700 dark:text-blue-300 dark:bg-blue-900/30",
+	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15 dark:border-chart-4 dark:text-chart-4 dark:bg-chart-4/20",
 	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:bg-purple-900/30",
 };
 
@@ -455,17 +455,17 @@ export function OwnerDetailPage({
 			{/* ============================================================ */}
 			<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 				{/* Card 1: Capital Contributed */}
-				<Card className="border-blue-200 dark:border-blue-800">
+				<Card className="border-chart-4 dark:border-chart-4">
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<Landmark className="h-4 w-4 text-blue-500" />
+							<Landmark className="h-4 w-4 text-chart-4" />
 							{t("dashboard.capitalContributed")}
 						</div>
 						{capitalLoading ? (
 							<Skeleton className="h-8 w-24 mt-1" />
 						) : (
 							<>
-								<div className="mt-1 text-2xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+								<div className="mt-1 text-2xl font-bold text-chart-4 dark:text-chart-4 tabular-nums">
 									{formatSARPrecise(
 										capitalData?.totalContributions ?? 0,
 									)}

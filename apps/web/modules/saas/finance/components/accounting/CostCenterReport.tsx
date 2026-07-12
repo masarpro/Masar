@@ -103,10 +103,10 @@ export function CostCenterReport({ organizationId }: Props) {
 						<p className="text-xl font-bold text-red-700">{formatAccounting(totals.totalExpenses)}</p>
 					</CardContent>
 				</Card>
-				<Card className="rounded-2xl bg-blue-50 dark:bg-blue-950/20 border-blue-200">
+				<Card className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border-chart-4">
 					<CardContent className="p-4 text-center">
-						<p className="text-xs text-blue-600">{t("finance.accounting.incomeStatement.netProfit")}</p>
-						<p className="text-xl font-bold text-blue-700">{formatAccounting(totals.netProfit)}</p>
+						<p className="text-xs text-chart-4">{t("finance.accounting.incomeStatement.netProfit")}</p>
+						<p className="text-xl font-bold text-chart-4">{formatAccounting(totals.netProfit)}</p>
 					</CardContent>
 				</Card>
 			</div>

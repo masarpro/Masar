@@ -214,7 +214,7 @@ export function BlocksSection({
 						key={floor.id}
 						className={`border rounded-lg overflow-hidden transition-all ${
 							hasItems
-								? "border-blue-200/50 bg-blue-50/20 dark:bg-blue-950/10"
+								? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
 						} ${
 							floor.isRepeated && hasItems

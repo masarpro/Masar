@@ -138,21 +138,21 @@ function MilestoneCard({
 	const [isOpen, setIsOpen] = useState(false);
 
 	const statusColor = term.isComplete
-		? "border-sky-200/50 bg-sky-50/80 dark:border-sky-800/30 dark:bg-sky-950/20"
+		? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
 		: isNext
-			? "border-blue-200/50 bg-blue-50/80 dark:border-blue-800/30 dark:bg-blue-950/20"
+			? "border-chart-4 bg-chart-4/15 dark:border-chart-4 dark:bg-chart-4/20"
 			: "border-slate-200/50 bg-slate-50/80 dark:border-slate-700/30 dark:bg-slate-900/20";
 
 	const progressColor = term.isComplete
-		? "[&>div]:bg-sky-500"
+		? "[&>div]:bg-chart-4"
 		: isNext
-			? "[&>div]:bg-blue-500"
+			? "[&>div]:bg-chart-4"
 			: "[&>div]:bg-slate-400";
 
 	const progressBg = term.isComplete
-		? "bg-sky-100 dark:bg-sky-900/40"
+		? "bg-chart-4/15 dark:bg-chart-4/20"
 		: isNext
-			? "bg-blue-100 dark:bg-blue-900/40"
+			? "bg-chart-4/15 dark:bg-chart-4/20"
 			: "bg-slate-200 dark:bg-slate-700/40";
 
 	const StatusIcon = term.isComplete
@@ -162,9 +162,9 @@ function MilestoneCard({
 			: Circle;
 
 	const statusIconColor = term.isComplete
-		? "text-sky-500"
+		? "text-chart-4"
 		: isNext
-			? "text-blue-500"
+			? "text-chart-4"
 			: "text-slate-400";
 
 	return (
@@ -181,9 +181,9 @@ function MilestoneCard({
 						variant="outline"
 						className={`rounded-lg text-[10px] ${
 							term.isComplete
-								? "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300"
+								? "border-chart-4 bg-chart-4/15 text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 								: isNext
-									? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
+									? "border-chart-4 bg-chart-4/15 text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 									: "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
 						}`}
 					>
@@ -192,7 +192,7 @@ function MilestoneCard({
 						)}
 					</Badge>
 					{isNext && !term.isComplete && (
-						<Badge className="rounded-lg bg-blue-100 text-[10px] text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+						<Badge className="rounded-lg bg-chart-4/15 text-[10px] text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 							{t("projectPayments.currentPhase")}
 						</Badge>
 					)}
@@ -253,7 +253,7 @@ function MilestoneCard({
 											<span className="font-mono text-slate-400">
 												{payment.paymentNo}
 											</span>
-											<span className="font-mono font-medium text-sky-700 dark:text-sky-300">
+											<span className="font-mono font-medium text-chart-4 dark:text-chart-4">
 												{formatNumber(
 													Number(payment.amount),
 												)}{" "}
@@ -276,7 +276,7 @@ function MilestoneCard({
 							size="sm"
 							className={`h-7 rounded-lg px-2 text-[11px] ${
 								isNext
-									? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+									? "bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
 									: "bg-slate-600 text-white hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
 							}`}
 						>

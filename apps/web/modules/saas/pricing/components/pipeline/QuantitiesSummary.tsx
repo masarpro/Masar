@@ -35,8 +35,8 @@ export function QuantitiesSummary({
 			label: t("pricing.pipeline.summaryStructural"),
 			count: (data as any)?.structural ?? 0,
 			icon: Building2,
-			color: "text-blue-600",
-			bg: "bg-blue-50 dark:bg-blue-950/30",
+			color: "text-chart-4",
+			bg: "bg-chart-4/15 dark:bg-chart-4/20",
 		},
 		{
 			label: t("pricing.pipeline.summaryFinishing"),

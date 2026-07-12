@@ -313,18 +313,18 @@ export function ExpensesList({
 	const getCategoryColor = (category: string) => {
 		const colors: Record<string, string> = {
 			MATERIALS:
-				"bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			LABOR: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400",
 			SALARIES:
 				"bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400",
 			RENT: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
 			UTILITIES:
-				"bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			FUEL: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400",
 			MAINTENANCE:
-				"bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			SUBCONTRACTOR:
-				"bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 		};
 		return (
 			colors[category] ||
@@ -354,9 +354,9 @@ export function ExpensesList({
 			case "FACILITY_RECURRING":
 				return "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
 			case "FACILITY_ASSET":
-				return "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400";
+				return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
 			case "PROJECT":
-				return "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400";
+				return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
 			default:
 				return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 		}
@@ -383,11 +383,11 @@ export function ExpensesList({
 		const classes: Record<string, string> = {
 			cancelled:
 				"bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-			paid: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+			paid: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			overdue:
 				"bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
 			partial:
-				"bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
+				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 			pending:
 				"bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
 		};
@@ -747,8 +747,8 @@ export function ExpensesList({
 						label: t("finance.expenses.subcontractPayments"),
 						value: <Currency amount={subcontractTotal} />,
 						icon: Hammer,
-						iconClassName: "text-sky-600 dark:text-sky-400",
-						iconBgClassName: "bg-sky-100 dark:bg-sky-900/50",
+						iconClassName: "text-chart-4 dark:text-chart-4",
+						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
 						hint: t("finance.listControls.resultsCount", {
 							count: subCount,
 						}),
@@ -810,7 +810,7 @@ export function ExpensesList({
 				<GlassStatCard
 					colorScheme="sky"
 					icon={
-						<Hammer className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<Hammer className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					}
 					title={t("finance.expenses.subcontractPayments")}
 					value={<Currency amount={subcontractTotal} />}
@@ -989,7 +989,7 @@ export function ExpensesList({
 											</span>
 											{item._type ===
 											"subcontract_payment" ? (
-												<Badge className="rounded-lg border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400">
+												<Badge className="rounded-lg border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 													<Hammer className="h-3 w-3 me-1" />
 													{t(
 														"finance.expenses.subcontractBadge",
@@ -1097,7 +1097,7 @@ export function ExpensesList({
 																		},
 																	)
 																}
-																className="text-sky-600"
+																className="text-chart-4"
 															>
 																<CreditCard className="h-4 w-4 me-2" />
 																{t(
@@ -1278,7 +1278,7 @@ export function ExpensesList({
 												<TableCell>
 													{item._type ===
 													"subcontract_payment" ? (
-														<Badge className="rounded-lg border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400">
+														<Badge className="rounded-lg border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 															<Hammer className="h-3 w-3 me-1" />
 															{t(
 																"finance.expenses.subcontractBadge",
@@ -1461,7 +1461,7 @@ export function ExpensesList({
 																					},
 																				)
 																			}
-																			className="text-sky-600"
+																			className="text-chart-4"
 																		>
 																			<CreditCard className="h-4 w-4 me-2" />
 																			{t(

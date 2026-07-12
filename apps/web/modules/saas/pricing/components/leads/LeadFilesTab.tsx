@@ -57,7 +57,7 @@ function getFileIcon(mimeType?: string | null) {
 	if (mimeType?.startsWith("image/")) {
 		return <Image className="h-4 w-4 text-pink-500" />;
 	}
-	return <File className="h-4 w-4 text-blue-500" />;
+	return <File className="h-4 w-4 text-chart-4" />;
 }
 
 export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProps) {

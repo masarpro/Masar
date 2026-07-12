@@ -125,7 +125,7 @@ export function FieldTimeline({
 			label: t("projects.field.newReport"),
 			icon: FileText,
 			href: `${basePath}/execution/new-report`,
-			color: "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400",
+			color: "bg-chart-4/15 text-chart-4 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:text-chart-4",
 		},
 		{
 			label: t("projects.field.uploadPhoto"),
@@ -173,7 +173,7 @@ export function FieldTimeline({
 					<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
 						{t("projects.field.currentProgress")}
 					</span>
-					<span className="text-3xl font-bold text-sky-600 dark:text-sky-400">
+					<span className="text-3xl font-bold text-chart-4 dark:text-chart-4">
 						{Math.round(currentProgress)}%
 					</span>
 				</div>
@@ -315,8 +315,8 @@ function TimelineItem({
 			return (
 				<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
+							<TrendingUp className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div className="flex-1">
 							<p className="font-medium text-slate-900 dark:text-slate-100">

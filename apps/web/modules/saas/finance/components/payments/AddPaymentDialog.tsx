@@ -387,7 +387,7 @@ export function AddPaymentDialog({
 									>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
-												<Building className="h-3.5 w-3.5 text-blue-500" />
+												<Building className="h-3.5 w-3.5 text-chart-4" />
 											) : (
 												<Wallet className="h-3.5 w-3.5 text-green-500" />
 											)}
@@ -414,7 +414,7 @@ export function AddPaymentDialog({
 							<div className="flex items-center gap-2.5 min-w-0">
 								<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 shrink-0">
 									{selectedAccount.accountType === "BANK" ? (
-										<Building className="h-3.5 w-3.5 text-blue-600" />
+										<Building className="h-3.5 w-3.5 text-chart-4" />
 									) : (
 										<Wallet className="h-3.5 w-3.5 text-green-600" />
 									)}

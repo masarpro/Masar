@@ -395,7 +395,7 @@ function FloorMaterialView({
 				<MaterialSectionCard
 					title={t("structural.boq.concreteSection")}
 					icon={Box}
-					iconColor="text-blue-600"
+					iconColor="text-chart-4"
 					borderColor="border-l-blue-500"
 					items={concreteRows}
 					valueAccessor={(item) => item.concreteVolume}
@@ -597,7 +597,7 @@ function SharedItemsCard({
 						</div>
 						<div className="flex items-center gap-4 text-sm">
 							{totalConcrete > 0 && (
-								<span className="text-blue-600 font-medium">
+								<span className="text-chart-4 font-medium">
 									{formatNumber(totalConcrete)} م³
 								</span>
 							)}
@@ -631,7 +631,7 @@ function SharedItemsCard({
 											<TableCell className="text-sm font-medium">{item.name}</TableCell>
 											<TableCell className="text-sm text-muted-foreground">{categoryLabel}</TableCell>
 											<TableCell className="text-sm">{item.quantity}</TableCell>
-											<TableCell className="text-sm text-blue-600">
+											<TableCell className="text-sm text-chart-4">
 												{formatNumber(item.concreteVolume)}
 											</TableCell>
 											<TableCell className="text-sm text-orange-600">
@@ -707,7 +707,7 @@ function SectionCard({
 						</div>
 						<div className="flex items-center gap-4 text-sm">
 							{section.totalConcrete > 0 && (
-								<span className="text-blue-600 font-medium">
+								<span className="text-chart-4 font-medium">
 									{formatNumber(section.totalConcrete)} م³
 								</span>
 							)}
@@ -844,7 +844,7 @@ function SubGroupView({
 										<TableCell className="text-sm">
 											{detail.item.quantity}
 										</TableCell>
-										<TableCell className="text-sm text-blue-600">
+										<TableCell className="text-sm text-chart-4">
 											{formatNumber(detail.item.concreteVolume)}
 										</TableCell>
 										<TableCell className="text-sm text-orange-600">
@@ -993,9 +993,9 @@ function GrandTotalCards({
 			icon: Box,
 			value: totals.concrete > 0 ? formatNumber(totals.concrete) : "—",
 			unit: "م³",
-			color: "text-blue-600",
-			bgColor: "bg-blue-50 dark:bg-blue-950/30",
-			borderColor: "border-blue-200 dark:border-blue-800",
+			color: "text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
+			borderColor: "border-chart-4 dark:border-chart-4",
 		},
 		{
 			title: t("structural.totalSteel"),

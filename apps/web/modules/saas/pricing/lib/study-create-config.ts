@@ -115,7 +115,7 @@ export const PROJECT_TYPES: readonly ProjectTypeConfig[] = [
 	{
 		value: "residential",
 		labelKey: "pricing.studies.projectTypes.residential",
-		color: "bg-sky-500",
+		color: "bg-chart-4",
 	},
 	{
 		value: "commercial",
@@ -142,6 +142,6 @@ export const PROJECT_TYPES: readonly ProjectTypeConfig[] = [
 /** Accent color for a project type (falls back to residential) */
 export function getProjectTypeColor(value: string): string {
 	return (
-		PROJECT_TYPES.find((p) => p.value === value)?.color ?? "bg-sky-500"
+		PROJECT_TYPES.find((p) => p.value === value)?.color ?? "bg-chart-4"
 	);
 }

@@ -751,8 +751,8 @@ function DetailsTabContent({
 			{/* ─── Metadata Card ──────────────────────────────────── */}
 			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
 				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-800/20 flex items-center justify-center">
-						<FileText className="h-[15px] w-[15px] text-blue-500" />
+					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4 flex items-center justify-center">
+						<FileText className="h-[15px] w-[15px] text-chart-4" />
 					</div>
 					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.details.metadata")}</span>
 				</div>
@@ -828,7 +828,7 @@ function DetailsTabContent({
 													? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
 													: invoice.zatcaSubmissionStatus === "FAILED"
 														? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-														: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+														: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 										}`}>
 											{t(`zatca.submission.${invoice.zatcaSubmissionStatus}`)}
 										</span>

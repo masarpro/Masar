@@ -231,7 +231,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 										</Badge>
 									</TableCell>
 									<TableCell className="text-end">
-										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.requiresApproval ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"}`}>
+										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.requiresApproval ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"}`}>
 											{lt.requiresApproval ? t("company.leaves.types.yes") : t("company.leaves.types.no")}
 										</Badge>
 									</TableCell>

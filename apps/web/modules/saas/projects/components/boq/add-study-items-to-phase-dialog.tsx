@@ -50,7 +50,7 @@ const KIND_ICONS: Record<Kind, any> = {
 };
 
 const KIND_COLORS: Record<Kind, string> = {
-	STRUCTURAL: "text-blue-500",
+	STRUCTURAL: "text-chart-4",
 	FINISHING: "text-amber-500",
 	MEP: "text-emerald-500",
 	LABOR: "text-orange-500",
@@ -185,7 +185,7 @@ export function AddStudyItemsToPhaseDialog({
 						{t("addStudyToPhase.title")}
 					</DialogTitle>
 					<div className="mt-1.5 flex items-center gap-2 text-xs text-slate-500">
-						<Flag className="h-3.5 w-3.5 text-blue-500" />
+						<Flag className="h-3.5 w-3.5 text-chart-4" />
 						<span>{targetPhaseTitle}</span>
 						{step === "pickItems" && selectedStudyName && (
 							<>
@@ -239,7 +239,7 @@ export function AddStudyItemsToPhaseDialog({
 													<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
 														{study.itemCounts?.structuralItems > 0 && (
 															<span className="flex items-center gap-1">
-																<HardHat className="h-3.5 w-3.5 text-blue-500" />
+																<HardHat className="h-3.5 w-3.5 text-chart-4" />
 																{study.itemCounts.structuralItems}
 															</span>
 														)}

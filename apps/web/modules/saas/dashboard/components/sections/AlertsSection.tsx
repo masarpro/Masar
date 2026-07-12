@@ -108,8 +108,8 @@ export function AlertsSection({
 			title: t("dashboard.alerts.upcomingPayments"),
 			count: upcomingPayments.length,
 			icon: Clock,
-			color: "text-blue-600 dark:text-blue-400",
-			bgColor: "bg-blue-50 dark:bg-blue-950/20",
+			color: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 			href: `/app/${organizationSlug}/projects`,
 		},
 	].filter(Boolean) as Array<{
