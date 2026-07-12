@@ -27,7 +27,7 @@ const DropdownMenuSubTrigger = ({
 }) => (
 	<DropdownMenuPrimitive.SubTrigger
 		className={cn(
-			"flex cursor-default select-none items-center rounded-md px-3 py-1.5 text-sm outline-hidden focus:bg-accent data-[state=open]:bg-accent",
+			"flex cursor-default select-none items-center rounded-lg px-3 py-1.5 text-sm outline-hidden focus:bg-accent data-[state=open]:bg-accent",
 			inset ? "ps-8" : "",
 			className,
 		)}
@@ -44,7 +44,8 @@ const DropdownMenuSubContent = ({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) => (
 	<DropdownMenuPrimitive.SubContent
 		className={cn(
-			"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[70] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=open]:animate-in",
+			// Botly-derived (same surface as dropdown 75:2472)
+			"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[70] min-w-[8rem] overflow-hidden rounded-[20px] border bg-popover px-3 py-2 text-popover-foreground shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] data-[state=closed]:animate-out data-[state=open]:animate-in",
 			className,
 		)}
 		{...props}
@@ -60,7 +61,8 @@ const DropdownMenuContent = ({
 		<DropdownMenuPrimitive.Content
 			sideOffset={sideOffset}
 			className={cn(
-				"z-[70] min-w-[8rem] overflow-hidden rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg",
+				// Botly dropdown 75:2472: radius 20px, border Stroke, shadow 0 8px 32px 12px 6%, inner px-12/py-8
+				"z-[70] min-w-[8rem] overflow-hidden rounded-[20px] border bg-popover px-3 py-2 text-popover-foreground shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
 				"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=open]:animate-in",
 				className,
 			)}
@@ -78,7 +80,8 @@ const DropdownMenuItem = ({
 }) => (
 	<DropdownMenuPrimitive.Item
 		className={cn(
-			"relative flex cursor-default select-none items-center rounded-md px-3 py-2 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+			// Botly item: radius 12px, resting text = Text secondary → hover Text Primary + Stroke bg
+			"relative flex cursor-default select-none items-center rounded-lg px-3 py-2 text-muted-foreground text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
 			inset ? "ps-8" : "",
 			className,
 		)}
@@ -94,7 +97,7 @@ const DropdownMenuCheckboxItem = ({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) => (
 	<DropdownMenuPrimitive.CheckboxItem
 		className={cn(
-			"relative flex cursor-default select-none items-center rounded-md py-3 pe-3 ps-8 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+			"relative flex cursor-default select-none items-center rounded-lg py-3 pe-3 ps-8 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
 			className,
 		)}
 		checked={checked}
@@ -116,7 +119,7 @@ const DropdownMenuRadioItem = ({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) => (
 	<DropdownMenuPrimitive.RadioItem
 		className={cn(
-			"relative flex cursor-default select-none items-center rounded-md py-2 pe-8 ps-3 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-[state=checked]:font-semibold data-disabled:opacity-50",
+			"relative flex cursor-default select-none items-center rounded-lg py-2 pe-8 ps-3 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-[state=checked]:font-semibold data-disabled:opacity-50",
 			className,
 		)}
 		{...props}
