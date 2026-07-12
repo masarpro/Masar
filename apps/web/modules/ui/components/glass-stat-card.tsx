@@ -1,70 +1,73 @@
 import type { ReactNode } from "react";
 import { cn } from "@ui/lib";
 
+/* Botly-restyle: flat card (bg-card + 2px Stroke, no glass/shadow), value is
+   always Text Primary, label/subtitle Text secondary; scheme hue kept only on
+   the icon chip + badge, remapped to Botly Brand/01..05. */
 const colorSchemes = {
 	blue: {
-		card: "bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/30",
-		iconBg: "bg-blue-100 dark:bg-blue-900/30",
-		iconText: "text-blue-600 dark:text-blue-400",
-		badge: "text-blue-600 dark:text-blue-400",
-		value: "text-blue-700 dark:text-blue-300",
-		subtitle: "text-blue-600/70 dark:text-blue-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-chart-4/15",
+		iconText: "text-chart-4",
+		badge: "text-chart-4",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	orange: {
-		card: "bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/30",
-		iconBg: "bg-orange-100 dark:bg-orange-900/30",
-		iconText: "text-orange-600 dark:text-orange-400",
-		badge: "text-orange-600 dark:text-orange-400",
-		value: "text-orange-700 dark:text-orange-300",
-		subtitle: "text-orange-600/70 dark:text-orange-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-chart-1/20",
+		iconText: "text-chart-1",
+		badge: "text-chart-1",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	sky: {
-		card: "bg-sky-50/80 dark:bg-sky-950/30 border-sky-100/50 dark:border-sky-900/50",
-		iconBg: "bg-sky-100 dark:bg-sky-900/30",
-		iconText: "text-sky-600 dark:text-sky-400",
-		badge: "text-sky-600 dark:text-sky-400",
-		value: "text-sky-700 dark:text-sky-300",
-		subtitle: "text-sky-600/70 dark:text-sky-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-chart-3/20",
+		iconText: "text-chart-3",
+		badge: "text-chart-3",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	red: {
-		card: "bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/30",
-		iconBg: "bg-red-100 dark:bg-red-900/30",
-		iconText: "text-red-600 dark:text-red-400",
-		badge: "text-red-600 dark:text-red-400",
-		value: "text-red-700 dark:text-red-300",
-		subtitle: "text-red-600/70 dark:text-red-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-destructive/15",
+		iconText: "text-destructive",
+		badge: "text-destructive",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	amber: {
-		card: "bg-amber-50/80 dark:bg-amber-950/30 border-amber-100/50 dark:border-amber-900/50",
-		iconBg: "bg-amber-100 dark:bg-amber-900/30",
-		iconText: "text-amber-600 dark:text-amber-400",
-		badge: "text-amber-600 dark:text-amber-400",
-		value: "text-amber-700 dark:text-amber-300",
-		subtitle: "text-amber-600/70 dark:text-amber-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-chart-1/20",
+		iconText: "text-chart-1",
+		badge: "text-chart-1",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	green: {
-		card: "bg-green-50/80 dark:bg-green-950/30 border-green-100/50 dark:border-green-900/50",
-		iconBg: "bg-green-100 dark:bg-green-900/30",
-		iconText: "text-green-600 dark:text-green-400",
-		badge: "text-green-600 dark:text-green-400",
-		value: "text-green-700 dark:text-green-300",
-		subtitle: "text-green-600/70 dark:text-green-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-success/15",
+		iconText: "text-success",
+		badge: "text-success",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	violet: {
-		card: "bg-violet-50/80 dark:bg-violet-950/30 border-violet-100/50 dark:border-violet-900/50",
-		iconBg: "bg-violet-100 dark:bg-violet-900/30",
-		iconText: "text-violet-600 dark:text-violet-400",
-		badge: "text-violet-600 dark:text-violet-400",
-		value: "text-violet-700 dark:text-violet-300",
-		subtitle: "text-violet-600/70 dark:text-violet-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-chart-4/15",
+		iconText: "text-chart-4",
+		badge: "text-chart-4",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 	slate: {
-		card: "bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/30",
-		iconBg: "bg-slate-100 dark:bg-slate-800/50",
-		iconText: "text-slate-500 dark:text-slate-400",
-		badge: "text-slate-500 dark:text-slate-400",
-		value: "text-slate-600 dark:text-slate-300",
-		subtitle: "text-slate-500/70 dark:text-slate-400/70",
+		card: "bg-card border-border",
+		iconBg: "bg-muted",
+		iconText: "text-muted-foreground",
+		badge: "text-muted-foreground",
+		value: "text-foreground",
+		subtitle: "text-muted-foreground",
 	},
 } as const;
 
@@ -97,7 +100,7 @@ export function GlassStatCard({
 		return (
 			<div
 				className={cn(
-					"backdrop-blur-xl border rounded-2xl shadow-lg shadow-black/5 p-4",
+					"border-2 rounded-[var(--botly-radius-card)] p-4",
 					colors.card,
 					className,
 				)}
@@ -110,7 +113,7 @@ export function GlassStatCard({
 	return (
 		<div
 			className={cn(
-				"backdrop-blur-xl border rounded-2xl shadow-lg shadow-black/5 min-w-0 p-3 sm:p-4",
+				"border-2 rounded-[var(--botly-radius-card)] min-w-0 p-3 sm:p-4",
 				colors.card,
 				className,
 			)}
@@ -130,7 +133,7 @@ export function GlassStatCard({
 					</span>
 				)}
 			</div>
-			<p className="truncate text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+			<p className="truncate text-[11px] sm:text-xs font-medium text-muted-foreground mb-1">
 				{title}
 			</p>
 			<p

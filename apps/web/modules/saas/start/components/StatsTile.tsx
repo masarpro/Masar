@@ -54,7 +54,7 @@ export function StatsTile({
 	return (
 		<Card>
 			<CardHeader className="pb-2">
-				<CardTitle className="text-foreground/60 text-sm">
+				<CardTitle className="text-muted-foreground text-sm">
 					{title}
 				</CardTitle>
 			</CardHeader>

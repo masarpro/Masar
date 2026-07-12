@@ -91,7 +91,8 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 	};
 
 	return (
-		<header className="sticky top-0 z-30 flex h-[52px] shrink-0 items-center justify-between border-b border-border/30 bg-background px-4">
+		// Botly Top bar (69:1786): flat, no divider
+		<header className="sticky top-0 z-30 flex h-[52px] shrink-0 items-center justify-between bg-background px-4">
 			{/* Start side: mobile hamburger + section icon + section name */}
 			<div className="flex items-center gap-2.5">
 				{isMobile && (
@@ -105,8 +106,8 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 						<Menu className="h-5 w-5" />
 					</Button>
 				)}
-				<SectionIcon className="h-5 w-5 text-primary/70" />
-				<span className="text-base font-medium text-foreground">
+				<SectionIcon className="h-5 w-5 text-foreground" />
+				<span className="text-base font-semibold text-foreground">
 					{sectionLabel}
 				</span>
 			</div>
