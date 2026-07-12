@@ -3,21 +3,36 @@
 import { DOMAIN_STYLES, type Domain } from "../types";
 
 interface Props {
-	selected: Set<Domain>;
-	onToggle: (domain: Domain) => void;
+	selected: Set<string>;
+	onToggle: (domain: string) => void;
 	onClear: () => void;
-	counts: Record<Domain, number>;
+	counts: Record<string, number>;
+	/** True total item count — the "all" chip must never undercount. */
+	totalCount: number;
 }
 
 const DOMAINS: Domain[] = ["FINISHING", "MEP", "EXTERIOR", "SPECIAL"];
+
+const FALLBACK_STYLE = {
+	color: "#64748b",
+	bgColor: "#64748b20",
+};
 
 export function DomainFilterChips({
 	selected,
 	onToggle,
 	onClear,
 	counts,
+	totalCount,
 }: Props) {
-	const totalCount = DOMAINS.reduce((s, d) => s + (counts[d] ?? 0), 0);
+	// Canonical order first, then any extra domain present on the items —
+	// a chip always exists for every domain that actually has items.
+	const chipDomains: string[] = [
+		...DOMAINS,
+		...Object.keys(counts).filter(
+			(d) => !(DOMAINS as string[]).includes(d),
+		),
+	];
 	const isAll = selected.size === 0;
 
 	return (
@@ -37,8 +52,13 @@ export function DomainFilterChips({
 				</span>
 			</button>
 
-			{DOMAINS.map((d) => {
-				const style = DOMAIN_STYLES[d];
+			{chipDomains.map((d) => {
+				const known = DOMAIN_STYLES[d as Domain];
+				const style = {
+					color: known?.color ?? FALLBACK_STYLE.color,
+					bgColor: known?.bgColor ?? FALLBACK_STYLE.bgColor,
+					label: known?.label ?? d,
+				};
 				const active = selected.has(d);
 				const count = counts[d] ?? 0;
 				if (count === 0 && !active) return null;

@@ -10,7 +10,6 @@ import {
 	Settings2,
 	Table as TableIcon,
 } from "lucide-react";
-import type { Domain } from "../types";
 import { DomainFilterChips } from "./DomainFilterChips";
 import { WorkspaceStatPills } from "./WorkspaceStatPills";
 
@@ -23,9 +22,9 @@ interface Props {
 	totalProfitPercent: number;
 	itemCount: number;
 
-	domainCounts: Record<Domain, number>;
-	selectedDomains: Set<Domain>;
-	onToggleDomain: (domain: Domain) => void;
+	domainCounts: Record<string, number>;
+	selectedDomains: Set<string>;
+	onToggleDomain: (domain: string) => void;
 	onClearDomains: () => void;
 
 	onAddItem: () => void;
@@ -151,6 +150,7 @@ export function WorkspaceBar({
 						onToggle={onToggleDomain}
 						onClear={onClearDomains}
 						counts={domainCounts}
+						totalCount={itemCount}
 					/>
 					<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 						<Layers className="h-3.5 w-3.5" />
