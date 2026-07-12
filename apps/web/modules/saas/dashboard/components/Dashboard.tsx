@@ -10,9 +10,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
+import { AttentionCard } from "./sections/AttentionCard";
 import { BotlyHero } from "./sections/BotlyHero";
-import { ProjectsDonutCard } from "./sections/ProjectsDonutCard";
 import { FinancePanel } from "./sections/FinancePanel";
+import { PortfolioPulseCard } from "./sections/PortfolioPulseCard";
+import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { WelcomeSection } from "./sections/WelcomeSection";
 
 // FinancePanel is imported statically (not next/dynamic with ssr:false). Its
@@ -97,86 +99,116 @@ export function Dashboard({
 		<div className="h-[220px] animate-pulse rounded-lg bg-muted" />
 	);
 
-	// Botly Dashboard/Light (Figma 120:11546) is a SINGLE viewport — hero (2/3)
-	// + widget stack (1/3) on top, one table below, nothing else. All previous
-	// below-the-fold sections (quick actions, alerts, operational, docs, tips)
-	// are intentionally not rendered here anymore (components kept on disk).
+	// Botly Dashboard/Light (Figma 120:11546), single viewport on xl.
+	// Left 2/3: hero → shortcut tiles → projects table (same width as hero).
+	// Right 1/3: cash-flow bars → portfolio pulse → attention + latest docs.
 	return (
-		<div className="flex flex-col gap-4 p-3 sm:p-4 xl:grid xl:h-[calc(100dvh-10.5rem)] xl:min-h-[560px] xl:grid-cols-3 xl:grid-rows-[minmax(0,58fr)_minmax(0,42fr)] xl:overflow-hidden xl:p-0">
+		<div className="flex flex-col gap-4 p-3 sm:p-4 xl:h-[calc(100dvh-11.25rem)] xl:min-h-[620px] xl:flex-row xl:overflow-hidden xl:p-0">
 			{/* Fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
-				<div className="xl:col-span-3 xl:row-span-2">
+				<div className="flex-1">
 					<WelcomeSection organizationSlug={organizationSlug} />
 				</div>
 			)}
 
 			{(showFinance || showProjects) && (
 				<>
-					{/* Hero — 2/3 of row 1 */}
-					<div className="min-h-0 xl:col-span-2">
-						{finLoading || statsLoading ? (
-							sectionSkeleton
-						) : (
-							<BotlyHero
-								organizationSlug={organizationSlug}
-								orgName={activeOrganization?.name ?? ""}
-								activeProjects={
-									showProjects ? (stats?.projects?.active ?? 0) : null
-								}
-								bankBalance={
-									showFinance
-										? (orgFinance?.balances?.totalBankBalance ?? 0)
-										: null
-								}
-								cashBalance={
-									showFinance
-										? (orgFinance?.balances?.totalCashBalance ?? 0)
-										: null
-								}
-								showFinance={showFinance}
-								showProjects={showProjects}
-							/>
-						)}
-					</div>
-
-					{/* Widget stack — 1/3 of row 1 */}
-					<div className="flex min-h-0 flex-col gap-4">
-						{showFinance &&
-							(finLoading || statsLoading ? (
-								cardSkeleton
-							) : (
-								<FinancePanel
-									bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
-									cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
-									financialTrend={dashboardData?.financialTrend ?? []}
-									organizationSlug={organizationSlug}
-								/>
-							))}
-						{showProjects &&
-							(statsLoading ? (
-								cardSkeleton
-							) : (
-								<ProjectsDonutCard
-									activeProjects={stats?.projects?.active ?? 0}
-									completedProjects={stats?.projects?.completed ?? 0}
-									onHoldProjects={stats?.projects?.onHold ?? 0}
-								/>
-							))}
-					</div>
-
-					{/* Projects table — full-width row 2 (Botly Earnings) */}
-					{showProjects && (
-						<div className="min-h-0 xl:col-span-3">
-							{projLoading ? (
+					{/* Left column — 2/3 */}
+					<div className="flex min-h-0 min-w-0 flex-col gap-4 xl:w-2/3">
+						<div className="min-h-0 xl:flex-[5]">
+							{finLoading || statsLoading ? (
 								sectionSkeleton
 							) : (
-								<ActiveProjectsSection
-									projects={projects}
+								<BotlyHero
 									organizationSlug={organizationSlug}
+									orgName={activeOrganization?.name ?? ""}
+									activeProjects={
+										showProjects ? (stats?.projects?.active ?? 0) : null
+									}
+									bankBalance={
+										showFinance
+											? (orgFinance?.balances?.totalBankBalance ?? 0)
+											: null
+									}
+									cashBalance={
+										showFinance
+											? (orgFinance?.balances?.totalCashBalance ?? 0)
+											: null
+									}
+									showFinance={showFinance}
+									showProjects={showProjects}
 								/>
 							)}
 						</div>
-					)}
+
+						<QuickActionsGrid organizationSlug={organizationSlug} />
+
+						{showProjects && (
+							<div className="min-h-0 xl:flex-[4]">
+								{projLoading ? (
+									sectionSkeleton
+								) : (
+									<ActiveProjectsSection
+										projects={projects}
+										organizationSlug={organizationSlug}
+									/>
+								)}
+							</div>
+						)}
+					</div>
+
+					{/* Right column — 1/3 */}
+					<div className="flex min-h-0 min-w-0 flex-col gap-4 xl:w-1/3">
+						{showFinance && (
+							<div className="min-h-0 xl:flex-[4]">
+								{finLoading || statsLoading ? (
+									cardSkeleton
+								) : (
+									<FinancePanel
+										bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
+										cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
+										financialTrend={dashboardData?.financialTrend ?? []}
+										organizationSlug={organizationSlug}
+									/>
+								)}
+							</div>
+						)}
+						{showProjects && (
+							<div className="min-h-0 xl:flex-[3]">
+								{projLoading ? (
+									cardSkeleton
+								) : (
+									<PortfolioPulseCard projects={projects} />
+								)}
+							</div>
+						)}
+						<div className="min-h-0 xl:flex-[5]">
+							{statsLoading ? (
+								cardSkeleton
+							) : (
+								<AttentionCard
+									organizationId={organizationId}
+									organizationSlug={organizationSlug}
+									overdueInvoices={
+										showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
+									}
+									overdueMilestones={
+										showProjects
+											? (dashboardData?.overdue?.milestones ?? [])
+											: []
+									}
+									pendingSubcontractClaims={
+										showFinance
+											? (dashboardData?.pendingSubcontractClaims ?? 0)
+											: 0
+									}
+									upcomingPayments={
+										showFinance ? (dashboardData?.upcoming ?? []) : []
+									}
+								/>
+							)}
+						</div>
+					</div>
 				</>
 			)}
 		</div>

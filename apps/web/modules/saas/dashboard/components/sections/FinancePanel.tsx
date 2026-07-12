@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 // initial bundle. The loading placeholder reserves the chart's box.
 const FinancePanelChart = dynamic(() => import("./FinancePanelChart"), {
 	ssr: false,
-	loading: () => <div className="w-full flex-1 min-h-[96px]" />,
+	loading: () => <div className="h-full w-full" />,
 });
 
 interface FinancePanelProps {
@@ -83,7 +83,9 @@ export function FinancePanel({
 				</span>
 			</div>
 
-			<div className="flex min-h-0 flex-1 flex-col">
+			{/* Explicit height: ResponsiveContainer needs a computed height —
+			    min-height alone resolves percentage children to 0 (prod bug). */}
+			<div className="h-36 xl:h-auto xl:min-h-0 xl:flex-1">
 				<FinancePanelChart financialTrend={financialTrend} />
 			</div>
 		</div>

@@ -71,7 +71,7 @@ export default function FinancePanelChart({
 	return (
 		<ChartContainer
 			config={chartConfig}
-			className="w-full flex-1 min-h-[96px] aspect-auto"
+			className="h-full w-full aspect-auto"
 		>
 			<BarChart
 				data={chartData}

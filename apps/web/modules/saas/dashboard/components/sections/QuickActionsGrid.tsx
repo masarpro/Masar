@@ -21,6 +21,11 @@ interface QuickActionsGridProps {
 	organizationSlug: string;
 }
 
+/**
+ * Botly-restyle: one flat strip of shortcut tiles under the hero —
+ * bg-card + 2px Stroke border + Brand-tinted icon chips (no glass,
+ * no pastel washes, no shadows). Tile body browses; the + creates.
+ */
 export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
@@ -47,10 +52,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.addExpense"),
 			browsePath: `/app/${organizationSlug}/finance/expenses`,
 			createPath: "",
-			iconColor: "text-rose-500 dark:text-rose-400",
-			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
-			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
-			borderColor: "border-rose-200/50 dark:border-rose-800/50",
+			chip: "bg-destructive/15 text-destructive",
 			onCreateClick: () => setExpenseDialogOpen(true),
 		},
 		{
@@ -60,10 +62,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`,
 			createPath: "",
-			iconColor: "text-emerald-500 dark:text-emerald-400",
-			bgColor: "bg-emerald-50/80 dark:bg-emerald-950/30",
-			hoverBg: "hover:bg-emerald-100 dark:hover:bg-emerald-900/50",
-			borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
+			chip: "bg-success/15 text-success",
 			onCreateClick: () => setPaymentDialogOpen(true),
 		},
 		{
@@ -73,10 +72,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.newQuotation"),
 			browsePath: `/app/${organizationSlug}/pricing/quotations`,
 			createPath: `/app/${organizationSlug}/pricing/quotations/new`,
-			iconColor: "text-chart-4 dark:text-chart-4",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			hoverBg: "hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
-			borderColor: "border-chart-4/50 dark:border-chart-4/50",
+			chip: "bg-chart-3/20 text-chart-3",
 		},
 		{
 			icon: Receipt,
@@ -85,10 +81,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.createInvoice"),
 			browsePath: `/app/${organizationSlug}/finance/invoices`,
 			createPath: `/app/${organizationSlug}/finance/invoices/new`,
-			iconColor: "text-chart-4 dark:text-chart-4",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			hoverBg: "hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
-			borderColor: "border-chart-4/50 dark:border-chart-4/50",
+			chip: "bg-chart-4/15 text-chart-4",
 		},
 		{
 			icon: Calculator,
@@ -97,10 +90,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.calculateQuantities"),
 			browsePath: `/app/${organizationSlug}/pricing/studies`,
 			createPath: `/app/${organizationSlug}/pricing/studies?new=1`,
-			iconColor: "text-violet-500 dark:text-violet-400",
-			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
-			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",
-			borderColor: "border-violet-200/50 dark:border-violet-800/50",
+			chip: "bg-chart-1/25 text-foreground",
 		},
 		{
 			icon: Users,
@@ -109,10 +99,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			actionLabel: t("dashboard.actions.newLead"),
 			browsePath: `/app/${organizationSlug}/pricing/leads`,
 			createPath: `/app/${organizationSlug}/pricing/leads/new`,
-			iconColor: "text-orange-500 dark:text-orange-400",
-			bgColor: "bg-orange-50/80 dark:bg-orange-950/30",
-			hoverBg: "hover:bg-orange-100 dark:hover:bg-orange-900/50",
-			borderColor: "border-orange-200/50 dark:border-orange-800/50",
+			chip: "bg-primary/10 text-primary",
 		},
 	];
 
@@ -124,93 +111,47 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 
 	return (
 		<>
-			{/* الجوال: شبكة مضغوطة — أيقونة + عنوان صغير لكل قسم */}
-			{/* الجوال: صف كامل العرض لكل إجراء — نفس نمط صفوف المالية */}
-			<div className="flex flex-col gap-2 sm:hidden">
+			<div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
 				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
+					const createInner = (
+						<>
+							<Plus className="size-3.5" />
+							<span className="truncate">{action.actionLabel}</span>
+						</>
+					);
 					return (
 						<div
 							key={i}
-							className={`flex h-14 items-center gap-3 rounded-2xl border ${action.borderColor} ${action.bgColor} px-3 transition-colors ${action.hoverBg}`}
+							className="flex min-w-0 flex-col overflow-hidden rounded-2xl border-2 bg-card transition-colors hover:border-primary/20"
 						>
 							<Link
 								href={action.browsePath}
-								className="flex min-w-0 flex-1 items-center gap-3"
+								className="flex min-w-0 items-center gap-2.5 p-3"
 							>
-								<div
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
+								<span
+									className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
 								>
-									<Icon className="h-5 w-5" />
-								</div>
-								<span className="truncate text-sm font-medium text-foreground/80">
+									<Icon className="size-4.5" />
+								</span>
+								<span className="truncate text-sm font-semibold text-card-foreground">
 									{action.sectionLabel}
 								</span>
 							</Link>
 							{action.onCreateClick ? (
 								<button
 									type="button"
-									aria-label={action.actionLabel}
 									onClick={action.onCreateClick}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
+									className="flex items-center justify-center gap-1.5 border-t-2 px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 								>
-									<Plus className="h-5 w-5" />
-								</button>
-							) : action.createPath ? (
-								<Link
-									href={action.createPath}
-									aria-label={action.actionLabel}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
-								>
-									<Plus className="h-5 w-5" />
-								</Link>
-							) : null}
-						</div>
-					);
-				})}
-			</div>
-
-			{/* الديسكتوب كما هو */}
-			<div className="hidden gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-6">
-				{visibleActions.map((action, i) => {
-					const Icon = action.icon;
-					return (
-						<div
-							key={i}
-							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
-							style={{ animationDelay: `${200 + i * 30}ms` }}
-						>
-							<Link
-								href={action.browsePath}
-								className={`flex flex-col items-center gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor}`}
-							>
-								<div className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}>
-									<Icon className="h-6 w-6" />
-								</div>
-								<span className="text-center text-sm font-medium text-foreground/80">
-									{action.sectionLabel}
-								</span>
-							</Link>
-							{"onCreateClick" in action && action.onCreateClick ? (
-								<button
-									type="button"
-									onClick={action.onCreateClick}
-									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
-								>
-									<Plus className={`h-4 w-4 ${action.iconColor}`} />
-									<span className={`text-xs font-medium ${action.iconColor}`}>
-										{action.actionLabel}
-									</span>
+									{createInner}
 								</button>
 							) : (
 								<Link
 									href={action.createPath}
-									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+									className="flex items-center justify-center gap-1.5 border-t-2 px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 								>
-									<Plus className={`h-4 w-4 ${action.iconColor}`} />
-									<span className={`text-xs font-medium ${action.iconColor}`}>
-										{action.actionLabel}
-									</span>
+									{createInner}
 								</Link>
 							)}
 						</div>

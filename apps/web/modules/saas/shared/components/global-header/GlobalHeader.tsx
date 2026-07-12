@@ -91,8 +91,8 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 	};
 
 	return (
-		// Botly Top bar (69:1786): flat, no divider
-		<header className="sticky top-0 z-30 flex h-[52px] shrink-0 items-center justify-between bg-background px-4">
+		// Botly Top bar (69:1786): flat, no divider, roomy 64px with 48px icon buttons
+		<header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between bg-background px-4">
 			{/* Start side: mobile hamburger + section icon + section name */}
 			<div className="flex items-center gap-2.5">
 				{isMobile && (
@@ -112,8 +112,8 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 				</span>
 			</div>
 
-			{/* End side: color mode + notifications + user avatar */}
-			<div className="flex items-center gap-1">
+			{/* End side: color mode + notifications + user avatar (Botly: 48px icon buttons + 40px avatar) */}
+			<div className="flex items-center gap-1.5">
 				<ColorModeToggle />
 
 				{activeOrganization?.id && (
@@ -128,13 +128,13 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="ms-1 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+							className="ms-1.5 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
 							aria-label="User menu"
 						>
 							<UserAvatar
 								name={user?.name ?? ""}
 								avatarUrl={user?.image}
-								className="h-8 w-8"
+								className="h-10 w-10"
 							/>
 						</button>
 					</DropdownMenuTrigger>

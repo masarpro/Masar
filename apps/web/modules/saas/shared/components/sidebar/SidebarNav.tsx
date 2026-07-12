@@ -62,13 +62,14 @@ const NavItemContent = memo(function NavItemContent({
 /* Botly menu item (63:8787 resting / 63:8790 active): resting = Text
    secondary on transparent; active = On-surface chip + white/10 border +
    Text invert, semibold. Hover derived: sidebar-accent at 50%. */
+/* Botly menu items are Base 1 (16px semibold) at every state (63:8787). */
 const navItemClasses = (isActive: boolean, isSubItem: boolean, collapsed: boolean) =>
 	cn(
-		"w-full flex items-center rounded-lg transition-all duration-200 ease-out relative border border-transparent",
+		"w-full flex items-center rounded-lg font-semibold transition-all duration-200 ease-out relative border border-transparent",
 		"hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
 		isActive &&
-			"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground font-semibold",
-		isSubItem ? "px-2.5 py-3 text-sm" : "p-3",
+			"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground",
+		isSubItem ? "px-2.5 py-2.5 text-sm" : "p-3 text-[15px]",
 		isSubItem && !isActive && "text-sidebar-foreground/80",
 		collapsed && !isSubItem && "justify-center",
 	);
@@ -117,10 +118,10 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 						>
 							<div
 								className={cn(
-									"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative border border-transparent",
+									"w-full flex items-center justify-between rounded-lg font-semibold text-[15px] transition-all duration-200 ease-out relative border border-transparent",
 									"hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
 									isActive &&
-										"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground font-semibold",
+										"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground",
 									"p-3",
 								)}
 							>
