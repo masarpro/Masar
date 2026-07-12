@@ -6,6 +6,7 @@ import { toNum, convertCostingItemDecimals } from "../../../lib/decimal-helpers"
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { dedupeCostingItems, summarizeCostingItems } from "../lib/costing-aggregation";
+import { isUnifiedStudyServer } from "../../unified-quantities/lib/classify";
 
 function calculateItemTotals(data: {
 	quantity: number;
@@ -83,11 +84,19 @@ export const costingGenerateItems = subscriptionProcedure
 
 			const study = await tx.costStudy.findFirst({
 				where: { id: input.studyId, organizationId: input.organizationId },
-				select: { id: true },
+				select: { id: true, workScopes: true, studyType: true },
 			});
 			if (!study) {
 				throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 			}
+
+			// الدراسات الموحّدة تُسعِّر التشطيبات وMEP داخل مساحة العمل الموحدة
+			// (QuantityItem) — توليدها هنا أيضاً يعني ازدواج تكلفتها. مرحلة
+			// تسعير التكلفة تبقى للأعمال الإنشائية/اليدوية/العمالة فقط.
+			const unifiedStudy = isUnifiedStudyServer({
+				workScopes: study.workScopes,
+				studyType: study.studyType,
+			});
 
 			// البنود الموجودة مسبقاً تُزامَن (كانت تُترك كما هي فتبقى الكميات
 			// قديمة بعد تعديل مرحلة الكميات — عرض السعر يتسعّر بكميات بائتة)
@@ -165,7 +174,8 @@ export const costingGenerateItems = subscriptionProcedure
 			}
 
 			// Finishing items (aggregated materials from specs)
-			for (const item of finishingItems) {
+			// — تُتخطى للدراسات الموحّدة (تُسعَّر في مساحة العمل الموحدة)
+			for (const item of unifiedStudy ? [] : finishingItems) {
 				items.push({
 					costStudyId: input.studyId,
 					organizationId: input.organizationId,
@@ -179,8 +189,8 @@ export const costingGenerateItems = subscriptionProcedure
 				});
 			}
 
-			// MEP items
-			for (const item of mepItems) {
+			// MEP items — تُتخطى للدراسات الموحّدة كذلك
+			for (const item of unifiedStudy ? [] : mepItems) {
 				items.push({
 					costStudyId: input.studyId,
 					organizationId: input.organizationId,

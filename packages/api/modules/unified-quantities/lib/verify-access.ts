@@ -6,6 +6,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { isUnifiedStudyServer } from "./classify";
 
 /**
  * تحقق من عضوية المستخدم في المنظمة + صلاحية pricing.studies.
@@ -32,25 +33,13 @@ export async function loadStudy(costStudyId: string, organizationId: string) {
 	if (!study) {
 		throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
 	}
-	// حصر المحرك: يطابق قاعدة الواجهة في unified-flag.ts حرفياً —
-	// الدراسة موحّدة عندما يكون العلم مفعّلاً و(لا نطاقات أو تشمل FINISHING/MEP)
-	// وليست من أنواع التسعير فقط (QUICK_PRICING وأخواتها لا تمر بمرحلة الكميات).
-	// غير ذلك تُدار عبر النظام الأساسي ولا يجوز الكتابة عليها من هنا
-	// (المحركان يكتبان نفس CostStudy بحسابات متنافرة)
-	const flagEnabled =
-		process.env.NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES === "1";
-	const pricingOnlyType = [
-		"QUICK_PRICING",
-		"CUSTOM_ITEMS",
-		"LUMP_SUM_ANALYSIS",
-	].includes(study.studyType);
-	const scopes = Array.isArray(study.workScopes) ? study.workScopes : [];
-	const isUnified =
-		flagEnabled &&
-		!pricingOnlyType &&
-		(scopes.length === 0 ||
-			scopes.includes("FINISHING") ||
-			scopes.includes("MEP"));
+	// حصر المحرك: القاعدة المشتركة في lib/classify.ts (تطابق الواجهة حرفياً).
+	// الدراسة غير الموحّدة تُدار عبر النظام الأساسي ولا يجوز الكتابة عليها
+	// من هنا (المحركان يكتبان نفس CostStudy بحسابات متنافرة)
+	const isUnified = isUnifiedStudyServer({
+		workScopes: study.workScopes,
+		studyType: study.studyType,
+	});
 	if (!isUnified) {
 		throw new ORPCError("CONFLICT", {
 			message: "هذه الدراسة تُدار عبر نظام الكميات الأساسي وليس النظام الموحّد",

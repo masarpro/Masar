@@ -51,8 +51,12 @@ export function SpecificationsPageContent({
 	const workScopesVal: string[] = (study as any)?.workScopes ?? [];
 	const { enabledTabs } = useStudyConfig({ studyType: studyTypeVal, workScopes: workScopesVal });
 
-	// Filter spec tabs (specs has structural, finishing, mep - no manual)
-	const specTabs = enabledTabs.filter((tab) => tab !== "manual");
+	// Filter spec tabs (specs has structural, finishing, mep - no manual).
+	// "unified" يُستبعد أيضاً: مواصفات التشطيبات/MEP للدراسات الموحّدة تُدخل
+	// داخل مساحة العمل الموحدة نفسها — هذه الصفحة للإنشائي فقط عندها.
+	const specTabs = enabledTabs.filter(
+		(tab) => tab !== "manual" && tab !== "unified",
+	);
 	const [activeTab, setActiveTab] = useState(specTabs[0] || "structural");
 
 	// ─── Fetch stages ───

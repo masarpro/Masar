@@ -27,8 +27,16 @@ export async function redirectIfUnified(
 		select: { workScopes: true, studyType: true },
 	});
 
+	// الدراسات الموحّدة التي تشمل نطاق STRUCTURAL أو CUSTOM تحتفظ بمسار
+	// المراحل القديم (مواصفات → تسعير تكلفة → تسعير) لأعمالها الإنشائية
+	// واليدوية — التشطيبات وMEP فقط هي ما انتقل لمساحة العمل الموحدة.
+	const scopes = Array.isArray(study?.workScopes) ? study.workScopes : [];
+	const keepsLegacyPipeline =
+		scopes.includes("STRUCTURAL") || scopes.includes("CUSTOM");
+
 	if (
 		study &&
+		!keepsLegacyPipeline &&
 		isUnifiedStudy({
 			workScopes: study.workScopes,
 			studyType: study.studyType,

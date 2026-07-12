@@ -23,6 +23,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { isUnifiedStudy } from "../../lib/unified-flag";
 import { LumpSumAnalysisSection } from "./LumpSumAnalysisSection";
 import { ProfitAnalysisCard } from "./ProfitAnalysisCard";
 
@@ -122,20 +123,27 @@ export function PricingPageContentV2({
 	const studyType = (studyData as any)?.studyType ?? "FULL_PROJECT";
 	const skipCostingCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
-	// Build enabled sections based on workScopes
+	// Build enabled sections based on workScopes.
+	// الدراسات الموحّدة: FINISHING/MEP تُسعَّر في مساحة العمل الموحدة، وهذه
+	// المرحلة للإنشائي/اليدوي/العمالة فقط (لن تولّد لهما بنود تكلفة أصلاً).
 	const workScopes: string[] = (studyData as any)?.workScopes ?? [];
+	const unifiedStudy = isUnifiedStudy({ workScopes, studyType });
 	const enabledSections = new Set<string>();
 	if (workScopes.length === 0) {
 		// Legacy/all-scopes: show everything
 		enabledSections.add("STRUCTURAL");
-		enabledSections.add("FINISHING");
-		enabledSections.add("MEP");
+		if (!unifiedStudy) {
+			enabledSections.add("FINISHING");
+			enabledSections.add("MEP");
+		}
 		enabledSections.add("MANUAL");
 		enabledSections.add("LABOR");
 	} else {
 		if (workScopes.includes("STRUCTURAL")) enabledSections.add("STRUCTURAL");
-		if (workScopes.includes("FINISHING")) enabledSections.add("FINISHING");
-		if (workScopes.includes("MEP")) enabledSections.add("MEP");
+		if (!unifiedStudy && workScopes.includes("FINISHING"))
+			enabledSections.add("FINISHING");
+		if (!unifiedStudy && workScopes.includes("MEP"))
+			enabledSections.add("MEP");
 		if (workScopes.includes("CUSTOM")) enabledSections.add("MANUAL");
 		// Always include LABOR (aggregates from whatever sections exist)
 		enabledSections.add("LABOR");

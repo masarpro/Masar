@@ -21,6 +21,7 @@ import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
 import { StageApprovalButton } from "../pipeline/StageApprovalButton";
 import { UnifiedItemsWorkspace } from "../unified-quantities";
 import { ImportItemsDialog } from "./ImportItemsDialog";
+import { StructuralPipelinePanel } from "./StructuralPipelinePanel";
 import { StructuralItemsEditor } from "./StructuralItemsEditor";
 // Legacy editors — only mounted when the unified workspace is OFF for this study
 import { FinishingItemsEditor } from "./FinishingItemsEditor";
@@ -230,6 +231,20 @@ export function QuantitiesSubTabs({
 			{!isUnified && enabledTabs.length > 1 && (
 				<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
 			)}
+
+			{/* Unified studies that also carry STRUCTURAL/CUSTOM scope keep the
+			    legacy pipeline (specs → costing → pricing) for those items —
+			    surfaced as a compact bottom panel instead of the full stepper.
+			    It embeds the quantities approval button, so the ladder can start. */}
+			{isUnified &&
+				(workScopes.includes("STRUCTURAL") ||
+					workScopes.includes("CUSTOM")) && (
+					<StructuralPipelinePanel
+						organizationId={organizationId}
+						organizationSlug={organizationSlug}
+						studyId={studyId}
+					/>
+				)}
 
 			{/* Bottom approval bar — hidden under unified mode because the workspace
 			    has its own header CTAs (quote / context) and per-item totals; the

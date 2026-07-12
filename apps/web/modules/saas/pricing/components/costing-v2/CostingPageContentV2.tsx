@@ -24,6 +24,7 @@ import { LaborOverviewTab } from "./LaborOverviewTab";
 import { CostingSummaryTab } from "./CostingSummaryTab";
 import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
+import { isUnifiedStudy } from "../../lib/unified-flag";
 
 interface CostingPageContentV2Props {
 	organizationId: string;
@@ -116,15 +117,24 @@ export function CostingPageContentV2({
 
 	const buildingArea = Number((study as any)?.buildingArea ?? 0);
 
-	// Build enabled tabs based on workScopes
+	// Build enabled tabs based on workScopes.
+	// الدراسات الموحّدة تُسعِّر التشطيبات وMEP داخل مساحة العمل الموحدة —
+	// هذه المرحلة تبقى للإنشائي/اليدوي/العمالة فقط (يطابق تخطي التوليد
+	// في costingGenerateItems على السيرفر).
 	const workScopes: string[] = (study as any)?.workScopes ?? [];
+	const unified = isUnifiedStudy({
+		workScopes,
+		studyType: (study as any)?.studyType,
+	});
 	const enabledTabs: string[] = [];
 	if (workScopes.length === 0) {
-		enabledTabs.push("structural", "finishing", "mep");
+		enabledTabs.push("structural");
+		if (!unified) enabledTabs.push("finishing", "mep");
 	} else {
 		if (workScopes.includes("STRUCTURAL")) enabledTabs.push("structural");
-		if (workScopes.includes("FINISHING")) enabledTabs.push("finishing");
-		if (workScopes.includes("MEP")) enabledTabs.push("mep");
+		if (!unified && workScopes.includes("FINISHING"))
+			enabledTabs.push("finishing");
+		if (!unified && workScopes.includes("MEP")) enabledTabs.push("mep");
 	}
 	// Always include labor and summary
 	enabledTabs.push("labor", "summary");

@@ -6874,6 +6874,11 @@
       "notStarted": "Not Started",
       "draft": "Draft",
       "inReview": "In Review",
+      "structuralPanel": {
+        "title": "Structural & Manual Works Pipeline",
+        "subtitle": "Specifications, costing and pricing for structural and manual items — finishing and MEP are priced in the workspace above",
+        "locked": "Unlocks after the previous stage is approved"
+      },
       "quantitiesDesc": "Survey and determine quantities for structural, finishing, and MEP items",
       "tabStructural": "Structural",
       "tabFinishing": "Finishing",
