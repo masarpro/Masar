@@ -48,14 +48,16 @@ export function GreetingHeader({
 		return <div className="h-14 animate-pulse bg-muted rounded-xl" />;
 	}
 
+	// Botly Top bar (Figma 69:1786): flat page title — big bold heading on
+	// the page background, no glass ribbon, actions/clock at the end.
 	return (
-		<div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+		<div className="flex flex-wrap items-center justify-between gap-3 py-1">
 			<div className="flex min-w-0 items-center gap-3">
-				<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+				<div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
 					<Icon className="h-5 w-5 text-primary" />
 				</div>
 				<div className="min-w-0">
-					<h1 className="truncate text-xl font-bold text-foreground">
+					<h1 className="truncate text-2xl font-bold leading-snug text-foreground xl:text-3xl">
 						{title}
 					</h1>
 					{subtitle ? (
@@ -68,7 +70,7 @@ export function GreetingHeader({
 
 			{actions ??
 				(showClock ? (
-					<div className="hidden sm:flex items-center gap-1.5 text-foreground font-medium text-sm">
+					<div className="hidden sm:flex items-center gap-1.5 text-muted-foreground font-medium text-sm">
 						<Clock className="h-4 w-4" />
 						<span className="tabular-nums">
 							{formatTime(currentTime)}
