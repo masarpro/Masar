@@ -62,89 +62,92 @@
 
 @layer base {
 	:root {
-		--border: #d4d9e0;
-		--input: #d4d9e0;
-		--ring: #0284c7;
-		--background: #f4f7fa;
-		--foreground: #0c1823;
-		--primary: #0284c7;
-		--primary-foreground: #ffffff;
-		--secondary: #e8edf0;
-		--secondary-foreground: #0c1823;
-		--destructive: #ef4444;
-		--destructive-foreground: #ffffff;
-		--success: #39a561;
-		--success-foreground: #ffffff;
-		--muted: #edf0f2;
-		--muted-foreground: #5a6d7a;
-		--accent: #e0e5ec;
-		--accent-foreground: #0c1823;
-		--popover: #ffffff;
-		--popover-foreground: #0c1823;
-		--card: #ffffff;
-		--card-foreground: #0c1823;
-		--cta: #dc2626;
+		/* Botly design tokens (Figma: Botly — AI Chatbot Dashboard) — light mode */
+		--border: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
+		--input: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
+		--ring: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background invert */
+		--background: oklch(1 0 0); /* #ffffff — Figma: Background */
+		--foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--primary: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background invert */
+		--primary-foreground: oklch(1 0 0); /* #ffffff — Figma: Text invert */
+		--secondary: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Neutral/02 */
+		--secondary-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--destructive: oklch(0.6931 0.1489 28.89); /* #ea7465 — Figma: Brand/02 */
+		--destructive-foreground: oklch(1 0 0); /* #ffffff */
+		--success: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
+		--success-foreground: oklch(1 0 0); /* #ffffff */
+		--muted: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Neutral/02 */
+		--muted-foreground: oklch(0.7191 0.0081 241.71); /* #a0a5a9 — Figma: Text secondary */
+		--accent: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke (dropdown hover) */
+		--accent-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--popover: oklch(1 0 0); /* #ffffff — Figma: Background */
+		--popover-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--card: oklch(1 0 0); /* #ffffff — Figma: Background */
+		--card-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--cta: #dc2626; /* Masar CTA — لا مقابل في Botly، تبقى كما هي */
 		--cta-foreground: #ffffff;
-		--radius: 0.75rem;
+		--radius: 0.75rem; /* 12px — Figma: Button/menu/dropdown radius (unchanged) */
+		--botly-radius-card: 2rem; /* 32px — Figma: Widget cards radius */
 
-		--chart-1: #0ea5e9;
-		--chart-2: #8b5cf6;
-		--chart-3: #f59e0b;
-		--chart-4: #ef4444;
-		--chart-5: #06b6d4;
+		--chart-1: oklch(0.8717 0.1251 80.92); /* #ffcc6f — Figma: Brand/01 */
+		--chart-2: oklch(0.6931 0.1489 28.89); /* #ea7465 — Figma: Brand/02 */
+		--chart-3: oklch(0.8017 0.0656 218.79); /* #8ec9db — Figma: Brand/03 */
+		--chart-4: oklch(0.6071 0.1882 271.81); /* #5d74f1 — Figma: Brand/04 */
+		--chart-5: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
 
-		--sidebar-background: #edf0f2;
-		--sidebar-foreground: #0c1823;
-		--sidebar-primary: #0284c7;
-		--sidebar-primary-foreground: #ffffff;
-		--sidebar-accent: #e0e5ec;
-		--sidebar-accent-foreground: #0c1823;
-		--sidebar-border: #d4d9e0;
-		--sidebar-ring: #0284c7;
+		--sidebar-background: oklch(1 0 0); /* #ffffff — Figma: Background */
+		--sidebar-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
+		--sidebar-primary: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background invert */
+		--sidebar-primary-foreground: oklch(1 0 0); /* #ffffff — Figma: Text invert */
+		--sidebar-accent: oklch(0.3171 0 0); /* #323232 — Figma: On surface (active item) */
+		--sidebar-accent-foreground: oklch(1 0 0); /* #ffffff — Figma: Text invert */
+		--sidebar-border: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
+		--sidebar-ring: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
 
 		/* fumadocs */
 		--fd-banner-height: 4.5rem;
 	}
 
 	.dark {
-		--border: #1a2a3f;
-		--input: #1a2a3f;
-		--ring: #38bdf8;
-		--background: #060a10;
-		--foreground: #e8edf0;
-		--primary: #38bdf8;
-		--primary-foreground: #ffffff;
-		--secondary: #121a31;
-		--secondary-foreground: #8a9eaa;
-		--destructive: #ef4444;
-		--destructive-foreground: #ffffff;
-		--success: #39a561;
-		--success-foreground: #ffffff;
-		--muted: #0c1220;
-		--muted-foreground: #4a626e;
-		--accent: #141e35;
-		--accent-foreground: #e8edf0;
-		--popover: #0c1220;
-		--popover-foreground: #e8edf0;
-		--card: #0f1528;
-		--card-foreground: #e8edf0;
-		--cta: #ef4444;
+		/* Botly design tokens — dark mode (Figma variables, Dashboard/Dark) */
+		--border: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
+		--input: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
+		--ring: oklch(1 0 0); /* #ffffff — Figma: Background invert (dark) */
+		--background: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background (dark) */
+		--foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--primary: oklch(1 0 0); /* #ffffff — Figma: Background invert (dark) */
+		--primary-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text invert (dark) */
+		--secondary: oklch(0.3171 0 0); /* #323232 — Figma: Neutral/06 */
+		--secondary-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--destructive: oklch(0.6931 0.1489 28.89); /* #ea7465 — Figma: Brand/02 */
+		--destructive-foreground: oklch(1 0 0); /* #ffffff */
+		--success: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
+		--success-foreground: oklch(1 0 0); /* #ffffff */
+		--muted: oklch(0.3171 0 0); /* #323232 — Figma: Neutral/06 */
+		--muted-foreground: oklch(0.66 0 0); /* #929292 — Figma: Text secondary (dark) */
+		--accent: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dropdown hover, dark) */
+		--accent-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--popover: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background (dark) */
+		--popover-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--card: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background (dark) */
+		--card-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--cta: #ef4444; /* Masar CTA — لا مقابل في Botly، تبقى كما هي */
 		--cta-foreground: #ffffff;
 
-		--chart-1: #0ea5e9;
-		--chart-2: #8b5cf6;
-		--chart-3: #f59e0b;
-		--chart-4: #ef4444;
-		--chart-5: #06b6d4;
+		--chart-1: oklch(0.8717 0.1251 80.92); /* #ffcc6f — Figma: Brand/01 */
+		--chart-2: oklch(0.6931 0.1489 28.89); /* #ea7465 — Figma: Brand/02 */
+		--chart-3: oklch(0.8017 0.0656 218.79); /* #8ec9db — Figma: Brand/03 */
+		--chart-4: oklch(0.6071 0.1882 271.81); /* #5d74f1 — Figma: Brand/04 */
+		--chart-5: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
 
-		--sidebar-background: #060a10;
-		--sidebar-foreground: #e8edf0;
-		--sidebar-primary: #38bdf8;
-		--sidebar-primary-foreground: #ffffff;
-		--sidebar-accent: #0f1528;
-		--sidebar-accent-foreground: #e8edf0;
-		--sidebar-border: #1a2a3f;
-		--sidebar-ring: #38bdf8;
+		--sidebar-background: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background (dark) */
+		--sidebar-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
+		--sidebar-primary: oklch(1 0 0); /* #ffffff — Figma: Background invert (dark) */
+		--sidebar-primary-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text invert (dark) */
+		--sidebar-accent: oklch(0.9529 0.0011 17.18); /* #f0efef — Figma: On surface (dark) */
+		--sidebar-accent-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text invert (dark) */
+		--sidebar-border: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
+		--sidebar-ring: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
 	}
 
 	*,
