@@ -11,9 +11,10 @@ const TabsList = ({
 	...props
 }: React.ComponentProps<typeof TabsPrimitive.List>) => (
 	<div className="min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+		{/* Botly tabs (Figma 43:163): pill style, no underline container */}
 		<TabsPrimitive.List
 			className={cn(
-				"inline-flex items-center justify-center border-b-2 text-card-foreground/80 text-sm",
+				"inline-flex items-center gap-1 text-sm",
 				className,
 			)}
 			{...props}
@@ -27,7 +28,9 @@ const TabsTrigger = ({
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) => (
 	<TabsPrimitive.Trigger
 		className={cn(
-			"-mb-0.5 inline-flex items-center justify-center whitespace-nowrap border-transparent border-b-2 px-3 py-2 font-medium text-foreground/60 text-sm ring-offset-background transition-all hover:text-foreground/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-primary data-[state=active]:text-card-foreground",
+			// Botly tab pill: radius 8px, semibold 14px; default=Text secondary,
+			// hover=Stroke bg, active=Background invert + white (43:160/161/162)
+			"inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5 font-semibold text-muted-foreground text-sm ring-offset-background transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
 			className,
 		)}
 		{...props}
