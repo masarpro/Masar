@@ -22,7 +22,6 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useStudyConfig } from "../../hooks/useStudyConfig";
 import { LeadStatusBadge } from "../leads/LeadStatusBadge";
-import { StudyPipelineStepper } from "./StudyPipelineStepper";
 
 interface CostStudyOverviewProps {
 	organizationId: string;
@@ -201,14 +200,7 @@ export function CostStudyOverview({
 				</Card>
 			)}
 
-			{/* Pipeline Stepper */}
-			<StudyPipelineStepper
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				stages={stagesArray}
-				entryPoint={entryPoint}
-				enabledStageTypes={enabledStageTypes as unknown as string[]}
-			/>
+			{/* شريط المراحل حُذف بطلب جودت — المراحل مدموجة أسفل صفحة الكميات */}
 
 			{/* Open Active Stage Button */}
 			{activeStagePath && (

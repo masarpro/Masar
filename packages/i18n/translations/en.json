@@ -6874,10 +6874,10 @@
       "notStarted": "Not Started",
       "draft": "Draft",
       "inReview": "In Review",
-      "structuralPanel": {
-        "title": "Structural & Manual Works Pipeline",
-        "subtitle": "Specifications, costing and pricing for structural and manual items — finishing and MEP are priced in the workspace above",
-        "locked": "Unlocks after the previous stage is approved"
+      "stagesPanel": {
+        "title": "Study stages: Specifications → Costing → Pricing",
+        "totalCost": "Total cost",
+        "sellingPrice": "Selling price"
       },
       "quantitiesDesc": "Survey and determine quantities for structural, finishing, and MEP items",
       "tabStructural": "Structural",
@@ -7330,6 +7330,9 @@
       "createError": "Failed to create study",
       "convertToQuotation": "Convert to Quotation",
       "convertToQuotationError": "Error preparing quotation data",
+      "convertToQuotationSuccess": "Quotation created with study items — continue editing now",
+      "convertToQuotationFailed": "Failed to create the quotation",
+      "defaultQuotationClient": "Unspecified client",
       "quotationPrefilled": "Quotation data prefilled from study",
       "stagesProgress": "{approved} of {total} stages approved",
       "status": {

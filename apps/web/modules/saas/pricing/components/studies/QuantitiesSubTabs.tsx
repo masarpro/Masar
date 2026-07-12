@@ -2,15 +2,8 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@ui/components/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
-import {
-	Building2,
-	Calendar,
-	FileEdit,
-	Hash,
-	Layers,
-} from "lucide-react";
+import { Building2, FileEdit, Layers } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
@@ -18,10 +11,9 @@ import { useCallback, useMemo } from "react";
 import { isUnifiedStudy } from "../../lib/unified-flag";
 import { ManualItemsTable } from "../pipeline/ManualItemsTable";
 import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
-import { StageApprovalButton } from "../pipeline/StageApprovalButton";
 import { UnifiedItemsWorkspace } from "../unified-quantities";
 import { ImportItemsDialog } from "./ImportItemsDialog";
-import { StructuralPipelinePanel } from "./StructuralPipelinePanel";
+import { StudyStagesAccordion } from "./StudyStagesAccordion";
 import { StructuralItemsEditor } from "./StructuralItemsEditor";
 // Legacy editors — only mounted when the unified workspace is OFF for this study
 import { FinishingItemsEditor } from "./FinishingItemsEditor";
@@ -83,36 +75,6 @@ export function QuantitiesSubTabs({
 		enabledTabs[0] ||
 		(isUnified ? "unified" : "structural");
 
-	// المخزن الجديد (StudyStage) — نفس المصدر الذي يقرأه StudyPageShell
-	// والذي تكتب فيه mutations زر الاعتماد (transactional)
-	const { data: stagesData } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	const { data: summaryData } = useQuery(
-		orpc.pricing.studies.quantitiesSummary.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	const stageRecords: Array<{
-		stage: string;
-		status: string;
-		canApprove?: boolean;
-	}> = (stagesData as any)?.stages ?? [];
-	const quantitiesStage = stageRecords.find((s) => s.stage === "QUANTITIES");
-	const quantitiesStatus = (quantitiesStage?.status ?? "DRAFT") as
-		| "NOT_STARTED"
-		| "DRAFT"
-		| "IN_REVIEW"
-		| "APPROVED";
-	const canApproveQuantities = quantitiesStage?.canApprove ?? true;
-
-	const totalItems = (summaryData as any)?.total ?? 0;
-	const lastUpdated = (study as any)?.updatedAt;
-
 	const handleTabChange = useCallback(
 		(tab: string) => {
 			const url = new URL(window.location.href);
@@ -121,16 +83,6 @@ export function QuantitiesSubTabs({
 		},
 		[router],
 	);
-
-	const formatDate = (date: Date | string | undefined) => {
-		if (!date) return "—";
-		const d = new Date(date);
-		return d.toLocaleDateString("ar-SA", {
-			day: "numeric",
-			month: "long",
-			year: "numeric",
-		});
-	};
 
 	return (
 		<div className="space-y-4">
@@ -232,59 +184,25 @@ export function QuantitiesSubTabs({
 				<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
 			)}
 
-			{/* Unified studies that also carry STRUCTURAL/CUSTOM scope keep the
-			    legacy pipeline (specs → costing → pricing) for those items —
-			    surfaced as a compact bottom panel instead of the full stepper.
-			    It embeds the quantities approval button, so the ladder can start. */}
-			{isUnified &&
-				(workScopes.includes("STRUCTURAL") ||
+			{/* المراحل مدموجة أسفل صفحة الكميات كأقسام مطوية (بطلب جودت):
+			    المواصفات ← تسعير التكلفة ← التسعير، مع اعتماد الكميات وزر
+			    التحويل لعرض سعر في رأس اللوحة. تظهر لكل الدراسات كاملة
+			    المسار — وللدراسات الموحّدة فقط عندما تشمل نطاقاً إنشائياً
+			    أو يدوياً (التشطيبات وMEP تُسعَّر داخل مساحة العمل). */}
+			{!["QUICK_PRICING", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS"].includes(
+				(study as any)?.studyType ?? "",
+			) &&
+				(!isUnified ||
+					workScopes.includes("STRUCTURAL") ||
 					workScopes.includes("CUSTOM")) && (
-					<StructuralPipelinePanel
+					<StudyStagesAccordion
 						organizationId={organizationId}
 						organizationSlug={organizationSlug}
 						studyId={studyId}
+						studyType={(study as any)?.studyType ?? "FULL_PROJECT"}
+						clientName={(study as any)?.customerName}
 					/>
 				)}
-
-			{/* Bottom approval bar — hidden under unified mode because the workspace
-			    has its own header CTAs (quote / context) and per-item totals; the
-			    pipeline approval ladder no longer applies. */}
-			{!isUnified && (
-				<Card className="sticky bottom-0 z-10 border-t-2 border-primary/20 bg-card/95 backdrop-blur-sm">
-					<CardContent className="p-4">
-						<div
-							className="flex items-center justify-between flex-wrap gap-3"
-							dir="rtl"
-						>
-							<div className="flex items-center gap-6 text-sm">
-								<span className="flex items-center gap-2 text-muted-foreground">
-									<Hash className="h-4 w-4" />
-									إجمالي البنود:{" "}
-									<span className="font-semibold text-foreground">
-										{totalItems}
-									</span>
-								</span>
-								<span className="flex items-center gap-2 text-muted-foreground">
-									<Calendar className="h-4 w-4" />
-									آخر تحديث:{" "}
-									<span className="font-semibold text-foreground">
-										{formatDate(lastUpdated)}
-									</span>
-								</span>
-							</div>
-							<StageApprovalButton
-								organizationId={organizationId}
-								organizationSlug={organizationSlug}
-								studyId={studyId}
-								stage="quantities"
-								status={quantitiesStatus}
-								canReopen
-								canApprove={canApproveQuantities}
-							/>
-						</div>
-					</CardContent>
-				</Card>
-			)}
 		</div>
 	);
 }

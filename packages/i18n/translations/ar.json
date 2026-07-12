@@ -6879,10 +6879,10 @@
       "notStarted": "لم تبدأ",
       "draft": "مسودة",
       "inReview": "قيد المراجعة",
-      "structuralPanel": {
-        "title": "مسار الأعمال الإنشائية واليدوية",
-        "subtitle": "المواصفات وتسعير التكلفة والتسعير للبنود الإنشائية واليدوية — التشطيبات والكهروميكانيكا تُسعَّر داخل مساحة العمل أعلاه",
-        "locked": "تُفتح بعد اعتماد المرحلة السابقة"
+      "stagesPanel": {
+        "title": "مراحل الدراسة: المواصفات ← تسعير التكلفة ← التسعير",
+        "totalCost": "إجمالي التكلفة",
+        "sellingPrice": "سعر البيع"
       },
       "quantitiesDesc": "حصر وتحديد كميات البنود الإنشائية والتشطيبات والكهروميكانيكية",
       "tabStructural": "إنشائي",
@@ -7335,6 +7335,9 @@
       "createError": "فشل إنشاء الدراسة",
       "convertToQuotation": "تحويل إلى عرض سعر",
       "convertToQuotationError": "حدث خطأ أثناء تحضير بيانات عرض السعر",
+      "convertToQuotationSuccess": "تم إنشاء عرض السعر ببنود الدراسة — أكمل تحريره الآن",
+      "convertToQuotationFailed": "تعذّر إنشاء عرض السعر",
+      "defaultQuotationClient": "عميل غير محدد",
       "quotationPrefilled": "تم تعبئة بيانات عرض السعر من الدراسة",
       "stagesProgress": "{approved} من {total} مراحل معتمدة",
       "status": {

@@ -3,17 +3,13 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Calculator } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
-import { useStudyConfig } from "../../hooks/useStudyConfig";
 import { StudyHeaderCard } from "./StudyHeaderCard";
 import { StudyConfigBar } from "./StudyConfigBar";
 import { EditStudyConfigDialog } from "./EditStudyConfigDialog";
-import { StudyPipelineStepper } from "./StudyPipelineStepper";
-import { ConvertToQuotationButton } from "./ConvertToQuotationButton";
 
 interface StudyPageShellProps {
 	organizationId: string;
@@ -29,11 +25,7 @@ export function StudyPageShell({
 	children,
 }: StudyPageShellProps) {
 	const t = useTranslations();
-	const pathname = usePathname();
 	const [editConfigOpen, setEditConfigOpen] = useState(false);
-
-	// صفحة مرحلة التسعير فقط: /pricing/studies/{id}/pricing
-	const isPricingStagePage = pathname?.endsWith("/pricing") ?? false;
 
 	const { data: study, isLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -41,26 +33,8 @@ export function StudyPageShell({
 		}),
 	);
 
-	// ─── Fetch stages from new StudyStage table ───
-	const { data: stagesData } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	// Build stages array for stepper
-	const stagesArray = (stagesData as any)?.stages ?? [];
-	const entryPoint = (stagesData as any)?.entryPoint ?? "FROM_SCRATCH";
-	const pricingStageStatus = stagesArray.find((s: any) => s.stage === "PRICING")?.status;
-
 	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
 	const workScopes: string[] = (study as any)?.workScopes ?? [];
-
-	const { enabledStageTypes } = useStudyConfig({
-		studyType,
-		workScopes,
-		entryPoint,
-	});
 
 	if (isLoading) {
 		return <StudyOverviewSkeleton />;
@@ -96,25 +70,10 @@ export function StudyPageShell({
 				canEdit
 			/>
 
-			{/* Convert to quotation button — يظهر فقط في صفحة مرحلة التسعير
-			    وبعد اعتماد المرحلة */}
-			{isPricingStagePage && pricingStageStatus === "APPROVED" && (
-				<ConvertToQuotationButton
-					studyId={studyId}
-					organizationSlug={organizationSlug}
-					studyType={studyType}
-					pricingStageStatus={pricingStageStatus}
-				/>
-			)}
-
-			{/* Pipeline stepper */}
-			<StudyPipelineStepper
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				stages={stagesArray}
-				entryPoint={entryPoint}
-				enabledStageTypes={enabledStageTypes as unknown as string[]}
-			/>
+			{/* شريط المراحل العلوي حُذف بطلب جودت — المراحل مدموجة الآن
+			    كأقسام مطوية أسفل صفحة الكميات (StudyStagesAccordion)،
+			    وزر التحويل لعرض سعر يعيش هناك ويُنشئ العرض في نظام
+			    عروض الأسعار مباشرة */}
 
 			{/* Page content */}
 			{children}

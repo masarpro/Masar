@@ -8,7 +8,6 @@ import Link from "next/link";
 import { Button } from "@ui/components/button";
 
 import { SpecificationsPageContent } from "../pipeline/SpecificationsPageContent";
-import { BOMSection } from "./BOMSection";
 
 interface SpecificationsPageContentV2Props {
 	organizationId: string;
@@ -67,15 +66,11 @@ export function SpecificationsPageContentV2({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* Existing specs content (editing specs per item) */}
+			{/* كتلة BOM حُذفت بطلب جودت — كانت تعرض "لم يتم استخراج المواد
+			    بعد" داخل الدراسة الإنشائية بلا فائدة */}
 			<SpecificationsPageContent
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
-				studyId={studyId}
-			/>
-
-			{/* BOM Section */}
-			<BOMSection
-				organizationId={organizationId}
 				studyId={studyId}
 			/>
 		</div>
