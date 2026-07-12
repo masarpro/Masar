@@ -86,6 +86,22 @@ export interface ItemCatalogEntry {
 
 export type Domain = "FINISHING" | "MEP" | "EXTERIOR" | "SPECIAL";
 
+/**
+ * Maps a catalog domain to the CostStudy workScope that covers it.
+ * workScopes has no EXTERIOR/SPECIAL values, so the two satellite
+ * domains attach to their closest scope: exterior/site works are
+ * finishing-type works, while SPECIAL (elevators, tanks, solar) are
+ * electromechanical systems. Used for scope-aware catalog filtering
+ * and for the conscious workScopes expansion when an out-of-scope
+ * item is added.
+ */
+export const DOMAIN_TO_SCOPE: Record<Domain, "FINISHING" | "MEP"> = {
+	FINISHING: "FINISHING",
+	EXTERIOR: "FINISHING",
+	MEP: "MEP",
+	SPECIAL: "MEP",
+};
+
 export type CalculationMethod =
 	| "direct_area"
 	| "length_x_height"

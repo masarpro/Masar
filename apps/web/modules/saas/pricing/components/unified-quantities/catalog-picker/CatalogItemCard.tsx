@@ -3,14 +3,17 @@
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
 import * as Icons from "lucide-react";
+import { DomainBadge } from "../shared/DomainBadge";
 import type { ItemCatalogEntry } from "../types";
 
 interface Props {
 	entry: ItemCatalogEntry;
 	onSelect: () => void;
+	/** Shown when the entry's domain is outside the study's workScopes. */
+	showDomainBadge?: boolean;
 }
 
-export function CatalogItemCard({ entry, onSelect }: Props) {
+export function CatalogItemCard({ entry, onSelect, showDomainBadge }: Props) {
 	const Icon =
 		((Icons as unknown as Record<string, Icons.LucideIcon>)[entry.icon]) ??
 		Icons.Package;
@@ -43,7 +46,15 @@ export function CatalogItemCard({ entry, onSelect }: Props) {
 				</div>
 
 				<div className="min-w-0 flex-1">
-					<h5 className="truncate text-sm font-medium">{entry.nameAr}</h5>
+					<div className="flex items-center gap-1.5">
+						<h5 className="truncate text-sm font-medium">{entry.nameAr}</h5>
+						{showDomainBadge && (
+							<DomainBadge
+								domain={entry.domain}
+								className="shrink-0 px-1.5 py-0 text-[10px]"
+							/>
+						)}
+					</div>
 					<p className="truncate text-xs text-muted-foreground">
 						{entry.unit} · هدر {Number(entry.defaultWastagePercent)}%
 					</p>

@@ -1,6 +1,9 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { CatalogPickerDrawer } from "./catalog-picker/CatalogPickerDrawer";
 import { ContextDrawer } from "./context-drawer/ContextDrawer";
 import { useCostStudy } from "./hooks/useCostStudy";
@@ -13,11 +16,12 @@ import { QuoteDrawer } from "./quote/QuoteDrawer";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
 import { ItemDetailDialog } from "./spreadsheet-view/ItemDetailDialog";
-import type {
-	CalculationMethod,
-	Domain,
-	ItemCatalogEntry,
-	QuantityItem,
+import {
+	DOMAIN_TO_SCOPE,
+	type CalculationMethod,
+	type Domain,
+	type ItemCatalogEntry,
+	type QuantityItem,
 } from "./types";
 import { ProfitControlCard } from "./workspace-header/ProfitControlCard";
 import {
@@ -80,8 +84,53 @@ export function UnifiedItemsWorkspace({
 		}
 	};
 
-	const { globalMarkupPercent } = useCostStudy(costStudyId, organizationId);
+	const { globalMarkupPercent, study } = useCostStudy(
+		costStudyId,
+		organizationId,
+	);
+	const workScopes = (study?.workScopes as string[] | undefined) ?? [];
 	const { totals } = useStudyTotals({ costStudyId, organizationId });
+
+	// Conscious scope expansion: adding an out-of-scope catalog item keeps
+	// its real domain and widens the study's workScopes to match, so the
+	// unified gate, config bar and scope-filtered catalog stay consistent.
+	const queryClient = useQueryClient();
+	const updateConfigMutation = useMutation(
+		orpc.pricing.studies.updateConfig.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: [["pricing", "studies"]],
+				});
+			},
+		}),
+	);
+
+	const expandScopesIfNeeded = async (domain: Domain) => {
+		const requiredScope = DOMAIN_TO_SCOPE[domain];
+		// Legacy studies with empty workScopes see the whole catalog and
+		// have no scope config to widen — leave them untouched.
+		if (
+			!requiredScope ||
+			workScopes.length === 0 ||
+			workScopes.includes(requiredScope)
+		) {
+			return;
+		}
+		try {
+			await updateConfigMutation.mutateAsync({
+				studyId: costStudyId,
+				organizationId,
+				workScopes: [...workScopes, requiredScope],
+			} as never);
+			toast.success(
+				requiredScope === "FINISHING"
+					? "أُضيف نطاق التشطيبات إلى الدراسة"
+					: "أُضيف نطاق الكهروميكانيكا إلى الدراسة",
+			);
+		} catch {
+			toast.error("تعذّر توسيع نطاق الدراسة — أضف النطاق يدوياً من صيغة الدراسة");
+		}
+	};
 
 	const {
 		selectedDomains,
@@ -118,6 +167,7 @@ export function UnifiedItemsWorkspace({
 			markupMethod: "percentage",
 			hasCustomMarkup: false,
 		} as never);
+		await expandScopesIfNeeded(entry.domain as Domain);
 	};
 
 	const totalGrossCost = Number(totals?.totalGrossCost ?? 0);
@@ -210,6 +260,7 @@ export function UnifiedItemsWorkspace({
 				onOpenChange={setPickerOpen}
 				mode={pickerMode}
 				organizationId={organizationId}
+				workScopes={workScopes}
 				onItemSelect={async (entry) => {
 					await handleAddItem(entry);
 					setPickerOpen(false);

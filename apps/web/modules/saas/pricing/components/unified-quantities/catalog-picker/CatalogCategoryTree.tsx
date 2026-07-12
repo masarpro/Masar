@@ -38,6 +38,8 @@ interface Props {
 	isLoading: boolean;
 	searchQuery: string;
 	onItemSelect: (entry: ItemCatalogEntry) => Promise<void> | void;
+	/** Domains outside the study's workScopes — their items get a domain badge. */
+	badgeDomains?: Set<string>;
 }
 
 function filterBySearch(
@@ -68,6 +70,7 @@ export function CatalogCategoryTree({
 	isLoading,
 	searchQuery,
 	onItemSelect,
+	badgeDomains,
 }: Props) {
 	if (isLoading) {
 		return (
@@ -103,7 +106,11 @@ export function CatalogCategoryTree({
 	return (
 		<Accordion
 			type="multiple"
-			defaultValue={["FINISHING"]}
+			// Open the first visible domain — for scope-filtered studies the
+			// FINISHING group may not be rendered at all. The key remounts the
+			// accordion when the visible domain set changes (scope toggle).
+			key={domainsWithMatches.join("|")}
+			defaultValue={[domainsWithMatches[0]]}
 			className="space-y-2"
 		>
 			{domainsWithMatches.map((domain) => {
@@ -145,6 +152,7 @@ export function CatalogCategoryTree({
 												key={entry.itemKey}
 												entry={entry}
 												onSelect={() => onItemSelect(entry)}
+												showDomainBadge={badgeDomains?.has(entry.domain)}
 											/>
 										))}
 									</div>
