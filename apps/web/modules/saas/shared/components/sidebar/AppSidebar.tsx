@@ -68,7 +68,9 @@ export const AppSidebar = React.memo(function AppSidebar({ headerExtra }: AppSid
 				/>
 			)}
 
-			{/* Sidebar */}
+			{/* Sidebar — Botly floating inverted panel (Figma 68:1489):
+			    the aside keeps the layout widths; the visible panel floats
+			    inside it with a 12px gutter and 20px radius. */}
 			<aside
 				className={cn(
 					"fixed top-0 z-[60] h-full start-0",
@@ -77,8 +79,7 @@ export const AppSidebar = React.memo(function AppSidebar({ headerExtra }: AppSid
 					// hide. Only the mobile overlay stays hidden until the client
 					// confirms the viewport (server can't detect mobile).
 					!ready && "max-xl:opacity-0",
-					"flex flex-col",
-					"bg-background border-e border-border shadow-xl",
+					"flex flex-col p-3",
 					ready && "transition-[width,opacity,transform] duration-300 ease-out",
 					// Width: full overlay on mobile, collapsible on desktop
 					isMobile
@@ -90,16 +91,18 @@ export const AppSidebar = React.memo(function AppSidebar({ headerExtra }: AppSid
 					hideTransformClass,
 				)}
 			>
-				<SidebarHeader
-					collapsed={effectiveCollapsed}
-					headerExtra={headerExtra}
-				/>
-				<SidebarNav
-					items={items}
-					activeId={activeId}
-					collapsed={effectiveCollapsed}
-				/>
-				<SidebarFooter />
+				<div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-sidebar-background text-sidebar-foreground">
+					<SidebarHeader
+						collapsed={effectiveCollapsed}
+						headerExtra={headerExtra}
+					/>
+					<SidebarNav
+						items={items}
+						activeId={activeId}
+						collapsed={effectiveCollapsed}
+					/>
+					<SidebarFooter />
+				</div>
 			</aside>
 		</>
 	);

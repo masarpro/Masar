@@ -24,16 +24,17 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 
 	return (
 		<>
+			{/* Botly: no header border — logo floats at panel top (63:8784) */}
 			<div
 				className={cn(
-					"relative flex h-16 items-center border-b border-border px-4",
+					"relative flex h-16 items-center px-4",
 					"justify-end",
 				)}
 			>
 				{!collapsed && (
 					<Link
 						href="/app"
-						className="absolute inset-0 flex items-center justify-center text-foreground"
+						className="absolute inset-0 flex items-center justify-center text-sidebar-accent-foreground"
 					>
 						<Logo />
 					</Link>
@@ -42,8 +43,8 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 					type="button"
 					onClick={handleToggle}
 					className={cn(
-						"relative z-10 rounded-lg p-2 transition-colors duration-200 ease-out hover:bg-muted",
-						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+						"relative z-10 rounded-lg p-2 transition-colors duration-200 ease-out hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
 					)}
 					aria-label={
 						isMobile
@@ -64,7 +65,7 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 			</div>
 
 			{!collapsed && headerExtra && (
-				<div className="border-b border-border px-3 py-2">
+				<div className="border-b border-sidebar-border px-3 py-2">
 					{headerExtra}
 				</div>
 			)}

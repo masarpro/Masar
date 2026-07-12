@@ -95,14 +95,16 @@
 		--chart-4: oklch(0.6071 0.1882 271.81); /* #5d74f1 — Figma: Brand/04 */
 		--chart-5: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
 
-		--sidebar-background: oklch(1 0 0); /* #ffffff — Figma: Background */
-		--sidebar-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text Primary */
-		--sidebar-primary: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background invert */
-		--sidebar-primary-foreground: oklch(1 0 0); /* #ffffff — Figma: Text invert */
+		/* Botly sidebar = floating INVERTED panel (Figma 68:1489 + Dashboard
+		   screens): dark #1d1d1d island on light mode, white island on dark. */
+		--sidebar-background: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background invert */
+		--sidebar-foreground: oklch(0.7191 0.0081 241.71); /* #a0a5a9 — Figma: Text secondary (resting item) */
+		--sidebar-primary: oklch(1 0 0); /* #ffffff — inverse on dark panel */
+		--sidebar-primary-foreground: oklch(0.2308 0 0); /* #1d1d1d */
 		--sidebar-accent: oklch(0.3171 0 0); /* #323232 — Figma: On surface (active item) */
 		--sidebar-accent-foreground: oklch(1 0 0); /* #ffffff — Figma: Text invert */
-		--sidebar-border: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
-		--sidebar-ring: oklch(0.9612 0 0); /* #f2f2f2 — Figma: Stroke */
+		--sidebar-border: rgba(255, 255, 255, 0.1); /* Figma: active item border (63:8790) */
+		--sidebar-ring: oklch(1 0 0); /* #ffffff — focus on dark panel */
 
 		/* fumadocs */
 		--fd-banner-height: 4.5rem;
@@ -140,14 +142,15 @@
 		--chart-4: oklch(0.6071 0.1882 271.81); /* #5d74f1 — Figma: Brand/04 */
 		--chart-5: oklch(0.5921 0.1136 158.46); /* #349264 — Figma: Brand/05 */
 
-		--sidebar-background: oklch(0.2308 0 0); /* #1d1d1d — Figma: Background (dark) */
-		--sidebar-foreground: oklch(1 0 0); /* #ffffff — Figma: Text Primary (dark) */
-		--sidebar-primary: oklch(1 0 0); /* #ffffff — Figma: Background invert (dark) */
-		--sidebar-primary-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text invert (dark) */
+		/* Botly sidebar dark mode = WHITE floating panel (Dashboard/Dark 120:11549) */
+		--sidebar-background: oklch(1 0 0); /* #ffffff — Figma: Background invert (dark) */
+		--sidebar-foreground: oklch(0.66 0 0); /* #929292 — Figma: Text secondary (dark) */
+		--sidebar-primary: oklch(0.2308 0 0); /* #1d1d1d — inverse on white panel */
+		--sidebar-primary-foreground: oklch(1 0 0); /* #ffffff */
 		--sidebar-accent: oklch(0.9529 0.0011 17.18); /* #f0efef — Figma: On surface (dark) */
 		--sidebar-accent-foreground: oklch(0.2308 0 0); /* #1d1d1d — Figma: Text invert (dark) */
-		--sidebar-border: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
-		--sidebar-ring: oklch(0.3171 0 0); /* #323232 — Figma: Stroke (dark) */
+		--sidebar-border: rgba(29, 29, 29, 0.08); /* derived: subtle border on white panel */
+		--sidebar-ring: oklch(0.2308 0 0); /* #1d1d1d — focus on white panel */
 	}
 
 	*,

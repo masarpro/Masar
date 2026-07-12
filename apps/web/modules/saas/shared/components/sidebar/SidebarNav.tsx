@@ -51,7 +51,6 @@ const NavItemContent = memo(function NavItemContent({
 			<Icon
 				className={cn(
 					"shrink-0",
-					isActive && "text-primary",
 					isSubItem ? "size-4" : "size-5",
 				)}
 			/>
@@ -60,14 +59,17 @@ const NavItemContent = memo(function NavItemContent({
 	);
 });
 
+/* Botly menu item (63:8787 resting / 63:8790 active): resting = Text
+   secondary on transparent; active = On-surface chip + white/10 border +
+   Text invert, semibold. Hover derived: sidebar-accent at 50%. */
 const navItemClasses = (isActive: boolean, isSubItem: boolean, collapsed: boolean) =>
 	cn(
-		"w-full flex items-center rounded-lg transition-all duration-200 ease-out relative",
-		"hover:bg-muted",
+		"w-full flex items-center rounded-lg transition-all duration-200 ease-out relative border border-transparent",
+		"hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
 		isActive &&
-			"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
+			"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground font-semibold",
 		isSubItem ? "px-2.5 py-3 text-sm" : "p-3",
-		isSubItem && !isActive && "text-muted-foreground",
+		isSubItem && !isActive && "text-sidebar-foreground/80",
 		collapsed && !isSubItem && "justify-center",
 	);
 
@@ -115,10 +117,10 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 						>
 							<div
 								className={cn(
-									"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative",
-									"hover:bg-muted",
+									"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative border border-transparent",
+									"hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
 									isActive &&
-										"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
+										"bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground font-semibold",
 									"p-3",
 								)}
 							>
@@ -132,8 +134,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 										<item.icon
 											className={cn(
 												"size-5 shrink-0",
-												isActive && "text-primary",
-											)}
+																		)}
 										/>
 										<span>{item.label}</span>
 									</Link>
@@ -142,8 +143,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 										<item.icon
 											className={cn(
 												"size-5 shrink-0",
-												isActive && "text-primary",
-											)}
+																		)}
 										/>
 										<span>{item.label}</span>
 									</div>
@@ -167,7 +167,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 								className="grid transition-all duration-200 ease-out data-[state=closed]:grid-rows-[0fr] data-[state=closed]:opacity-0 data-[state=open]:grid-rows-[1fr] data-[state=open]:opacity-100"
 							>
 								<div className="overflow-hidden">
-									<div className="ms-4 mt-1 space-y-1 border-s-2 border-border ps-3">
+									<div className="ms-4 mt-1 space-y-1 border-s-2 border-sidebar-border ps-3">
 									{(item.children ?? []).map((child) => {
 										const childHref = child.href;
 										const childActive = child.id === activeId;
