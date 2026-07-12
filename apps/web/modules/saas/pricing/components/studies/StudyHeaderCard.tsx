@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { getStudyScopeSubtitle } from "../../lib/study-scope-subtitle";
 import { formatDate } from "../../lib/utils";
 
 interface StudyHeaderCardProps {
@@ -26,6 +27,7 @@ interface StudyHeaderCardProps {
 		status: string;
 		finishingLevel: string;
 		hasBasement: boolean;
+		workScopes?: string[] | null;
 		createdAt: Date | string;
 		updatedAt: Date | string;
 	};
@@ -81,7 +83,7 @@ export function StudyHeaderCard({
 									{study.name || t("pricing.studies.unnamed")}
 								</h1>
 								<p className="text-sm text-muted-foreground truncate">
-									الأعمال الإنشائية — حساب كميات الخرسانة والحديد للعناصر الإنشائية
+									{getStudyScopeSubtitle(t, study.workScopes)}
 								</p>
 							</div>
 							<Badge variant={getStatusBadgeVariant(study.status)}>

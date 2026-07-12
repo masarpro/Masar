@@ -7427,6 +7427,20 @@
         "costSummary": "Cost Summary",
         "quickActions": "Quick Actions"
       },
+      "scopeSubtitle": {
+        "STRUCTURAL": "Structural works — concrete and rebar quantity takeoff",
+        "FINISHING": "Finishing works — itemized takeoff and pricing",
+        "MEP": "MEP works — electrical, plumbing and HVAC takeoff",
+        "CUSTOM": "Custom items",
+        "generic": "Quantity and pricing study",
+        "multiSuffix": "quantity takeoff and pricing",
+        "names": {
+          "STRUCTURAL": "Structural",
+          "FINISHING": "Finishing",
+          "MEP": "MEP",
+          "CUSTOM": "Custom items"
+        }
+      },
       "structural": {
         "title": "Structural Works",
         "subtitle": "Calculate concrete and steel quantities for structural elements",
