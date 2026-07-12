@@ -5559,6 +5559,7 @@ model CostingItem {
   costStudy    CostStudy    @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@unique([costStudyId, sourceItemType, sourceItemId])
   @@index([costStudyId, section])
   @@index([organizationId])
   @@map("costing_items")
