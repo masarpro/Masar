@@ -25,6 +25,7 @@ export function ElementResultCard({ result }: ElementResultCardProps) {
 		{ label: t("results.waterproofing"), value: result.waterproofingArea, unit: "م²", icon: "💧", show: result.waterproofingArea > 0 },
 		{ label: t("results.excavation"), value: result.excavationVolume, unit: "م³", icon: "⛏️", show: result.excavationVolume > 0 },
 		{ label: t("results.blocks"), value: result.blockCount, unit: t("results.blockUnit"), icon: "🧱", show: result.blockCount > 0 },
+		{ label: t("results.mortar"), value: result.mortarVolume, unit: "م³", icon: "🪣", show: result.mortarVolume > 0 },
 	];
 
 	return (

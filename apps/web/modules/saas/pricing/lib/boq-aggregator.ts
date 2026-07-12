@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { recalculateItem, computeOptimizedFactoryOrder, type CuttingDetailRow, type RecalcResult } from "./boq-recalculator";
+import type { OtherStructuralResult } from "../types/other-structural";
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -18,6 +19,20 @@ export interface StructuralItem {
 	concreteVolume: number;
 	steelWeight: number;
 	totalCost: number;
+	// أعمدة اختيارية من StructuralItem في قاعدة البيانات (إن مُرّرت)
+	formworkArea?: number | null;
+	blockCount?: number | null;
+}
+
+/**
+ * النتيجة الكاملة المحفوظة لعنصر "عناصر إنشائية أخرى" —
+ * تُخزَّن داخل dimensions.__result عند الحفظ (بدون تغيير في Schema).
+ * العناصر القديمة (قبل هذا الحقل) ترجع null وتُعامل كما في السابق.
+ */
+function getOtherStructuralSavedResult(item: StructuralItem): OtherStructuralResult | null {
+	if (item.category !== "otherStructural") return null;
+	const result = (item.dimensions as any)?.__result;
+	return result && typeof result === "object" ? (result as OtherStructuralResult) : null;
 }
 
 export interface BOQItemDetail {
@@ -42,6 +57,14 @@ export interface BOQSection {
 	totalConcrete: number;
 	totalRebar: number;
 	totalBlocks: number;
+	/** مواد إضافية لقسم "عناصر إنشائية أخرى" (من dimensions.__result) */
+	extras?: {
+		plainConcrete: number;   // م³ — خرسانة عادية (نظافة)
+		grcWeight: number;       // كجم
+		waterproofingArea: number; // م²
+		excavationVolume: number;  // م³
+		mortarVolume: number;      // م³
+	};
 }
 
 export interface FactoryOrderEntry {
@@ -463,9 +486,16 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 			const groupItems = subGroupMap.get(key)!;
 			const concrete = groupItems.reduce((s, d) => s + d.item.concreteVolume, 0);
 			const rebar = groupItems.reduce((s, d) => s + d.item.steelWeight, 0);
-			const blocks = category === "blocks"
-				? groupItems.reduce((s, d) => s + d.item.quantity, 0)
-				: 0;
+			let blocks = 0;
+			if (category === "blocks") {
+				blocks = groupItems.reduce((s, d) => s + d.item.quantity, 0);
+			} else if (category === "otherStructural") {
+				// بلوك عناصر البيارات/الأسوار — من عمود العنصر أو النتيجة المحفوظة
+				blocks = groupItems.reduce((s, d) => {
+					const saved = getOtherStructuralSavedResult(d.item);
+					return s + (d.item.blockCount ?? (saved ? saved.blockCount * (d.item.quantity || 1) : 0));
+				}, 0);
+			}
 
 			return {
 				key,
@@ -486,10 +516,47 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 		grandBlocks += totalBlocks;
 
 		// Formwork estimate
-		if (category !== "blocks" && category !== "plainConcrete") {
+		if (category === "otherStructural") {
+			// شدات العناصر الأخرى: عمود العنصر أولاً ثم النتيجة المحفوظة
+			// ثم dimensions.formworkArea (عنصر مخصص قديم — قيمة لكل وحدة)
+			categoryItems.forEach((item) => {
+				const saved = getOtherStructuralSavedResult(item);
+				grandFormwork +=
+					item.formworkArea ??
+					(saved
+						? saved.totalFormwork
+						: ((item.dimensions as any)?.formworkArea || 0) * (item.quantity || 1));
+			});
+		} else if (category !== "blocks" && category !== "plainConcrete") {
 			categoryItems.forEach((item) => {
 				grandFormwork += (item.dimensions as any)?.formworkArea || 0;
 			});
+		}
+
+		// مواد إضافية لقسم "عناصر إنشائية أخرى" — العناصر الجديدة فقط
+		// (القديمة بلا __result تبقى بسلوكها السابق: خرسانتها مدموجة RC+عادية)
+		let extras: BOQSection["extras"];
+		if (category === "otherStructural") {
+			const acc = { plainConcrete: 0, grcWeight: 0, waterproofingArea: 0, excavationVolume: 0, mortarVolume: 0 };
+			for (const item of categoryItems) {
+				const saved = getOtherStructuralSavedResult(item);
+				if (!saved) continue;
+				const qty = item.quantity || 1;
+				acc.plainConcrete += saved.totalConcretePlain ?? 0;
+				acc.grcWeight += saved.totalGrcWeight ?? 0;
+				acc.waterproofingArea += (saved.waterproofingArea ?? 0) * qty;
+				acc.excavationVolume += (saved.excavationVolume ?? 0) * qty;
+				acc.mortarVolume += (saved.mortarVolume ?? 0) * qty;
+			}
+			acc.plainConcrete = Number(acc.plainConcrete.toFixed(2));
+			acc.grcWeight = Number(acc.grcWeight.toFixed(2));
+			acc.waterproofingArea = Number(acc.waterproofingArea.toFixed(2));
+			acc.excavationVolume = Number(acc.excavationVolume.toFixed(2));
+			acc.mortarVolume = Number(acc.mortarVolume.toFixed(2));
+			if (Object.values(acc).some((v) => v > 0)) extras = acc;
+			// الخرسانة العادية (النظافة) تُحسب ضمن الإجمالي العام للخرسانة
+			// لكن كصبة نظافة وليس ضمن RC للقسم (concreteVolume = RC فقط)
+			grandConcrete += acc.plainConcrete;
 		}
 
 		sections.push({
@@ -500,6 +567,7 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 			totalConcrete,
 			totalRebar,
 			totalBlocks,
+			...(extras ? { extras } : {}),
 		});
 	}
 

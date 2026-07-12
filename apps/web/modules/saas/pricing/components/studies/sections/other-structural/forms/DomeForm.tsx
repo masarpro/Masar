@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { DomeInput } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -35,11 +36,11 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				</div>
 				<div>
 					<Label>{t("fields.diameter")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.diameter || ""} onChange={(e: any) => set("diameter", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={50} step={0.5} value={data.diameter ?? ""} onChange={(e: any) => set("diameter", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.riseHeight")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.riseHeight || ""} onChange={(e: any) => set("riseHeight", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={25} step={0.5} value={data.riseHeight ?? ""} onChange={(e: any) => set("riseHeight", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
@@ -66,11 +67,11 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				<div className="grid grid-cols-2 gap-3">
 					<div>
 						<Label>{t("fields.drumHeight")} (م)</Label>
-						<Input type="number" min={0} step={0.5} value={data.drumHeight ?? ""} onChange={(e: any) => set("drumHeight", parseFloat(e.target.value) || 0)} />
+						<Input type="number" min={0.1} max={20} step={0.5} value={data.drumHeight ?? ""} onChange={(e: any) => set("drumHeight", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.drumThickness")} (سم)</Label>
-						<Input type="number" value={data.drumThickness ?? 20} onChange={(e: any) => set("drumThickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" min={5} max={200} step={5} value={data.drumThickness ?? ""} onChange={(e: any) => set("drumThickness", numOrUndef(e.target.value))} />
 					</div>
 				</div>
 			)}
@@ -83,11 +84,11 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 					</div>
 					<div>
 						<Label>{t("fields.supportColumnHeight")} (م)</Label>
-						<Input type="number" min={0} step={0.5} value={data.supportColumnHeight ?? ""} onChange={(e: any) => set("supportColumnHeight", parseFloat(e.target.value) || 0)} />
+						<Input type="number" min={0.1} max={50} step={0.5} value={data.supportColumnHeight ?? ""} onChange={(e: any) => set("supportColumnHeight", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.supportColumnSize")} (سم)</Label>
-						<Input type="number" value={data.supportColumnSize ?? 40} onChange={(e: any) => set("supportColumnSize", parseFloat(e.target.value) || 40)} />
+						<Input type="number" min={5} max={200} step={5} value={data.supportColumnSize ?? ""} onChange={(e: any) => set("supportColumnSize", numOrUndef(e.target.value))} />
 					</div>
 				</div>
 			)}
@@ -100,21 +101,21 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 					<div>
 						<Label>{t("fields.shellThicknessTop")} (سم)</Label>
-						<Input type="number" value={data.shellThicknessTop} onChange={(e: any) => set("shellThicknessTop", parseFloat(e.target.value) || 10)} />
+						<Input type="number" min={5} max={200} step={1} value={data.shellThicknessTop ?? ""} onChange={(e: any) => set("shellThicknessTop", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.shellThicknessBottom")} (سم)</Label>
-						<Input type="number" value={data.shellThicknessBottom} onChange={(e: any) => set("shellThicknessBottom", parseFloat(e.target.value) || 15)} />
+						<Input type="number" min={5} max={200} step={1} value={data.shellThicknessBottom ?? ""} onChange={(e: any) => set("shellThicknessBottom", numOrUndef(e.target.value))} />
 					</div>
 					{data.hasRingBeam && (
 						<>
 							<div>
 								<Label>{t("fields.ringBeamWidth")} (سم)</Label>
-								<Input type="number" value={data.ringBeamWidth} onChange={(e: any) => set("ringBeamWidth", parseFloat(e.target.value) || 30)} />
+								<Input type="number" min={5} max={200} step={5} value={data.ringBeamWidth ?? ""} onChange={(e: any) => set("ringBeamWidth", numOrUndef(e.target.value))} />
 							</div>
 							<div>
 								<Label>{t("fields.ringBeamDepth")} (سم)</Label>
-								<Input type="number" value={data.ringBeamDepth} onChange={(e: any) => set("ringBeamDepth", parseFloat(e.target.value) || 60)} />
+								<Input type="number" min={5} max={200} step={5} value={data.ringBeamDepth ?? ""} onChange={(e: any) => set("ringBeamDepth", numOrUndef(e.target.value))} />
 							</div>
 						</>
 					)}

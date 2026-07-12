@@ -393,6 +393,216 @@ describe("calculateOtherStructural — retaining wall excavation and GRC units",
 	});
 });
 
+// ─── Other Structural: corrected formulas (audit 2026-07) ───
+
+describe("calculateOtherStructural — dome spherical cap", () => {
+	const baseDome = {
+		id: "dome-1",
+		elementType: "DOME" as const,
+		name: "قبة",
+		domeType: "HALF_SPHERE" as const,
+		diameter: 8,
+		riseHeight: 2,
+		shellThicknessTop: 10,
+		shellThicknessBottom: 15,
+		hasRingBeam: false,
+		ringBeamWidth: 30,
+		ringBeamDepth: 60,
+		hasDrum: false,
+		hasSupportColumns: false,
+		quantity: 1,
+	};
+
+	it("uses spherical-cap area for a shallow dome (not hemisphere)", () => {
+		const r = calculateOtherStructural(baseDome);
+		// a=4، h=2 → Rs=(16+4)/4=5 → المساحة=2π·5·2=62.83م² (وليس 100.53)
+		// الحجم = 62.83 × 0.125 = 7.85 م³
+		const shell = r.breakdown.find((b) => b.componentEn === "Dome Shell");
+		expect(shell?.concreteVolume).toBeCloseTo(7.85, 2);
+		// شدات وجهين = 2 × 62.83 = 125.66 م²
+		expect(shell?.formworkArea).toBeCloseTo(125.66, 1);
+		// حديد = 7.854 × 50 × 1.05 = 412.33 كجم
+		expect(shell?.steelWeight).toBeCloseTo(412.33, 1);
+	});
+
+	it("falls back to hemisphere when riseHeight is missing", () => {
+		const r = calculateOtherStructural({ ...baseDome, riseHeight: 0 });
+		// h=a=4 → Rs=4 → المساحة=2π·16=100.53م² → الحجم=12.57م³
+		const shell = r.breakdown.find((b) => b.componentEn === "Dome Shell");
+		expect(shell?.concreteVolume).toBeCloseTo(12.57, 2);
+	});
+
+	it("GRC precast dome: weight only, no concrete/steel/formwork for the shell", () => {
+		const r = calculateOtherStructural({ ...baseDome, domeType: "GRC_PRECAST" });
+		expect(r.concreteVolumeRC).toBe(0);
+		expect(r.steelWeight).toBe(0);
+		expect(r.formworkArea).toBe(0);
+		// 62.83م² × 50 كجم/م² = 3141.59 كجم
+		expect(r.grcWeight).toBeCloseTo(3141.59, 1);
+	});
+});
+
+describe("calculateOtherStructural — minaret footing and top cap", () => {
+	const baseMinaret = {
+		id: "min-1",
+		elementType: "MINARET" as const,
+		name: "مأذنة",
+		shape: "CYLINDRICAL" as const,
+		style: "MODERN" as const,
+		totalHeight: 20,
+		outerDiameter: 2.0,
+		wallThickness: 25,
+		hasBalcony: false,
+		balconyCount: 0,
+		balconyProjection: 80,
+		topType: "CONE" as const,
+		quantity: 1,
+	};
+
+	it("adds an RC footing sized outerDiameter + 2.0m at 0.8m thickness", () => {
+		const r = calculateOtherStructural(baseMinaret);
+		const footing = r.breakdown.find((b) => b.componentEn === "Foundation");
+		// (2+2)² × 0.8 = 12.8 م³
+		expect(footing?.concreteVolume).toBeCloseTo(12.8, 2);
+		// حديد = 12.8 × 120 (MINARET_FOUNDATION) × 1.05 = 1612.8 كجم
+		expect(footing?.steelWeight).toBeCloseTo(1612.8, 1);
+		// حفر = (4+1)² × (0.8+0.3) = 27.5 م³
+		expect(r.excavationVolume).toBeCloseTo(27.5, 1);
+		// صبة نظافة تحت القاعدة = 16 × 0.1 = 1.6 م³
+		expect(r.concreteVolumePlain).toBeCloseTo(1.6, 2);
+	});
+
+	it("adds a cone cap using lateral shell area with 10cm thickness", () => {
+		const r = calculateOtherStructural(baseMinaret);
+		const cap = r.breakdown.find((b) => b.componentEn === "Cone Cap");
+		// r=1، h=1.5 → slant=√3.25=1.803 → مساحة جانبية=π·1·1.803=5.664م²
+		// الحجم = 5.664 × 0.10 = 0.57 م³
+		expect(cap?.concreteVolume).toBeCloseTo(0.57, 2);
+	});
+
+	it("GRC top: weight only, no concrete", () => {
+		const r = calculateOtherStructural({ ...baseMinaret, topType: "GRC" });
+		const cap = r.breakdown.find((b) => b.componentEn === "Top Cap (GRC)");
+		expect(cap?.concreteVolume).toBe(0);
+		// 5.664م² × 50 = 283.18 كجم
+		expect(cap?.grcWeight).toBeCloseTo(283.18, 1);
+	});
+
+	it("small dome top: hemisphere shell 2πr² × 0.10m", () => {
+		const r = calculateOtherStructural({ ...baseMinaret, topType: "DOME_SMALL" });
+		const cap = r.breakdown.find((b) => b.componentEn === "Small Dome Cap");
+		// 2π·1² × 0.10 = 0.63 م³
+		expect(cap?.concreteVolume).toBeCloseTo(0.63, 2);
+	});
+});
+
+describe("calculateOtherStructural — counterfort wall triangular ribs", () => {
+	it("halves the counterfort prism volume (triangular elevation)", () => {
+		const r = calculateOtherStructural({
+			id: "rw-cf",
+			elementType: "RETAINING_WALL",
+			name: "جدار استنادي",
+			wallType: "COUNTERFORT",
+			length: 10,
+			height: 4,
+			stemThickness: 25,
+			baseWidth: 2.4,
+			baseThickness: 30,
+			quantity: 1,
+		});
+		const cf = r.breakdown.find((b) => b.componentEn === "Counterforts");
+		// العدد=floor(10/3)+1=4، الارتفاع=3.7، العرض=1.92، السماكة=0.25
+		// الحجم = 4 × (3.7×1.92/2) × 0.25 = 3.55 م³ (كانت 7.10 كمنشور كامل)
+		expect(cf?.concreteVolume).toBeCloseTo(3.55, 2);
+		// الشدات وجها المثلث = 4 × 2 × (3.7×1.92/2) = 28.42 م²
+		expect(cf?.formworkArea).toBeCloseTo(28.42, 1);
+	});
+});
+
+describe("calculateOtherStructural — precast boundary wall", () => {
+	it("computes panel concrete + steel with zero formwork", () => {
+		const r = calculateOtherStructural({
+			id: "bw-1",
+			elementType: "BOUNDARY_WALL",
+			name: "سور",
+			wallType: "PRECAST",
+			length: 10,
+			height: 2.5,
+			thickness: 20,
+			hasRCColumns: false,
+			columnSpacing: 3.5,
+			hasFoundation: false,
+			foundationWidth: 50,
+			foundationDepth: 50,
+			quantity: 1,
+		});
+		// 10 × 2.5 × 0.2 = 5 م³
+		expect(r.concreteVolumeRC).toBeCloseTo(5.0, 2);
+		// حديد بنسبة الجدار الخرساني = 5 × 95 × 1.05 = 498.75 كجم
+		expect(r.steelWeight).toBeCloseTo(498.75, 1);
+		// مسبق الصب — لا شدات
+		expect(r.formworkArea).toBe(0);
+	});
+});
+
+describe("calculateOtherStructural — open septic tank has no top slab", () => {
+	const base = {
+		id: "st-1",
+		elementType: "SEPTIC_TANK" as const,
+		name: "بيارة",
+		tankType: "SEALED" as const,
+		length: 4,
+		width: 2,
+		depth: 1.5,
+		wallType: "RC" as const,
+		wallThickness: 20,
+		baseThickness: 25,
+		slabThickness: 15,
+		quantity: 1,
+	};
+
+	it("removes top slab concrete, formwork and roof waterproofing when OPEN", () => {
+		const sealed = calculateOtherStructural(base);
+		const open = calculateOtherStructural({ ...base, tankType: "OPEN" });
+
+		expect(sealed.breakdown.some((b) => b.componentEn === "Top Slab")).toBe(true);
+		expect(open.breakdown.some((b) => b.componentEn === "Top Slab")).toBe(false);
+
+		// فرق الخرسانة = سقف 4.4×2.4×0.15 = 1.58 م³
+		expect(sealed.concreteVolumeRC - open.concreteVolumeRC).toBeCloseTo(1.58, 2);
+		// فرق العزل = مساحة السقف 4.4×2.4 = 10.56 م²
+		expect(sealed.waterproofingArea - open.waterproofingArea).toBeCloseTo(10.56, 1);
+	});
+
+	it("block-wall OPEN tank also skips the top slab", () => {
+		const open = calculateOtherStructural({ ...base, tankType: "OPEN", wallType: "BLOCK_20" });
+		expect(open.breakdown.some((b) => b.componentEn === "Top Slab")).toBe(false);
+		expect(open.blockCount).toBeGreaterThan(0);
+	});
+});
+
+describe("calculateOtherStructural — decor materials RC/STONE get no GRC weight", () => {
+	it("keeps the quantity line but computes zero weight for RC and STONE", () => {
+		const r = calculateOtherStructural({
+			id: "decor-2",
+			elementType: "CONCRETE_DECOR",
+			name: "ديكورات",
+			items: [
+				{ id: "d1", type: "PANEL", material: "RC", unit: "SQM", area: 10, quantity: 1 },
+				{ id: "d2", type: "BELT", material: "STONE", unit: "LINEAR_METER", length: 10, quantity: 1 },
+				{ id: "d3", type: "CORNICE", material: "GRC", unit: "LINEAR_METER", length: 10, quantity: 1 },
+			],
+			quantity: 1,
+		});
+		// GRC فقط: 10 × 25 = 250 كجم — بندا RC/STONE بلا وزن مُختلق
+		expect(r.grcWeight).toBeCloseTo(250, 1);
+		// بند RC يبقى ظاهراً بمساحته (10م²)
+		const rcRow = r.breakdown.find((b) => b.componentEn === "PANEL");
+		expect(rcRow?.formworkArea).toBeCloseTo(10, 1);
+		expect(rcRow?.grcWeight ?? 0).toBe(0);
+	});
+});
+
 describe("calculateRibbedSlab", () => {
 	it("calculates block count and concrete for ribbed slab", () => {
 		const result = calculateRibbedSlab({

@@ -8,6 +8,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ConcreteDecorInput, ConcreteDecorItem, DecorItemType, DecorMaterial, DecorUnit } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 function newDecorItem(): ConcreteDecorItem {
 	return {
@@ -91,25 +92,25 @@ export function ConcreteDecorForm({ data, onChange }: ElementFormProps<ConcreteD
 						{item.unit === 'LINEAR_METER' && (
 							<div>
 								<Label>{t("fields.length")} (م.ط)</Label>
-								<Input type="number" min={0} step={0.5} value={item.length || ""} onChange={(e: any) => updateItem(idx, "length", parseFloat(e.target.value) || 0)} />
+								<Input type="number" min={0.1} max={1000} step={0.5} value={item.length ?? ""} onChange={(e: any) => updateItem(idx, "length", numOrUndef(e.target.value))} />
 							</div>
 						)}
 						{item.unit === 'SQM' && (
 							<div>
 								<Label>{t("fields.area")} (م²)</Label>
-								<Input type="number" min={0} step={0.5} value={item.area || ""} onChange={(e: any) => updateItem(idx, "area", parseFloat(e.target.value) || 0)} />
+								<Input type="number" min={0.1} max={10000} step={0.5} value={item.area ?? ""} onChange={(e: any) => updateItem(idx, "area", numOrUndef(e.target.value))} />
 							</div>
 						)}
 						{(item.unit === 'PIECE' || item.unit === 'LINEAR_METER') && (
 							<>
 								<div>
 									<Label>{t("fields.height")} (سم)</Label>
-									<Input type="number" value={item.height ?? ""} onChange={(e: any) => updateItem(idx, "height", parseFloat(e.target.value) || 0)} />
+									<Input type="number" min={1} max={500} value={item.height ?? ""} onChange={(e: any) => updateItem(idx, "height", numOrUndef(e.target.value))} />
 								</div>
 								{item.unit === 'PIECE' && (
 									<div>
 										<Label>{t("fields.width")} (سم)</Label>
-										<Input type="number" value={item.width ?? ""} onChange={(e: any) => updateItem(idx, "width", parseFloat(e.target.value) || 0)} />
+										<Input type="number" min={1} max={500} value={item.width ?? ""} onChange={(e: any) => updateItem(idx, "width", numOrUndef(e.target.value))} />
 									</div>
 								)}
 							</>

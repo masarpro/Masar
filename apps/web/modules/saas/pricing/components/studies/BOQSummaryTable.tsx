@@ -737,6 +737,37 @@ function SectionCard({
 								toggleCutting={toggleCutting}
 							/>
 						))}
+
+						{/* مواد إضافية (عناصر إنشائية أخرى): نظافة، GRC، عزل، حفر، مونة */}
+						{section.extras && (
+							<div className="flex flex-wrap gap-2 pt-1">
+								{section.extras.plainConcrete > 0 && (
+									<Badge variant="secondary" className="text-xs gap-1">
+										{t("structural.otherStructural.results.concretePlain")}: {formatNumber(section.extras.plainConcrete)} م³
+									</Badge>
+								)}
+								{section.extras.grcWeight > 0 && (
+									<Badge variant="secondary" className="text-xs gap-1">
+										{t("structural.otherStructural.results.grcWeight")}: {formatNumber(section.extras.grcWeight)} كجم
+									</Badge>
+								)}
+								{section.extras.waterproofingArea > 0 && (
+									<Badge variant="secondary" className="text-xs gap-1">
+										{t("structural.otherStructural.results.waterproofing")}: {formatNumber(section.extras.waterproofingArea)} م²
+									</Badge>
+								)}
+								{section.extras.excavationVolume > 0 && (
+									<Badge variant="secondary" className="text-xs gap-1">
+										{t("structural.otherStructural.results.excavation")}: {formatNumber(section.extras.excavationVolume)} م³
+									</Badge>
+								)}
+								{section.extras.mortarVolume > 0 && (
+									<Badge variant="secondary" className="text-xs gap-1">
+										{t("structural.otherStructural.results.mortar")}: {formatNumber(section.extras.mortarVolume)} م³
+									</Badge>
+								)}
+							</div>
+						)}
 					</div>
 				</CollapsibleContent>
 			</Collapsible>

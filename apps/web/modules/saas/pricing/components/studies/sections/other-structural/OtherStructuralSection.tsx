@@ -18,7 +18,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
 import { cn } from "@ui/lib";
 
-import { calculateOtherStructural } from "../../../../lib/other-structural-calculations";
+import { calculateOtherStructural, getOtherStructuralInputErrors } from "../../../../lib/other-structural-calculations";
 import { ELEMENT_CATALOG, ELEMENT_DEFAULTS } from "../../../../constants/other-structural";
 import type {
 	OtherStructuralInput,
@@ -120,9 +120,19 @@ export function OtherStructuralSection({
 		items
 			.filter(item => item.subCategory === "otherStructural" || (item.dimensions as any)?.elementType)
 			.map(item => {
-				const inputData = item.dimensions as unknown as OtherStructuralInput;
+				// العناصر الجديدة تحمل النتيجة الكاملة في dimensions.__result —
+				// نفصلها عن المدخلات، والعناصر القديمة (بدون __result) تُحسب من جديد
+				const { __result: savedResult, ...rawInput } = (item.dimensions ?? {}) as Record<string, any>;
+				const inputData = rawInput as unknown as OtherStructuralInput;
 				let result: OtherStructuralResult | null = null;
-				try { result = calculateOtherStructural(inputData); } catch { /* skip */ }
+				try {
+					if (getOtherStructuralInputErrors(inputData).length === 0) {
+						result = calculateOtherStructural(inputData);
+					}
+				} catch { /* skip */ }
+				if (!result && savedResult && typeof savedResult === "object") {
+					result = savedResult as OtherStructuralResult;
+				}
 				return { input: inputData, result, savedItemId: item.id };
 			}),
 	);
@@ -135,15 +145,22 @@ export function OtherStructuralSection({
 	const createMutation = useMutation(
 		orpc.pricing.studies.structuralItem.create.mutationOptions(),
 	);
+	const updateMutation = useMutation(
+		orpc.pricing.studies.structuralItem.update.mutationOptions(),
+	);
 	const deleteMutation = useMutation(
 		orpc.pricing.studies.structuralItem.delete.mutationOptions(),
 	);
 
+	// حساب النتيجة فقط عند اكتمال المدخلات — الأبعاد الصفرية لا تُحسب بصمت
+	const computeResult = (input: OtherStructuralInput): OtherStructuralResult | null => {
+		if (getOtherStructuralInputErrors(input).length > 0) return null;
+		try { return calculateOtherStructural(input); } catch { return null; }
+	};
+
 	const handleAddElement = useCallback((type: OtherStructuralElementType) => {
 		const input = createDefaultInput(type);
-		let result: OtherStructuralResult | null = null;
-		try { result = calculateOtherStructural(input); } catch { /* skip */ }
-		setElements(prev => [...prev, { input, result }]);
+		setElements(prev => [...prev, { input, result: computeResult(input) }]);
 		setEditingIndex(elements.length);
 		setShowPicker(false);
 	}, [elements.length]);
@@ -151,9 +168,7 @@ export function OtherStructuralSection({
 	const handleUpdateInput = useCallback((index: number, newInput: OtherStructuralInput) => {
 		setElements(prev => {
 			const next = [...prev];
-			let result: OtherStructuralResult | null = null;
-			try { result = calculateOtherStructural(newInput); } catch { /* skip */ }
-			next[index] = { ...next[index], input: newInput, result };
+			next[index] = { ...next[index], input: newInput, result: computeResult(newInput) };
 			return next;
 		});
 	}, []);
@@ -163,19 +178,35 @@ export function OtherStructuralSection({
 		if (!el.result) return;
 
 		try {
-			await (createMutation.mutateAsync as (data: any) => Promise<unknown>)({
+			const payload = {
 				organizationId,
 				costStudyId: studyId,
 				category: "otherStructural",
 				subCategory: "otherStructural",
 				name: el.input.name,
-				dimensions: el.input as any,
+				// النتيجة الكاملة (شدات، عزل، حفر، بلوك، مونة، GRC) تُحفظ داخل
+				// dimensions.__result حتى تصل لكل مستهلكي البيانات بدون تغيير Schema
+				dimensions: { ...el.input, __result: el.result } as any,
 				quantity: el.result.quantity,
 				unit: "مجموعة",
-				concreteVolume: el.result.totalConcreteRC + el.result.totalConcretePlain,
+				// خرسانة مسلحة فقط — صبة النظافة في __result.totalConcretePlain
+				concreteVolume: el.result.totalConcreteRC,
 				steelWeight: el.result.totalSteelWeight,
 				totalCost: 0,
-			});
+			};
+			if (el.savedItemId) {
+				await (updateMutation.mutateAsync as (data: any) => Promise<unknown>)({
+					...payload,
+					id: el.savedItemId,
+				});
+			} else {
+				const created = await (createMutation.mutateAsync as (data: any) => Promise<unknown>)(payload);
+				const createdId = (created as any)?.id;
+				if (createdId) {
+					// ربط العنصر المحلي بسجله المحفوظ حتى لا يتكرر عند إعادة الحفظ
+					setElements(prev => prev.map((e, i) => (i === index ? { ...e, savedItemId: createdId } : e)));
+				}
+			}
 			toast.success(t("messages.saved"));
 			setEditingIndex(null);
 			onSave();
@@ -183,7 +214,7 @@ export function OtherStructuralSection({
 		} catch {
 			toast.error(t("messages.saveError"));
 		}
-	}, [elements, createMutation, organizationId, studyId, t, onSave, onUpdate]);
+	}, [elements, createMutation, updateMutation, organizationId, studyId, t, onSave, onUpdate]);
 
 	const handleDeleteElement = useCallback(async (index: number) => {
 		const el = elements[index];
@@ -283,9 +314,20 @@ export function OtherStructuralSection({
 											onChange={(data) => handleUpdateInput(index, data)}
 										/>
 
+										{/* تنبيه اكتمال الأبعاد المطلوبة */}
+										{!el.result && (
+											<p className="text-xs text-destructive">
+												{t("messages.missingDims")}
+											</p>
+										)}
+
 										{/* أزرار الحفظ/الإلغاء */}
 										<div className="flex gap-2">
-											<Button size="sm" onClick={() => handleSaveElement(index)} disabled={createMutation.isPending}>
+											<Button
+												size="sm"
+												onClick={() => handleSaveElement(index)}
+												disabled={!el.result || createMutation.isPending || updateMutation.isPending}
+											>
 												<Save className="h-4 w-4 me-1" />
 												{tS("saveItem")}
 											</Button>

@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { GroundWaterTankInput } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function WaterTankGroundForm({ data, onChange }: ElementFormProps<GroundWaterTankInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -38,22 +39,22 @@ export function WaterTankGroundForm({ data, onChange }: ElementFormProps<GroundW
 					<>
 						<div>
 							<Label>{t("fields.length")} (م)</Label>
-							<Input type="number" min={0} step={0.1} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
+							<Input type="number" min={0.1} max={200} step={0.1} value={data.length ?? ""} onChange={(e: any) => set("length", numOrUndef(e.target.value))} />
 						</div>
 						<div>
 							<Label>{t("fields.width")} (م)</Label>
-							<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e: any) => set("width", parseFloat(e.target.value) || 0)} />
+							<Input type="number" min={0.1} max={200} step={0.1} value={data.width ?? ""} onChange={(e: any) => set("width", numOrUndef(e.target.value))} />
 						</div>
 					</>
 				) : (
 					<div>
 						<Label>{t("fields.diameter")} (م)</Label>
-						<Input type="number" min={0} step={0.1} value={data.diameter || ""} onChange={(e: any) => set("diameter", parseFloat(e.target.value) || 0)} />
+						<Input type="number" min={0.1} max={200} step={0.1} value={data.diameter ?? ""} onChange={(e: any) => set("diameter", numOrUndef(e.target.value))} />
 					</div>
 				)}
 				<div>
 					<Label>{t("fields.depth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.depth || ""} onChange={(e: any) => set("depth", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={50} step={0.1} value={data.depth ?? ""} onChange={(e: any) => set("depth", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
@@ -74,15 +75,15 @@ export function WaterTankGroundForm({ data, onChange }: ElementFormProps<GroundW
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" min={5} max={200} step={5} value={data.wallThickness ?? ""} onChange={(e: any) => set("wallThickness", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.baseThickness")} (سم)</Label>
-						<Input type="number" value={data.baseThickness} onChange={(e: any) => set("baseThickness", parseFloat(e.target.value) || 30)} />
+						<Input type="number" min={5} max={200} step={5} value={data.baseThickness ?? ""} onChange={(e: any) => set("baseThickness", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.slabThickness")} (سم)</Label>
-						<Input type="number" value={data.slabThickness} onChange={(e: any) => set("slabThickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" min={5} max={200} step={5} value={data.slabThickness ?? ""} onChange={(e: any) => set("slabThickness", numOrUndef(e.target.value))} />
 					</div>
 				</div>
 			)}

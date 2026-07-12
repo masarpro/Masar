@@ -231,9 +231,26 @@ export const blocksDimensionsSchema = z
 	})
 	.passthrough();
 
+// ─── Other Structural (عناصر إنشائية أخرى) dimensions ───
+// dimensions لهذه الفئة هي كائن OtherStructuralInput كاملاً (يُميَّز بحقل
+// elementType) + النتيجة الكاملة المحفوظة في __result. الأبعاد تختلف كلياً
+// بين الأنواع (بيارة/قبة/مأذنة/ديكور…) لذا يُكتفى بالتمييز + passthrough.
+
+export const otherStructuralDimensionsSchema = z
+	.object({
+		elementType: z.string().max(50),
+		name: z.string().max(200).optional(),
+		quantity: z.number().nonnegative().optional(),
+		__result: z.record(z.string(), z.unknown()).optional(),
+	})
+	.passthrough();
+
 // ─── Union of all structural dimensions ───
 
 export const structuralDimensionsUnion = z.union([
+	// يجب أن يسبق البقية: يلتقط أي dimensions تحمل elementType
+	// (فئات الأقسام الأخرى لا تُرسل هذا الحقل إطلاقاً)
+	otherStructuralDimensionsSchema,
 	plainConcreteDimensionsSchema,
 	columnDimensionsSchema,
 	beamDimensionsSchema,

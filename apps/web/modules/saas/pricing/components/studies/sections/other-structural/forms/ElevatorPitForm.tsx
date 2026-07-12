@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ElevatorPitInput } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPitInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -34,11 +35,11 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				</div>
 				<div>
 					<Label>{t("fields.numberOfStops")}</Label>
-					<Input type="number" min={2} step={1} value={data.numberOfStops} onChange={(e: any) => set("numberOfStops", parseInt(e.target.value) || 3)} />
+					<Input type="number" min={1} max={100} step={1} value={data.numberOfStops ?? ""} onChange={(e: any) => set("numberOfStops", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.floorHeight")} (م)</Label>
-					<Input type="number" min={2} step={0.1} value={data.floorHeight} onChange={(e: any) => set("floorHeight", parseFloat(e.target.value) || 3.2)} />
+					<Input type="number" min={0.1} max={20} step={0.1} value={data.floorHeight ?? ""} onChange={(e: any) => set("floorHeight", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
@@ -49,15 +50,15 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.pitWidth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitWidth} onChange={(e: any) => set("pitWidth", parseFloat(e.target.value) || 1.6)} />
+					<Input type="number" min={0.1} max={20} step={0.1} value={data.pitWidth ?? ""} onChange={(e: any) => set("pitWidth", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.pitLength")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitLength} onChange={(e: any) => set("pitLength", parseFloat(e.target.value) || 1.6)} />
+					<Input type="number" min={0.1} max={20} step={0.1} value={data.pitLength ?? ""} onChange={(e: any) => set("pitLength", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.pitHoleDepth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitHoleDepth} onChange={(e: any) => set("pitHoleDepth", parseFloat(e.target.value) || 1.2)} />
+					<Input type="number" min={0.1} max={10} step={0.1} value={data.pitHoleDepth ?? ""} onChange={(e: any) => set("pitHoleDepth", numOrUndef(e.target.value))} />
 				</div>
 			</div>
 
@@ -70,7 +71,7 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				<div className="grid grid-cols-2 gap-3">
 					<div>
 						<Label>{t("fields.machineRoomHeight")} (م)</Label>
-						<Input type="number" min={2} step={0.1} value={data.machineRoomHeight ?? 2.5} onChange={(e: any) => set("machineRoomHeight", parseFloat(e.target.value) || 2.5)} />
+						<Input type="number" min={0.1} max={10} step={0.1} value={data.machineRoomHeight ?? ""} onChange={(e: any) => set("machineRoomHeight", numOrUndef(e.target.value))} />
 					</div>
 				</div>
 			)}
@@ -83,15 +84,15 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" min={5} max={200} step={5} value={data.wallThickness ?? ""} onChange={(e: any) => set("wallThickness", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.pitSlabThickness")} (سم)</Label>
-						<Input type="number" value={data.pitSlabThickness} onChange={(e: any) => set("pitSlabThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" min={5} max={200} step={5} value={data.pitSlabThickness ?? ""} onChange={(e: any) => set("pitSlabThickness", numOrUndef(e.target.value))} />
 					</div>
 					<div>
 						<Label>{t("fields.overTravel")} (م)</Label>
-						<Input type="number" value={data.overTravel} onChange={(e: any) => set("overTravel", parseFloat(e.target.value) || 3.5)} />
+						<Input type="number" min={0} max={20} step={0.1} value={data.overTravel ?? ""} onChange={(e: any) => set("overTravel", numOrUndef(e.target.value))} />
 					</div>
 				</div>
 			)}

@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { MINARET_STYLE_FACTORS } from "../../../../../constants/other-structural";
 import type { MinaretInput, MinaretStyle } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -70,15 +71,15 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 				</div>
 				<div>
 					<Label>{t("fields.totalHeight")} (م)</Label>
-					<Input type="number" min={0} step={1} value={data.totalHeight || ""} onChange={(e: any) => set("totalHeight", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={100} step={1} value={data.totalHeight ?? ""} onChange={(e: any) => set("totalHeight", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{data.shape === "SQUARE" ? t("fields.sideLength") : t("fields.outerDiameter")} (م)</Label>
 					<Input
-						type="number" min={0} step={0.1}
-						value={data.shape === "SQUARE" ? (data.sideLength || data.outerDiameter || "") : (data.outerDiameter || "")}
+						type="number" min={0.1} max={20} step={0.1}
+						value={data.shape === "SQUARE" ? (data.sideLength ?? data.outerDiameter ?? "") : (data.outerDiameter ?? "")}
 						onChange={(e: any) => {
-							const v = parseFloat(e.target.value) || 0;
+							const v = numOrUndef(e.target.value);
 							if (data.shape === "SQUARE") set("sideLength", v);
 							else set("outerDiameter", v);
 						}}
@@ -123,12 +124,12 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" min={5} max={200} step={1} value={data.wallThickness ?? ""} onChange={(e: any) => set("wallThickness", numOrUndef(e.target.value))} />
 					</div>
 					{data.hasBalcony && (
 						<div>
 							<Label>{t("fields.balconyProjection")} (سم)</Label>
-							<Input type="number" value={data.balconyProjection} onChange={(e: any) => set("balconyProjection", parseFloat(e.target.value) || 80)} />
+							<Input type="number" min={10} max={300} step={5} value={data.balconyProjection ?? ""} onChange={(e: any) => set("balconyProjection", numOrUndef(e.target.value))} />
 						</div>
 					)}
 				</div>

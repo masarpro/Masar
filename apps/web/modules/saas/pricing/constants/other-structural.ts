@@ -72,7 +72,6 @@ export const ELEVATOR_STANDARD_SIZES = [
 export const MINARET_STYLE_FACTORS = {
 	MODERN: {
 		shapeDefault: 'CYLINDRICAL' as const,
-		heightMultiplier: 1.0,
 		wallThicknessDefault: 25,
 		diameterDefault: 2.0,
 		description_ar: 'حديث',
@@ -80,7 +79,6 @@ export const MINARET_STYLE_FACTORS = {
 	},
 	ANDALUSIAN: {
 		shapeDefault: 'SQUARE' as const,
-		heightMultiplier: 1.0,
 		wallThicknessDefault: 30,
 		diameterDefault: 2.5,
 		description_ar: 'أندلسي',
@@ -88,7 +86,6 @@ export const MINARET_STYLE_FACTORS = {
 	},
 	OTTOMAN: {
 		shapeDefault: 'CYLINDRICAL' as const,
-		heightMultiplier: 1.2,
 		wallThicknessDefault: 22,
 		diameterDefault: 1.8,
 		description_ar: 'عثماني',
@@ -96,7 +93,6 @@ export const MINARET_STYLE_FACTORS = {
 	},
 	MAMLUK: {
 		shapeDefault: 'OCTAGONAL' as const,
-		heightMultiplier: 1.0,
 		wallThicknessDefault: 28,
 		diameterDefault: 2.2,
 		description_ar: 'مملوكي',
@@ -104,7 +100,6 @@ export const MINARET_STYLE_FACTORS = {
 	},
 	ABBASID: {
 		shapeDefault: 'CYLINDRICAL' as const,
-		heightMultiplier: 0.9,
 		wallThicknessDefault: 30,
 		diameterDefault: 3.0,
 		description_ar: 'عباسي',
@@ -112,7 +107,6 @@ export const MINARET_STYLE_FACTORS = {
 	},
 	MAGHREBI: {
 		shapeDefault: 'SQUARE' as const,
-		heightMultiplier: 1.0,
 		wallThicknessDefault: 30,
 		diameterDefault: 2.5,
 		description_ar: 'مغربي',

@@ -261,7 +261,9 @@ export function calculateOtherStructural(input: OtherStructuralInput): OtherStru
 function calculateSepticTank(input: SepticTankInput): OtherStructuralResult {
 	const wallThickM = input.wallThickness / 100;
 	const baseThickM = input.baseThickness / 100;
-	const slabThickM = input.slabThickness / 100;
+	const slabThickM = (input.slabThickness ?? 0) / 100;
+	// البيارة المفتوحة بلا سقف علوي (لا خرسانة ولا شدات ولا عزل للسقف)
+	const hasTopSlab = input.tankType !== 'OPEN';
 
 	const ratios = { base: STEEL_RATIOS.TANK_BASE, walls: STEEL_RATIOS.TANK_WALLS, slab: STEEL_RATIOS.TANK_SLAB };
 
@@ -270,12 +272,16 @@ function calculateSepticTank(input: SepticTankInput): OtherStructuralResult {
 			input.length, input.width, input.depth,
 			wallThickM, baseThickM, slabThickM, ratios,
 		);
+		const outerL = input.length + 2 * wallThickM;
+		const outerW = input.width + 2 * wallThickM;
 
 		const breakdown: ComponentBreakdown[] = [
 			{ component: 'القاعدة', componentEn: 'Base Slab', concreteVolume: r2(box.base.volume), steelWeight: r2(box.base.steel), formworkArea: r2(box.base.formwork) },
 			{ component: 'الجدران', componentEn: 'Walls', concreteVolume: r2(box.walls.volume), steelWeight: r2(box.walls.steel), formworkArea: r2(box.walls.formwork) },
-			{ component: 'السقف', componentEn: 'Top Slab', concreteVolume: r2(box.slab.volume), steelWeight: r2(box.slab.steel), formworkArea: r2(box.slab.formwork) },
 		];
+		if (hasTopSlab) {
+			breakdown.push({ component: 'السقف', componentEn: 'Top Slab', concreteVolume: r2(box.slab.volume), steelWeight: r2(box.slab.steel), formworkArea: r2(box.slab.formwork) });
+		}
 
 		// حاجز وسطي لبيارة ذات غرفتين
 		if (input.tankType === 'TWO_CHAMBER') {
@@ -290,7 +296,8 @@ function calculateSepticTank(input: SepticTankInput): OtherStructuralResult {
 
 		return buildResult(input.elementType, input.name, input.quantity, breakdown, {
 			concreteVolumePlain: box.leanConcrete,
-			waterproofingArea: box.waterproofInner + box.waterproofOuter,
+			// بيارة مفتوحة: لا عزل لسطح السقف (غير موجود)
+			waterproofingArea: box.waterproofInner + box.waterproofOuter - (hasTopSlab ? 0 : outerL * outerW),
 			excavationVolume: box.excavation,
 		});
 	}
@@ -313,8 +320,10 @@ function calculateSepticTank(input: SepticTankInput): OtherStructuralResult {
 	const breakdown: ComponentBreakdown[] = [
 		{ component: 'القاعدة', componentEn: 'Base Slab', concreteVolume: r2(baseVol), steelWeight: r2(steelFromRatio(baseVol, ratios.base)), formworkArea: r2(2 * (outerL + outerW) * baseThickM) },
 		{ component: 'الجدران (بلوك)', componentEn: 'Walls (Block)', concreteVolume: 0, steelWeight: 0, formworkArea: 0 },
-		{ component: 'السقف', componentEn: 'Top Slab', concreteVolume: r2(slabVol), steelWeight: r2(steelFromRatio(slabVol, ratios.slab)), formworkArea: r2(outerL * outerW) },
 	];
+	if (hasTopSlab) {
+		breakdown.push({ component: 'السقف', componentEn: 'Top Slab', concreteVolume: r2(slabVol), steelWeight: r2(steelFromRatio(slabVol, ratios.slab)), formworkArea: r2(outerL * outerW) });
+	}
 
 	const excL = outerL + 1.0;
 	const excW = outerW + 1.0;
@@ -322,7 +331,8 @@ function calculateSepticTank(input: SepticTankInput): OtherStructuralResult {
 
 	return buildResult(input.elementType, input.name, input.quantity, breakdown, {
 		concreteVolumePlain: leanConcrete,
-		waterproofingArea: wallArea + input.length * input.width + 2 * (outerL + outerW) * input.depth + outerL * outerW,
+		// بيارة مفتوحة: لا عزل لسطح السقف (غير موجود)
+		waterproofingArea: wallArea + input.length * input.width + 2 * (outerL + outerW) * input.depth + (hasTopSlab ? outerL * outerW : 0),
 		excavationVolume: excL * excW * excDepth,
 		blockCount,
 		mortarVolume,
@@ -519,8 +529,9 @@ function calculateRetainingWall(input: RetainingWallInput): OtherStructuralResul
 		const cfHeight = stemHeight;
 		const cfWidth = baseWidth * 0.8; // 80% من عرض القاعدة
 		const cfThick = 0.25; // 25 سم
-		const cfVol = count * cfHeight * cfWidth * cfThick;
-		const cfFormwork = count * 2 * cfHeight * cfWidth;
+		// المقطع الرأسي للضلع مثلثي (وليس منشوراً كاملاً) → القسمة على 2
+		const cfVol = count * (cfHeight * cfWidth / 2) * cfThick;
+		const cfFormwork = count * 2 * (cfHeight * cfWidth / 2);
 		breakdown.push({
 			component: 'أضلاع مقاومة', componentEn: 'Counterforts',
 			concreteVolume: r2(cfVol), steelWeight: r2(steelFromRatio(cfVol, STEEL_RATIOS.RETAINING_COUNTERFORT)),
@@ -551,8 +562,8 @@ function calculateRetainingWall(input: RetainingWallInput): OtherStructuralResul
 
 function calculateBoundaryWall(input: BoundaryWallInput): OtherStructuralResult {
 	const thickM = input.thickness / 100;
-	const foundW = input.foundationWidth / 100;
-	const foundD = input.foundationDepth / 100;
+	const foundW = (input.foundationWidth ?? 0) / 100;
+	const foundD = (input.foundationDepth ?? 0) / 100;
 	const breakdown: ComponentBreakdown[] = [];
 
 	let blockCount = 0;
@@ -617,6 +628,14 @@ function calculateBoundaryWall(input: BoundaryWallInput): OtherStructuralResult 
 			concreteVolume: r2(wallVol), steelWeight: r2(steelFromRatio(wallVol, STEEL_RATIOS.RETAINING_STEM)),
 			formworkArea: r2(wallFormwork),
 		});
+	} else if (input.wallType === 'PRECAST') {
+		// ألواح مسبقة الصب: خرسانة وحديد بنفس نسبة الجدار الخرساني، بلا شدات
+		const panelVol = input.length * input.height * thickM;
+		breakdown.push({
+			component: 'ألواح مسبقة الصب', componentEn: 'Precast Panels',
+			concreteVolume: r2(panelVol), steelWeight: r2(steelFromRatio(panelVol, STEEL_RATIOS.RETAINING_STEM)),
+			formworkArea: 0,
+		});
 	}
 
 	// صبة نظافة
@@ -639,8 +658,8 @@ function calculateBoundaryWall(input: BoundaryWallInput): OtherStructuralResult 
 
 function calculateRamp(input: RampInput): OtherStructuralResult {
 	const thickM = input.thickness / 100;
-	const wallHM = input.wallHeight / 100;
-	const wallThickM = input.wallThickness / 100;
+	const wallHM = (input.wallHeight ?? 0) / 100;
+	const wallThickM = (input.wallThickness ?? 0) / 100;
 	const breakdown: ComponentBreakdown[] = [];
 
 	// 1. بلاطة الرامب
@@ -675,20 +694,36 @@ function calculateDome(input: DomeInput): OtherStructuralResult {
 	const avgThickM = (input.shellThicknessTop + input.shellThicknessBottom) / 2 / 100;
 	const breakdown: ComponentBreakdown[] = [];
 
-	// 1. بلاطة القبة القشرية (نصف كرة تقريبي)
-	// مساحة نصف الكرة = 2πR²
-	const shellSurfaceArea = 2 * Math.PI * R * R;
-	const shellVol = shellSurfaceArea * avgThickM;
-	breakdown.push({
-		component: 'بلاطة القبة', componentEn: 'Dome Shell',
-		concreteVolume: r2(shellVol), steelWeight: r2(steelFromRatio(shellVol, STEEL_RATIOS.DOME_SHELL)),
-		formworkArea: r2(shellSurfaceArea),
-	});
+	// 1. بلاطة القبة القشرية — قطاع كروي (Spherical Cap)
+	// a = نصف قطر القاعدة، h = ارتفاع القبة (الافتراضي = a أي نصف كرة)
+	// نصف قطر الكرة الأم Rs = (a² + h²) / 2h ← مساحة القطاع = 2π·Rs·h
+	// (الصيغة القديمة 2πR² كانت تفترض نصف كرة دائماً وتضخّم القباب الضحلة:
+	// D=8م، h=2م → 62.83م² وليس 100.53م² — تضخيم 60%)
+	const a = R;
+	const h = input.riseHeight > 0 ? input.riseHeight : a;
+	const Rs = (a * a + h * h) / (2 * h);
+	const shellSurfaceArea = 2 * Math.PI * Rs * h;
+
+	if (input.domeType === 'GRC_PRECAST') {
+		// قشرة GRC مسبقة الصنع — لا خرسانة ولا حديد ولا شدات للقشرة
+		breakdown.push({
+			component: 'قشرة القبة (GRC)', componentEn: 'Dome Shell (GRC)',
+			concreteVolume: 0, steelWeight: 0, formworkArea: 0,
+			grcWeight: r2(shellSurfaceArea * GRC_WEIGHT_PER_SQM),
+		});
+	} else {
+		const shellVol = shellSurfaceArea * avgThickM;
+		breakdown.push({
+			component: 'بلاطة القبة', componentEn: 'Dome Shell',
+			concreteVolume: r2(shellVol), steelWeight: r2(steelFromRatio(shellVol, STEEL_RATIOS.DOME_SHELL)),
+			formworkArea: r2(2 * shellSurfaceArea), // وجه داخلي + خارجي
+		});
+	}
 
 	// 2. الكمرة الدائرية
 	if (input.hasRingBeam) {
-		const ringW = input.ringBeamWidth / 100;
-		const ringD = input.ringBeamDepth / 100;
+		const ringW = (input.ringBeamWidth ?? 0) / 100;
+		const ringD = (input.ringBeamDepth ?? 0) / 100;
 		const ringLength = Math.PI * input.diameter;
 		const ringVol = ringW * ringD * ringLength;
 		const ringFormwork = (2 * ringD + ringW) * ringLength;
@@ -740,6 +775,8 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 	let shaftInnerPerimeter: number;
 	let shaftOuterArea: number;
 	let shaftInnerArea: number;
+	let shaftOuterRadius: number; // نصف القطر الخارجي المكافئ (لقمة المأذنة)
+	let baseDim: number; // البعد الخارجي المرجعي (لقاعدة المأذنة)
 
 	if (input.shape === 'CYLINDRICAL') {
 		const outerD = input.outerDiameter ?? 2.0;
@@ -749,6 +786,8 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 		shaftInnerPerimeter = Math.PI * 2 * R_inner;
 		shaftOuterArea = Math.PI * R_outer * R_outer;
 		shaftInnerArea = Math.PI * R_inner * R_inner;
+		shaftOuterRadius = R_outer;
+		baseDim = outerD;
 	} else if (input.shape === 'SQUARE') {
 		const side = input.sideLength ?? input.outerDiameter ?? 2.0;
 		const innerSide = side - 2 * wallThickM;
@@ -756,6 +795,8 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 		shaftInnerPerimeter = 4 * innerSide;
 		shaftOuterArea = side * side;
 		shaftInnerArea = innerSide * innerSide;
+		shaftOuterRadius = side / 2;
+		baseDim = side;
 	} else {
 		// مثمن
 		const outerD = input.outerDiameter ?? input.sideLength ?? 2.0;
@@ -766,6 +807,8 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 		shaftInnerPerimeter = 8 * innerSide;
 		shaftOuterArea = 2 * (1 + Math.SQRT2) * outerSide * outerSide;
 		shaftInnerArea = 2 * (1 + Math.SQRT2) * innerSide * innerSide;
+		shaftOuterRadius = outerD / 2;
+		baseDim = outerD;
 	}
 
 	// 1. الجذع
@@ -779,7 +822,7 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 
 	// 2. الشرفات
 	if (input.hasBalcony && input.balconyCount > 0) {
-		const balconyProj = input.balconyProjection / 100;
+		const balconyProj = (input.balconyProjection ?? 0) / 100;
 		const balconyThick = 0.15; // 15 سم
 		// بروز دائري/مربع حول الجذع
 		const balconyOuterPerimeter = shaftOuterPerimeter + 2 * Math.PI * balconyProj;
@@ -797,11 +840,61 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 		});
 	}
 
-	// صبة نظافة (قاعدة المأذنة)
-	const leanConcrete = shaftOuterArea * 1.5 * LEAN_CONCRETE_THICKNESS; // قاعدة أوسع 50%
+	// 3. القمة (حسب نوعها) — نصف القطر = نصف القطر الخارجي للجذع
+	const capThickM = 0.10; // سمك القشرة 10 سم
+	const capR = shaftOuterRadius;
+	if (input.topType === 'CONE') {
+		// مخروط: الارتفاع الافتراضي = 1.5×نصف القطر، المساحة الجانبية = π·r·slant
+		const capHeight = 1.5 * capR;
+		const slant = Math.sqrt(capR * capR + capHeight * capHeight);
+		const coneArea = Math.PI * capR * slant;
+		const coneVol = coneArea * capThickM;
+		breakdown.push({
+			component: 'القمة المخروطية', componentEn: 'Cone Cap',
+			concreteVolume: r2(coneVol), steelWeight: r2(steelFromRatio(coneVol, STEEL_RATIOS.DOME_SHELL)),
+			formworkArea: r2(2 * coneArea), // وجه داخلي + خارجي
+		});
+	} else if (input.topType === 'DOME_SMALL') {
+		// قبة صغيرة: نصف كرة 2πr²
+		const smallDomeArea = 2 * Math.PI * capR * capR;
+		const smallDomeVol = smallDomeArea * capThickM;
+		breakdown.push({
+			component: 'قبة صغيرة', componentEn: 'Small Dome Cap',
+			concreteVolume: r2(smallDomeVol), steelWeight: r2(steelFromRatio(smallDomeVol, STEEL_RATIOS.DOME_SHELL)),
+			formworkArea: r2(2 * smallDomeArea),
+		});
+	} else {
+		// قمة GRC مسبقة الصنع — وزن فقط بلا خرسانة أو شدات
+		const capHeight = 1.5 * capR;
+		const slant = Math.sqrt(capR * capR + capHeight * capHeight);
+		const coneArea = Math.PI * capR * slant;
+		breakdown.push({
+			component: 'القمة (GRC)', componentEn: 'Top Cap (GRC)',
+			concreteVolume: 0, steelWeight: 0, formworkArea: 0,
+			grcWeight: r2(coneArea * GRC_WEIGHT_PER_SQM),
+		});
+	}
+
+	// 4. قاعدة المأذنة (RC Footing): البعد الخارجي + 1.0م من كل جهة، سماكة 0.8م
+	const footSide = baseDim + 2.0;
+	const footThick = 0.8;
+	const footVol = footSide * footSide * footThick;
+	breakdown.push({
+		component: 'القاعدة', componentEn: 'Foundation',
+		concreteVolume: r2(footVol), steelWeight: r2(steelFromRatio(footVol, STEEL_RATIOS.MINARET_FOUNDATION)),
+		formworkArea: r2(4 * footSide * footThick),
+	});
+
+	// صبة نظافة تحت القاعدة
+	const leanConcrete = footSide * footSide * LEAN_CONCRETE_THICKNESS;
+
+	// الحفر: 0.5م مساحة عمل من كل جهة + 0.3م عمق عمل
+	const excSide = footSide + 1.0;
+	const excavation = excSide * excSide * (footThick + 0.3);
 
 	return buildResult(input.elementType, input.name, input.quantity, breakdown, {
 		concreteVolumePlain: leanConcrete,
+		excavationVolume: excavation,
 	});
 }
 
@@ -817,15 +910,19 @@ function calculateConcreteDecor(input: ConcreteDecorInput): OtherStructuralResul
 		let weight = 0;
 		let area = 0;
 
+		// ثوابت الوزن (GRC_WEIGHT_*) تخص عناصر GRC/GRP فقط —
+		// عناصر RC/STONE تُسجَّل كبند كمية/مساحة واضح بلا وزن مُختلق
+		const isGrcLike = item.material === 'GRC' || item.material === 'GRP';
+
 		if (item.unit === 'LINEAR_METER' && item.length) {
-			weight = item.length * item.quantity * GRC_WEIGHT_PER_LM_CORNICE;
+			if (isGrcLike) weight = item.length * item.quantity * GRC_WEIGHT_PER_LM_CORNICE;
 			area = item.length * (item.height ?? 30) / 100 * item.quantity;
 		} else if (item.unit === 'SQM' && item.area) {
-			weight = item.area * item.quantity * GRC_WEIGHT_PER_SQM;
+			if (isGrcLike) weight = item.area * item.quantity * GRC_WEIGHT_PER_SQM;
 			area = item.area * item.quantity;
 		} else if (item.unit === 'PIECE') {
 			const pieceArea = ((item.height ?? 30) / 100) * ((item.width ?? 30) / 100);
-			weight = pieceArea * item.quantity * GRC_WEIGHT_PER_SQM;
+			if (isGrcLike) weight = pieceArea * item.quantity * GRC_WEIGHT_PER_SQM;
 			area = pieceArea * item.quantity;
 		}
 
@@ -852,15 +949,137 @@ function calculateCustomElement(input: CustomElementInput): OtherStructuralResul
 	const breakdown: ComponentBreakdown[] = [{
 		component: input.name,
 		componentEn: input.name,
-		concreteVolume: input.concreteVolumeRC,
-		steelWeight: input.steelWeight,
-		formworkArea: input.formworkArea,
+		concreteVolume: input.concreteVolumeRC ?? 0,
+		steelWeight: input.steelWeight ?? 0,
+		formworkArea: input.formworkArea ?? 0,
 	}];
 
 	return buildResult(input.elementType, input.name, input.quantity, breakdown, {
-		concreteVolumePlain: input.concreteVolumePlain,
-		waterproofingArea: input.waterproofingArea,
-		excavationVolume: input.excavationVolume,
-		blockCount: input.blockCount,
+		concreteVolumePlain: input.concreteVolumePlain ?? 0,
+		waterproofingArea: input.waterproofingArea ?? 0,
+		excavationVolume: input.excavationVolume ?? 0,
+		blockCount: input.blockCount ?? 0,
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// التحقق من اكتمال المدخلات — الأبعاد الصفرية/الفارغة لا تُحسب بصمت
+// ═══════════════════════════════════════════════════════════════════════════
+
+// حدود منطقية متسقة مع validateStructuralBounds على الخادم
+const THICKNESS_MIN_CM = 5;
+const THICKNESS_MAX_CM = 200;
+const DIM_MIN_M = 0.1;
+const DIM_MAX_M = 200;
+const HEIGHT_MAX_M = 100;
+const DEPTH_MAX_M = 50;
+
+function isBetween(v: number | undefined, min: number, max: number): boolean {
+	return v !== undefined && Number.isFinite(v) && v >= min && v <= max;
+}
+
+/**
+ * يرجع قائمة أسماء الحقول الناقصة/غير الصالحة لعنصر إنشائي إضافي.
+ * قائمة فارغة = المدخلات مكتملة ويمكن الحساب والحفظ.
+ */
+export function getOtherStructuralInputErrors(input: OtherStructuralInput): string[] {
+	const errors: string[] = [];
+	const need = (ok: boolean, field: string) => { if (!ok) errors.push(field); };
+	const dim = (v: number | undefined, field: string, max: number = DIM_MAX_M) =>
+		need(isBetween(v, DIM_MIN_M, max), field);
+	const thick = (v: number | undefined, field: string) =>
+		need(isBetween(v, THICKNESS_MIN_CM, THICKNESS_MAX_CM), field);
+
+	need((input.quantity ?? 0) >= 1, 'quantity');
+
+	switch (input.elementType) {
+		case 'SEPTIC_TANK':
+			dim(input.length, 'length');
+			dim(input.width, 'width');
+			dim(input.depth, 'depth', DEPTH_MAX_M);
+			thick(input.wallThickness, 'wallThickness');
+			thick(input.baseThickness, 'baseThickness');
+			if (input.tankType !== 'OPEN') thick(input.slabThickness, 'slabThickness');
+			break;
+		case 'WATER_TANK_GROUND':
+		case 'WATER_TANK_ELEVATED':
+			if (input.shape === 'CYLINDRICAL') dim(input.diameter, 'diameter');
+			else { dim(input.length, 'length'); dim(input.width, 'width'); }
+			dim(input.depth, 'depth', DEPTH_MAX_M);
+			thick(input.wallThickness, 'wallThickness');
+			thick(input.baseThickness, 'baseThickness');
+			thick(input.slabThickness, 'slabThickness');
+			break;
+		case 'ELEVATOR_PIT':
+			dim(input.pitWidth, 'pitWidth', 20);
+			dim(input.pitLength, 'pitLength', 20);
+			dim(input.pitHoleDepth, 'pitHoleDepth', 10);
+			need((input.numberOfStops ?? 0) >= 1, 'numberOfStops');
+			dim(input.floorHeight, 'floorHeight', 20);
+			thick(input.wallThickness, 'wallThickness');
+			thick(input.pitSlabThickness, 'pitSlabThickness');
+			need(isBetween(input.overTravel, 0, 20), 'overTravel');
+			break;
+		case 'RETAINING_WALL':
+			dim(input.length, 'length');
+			dim(input.height, 'height', HEIGHT_MAX_M);
+			thick(input.stemThickness, 'stemThickness');
+			thick(input.baseThickness, 'baseThickness');
+			break;
+		case 'BOUNDARY_WALL':
+			dim(input.length, 'length', 1000);
+			dim(input.height, 'height', HEIGHT_MAX_M);
+			thick(input.thickness, 'thickness');
+			if (input.hasRCColumns) dim(input.columnSpacing, 'columnSpacing', 20);
+			if (input.hasFoundation) {
+				thick(input.foundationWidth, 'foundationWidth');
+				thick(input.foundationDepth, 'foundationDepth');
+			}
+			break;
+		case 'RAMP':
+			dim(input.length, 'length');
+			dim(input.width, 'width');
+			thick(input.thickness, 'thickness');
+			if (input.hasWalls) {
+				need(isBetween(input.wallHeight, 10, 500), 'wallHeight'); // سم
+				thick(input.wallThickness, 'wallThickness');
+			}
+			break;
+		case 'DOME':
+			dim(input.diameter, 'diameter', 50);
+			thick(input.shellThicknessTop, 'shellThicknessTop');
+			thick(input.shellThicknessBottom, 'shellThicknessBottom');
+			if (input.hasRingBeam) {
+				thick(input.ringBeamWidth, 'ringBeamWidth');
+				thick(input.ringBeamDepth, 'ringBeamDepth');
+			}
+			break;
+		case 'MINARET':
+			dim(input.totalHeight, 'totalHeight', HEIGHT_MAX_M);
+			need(((input.outerDiameter ?? input.sideLength) ?? 0) > 0, 'outerDiameter');
+			thick(input.wallThickness, 'wallThickness');
+			if (input.hasBalcony) {
+				need((input.balconyCount ?? 0) >= 1, 'balconyCount');
+				need(isBetween(input.balconyProjection, 10, 300), 'balconyProjection'); // سم
+			}
+			break;
+		case 'CONCRETE_DECOR':
+			need(input.items.length > 0, 'items');
+			for (const item of input.items) {
+				if (item.unit === 'LINEAR_METER') need((item.length ?? 0) > 0, 'length');
+				else if (item.unit === 'SQM') need((item.area ?? 0) > 0, 'area');
+				// PIECE: الارتفاع/العرض لهما افتراضي 30سم في المحرك
+			}
+			break;
+		case 'CUSTOM_ELEMENT': {
+			const hasAnyValue = [
+				input.concreteVolumeRC, input.concreteVolumePlain, input.steelWeight,
+				input.formworkArea, input.waterproofingArea, input.excavationVolume, input.blockCount,
+			].some((v) => (v ?? 0) > 0);
+			need(hasAnyValue, 'values');
+			break;
+		}
+	}
+
+	return errors;
 }

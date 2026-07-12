@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { RampInput } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -34,11 +35,11 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 				</div>
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={200} step={0.5} value={data.length ?? ""} onChange={(e: any) => set("length", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.width")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e: any) => set("width", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={200} step={0.1} value={data.width ?? ""} onChange={(e: any) => set("width", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
@@ -59,17 +60,17 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.slabThickness")} (سم)</Label>
-						<Input type="number" value={data.thickness} onChange={(e: any) => set("thickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" min={5} max={200} step={5} value={data.thickness ?? ""} onChange={(e: any) => set("thickness", numOrUndef(e.target.value))} />
 					</div>
 					{data.hasWalls && (
 						<>
 							<div>
 								<Label>{t("fields.wallHeight")} (سم)</Label>
-								<Input type="number" value={data.wallHeight} onChange={(e: any) => set("wallHeight", parseFloat(e.target.value) || 100)} />
+								<Input type="number" min={10} max={500} step={10} value={data.wallHeight ?? ""} onChange={(e: any) => set("wallHeight", numOrUndef(e.target.value))} />
 							</div>
 							<div>
 								<Label>{t("fields.wallThickness")} (سم)</Label>
-								<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 20)} />
+								<Input type="number" min={5} max={200} step={5} value={data.wallThickness ?? ""} onChange={(e: any) => set("wallThickness", numOrUndef(e.target.value))} />
 							</div>
 						</>
 					)}

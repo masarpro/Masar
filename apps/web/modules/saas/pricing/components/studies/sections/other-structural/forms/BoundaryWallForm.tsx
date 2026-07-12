@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { BoundaryWallInput } from "../../../../../types/other-structural";
 import type { ElementFormProps } from "./ElementFormWrapper";
+import { numOrUndef } from "./numeric-input";
 
 export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWallInput>) {
 	const t = useTranslations("pricing.studies.structural.otherStructural");
@@ -34,11 +35,11 @@ export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWa
 				</div>
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={1} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={1000} step={1} value={data.length ?? ""} onChange={(e: any) => set("length", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.height")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.height || ""} onChange={(e: any) => set("height", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0.1} max={100} step={0.1} value={data.height ?? ""} onChange={(e: any) => set("height", numOrUndef(e.target.value))} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
@@ -65,23 +66,23 @@ export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWa
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 					<div>
 						<Label>{t("fields.thickness")} (سم)</Label>
-						<Input type="number" value={data.thickness} onChange={(e: any) => set("thickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" min={5} max={200} step={5} value={data.thickness ?? ""} onChange={(e: any) => set("thickness", numOrUndef(e.target.value))} />
 					</div>
 					{data.hasRCColumns && (
 						<div>
 							<Label>{t("fields.columnSpacing")} (م)</Label>
-							<Input type="number" step={0.5} value={data.columnSpacing} onChange={(e: any) => set("columnSpacing", parseFloat(e.target.value) || 3.5)} />
+							<Input type="number" min={0.5} max={20} step={0.5} value={data.columnSpacing ?? ""} onChange={(e: any) => set("columnSpacing", numOrUndef(e.target.value))} />
 						</div>
 					)}
 					{data.hasFoundation && (
 						<>
 							<div>
 								<Label>{t("fields.foundationWidth")} (سم)</Label>
-								<Input type="number" value={data.foundationWidth} onChange={(e: any) => set("foundationWidth", parseFloat(e.target.value) || 50)} />
+								<Input type="number" min={5} max={200} step={5} value={data.foundationWidth ?? ""} onChange={(e: any) => set("foundationWidth", numOrUndef(e.target.value))} />
 							</div>
 							<div>
 								<Label>{t("fields.foundationDepth")} (سم)</Label>
-								<Input type="number" value={data.foundationDepth} onChange={(e: any) => set("foundationDepth", parseFloat(e.target.value) || 50)} />
+								<Input type="number" min={5} max={200} step={5} value={data.foundationDepth ?? ""} onChange={(e: any) => set("foundationDepth", numOrUndef(e.target.value))} />
 							</div>
 						</>
 					)}

@@ -499,6 +499,11 @@ export function recalculateItem(
 			return recalculateStairsCutting(dims, quantity, itemName);
 		case "slabs":
 			return recalculateSlabCutting(dims, quantity, itemName);
+		case "otherStructural":
+			// حديد العناصر الأخرى محسوب بنِسَب (كجم/م³) وليس بأسياخ —
+			// لا تفاصيل تقطيع مُختلقة. hasRebarParams=false يُبقي الوزن المخزّن
+			// (item.steelWeight) ظاهراً في الملخص ويستثنيه من طلبية المصنع
+			// مع تحذير Audit F14 في الواجهة — تمرير آمن لا يصفّر شيئاً.
 		default:
 			return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 	}
