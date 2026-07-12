@@ -103,6 +103,7 @@ interface StudyPipelineStepperProps {
 		stage: StageType;
 		status: StageStatus;
 		assigneeId?: string | null;
+		approvedById?: string | null;
 	}>;
 	entryPoint: StudyEntryPoint;
 	currentStage?: StageType;
@@ -121,11 +122,22 @@ function getStageStatus(
 }
 
 function isSkippedStage(
-	stageIndex: number,
+	stageKey: StageType,
+	stages: StudyPipelineStepperProps["stages"],
 	entryPoint: StudyEntryPoint,
 ): boolean {
+	// المقارنة يجب أن تتم على فهرس المرحلة في الـ pipeline الكامل —
+	// وليس فهرسها داخل visibleStages المُفلترة (كانت تُظهر مراحل
+	// QUICK_PRICING الفعّالة كأنها "متخطاة")
+	const fullIndex = PIPELINE_STAGES.findIndex((s) => s.key === stageKey);
 	const startIndex = ENTRY_POINT_START_INDEX[entryPoint] ?? 0;
-	return stageIndex < startIndex;
+	if (fullIndex >= startIndex) return false;
+	// المراحل المتخطاة تُزرع APPROVED بدون معتمِد عند الإنشاء.
+	// مرحلة يعمل عليها المستخدم (DRAFT/IN_REVIEW) أو اعتمدها فعلياً
+	// (approvedById موجود) ليست "متخطاة" حتى لو سبقت نقطة الدخول.
+	const record = stages.find((s) => s.stage === stageKey);
+	if (!record) return true;
+	return record.status === "APPROVED" && !record.approvedById;
 }
 
 export function StudyPipelineStepper({
@@ -160,7 +172,7 @@ export function StudyPipelineStepper({
 			<div className="hidden sm:flex items-center justify-center gap-0">
 				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
-					const isSkipped = isSkippedStage(index, entryPoint);
+					const isSkipped = isSkippedStage(stage.key, stages, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
 					const counts = stageCounts?.[stage.key];
 					const isLocked =
@@ -315,7 +327,7 @@ export function StudyPipelineStepper({
 			<div className="flex sm:hidden items-center justify-center gap-1">
 				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
-					const isSkipped = isSkippedStage(index, entryPoint);
+					const isSkipped = isSkippedStage(stage.key, stages, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
 					const isLocked =
 						!isSkipped && !isCurrent && status === "NOT_STARTED";

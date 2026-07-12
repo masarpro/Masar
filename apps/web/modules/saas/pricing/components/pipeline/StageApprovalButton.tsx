@@ -49,6 +49,18 @@ const STAGE_LABEL_KEYS: Record<StageName, string> = {
 	quotation: "pricing.pipeline.quotation",
 };
 
+// Map legacy stage names → StudyStage.stage values (transactional store)
+const STAGE_TO_STUDY_STAGE: Record<
+	StageName,
+	"QUANTITIES" | "SPECIFICATIONS" | "COSTING" | "PRICING" | "QUOTATION"
+> = {
+	quantities: "QUANTITIES",
+	specs: "SPECIFICATIONS",
+	costing: "COSTING",
+	pricing: "PRICING",
+	quotation: "QUOTATION",
+};
+
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════════
@@ -70,19 +82,24 @@ export function StageApprovalButton({
 	const nextStage = stageIndex < STAGE_ORDER.length - 1 ? STAGE_ORDER[stageIndex + 1] : null;
 
 	const invalidateStages = () => {
+		// كلا عائلتي المفاتيح: المخزن القديم (stages) + المخزن الجديد (studyStages)
+		// + الدراسة نفسها (الحالة المشتقة في getById/list)
 		queryClient.invalidateQueries({
-			queryKey: [["pricing", "studies", "stages"]],
+			queryKey: orpc.pricing.studies.stages.key(),
 		});
 		queryClient.invalidateQueries({
-			queryKey: [["pricing", "studies", "studyStages"]],
+			queryKey: orpc.pricing.studies.studyStages.key(),
 		});
 		queryClient.invalidateQueries({
-			queryKey: [["pricing", "studies"]],
+			queryKey: orpc.pricing.studies.getById.key(),
+		});
+		queryClient.invalidateQueries({
+			queryKey: orpc.pricing.studies.list.key(),
 		});
 	};
 
 	const approveMutation = useMutation(
-		orpc.pricing.studies.stages.approve.mutationOptions({
+		orpc.pricing.studies.studyStages.approve.mutationOptions({
 			onSuccess: () => {
 				toast.success(t("pricing.pipeline.approved"));
 				invalidateStages();
@@ -101,7 +118,7 @@ export function StageApprovalButton({
 	);
 
 	const reopenMutation = useMutation(
-		orpc.pricing.studies.stages.reopen.mutationOptions({
+		orpc.pricing.studies.studyStages.reopen.mutationOptions({
 			onSuccess: () => {
 				toast.success(t("pricing.pipeline.reopen"));
 				invalidateStages();
@@ -116,7 +133,7 @@ export function StageApprovalButton({
 		(approveMutation as any).mutate({
 			organizationId,
 			studyId,
-			stage,
+			stage: STAGE_TO_STUDY_STAGE[stage],
 		});
 	};
 
@@ -124,7 +141,7 @@ export function StageApprovalButton({
 		(reopenMutation as any).mutate({
 			organizationId,
 			studyId,
-			stage,
+			stage: STAGE_TO_STUDY_STAGE[stage],
 		});
 	};
 

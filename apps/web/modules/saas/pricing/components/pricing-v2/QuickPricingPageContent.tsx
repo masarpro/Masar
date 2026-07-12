@@ -166,14 +166,21 @@ export function QuickPricingPageContent({
 	);
 
 	const approveMutation = useMutation(
-		orpc.pricing.studies.stages.approve.mutationOptions({
+		// المخزن الجديد (StudyStage) — يزامن الحقول القديمة داخل $transaction
+		orpc.pricing.studies.studyStages.approve.mutationOptions({
 			onSuccess: () => {
 				toast.success(t("toasts.pricingStageApproved"));
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "stages"]],
+					queryKey: orpc.pricing.studies.stages.key(),
 				});
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "studyStages"]],
+					queryKey: orpc.pricing.studies.studyStages.key(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: orpc.pricing.studies.getById.key(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: orpc.pricing.studies.list.key(),
 				});
 			},
 			onError: (error: any) => {
@@ -232,7 +239,7 @@ export function QuickPricingPageContent({
 		(approveMutation as any).mutate({
 			organizationId,
 			studyId,
-			stage: "pricing",
+			stage: "PRICING",
 		});
 	};
 

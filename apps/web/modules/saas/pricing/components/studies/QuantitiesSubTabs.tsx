@@ -52,7 +52,10 @@ export function QuantitiesSubTabs({
 	);
 
 	const workScopes: string[] = (study as any)?.workScopes ?? [];
-	const isUnified = isUnifiedStudy({ workScopes });
+	const isUnified = isUnifiedStudy({
+		workScopes,
+		studyType: (study as any)?.studyType,
+	});
 
 	// Tab list. When unified is in effect the legacy `finishing` and `mep`
 	// editors are hidden — the unified tab is the single entry point for both.
@@ -79,8 +82,10 @@ export function QuantitiesSubTabs({
 		enabledTabs[0] ||
 		(isUnified ? "unified" : "structural");
 
+	// المخزن الجديد (StudyStage) — نفس المصدر الذي يقرأه StudyPageShell
+	// والذي تكتب فيه mutations زر الاعتماد (transactional)
 	const { data: stagesData } = useQuery(
-		orpc.pricing.studies.stages.get.queryOptions({
+		orpc.pricing.studies.studyStages.get.queryOptions({
 			input: { organizationId, studyId },
 		}),
 	);
@@ -91,21 +96,18 @@ export function QuantitiesSubTabs({
 		}),
 	);
 
-	const stages = (stagesData as any)?.stages ?? {
-		quantities: "DRAFT" as const,
-		specs: "NOT_STARTED" as const,
-		costing: "NOT_STARTED" as const,
-		pricing: "NOT_STARTED" as const,
-		quotation: "NOT_STARTED" as const,
-	};
-
-	const canApprove = (stagesData as any)?.canApprove ?? {
-		quantities: true,
-		specs: true,
-		costing: true,
-		pricing: true,
-		quotation: true,
-	};
+	const stageRecords: Array<{
+		stage: string;
+		status: string;
+		canApprove?: boolean;
+	}> = (stagesData as any)?.stages ?? [];
+	const quantitiesStage = stageRecords.find((s) => s.stage === "QUANTITIES");
+	const quantitiesStatus = (quantitiesStage?.status ?? "DRAFT") as
+		| "NOT_STARTED"
+		| "DRAFT"
+		| "IN_REVIEW"
+		| "APPROVED";
+	const canApproveQuantities = quantitiesStage?.canApprove ?? true;
 
 	const totalItems = (summaryData as any)?.total ?? 0;
 	const lastUpdated = (study as any)?.updatedAt;
@@ -260,9 +262,9 @@ export function QuantitiesSubTabs({
 								organizationSlug={organizationSlug}
 								studyId={studyId}
 								stage="quantities"
-								status={stages.quantities}
+								status={quantitiesStatus}
 								canReopen
-								canApprove={canApprove.quantities}
+								canApprove={canApproveQuantities}
 							/>
 						</div>
 					</CardContent>

@@ -6,6 +6,43 @@ import { db } from "../client";
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * Derive the display status of a study from its stage scalar fields.
+ *
+ * عمود `status` في قاعدة البيانات لا يُحدَّث بعد الإنشاء (يبقى "draft")،
+ * لذا نشتق الحالة من حقول المراحل عند القراءة — بدون أي كتابة على العمود:
+ * - "completed": مرحلة التسعير (أو عرض السعر) معتمدة
+ * - "in_progress": أي مرحلة APPROVED أو IN_REVIEW
+ * - "draft": ما عدا ذلك
+ */
+export function deriveCostStudyStatus(study: {
+	quantitiesStatus?: string | null;
+	specsStatus?: string | null;
+	costingStatus?: string | null;
+	pricingStatus?: string | null;
+	quotationStatus?: string | null;
+}): "draft" | "in_progress" | "completed" {
+	if (
+		study.pricingStatus === "APPROVED" ||
+		study.quotationStatus === "APPROVED"
+	) {
+		return "completed";
+	}
+
+	const stageStatuses = [
+		study.quantitiesStatus,
+		study.specsStatus,
+		study.costingStatus,
+		study.pricingStatus,
+		study.quotationStatus,
+	];
+	if (stageStatuses.some((s) => s === "APPROVED" || s === "IN_REVIEW")) {
+		return "in_progress";
+	}
+
+	return "draft";
+}
+
+/**
  * Get all cost studies for an organization
  */
 export async function getOrganizationCostStudies(
@@ -20,17 +57,12 @@ export async function getOrganizationCostStudies(
 ) {
 	const where: {
 		organizationId: string;
-		status?: string;
 		projectId?: string;
 		OR?: Array<{ name?: { contains: string; mode: "insensitive" }; customerName?: { contains: string; mode: "insensitive" } }>;
 	} = { organizationId };
 
 	if (options?.projectId) {
 		where.projectId = options.projectId;
-	}
-
-	if (options?.status) {
-		where.status = options.status;
 	}
 
 	if (options?.query) {
@@ -40,51 +72,52 @@ export async function getOrganizationCostStudies(
 		];
 	}
 
-	// Stats aggregate across ALL matching studies (ignoring the status filter
-	// and pagination) so status counts and total value stay accurate.
-	const { status: _statusFilter, ...statsWhere } = where;
-
-	const [costStudies, total, statusGroups] = await Promise.all([
-		db.costStudy.findMany({
-			where,
-			include: {
-				createdBy: { select: { id: true, name: true } },
-				lead: { select: { id: true, name: true, status: true } },
-				_count: {
-					select: {
-						structuralItems: true,
-						finishingItems: true,
-						mepItems: true,
-						laborItems: true,
-						quotes: true,
-					},
+	// الحالة مشتقة من حقول المراحل، لذا الفلترة بالحالة والإحصاءات تتم
+	// في JS بعد الجلب (قوائم الدراسات لكل منظمة صغيرة). لا نفلتر على
+	// عمود status في قاعدة البيانات — فهو مجمّد على "draft".
+	const allStudies = await db.costStudy.findMany({
+		where,
+		include: {
+			createdBy: { select: { id: true, name: true } },
+			lead: { select: { id: true, name: true, status: true } },
+			_count: {
+				select: {
+					structuralItems: true,
+					finishingItems: true,
+					mepItems: true,
+					laborItems: true,
+					quotes: true,
 				},
 			},
-			orderBy: { createdAt: "desc" },
-			take: options?.limit ?? 50,
-			skip: options?.offset ?? 0,
-		}),
-		db.costStudy.count({ where }),
-		db.costStudy.groupBy({
-			by: ["status"],
-			where: statsWhere,
-			_count: { _all: true },
-			_sum: { totalCost: true },
-		}),
-	]);
+		},
+		orderBy: { createdAt: "desc" },
+	});
 
+	const withDerivedStatus = allStudies.map((study) => ({
+		...study,
+		status: deriveCostStudyStatus(study),
+	}));
+
+	// Stats aggregate across ALL matching studies (ignoring the status filter
+	// and pagination) so status counts and total value stay accurate.
 	const byStatus: Record<string, number> = {};
-	let totalCount = 0;
 	let totalValue = 0;
-	for (const group of statusGroups) {
-		byStatus[group.status] = group._count._all;
-		totalCount += group._count._all;
-		totalValue += Number(group._sum.totalCost ?? 0);
+	for (const study of withDerivedStatus) {
+		byStatus[study.status] = (byStatus[study.status] ?? 0) + 1;
+		totalValue += Number(study.totalCost ?? 0);
 	}
+	const totalCount = withDerivedStatus.length;
+
+	const filtered = options?.status
+		? withDerivedStatus.filter((study) => study.status === options.status)
+		: withDerivedStatus;
+
+	const offset = options?.offset ?? 0;
+	const limit = options?.limit ?? 50;
 
 	return {
-		costStudies,
-		total,
+		costStudies: filtered.slice(offset, offset + limit),
+		total: filtered.length,
 		stats: { totalCount, totalValue, byStatus },
 	};
 }
@@ -93,7 +126,7 @@ export async function getOrganizationCostStudies(
  * Get a single cost study by ID — lightweight (no item arrays)
  */
 export async function getCostStudyById(id: string, organizationId: string) {
-	return db.costStudy.findFirst({
+	const study = await db.costStudy.findFirst({
 		where: { id, organizationId },
 		include: {
 			sectionMarkups: true,
@@ -110,6 +143,11 @@ export async function getCostStudyById(id: string, organizationId: string) {
 			},
 		},
 	});
+
+	if (!study) return null;
+
+	// الحالة المعروضة مشتقة من حقول المراحل (عمود status مجمّد بعد الإنشاء)
+	return { ...study, status: deriveCostStudyStatus(study) };
 }
 
 /**

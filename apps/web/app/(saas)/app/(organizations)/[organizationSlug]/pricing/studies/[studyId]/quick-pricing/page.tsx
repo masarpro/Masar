@@ -3,6 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { QuickPricingPageContent } from "@saas/pricing/components/pricing-v2/QuickPricingPageContent";
+import { redirectIfUnified } from "@saas/pricing/lib/guards/redirect-if-unified";
 import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 
@@ -26,6 +27,8 @@ async function QuickPricingPageContentWrapper({ organizationSlug, studyId }: { o
 	if (!activeOrganization) {
 		return notFound();
 	}
+
+	await redirectIfUnified(organizationSlug, studyId, activeOrganization.id);
 
 	return (
 		<PricingShell

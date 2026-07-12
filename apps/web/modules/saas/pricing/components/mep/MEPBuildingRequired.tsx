@@ -16,7 +16,8 @@ export function MEPBuildingRequired({
 	organizationSlug,
 }: MEPBuildingRequiredProps) {
 	const t = useTranslations("pricing.studies.mep");
-	const finishingPath = `/app/${organizationSlug}/pricing/studies/${studyId}/finishing`;
+	// المسار الحالي — صفحة الكميات بتبويب التشطيبات (مسار /finishing القديم حُذف)
+	const finishingPath = `/app/${organizationSlug}/pricing/studies/${studyId}/quantities?tab=finishing`;
 
 	return (
 		<Card className="border-dashed">

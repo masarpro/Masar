@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Calculator } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -28,7 +29,11 @@ export function StudyPageShell({
 	children,
 }: StudyPageShellProps) {
 	const t = useTranslations();
+	const pathname = usePathname();
 	const [editConfigOpen, setEditConfigOpen] = useState(false);
+
+	// صفحة مرحلة التسعير فقط: /pricing/studies/{id}/pricing
+	const isPricingStagePage = pathname?.endsWith("/pricing") ?? false;
 
 	const { data: study, isLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -91,14 +96,16 @@ export function StudyPageShell({
 				canEdit
 			/>
 
-			{/* Convert to quotation button */}
-			<ConvertToQuotationButton
-				studyId={studyId}
-				organizationId={organizationId}
-				organizationSlug={organizationSlug}
-				studyType={studyType}
-				pricingStageStatus={pricingStageStatus}
-			/>
+			{/* Convert to quotation button — يظهر فقط في صفحة مرحلة التسعير
+			    وبعد اعتماد المرحلة */}
+			{isPricingStagePage && pricingStageStatus === "APPROVED" && (
+				<ConvertToQuotationButton
+					studyId={studyId}
+					organizationSlug={organizationSlug}
+					studyType={studyType}
+					pricingStageStatus={pricingStageStatus}
+				/>
+			)}
 
 			{/* Pipeline stepper */}
 			<StudyPipelineStepper

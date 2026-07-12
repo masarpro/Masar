@@ -31,7 +31,10 @@ export function useStudyConfig(study: StudyConfigInput) {
 	// When the unified workspace is active for this study, the 4 downstream
 	// stages (specifications/costing/pricing/quotation) collapse into the
 	// single Quantities page.
-	const useUnifiedWorkspace = isUnifiedStudy({ workScopes: study.workScopes });
+	const useUnifiedWorkspace = isUnifiedStudy({
+		workScopes: study.workScopes,
+		studyType: study.studyType,
+	});
 
 	const enabledStages = useMemo(() => {
 		if (useUnifiedWorkspace) return ["quantities"] as const;
@@ -43,6 +46,7 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"specifications",
 					"costing",
 					"pricing",
+					"quotation",
 				] as const;
 			case "COST_PRICING":
 				return [
@@ -50,6 +54,7 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"specifications",
 					"costing",
 					"pricing",
+					"quotation",
 				] as const;
 			case "QUICK_PRICING":
 			case "CUSTOM_ITEMS": // backward compat
@@ -77,6 +82,7 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"SPECIFICATIONS",
 					"COSTING",
 					"PRICING",
+					"QUOTATION",
 				] as const;
 			case "COST_PRICING":
 				return [
@@ -84,6 +90,7 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"SPECIFICATIONS",
 					"COSTING",
 					"PRICING",
+					"QUOTATION",
 				] as const;
 			case "QUICK_PRICING":
 			case "CUSTOM_ITEMS":
