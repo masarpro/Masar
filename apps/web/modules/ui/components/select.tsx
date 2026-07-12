@@ -19,7 +19,8 @@ const SelectTrigger = ({
 }: React.ComponentProps<typeof SelectPrimitive.Trigger>) => (
 	<SelectPrimitive.Trigger
 		className={cn(
-			"flex h-8 w-full items-center justify-between rounded-md bg-card shadow-xs border border-input px-3 py-2 text-base ring-offset-background placeholder:text-foreground/60 focus:outline-hidden focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+			// Botly-derived: radius 12px, flat (no shadow), placeholder = Text secondary
+			"flex h-8 w-full items-center justify-between rounded-lg bg-card border border-input px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
 			className,
 		)}
 		{...props}
@@ -40,7 +41,8 @@ const SelectContent = ({
 	<SelectPrimitive.Portal>
 		<SelectPrimitive.Content
 			className={cn(
-				"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=closed]:animate-out data-[state=open]:animate-in",
+				// Botly dropdown 75:2472: radius 20px, border Stroke, shadow 0 8px 32px 12px rgba(0,0,0,0.06)
+				"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 min-w-[8rem] overflow-hidden rounded-[20px] border bg-popover text-popover-foreground shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] data-[state=closed]:animate-out data-[state=open]:animate-in",
 				position === "popper"
 					? "data-[side=left]:-translate-x-1 data-[side=top]:-translate-y-1 data-[side=right]:translate-x-1 data-[side=bottom]:translate-y-1"
 					: "",
@@ -80,7 +82,8 @@ const SelectItem = ({
 }: React.ComponentProps<typeof SelectPrimitive.Item>) => (
 	<SelectPrimitive.Item
 		className={cn(
-			"relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pe-8 ps-2 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+			// Botly dropdown item: radius 12px, hover/focus = Stroke (--accent)
+			"relative flex w-full cursor-default select-none items-center rounded-lg py-1.5 pe-8 ps-2 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
 			className,
 		)}
 		{...props}

@@ -5,8 +5,11 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import * as React from "react";
 
+/* Botly (Figma 43:12 Button, 63:5723 Icon button): radius 12px, semibold,
+   full-opacity icons, hover surface = Stroke (--accent). lg/icon = 48px per
+   Figma; sm/md keep Masar density (approved hybrid). */
 const buttonVariants = cva(
-	"flex items-center justify-center font-medium enabled:cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&>svg]:me-1.5 [&>svg]:opacity-60 [&>svg+svg]:hidden",
+	"flex items-center justify-center font-semibold enabled:cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&>svg]:me-1.5 [&>svg+svg]:hidden",
 	{
 		variants: {
 			variant: {
@@ -15,17 +18,17 @@ const buttonVariants = cva(
 				cta: "bg-[var(--cta)] text-[var(--cta-foreground)] hover:bg-[var(--cta)]/90 shadow-sm shadow-red-500/20",
 				error: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
 				outline:
-					"border border-secondary/15 bg-transparent text-muted-foreground hover:bg-secondary/10 hover:text-foreground",
+					"border border-input bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground",
 				secondary:
 					"bg-secondary text-secondary-foreground hover:bg-secondary/90",
-				ghost: "text-muted-foreground hover:bg-secondary/10 hover:text-foreground",
+				ghost: "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
 			size: {
-				sm: "h-6 rounded-md px-3 text-xs",
-				md: "h-8 rounded-md px-4 text-sm",
-				lg: "h-10 rounded-md px-6 text-base",
-				icon: "size-8 rounded-md [&>svg]:m-0 [&>svg]:opacity-100",
+				sm: "h-6 rounded-lg px-3 text-xs",
+				md: "h-8 rounded-lg px-4 text-sm",
+				lg: "h-12 rounded-lg px-6 text-base [&>svg]:me-3",
+				icon: "size-12 rounded-lg [&>svg]:m-0",
 			},
 		},
 		defaultVariants: {
