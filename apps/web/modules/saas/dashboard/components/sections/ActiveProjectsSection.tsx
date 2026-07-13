@@ -108,17 +108,8 @@ export function ActiveProjectsSection({
 				</Link>
 			</div>
 
-			{/* Column labels (single-line table title row) */}
-			<div className="mt-4 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.9fr)] items-center gap-3 border-b-2 pb-4 text-sm font-medium text-muted-foreground sm:grid">
-				<span className="truncate">{t("dashboard.activeProjects")}</span>
-				<span className="truncate">{t("projects.overview.progress")}</span>
-				<span className="truncate">{t("dashboard.projectCard.paymentsShort")}</span>
-				<span className="truncate">{t("dashboard.projectCard.receiptsShort")}</span>
-				<span className="truncate text-end">{t("dashboard.projectCard.photos")}</span>
-			</div>
-
 			{/* Rows — one project per line */}
-			<div className="min-h-0 flex-1 overflow-y-auto">
+			<div className="mt-4 min-h-0 flex-1 overflow-y-auto">
 				{visibleProjects.map((project) => {
 					const progress = Math.min(
 						Math.round(Number(project.progress ?? 0)),
