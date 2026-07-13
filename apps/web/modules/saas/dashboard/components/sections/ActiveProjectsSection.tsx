@@ -136,11 +136,11 @@ export function ActiveProjectsSection({
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-center gap-3 border-b-2 py-2.5 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]"
+							className="group grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-center gap-3 border-b-2 py-3.5 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]"
 						>
 							{/* Project: cover + name + milestone·days subline */}
-							<div className="flex min-w-0 items-center gap-2.5">
-								<div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-chart-4/15">
+							<div className="flex min-w-0 items-center gap-3">
+								<div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-chart-4/15">
 									<ProjectThumb
 										src={
 											project.coverPhoto?.url ??
@@ -154,7 +154,7 @@ export function ActiveProjectsSection({
 									<p className="truncate text-sm font-semibold text-card-foreground">
 										{project.name || t("projects.unnamed")}
 									</p>
-									<p className="flex items-center gap-1 truncate text-[11px] leading-tight text-muted-foreground">
+									<p className="flex items-center gap-1 truncate text-xs leading-tight text-muted-foreground">
 										<MapPin className="size-3 shrink-0 text-chart-3" />
 										<span className="truncate">{milestoneText}</span>
 									</p>

@@ -111,7 +111,9 @@ export function HeaderQuickAdd() {
 					type="button"
 					aria-label={t("globalHeader.quickAdd.title")}
 					className={cn(
-						"flex size-11 items-center justify-center rounded-xl text-foreground transition-colors",
+						// Botly 267:4701: the quick-add is the only trailing icon in an
+						// outlined squircle box; bell + search stay plain.
+						"flex size-11 items-center justify-center rounded-xl border-2 text-foreground transition-colors",
 						"hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 					)}
 				>

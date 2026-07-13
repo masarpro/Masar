@@ -129,10 +129,9 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 				</div>
 			</div>
 
-			{/* Trailing side: quick-add + search + notifications + avatar */}
-			<div className="flex items-center gap-1 xl:gap-2">
+			{/* Trailing side (Botly 267:4701): quick-add → bell → search → avatar */}
+			<div className="flex items-center gap-2 xl:gap-3">
 				<HeaderQuickAdd />
-				<HeaderSearch />
 
 				{activeOrganization?.id && (
 					<NotificationBell
@@ -140,6 +139,8 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 						organizationSlug={activeOrganization.slug}
 					/>
 				)}
+
+				<HeaderSearch />
 
 				{/* Avatar + Botly profile card dropdown (75:2472) */}
 				<DropdownMenu modal={false}>

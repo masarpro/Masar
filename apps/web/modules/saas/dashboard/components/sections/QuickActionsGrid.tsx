@@ -117,14 +117,14 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 					{t("dashboard.quickActions")}
 				</p>
 
-				<div className="grid min-h-0 flex-1 auto-rows-min grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-3">
+				<div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-3">
 					{visibleActions.map((action, i) => {
 						const Icon = action.icon;
 						const createChip = "flex size-7 shrink-0 items-center justify-center rounded-lg border-2 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground";
 						return (
 							<div
 								key={i}
-								className="flex min-w-0 items-center gap-2 rounded-2xl border-2 p-2 transition-colors hover:border-primary/20"
+								className="flex min-h-0 min-w-0 items-center gap-2 rounded-2xl border-2 p-2 transition-colors hover:border-primary/20"
 							>
 								<Link
 									href={action.browsePath}
@@ -132,9 +132,9 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 									title={action.sectionLabel}
 								>
 									<span
-										className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
+										className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
 									>
-										<Icon className="size-4.5" />
+										<Icon className="size-4" />
 									</span>
 									<span className="truncate text-sm font-semibold text-card-foreground">
 										{action.sectionLabel}
