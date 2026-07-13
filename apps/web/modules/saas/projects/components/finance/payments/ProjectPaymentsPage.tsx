@@ -49,10 +49,10 @@ export function ProjectPaymentsPage({
 			{/* Header */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="text-xl font-semibold text-foreground">
 						{t("projectPayments.title")}
 					</h2>
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("projectPayments.subtitle")}
 					</p>
 				</div>
@@ -68,7 +68,7 @@ export function ProjectPaymentsPage({
 					</Button>
 					<Button
 						size="sm"
-						className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+						className="rounded-xl"
 						onClick={() => setCreateOpen(true)}
 					>
 						<Plus className="me-1.5 h-4 w-4" />
@@ -80,9 +80,9 @@ export function ProjectPaymentsPage({
 			{/* Scenario 1: No contract */}
 			{!hasContract && (
 				<>
-					<div className="flex items-start gap-3 rounded-xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
+					<div className="flex items-start gap-3 rounded-xl border-2 border-chart-4/20 bg-chart-4/10 p-4">
 						<Info className="mt-0.5 h-5 w-5 shrink-0 text-chart-4" />
-						<p className="text-sm text-chart-4 dark:text-chart-4">
+						<p className="text-sm text-chart-4">
 							{t("projectPayments.noContractHint")}
 						</p>
 					</div>
@@ -117,9 +117,9 @@ export function ProjectPaymentsPage({
 						totalCollected={data?.totalCollected ?? 0}
 						remaining={data?.remaining ?? 0}
 					/>
-					<div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-						<Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-						<p className="text-sm text-amber-700 dark:text-amber-300">
+					<div className="flex items-start gap-3 rounded-xl border-2 border-chart-1/20 bg-chart-1/10 p-4">
+						<Info className="mt-0.5 h-5 w-5 shrink-0 text-chart-1" />
+						<p className="text-sm text-chart-1">
 							{t("projectPayments.noTermsHint")}
 						</p>
 					</div>

@@ -579,3 +579,120 @@ export async function getMonthlyFinancialTrend(organizationId: string) {
 		}))
 		.sort((a, b) => a.month.localeCompare(b.month));
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Active Projects (dashboard card) - المشاريع النشطة (بطاقة لوحة القيادة)
+// Enriched per-project cards: progress (from the project itself), مدفوعات
+// (ProjectExpense sum), مقبوضات (ProjectPayment sum), current milestone + days
+// on it, and the latest published photos — all scoped to the organization.
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getActiveProjectsForDashboard(
+	organizationId: string,
+	options?: {
+		limit?: number;
+		/** Per-member visibility restriction (mirrors list-projects). */
+		restrictToProjectIds?: string[];
+	},
+) {
+	const limit = options?.limit ?? 4;
+	const where: {
+		organizationId: string;
+		status: "ACTIVE";
+		id?: { in: string[] };
+	} = { organizationId, status: "ACTIVE" };
+	if (options?.restrictToProjectIds) {
+		where.id = { in: options.restrictToProjectIds };
+	}
+
+	const projects = await db.project.findMany({
+		where,
+		include: {
+			coverPhoto: { select: { url: true } },
+			photos: {
+				take: 4,
+				orderBy: [{ takenAt: "desc" }, { createdAt: "desc" }],
+				select: { url: true },
+			},
+			milestones: {
+				where: { status: { in: ["IN_PROGRESS", "PLANNED"] } },
+				orderBy: { orderIndex: "asc" },
+				take: 8,
+				select: {
+					title: true,
+					status: true,
+					actualStart: true,
+					plannedStart: true,
+				},
+			},
+		},
+		orderBy: { createdAt: "desc" },
+		take: limit,
+	});
+
+	const projectIds = projects.map((p) => p.id);
+
+	const [expenseSums, paymentSums] = await Promise.all([
+		projectIds.length
+			? db.projectExpense.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: projectIds } },
+					_sum: { amount: true },
+				})
+			: Promise.resolve(
+					[] as { projectId: string; _sum: { amount: unknown } }[],
+				),
+		projectIds.length
+			? db.projectPayment.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: projectIds } },
+					_sum: { amount: true },
+				})
+			: Promise.resolve(
+					[] as { projectId: string; _sum: { amount: unknown } }[],
+				),
+	]);
+
+	const expenseMap = new Map(
+		expenseSums.map((e) => [e.projectId, Number(e._sum.amount ?? 0)]),
+	);
+	const paymentMap = new Map(
+		paymentSums.map((p) => [p.projectId, Number(p._sum.amount ?? 0)]),
+	);
+
+	const now = new Date();
+	const DAY_MS = 24 * 60 * 60 * 1000;
+
+	return projects.map((p) => {
+		// Current milestone: the one IN_PROGRESS, otherwise the next PLANNED one
+		// (list is already ordered by orderIndex).
+		const current =
+			p.milestones.find((m) => m.status === "IN_PROGRESS") ??
+			p.milestones[0] ??
+			null;
+
+		let currentMilestone: { title: string; days: number | null } | null = null;
+		if (current) {
+			const start = current.actualStart ?? current.plannedStart;
+			const days = start
+				? Math.max(
+						0,
+						Math.floor((now.getTime() - new Date(start).getTime()) / DAY_MS),
+					)
+				: null;
+			currentMilestone = { title: current.title, days };
+		}
+
+		return {
+			id: p.id,
+			name: p.name,
+			clientName: p.clientName,
+			progress: Number(p.progress),
+			coverPhoto: p.coverPhoto,
+			photos: p.photos,
+			expensesTotal: expenseMap.get(p.id) ?? 0,
+			paymentsTotal: paymentMap.get(p.id) ?? 0,
+			currentMilestone,
+		};
+	});
+}

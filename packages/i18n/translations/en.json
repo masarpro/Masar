@@ -1850,6 +1850,12 @@
     "quantities": "Quantities",
     "settings": "Settings",
     "viewAll": "View All",
+    "projectCard": {
+      "payments": "Project Payments",
+      "receipts": "Project Receipts",
+      "daysOnPhase": "{days} day(s) on phase",
+      "noPhase": "No active phase"
+    },
     "fieldActivity": {
       "title": "Field Activity",
       "siteUpdates": "Latest Site Updates",

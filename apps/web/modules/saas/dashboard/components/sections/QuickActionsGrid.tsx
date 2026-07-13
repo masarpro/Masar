@@ -22,9 +22,10 @@ interface QuickActionsGridProps {
 }
 
 /**
- * Botly-restyle: one flat strip of shortcut tiles under the hero —
- * bg-card + 2px Stroke border + Brand-tinted icon chips (no glass,
- * no pastel washes, no shadows). Tile body browses; the + creates.
+ * Botly-restyle: all shortcuts merged into ONE flat card ("إجراءات سريعة").
+ * Each cell is a section (icon chip + label → browse) with a trailing +
+ * (create). Same surface/border/chip language as before — only the layout
+ * changed from six separate tiles to a single grouped card.
  */
 export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const t = useTranslations();
@@ -111,52 +112,58 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 
 	return (
 		<>
-			<div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-				{visibleActions.map((action, i) => {
-					const Icon = action.icon;
-					const createInner = (
-						<>
-							<Plus className="size-3.5" />
-							<span className="truncate">{action.actionLabel}</span>
-						</>
-					);
-					return (
-						<div
-							key={i}
-							className="flex min-w-0 flex-col overflow-hidden rounded-2xl border-2 bg-card transition-colors hover:border-primary/20"
-						>
-							<Link
-								href={action.browsePath}
-								className="flex min-w-0 items-center gap-2.5 p-3"
+			<div className="shrink-0 rounded-3xl border-2 bg-card p-5">
+				<p className="mb-3 text-base font-semibold text-card-foreground">
+					{t("dashboard.quickActions")}
+				</p>
+
+				<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+					{visibleActions.map((action, i) => {
+						const Icon = action.icon;
+						const createChip = "flex size-7 shrink-0 items-center justify-center rounded-lg border-2 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground";
+						return (
+							<div
+								key={i}
+								className="flex min-w-0 items-center gap-2 rounded-2xl border-2 p-2 transition-colors hover:border-primary/20"
 							>
-								<span
-									className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
-								>
-									<Icon className="size-4.5" />
-								</span>
-								<span className="truncate text-sm font-semibold text-card-foreground">
-									{action.sectionLabel}
-								</span>
-							</Link>
-							{action.onCreateClick ? (
-								<button
-									type="button"
-									onClick={action.onCreateClick}
-									className="flex items-center justify-center gap-1.5 border-t-2 px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-								>
-									{createInner}
-								</button>
-							) : (
 								<Link
-									href={action.createPath}
-									className="flex items-center justify-center gap-1.5 border-t-2 px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+									href={action.browsePath}
+									className="flex min-w-0 flex-1 items-center gap-2.5"
+									title={action.sectionLabel}
 								>
-									{createInner}
+									<span
+										className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
+									>
+										<Icon className="size-4.5" />
+									</span>
+									<span className="truncate text-sm font-semibold text-card-foreground">
+										{action.sectionLabel}
+									</span>
 								</Link>
-							)}
-						</div>
-					);
-				})}
+								{action.onCreateClick ? (
+									<button
+										type="button"
+										onClick={action.onCreateClick}
+										className={createChip}
+										aria-label={action.actionLabel}
+										title={action.actionLabel}
+									>
+										<Plus className="size-4" />
+									</button>
+								) : (
+									<Link
+										href={action.createPath}
+										className={createChip}
+										aria-label={action.actionLabel}
+										title={action.actionLabel}
+									>
+										<Plus className="size-4" />
+									</Link>
+								)}
+							</div>
+						);
+					})}
+				</div>
 			</div>
 
 			<AddExpenseDialog

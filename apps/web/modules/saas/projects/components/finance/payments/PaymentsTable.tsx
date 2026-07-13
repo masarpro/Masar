@@ -60,11 +60,11 @@ interface PaymentsTableProps {
 }
 
 const PAYMENT_METHOD_COLORS: Record<string, string> = {
-	CASH: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-	BANK_TRANSFER: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	CHEQUE: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-	CREDIT_CARD: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-	OTHER: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
+	CASH: "bg-success/15 text-success",
+	BANK_TRANSFER: "bg-chart-4/15 text-chart-4",
+	CHEQUE: "bg-chart-4/15 text-chart-4",
+	CREDIT_CARD: "bg-chart-1/15 text-chart-1",
+	OTHER: "bg-muted text-muted-foreground",
 };
 
 export function PaymentsTable({

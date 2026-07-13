@@ -36,10 +36,10 @@ export function FreePaymentsSection({
 	return (
 		<div className="space-y-3">
 			<div className="flex items-center justify-between">
-				<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+				<h3 className="text-base font-semibold text-foreground">
 					{t("projectPayments.freePayments")}
 				</h3>
-				<span className="text-sm font-medium text-chart-4 dark:text-chart-4">
+				<span className="text-sm font-medium text-chart-4">
 					{t("projectPayments.total")}: {formatSAR(totalCollected)}
 				</span>
 			</div>

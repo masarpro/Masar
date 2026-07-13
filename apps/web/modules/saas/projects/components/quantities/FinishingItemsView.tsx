@@ -167,7 +167,7 @@ export function FinishingItemsView({
 
 	return (
 		<div className="space-y-6">
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card">
 				<div className="overflow-x-auto">
 					<Table>
 						<TableHeader>
@@ -212,7 +212,7 @@ export function FinishingItemsView({
 										{formatNumber(item.totalCost, 2)}
 									</TableCell>
 									<TableCell
-										className="max-w-[200px] truncate text-slate-500 dark:text-slate-400"
+										className="max-w-[200px] truncate text-muted-foreground"
 										title={item.specifications ?? undefined}
 									>
 										{item.specifications
@@ -251,7 +251,7 @@ export function FinishingItemsView({
 							))}
 
 							{/* Total row */}
-							<TableRow className="bg-slate-50 font-semibold dark:bg-slate-800/50">
+							<TableRow className="bg-muted font-semibold">
 								<TableCell
 									colSpan={5}
 									className="text-card-foreground"

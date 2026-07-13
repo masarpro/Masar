@@ -65,19 +65,21 @@ export function BotlyHero({
 					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
 			}}
 		>
-			{/* Content — Figma: absolute 48px inset, gap 24 */}
-			<div className="absolute start-6 top-6 flex flex-col items-start gap-5 xl:start-12 xl:top-10 xl:gap-6">
-				<h2 className="max-w-[22rem] text-2xl font-bold leading-tight text-[#1d1d1d] xl:text-4xl xl:leading-[1.2]">
+			{/* Content — greeting on a single line + finance button beside it */}
+			<div className="absolute inset-x-6 top-6 flex items-center gap-3 xl:inset-x-12 xl:top-10">
+				<h2 className="min-w-0 flex-1 truncate text-base font-bold leading-tight text-[#1d1d1d] xl:text-xl">
 					{t("dashboard.welcome.greeting", { name: orgName })}
 				</h2>
-				{/* Botly Button 45:4490: #1d1d1d, px-24 py-12, rounded-12, gap-12, 16/24 semibold */}
-				<Link
-					href={`/app/${organizationSlug}/finance`}
-					className="flex items-center justify-center gap-3 rounded-[12px] bg-[#1d1d1d] px-6 py-3 text-[16px] font-semibold leading-6 text-white transition-opacity hover:opacity-90"
-				>
-					{t("dashboard.cashFlow.goToFinance")}
-					<ChevronLeft className="size-6 rtl-flip" />
-				</Link>
+				{/* Botly Button 45:4490: #1d1d1d, rounded-12, semibold */}
+				{showFinance && (
+					<Link
+						href={`/app/${organizationSlug}/finance`}
+						className="flex shrink-0 items-center justify-center gap-2 rounded-[12px] bg-[#1d1d1d] px-4 py-2.5 text-sm font-semibold leading-6 text-white transition-opacity hover:opacity-90"
+					>
+						{t("dashboard.cashFlow.goToFinance")}
+						<ChevronLeft className="size-5 rtl-flip" />
+					</Link>
+				)}
 			</div>
 
 			{/* Stats strip — Figma 45:4463: 12px inset, glass, rounded-24, px-36 py-24 */}

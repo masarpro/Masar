@@ -1850,6 +1850,12 @@
     "quantities": "حصر الكميات",
     "settings": "الإعدادات",
     "viewAll": "عرض الكل",
+    "projectCard": {
+      "payments": "مدفوعات المشروع",
+      "receipts": "مقبوضات المشروع",
+      "daysOnPhase": "{days} يوم على المرحلة",
+      "noPhase": "لا توجد مرحلة نشطة"
+    },
     "fieldActivity": {
       "title": "النشاط الميداني",
       "siteUpdates": "آخر تحديثات المواقع",

@@ -3,10 +3,17 @@ import { z } from "zod";
 import { protectedProcedure } from "../../orpc/procedures";
 import { verifyOrganizationMembership } from "../organizations/lib/membership";
 import {
+	getCachedUserProjectScope,
+	verifyOrganizationAccess,
+} from "../../lib/permissions";
+import { normalizePhotoRecord } from "../../lib/media/photo-url";
+import {
+	getActiveProjectsForDashboard,
 	getDashboardStats,
 	getProjectStatusDistribution,
 	getProjectTypeDistribution,
 	getFinancialSummaryByProject,
+	getProjectsForUser,
 	getUpcomingMilestones,
 	getOverdueMilestones,
 	getRecentActivities,
@@ -175,6 +182,51 @@ const getFinancialTrend = protectedProcedure
 	});
 
 /**
+ * Enriched active-project cards for the dashboard: progress, مدفوعات/مقبوضات,
+ * current milestone + days, and latest photos. Respects per-member project
+ * visibility exactly like projects.list.
+ */
+const activeProjects = protectedProcedure
+	.input(
+		organizationInput.extend({
+			limit: z.number().min(1).max(12).optional().default(4),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		const [, scope] = await Promise.all([
+			verifyOrganizationAccess(input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			}),
+			getCachedUserProjectScope(context.user.id, input.organizationId),
+		]);
+
+		let restrictToProjectIds: string[] | undefined;
+		if (!scope.allProjects) {
+			const assigned = await getProjectsForUser(
+				context.user.id,
+				input.organizationId,
+			);
+			restrictToProjectIds = assigned.map((p) => p.id);
+		}
+
+		const projects = await getActiveProjectsForDashboard(input.organizationId, {
+			limit: input.limit,
+			restrictToProjectIds,
+		});
+
+		return {
+			projects: projects.map((p) => ({
+				...p,
+				coverPhoto: normalizePhotoRecord(p.coverPhoto),
+				photos: p.photos
+					.map((ph) => normalizePhotoRecord(ph))
+					.filter((ph): ph is { url: string } => ph !== null),
+			})),
+		};
+	});
+
+/**
  * Combined dashboard endpoint — single auth check, all queries in parallel
  */
 const getAll = protectedProcedure
@@ -253,5 +305,6 @@ export const dashboardRouter = {
 	getOverdue,
 	getActivities,
 	getFinancialTrend,
+	activeProjects,
 	getAll,
 };

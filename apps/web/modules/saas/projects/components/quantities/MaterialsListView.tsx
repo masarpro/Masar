@@ -69,17 +69,17 @@ export function MaterialsListView({
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+				<h1 className="text-2xl font-semibold text-foreground">
 					{t("materials.title")}
 				</h1>
-				<div className="flex rounded-xl border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+				<div className="flex rounded-xl border-2 bg-muted p-0.5">
 					<button
 						type="button"
 						onClick={() => setGroupBy("category")}
 						className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 							groupBy === "category"
-								? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-								: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+								? "bg-accent text-accent-foreground"
+								: "text-muted-foreground hover:text-foreground"
 						}`}
 					>
 						{t("materials.groupBy.category")}
@@ -89,8 +89,8 @@ export function MaterialsListView({
 						onClick={() => setGroupBy("phase")}
 						className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 							groupBy === "phase"
-								? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-								: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+								? "bg-accent text-accent-foreground"
+								: "text-muted-foreground hover:text-foreground"
 						}`}
 					>
 						{t("materials.groupBy.phase")}
@@ -100,8 +100,8 @@ export function MaterialsListView({
 						onClick={() => setGroupBy("study")}
 						className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 							groupBy === "study"
-								? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-								: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+								? "bg-accent text-accent-foreground"
+								: "text-muted-foreground hover:text-foreground"
 						}`}
 					>
 						{t("materials.groupBy.study")}
@@ -111,22 +111,22 @@ export function MaterialsListView({
 
 			{/* Summary Cards */}
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2">
 					<CardContent className="p-5">
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("materials.summary.grandTotal")}
 						</p>
-						<p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+						<p className="mt-1 text-xl font-bold text-card-foreground">
 							{formatNum2(grandTotal, 2)}
 						</p>
 					</CardContent>
 				</Card>
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2">
 					<CardContent className="p-5">
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("materials.summary.itemCount")}
 						</p>
-						<p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+						<p className="mt-1 text-xl font-bold text-card-foreground">
 							{formatNumber(itemCount)}
 						</p>
 					</CardContent>
@@ -136,7 +136,7 @@ export function MaterialsListView({
 			{/* Groups */}
 			{groups.length === 0 && (
 				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("materials.empty")}
 					</p>
 				</div>
@@ -144,19 +144,19 @@ export function MaterialsListView({
 
 			{groups.map((group: any) => (
 				<Collapsible key={group.label} defaultOpen>
-					<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+					<div className="rounded-2xl border-2 bg-card">
 						<CollapsibleTrigger asChild>
 							<button
 								type="button"
-								className="flex w-full items-center justify-between border-b border-slate-200 px-6 py-4 text-start dark:border-slate-800"
+								className="flex w-full items-center justify-between border-b-2 px-6 py-4 text-start"
 							>
 								<div className="flex items-center gap-3">
-									<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 [[data-state=closed]_&]:-rotate-90" />
-									<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+									<ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:-rotate-90" />
+									<h2 className="text-lg font-semibold text-card-foreground">
 										{group.label}
 									</h2>
 								</div>
-								<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+								<span className="text-sm font-medium text-muted-foreground">
 									{formatNum2(group.total, 2)}
 								</span>
 							</button>
@@ -183,22 +183,22 @@ export function MaterialsListView({
 									<TableBody>
 										{(group.items ?? []).map((item: any, idx: number) => (
 											<TableRow key={item.id ?? idx}>
-												<TableCell className="text-slate-600 dark:text-slate-400">
+												<TableCell className="text-muted-foreground">
 													{SECTION_LABELS[item.section] ?? item.section}
 												</TableCell>
-												<TableCell className="font-medium text-slate-900 dark:text-slate-100">
+												<TableCell className="font-medium text-card-foreground">
 													{item.description}
 												</TableCell>
-												<TableCell className="text-end text-slate-600 dark:text-slate-400">
+												<TableCell className="text-end text-muted-foreground">
 													{formatNumber(item.quantity)}
 												</TableCell>
-												<TableCell className="text-slate-600 dark:text-slate-400">
+												<TableCell className="text-muted-foreground">
 													{item.unit}
 												</TableCell>
-												<TableCell className="text-end text-slate-600 dark:text-slate-400">
+												<TableCell className="text-end text-muted-foreground">
 													{formatNum2(item.unitPrice, 2)}
 												</TableCell>
-												<TableCell className="text-end font-medium text-slate-900 dark:text-slate-100">
+												<TableCell className="text-end font-medium text-card-foreground">
 													{formatNum2(item.totalCost, 2)}
 												</TableCell>
 											</TableRow>
@@ -213,13 +213,13 @@ export function MaterialsListView({
 
 			{/* Grand Total Footer */}
 			{groups.length > 0 && (
-				<Card className="rounded-2xl border-2 border-slate-200 dark:border-slate-700">
+				<Card className="rounded-2xl border-2">
 					<CardContent className="p-5">
 						<div className="flex items-center justify-between">
-							<p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+							<p className="text-lg font-semibold text-card-foreground">
 								{t("materials.summary.grandTotal")}
 							</p>
-							<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+							<p className="text-2xl font-bold text-card-foreground">
 								{formatNum2(grandTotal, 2)}
 							</p>
 						</div>

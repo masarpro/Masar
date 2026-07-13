@@ -245,7 +245,7 @@ export const OwnerDrawingTab = forwardRef<
 				{/* Row 1: Owner, Date */}
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground">
 							<User className="h-3 w-3 inline me-1" />
 							{t("finance.expenses.ownerDrawingPayment.selectOwner")} *
 						</Label>
@@ -277,7 +277,7 @@ export const OwnerDrawingTab = forwardRef<
 						</Select>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground">
 							{t("finance.expenses.date")} *
 						</Label>
 						<Input
@@ -293,7 +293,7 @@ export const OwnerDrawingTab = forwardRef<
 				{/* Row 2: Amount, Bank Account */}
 				<div className="grid grid-cols-2 gap-2 sm:gap-3">
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground">
 							{t("finance.expenses.amount")} *
 						</Label>
 						<Input
@@ -308,14 +308,14 @@ export const OwnerDrawingTab = forwardRef<
 							required
 						/>
 						{bankInsufficient && (
-							<p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+							<p className="text-xs text-destructive flex items-center gap-1 mt-1">
 								<AlertTriangle className="h-3 w-3" />
 								{t("finance.expenses.ownerDrawingPayment.insufficientBank")}
 							</p>
 						)}
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground">
 							{t("finance.expenses.selectAccount")}
 						</Label>
 						<Select
@@ -339,10 +339,10 @@ export const OwnerDrawingTab = forwardRef<
 											{account.accountType === "BANK" ? (
 												<Building className="h-3.5 w-3.5 text-chart-4" />
 											) : (
-												<Wallet className="h-3.5 w-3.5 text-green-500" />
+												<Wallet className="h-3.5 w-3.5 text-success" />
 											)}
 											<span>{account.name}</span>
-											<span className="text-slate-400 text-xs">
+											<span className="text-muted-foreground text-xs">
 												(
 												<Currency
 													amount={Number(
@@ -361,21 +361,21 @@ export const OwnerDrawingTab = forwardRef<
 
 				{/* Selected account info */}
 				{selectedAccount && (
-					<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+					<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/15 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 						<div className="flex items-center gap-2.5 min-w-0">
-							<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20 shrink-0">
+							<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 shrink-0">
 								{selectedAccount.accountType === "BANK" ? (
 									<Building className="h-3.5 w-3.5 text-chart-4" />
 								) : (
-									<Wallet className="h-3.5 w-3.5 text-green-600" />
+									<Wallet className="h-3.5 w-3.5 text-success" />
 								)}
 							</div>
 							<div className="min-w-0">
-								<p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+								<p className="text-sm font-medium text-foreground truncate">
 									{selectedAccount.name}
 								</p>
 								{selectedAccount.bankName && (
-									<p className="text-[11px] text-slate-500 truncate">
+									<p className="text-[11px] text-muted-foreground truncate">
 										{selectedAccount.bankName}
 									</p>
 								)}
@@ -389,8 +389,8 @@ export const OwnerDrawingTab = forwardRef<
 							</span>
 							{numericAmount > 0 && (
 								<>
-									<ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-									<span className="text-red-500 font-semibold">
+									<ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+									<span className="text-destructive font-semibold">
 										<Currency
 											amount={
 												Number(
@@ -407,9 +407,9 @@ export const OwnerDrawingTab = forwardRef<
 
 				{/* Overdraw warning */}
 				{checkResult?.willExceed && (
-					<div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/30 dark:bg-amber-950/20 p-2.5 sm:p-3">
-						<AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-						<div className="text-xs text-amber-700 dark:text-amber-300">
+					<div className="flex items-start gap-2 rounded-xl border-2 border-chart-1/30 bg-chart-1/10 p-2.5 sm:p-3">
+						<AlertTriangle className="h-4 w-4 text-chart-1 mt-0.5 shrink-0" />
+						<div className="text-xs text-chart-1">
 							<p className="font-medium">
 								{t("finance.expenses.ownerDrawingPayment.overdrawWarning")}
 							</p>
@@ -429,7 +429,7 @@ export const OwnerDrawingTab = forwardRef<
 
 				{/* Project (optional) */}
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						<FolderOpen className="h-3 w-3 inline me-1" />
 						{t("finance.expenses.projectLink")} ({t("common.optional")})
 					</Label>
@@ -461,7 +461,7 @@ export const OwnerDrawingTab = forwardRef<
 
 				{/* Description */}
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.description")}
 					</Label>
 					<Input
@@ -483,7 +483,7 @@ export const OwnerDrawingTab = forwardRef<
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle className="flex items-center gap-2">
-							<AlertTriangle className="h-5 w-5 text-amber-500" />
+							<AlertTriangle className="h-5 w-5 text-chart-1" />
 							{t("finance.ownerDrawings.overdrawDialog.title")}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
@@ -558,7 +558,7 @@ export const OwnerDrawingTab = forwardRef<
 										"finance.ownerDrawings.availableForOwner",
 									)}
 								</span>
-								<span className="font-bold text-red-600">
+								<span className="font-bold text-destructive">
 									<Currency
 										amount={
 											overdrawData.availableForOwner ?? 0
@@ -586,7 +586,7 @@ export const OwnerDrawingTab = forwardRef<
 						<AlertDialogAction
 							onClick={handleOverdrawConfirm}
 							disabled={createMutation.isPending}
-							className="bg-amber-600 text-white hover:bg-amber-700"
+							className="bg-chart-1 text-primary hover:bg-chart-1/90"
 						>
 							{t(
 								"finance.ownerDrawings.overdrawDialog.confirmDespite",

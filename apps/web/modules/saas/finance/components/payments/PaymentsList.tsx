@@ -263,16 +263,14 @@ export function PaymentsList({
 
 	const getPaymentMethodColor = (method: string) => {
 		const colors: Record<string, string> = {
-			CASH: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400",
-			BANK_TRANSFER:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			CHEQUE: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-			CREDIT_CARD:
-				"bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400",
+			CASH: "bg-success/15 text-success",
+			BANK_TRANSFER: "bg-chart-4/15 text-chart-4",
+			CHEQUE: "bg-chart-1/15 text-chart-1",
+			CREDIT_CARD: "bg-chart-4/15 text-chart-4",
 		};
 		return (
 			colors[method] ||
-			"bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
+			"bg-muted text-muted-foreground"
 		);
 	};
 
@@ -578,7 +576,7 @@ export function PaymentsList({
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								onClick={() => setDeletePaymentId(payment.id)}
-								className="text-red-600"
+								className="text-destructive"
 							>
 								<Trash2 className="h-4 w-4 me-2" />
 								{t("common.delete")}
@@ -612,8 +610,8 @@ export function PaymentsList({
 						label: t("finance.payments.totalPayments"),
 						value: <Currency amount={totalPayments} />,
 						icon: TrendingUp,
-						iconClassName: "text-green-600 dark:text-green-400",
-						iconBgClassName: "bg-green-100 dark:bg-green-900/50",
+						iconClassName: "text-success",
+						iconBgClassName: "bg-success/15",
 					},
 					{
 						label: t("finance.payments.paymentsCount"),
@@ -633,9 +631,9 @@ export function PaymentsList({
 						label: t("finance.payments.completedTotal"),
 						value: <Currency amount={completedTotal} />,
 						icon: CheckCircle2,
-						iconClassName: "text-emerald-600 dark:text-emerald-400",
+						iconClassName: "text-success",
 						iconBgClassName:
-							"bg-emerald-100 dark:bg-emerald-900/50",
+							"bg-success/15",
 					},
 				]}
 			/>
@@ -645,7 +643,7 @@ export function PaymentsList({
 				<GlassStatCard
 					colorScheme="green"
 					icon={
-						<TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+						<TrendingUp className="h-5 w-5 text-success" />
 					}
 					title={t("finance.payments.totalPayments")}
 					value={<Currency amount={totalPayments} />}
@@ -672,7 +670,7 @@ export function PaymentsList({
 				<GlassStatCard
 					colorScheme="green"
 					icon={
-						<CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+						<CheckCircle2 className="h-5 w-5 text-success" />
 					}
 					title={t("finance.payments.completedTotal")}
 					value={<Currency amount={completedTotal} />}
@@ -682,7 +680,7 @@ export function PaymentsList({
 			{/* الجوال: بحث + ورقة فلاتر */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.payments.searchPlaceholder")}
 						value={searchInput}
@@ -711,7 +709,7 @@ export function PaymentsList({
 			{/* الديسكتوب: تولبار الفلاتر */}
 			<div className="hidden flex-wrap items-center gap-2 sm:flex">
 				<div className="relative w-64">
-					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.payments.searchPlaceholder")}
 						value={searchInput}
@@ -749,19 +747,19 @@ export function PaymentsList({
 						className="w-72 space-y-3 rounded-xl"
 					>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.listControls.filterByMethod")}
 							</p>
 							{methodSelect("w-full")}
 						</div>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.listControls.filterByStatus")}
 							</p>
 							{statusSelect("w-full")}
 						</div>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.listControls.filterByAccount")}
 							</p>
 							{accountSelect("w-full")}
@@ -806,7 +804,7 @@ export function PaymentsList({
 								<div className="flex items-start justify-between gap-3">
 									<div className="min-w-0 flex-1">
 										<div className="flex flex-wrap items-center gap-1.5">
-											<span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+											<span className="font-mono text-xs text-muted-foreground">
 												{payment.paymentNo}
 											</span>
 											{payment._source === "project" && (
@@ -825,14 +823,14 @@ export function PaymentsList({
 												)}
 											</Badge>
 										</div>
-										<p className="mt-1 flex items-center gap-1 truncate text-sm font-medium text-slate-900 dark:text-slate-100">
-											<User className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+										<p className="mt-1 flex items-center gap-1 truncate text-sm font-medium text-foreground">
+											<User className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
 											{payment.client?.name ||
 												payment.clientName ||
 												payment.project?.name ||
 												"-"}
 										</p>
-										<p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+										<p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
 											<Calendar className="h-3 w-3" />
 											{formatDate(new Date(payment.date))}
 											{payment.destinationAccount
@@ -851,7 +849,7 @@ export function PaymentsList({
 										</p>
 									</div>
 									<div className="flex shrink-0 flex-col items-end gap-1">
-										<span className="font-bold tabular-nums text-green-600 dark:text-green-400">
+										<span className="font-bold tabular-nums text-success">
 											+
 											<Currency
 												amount={Number(payment.amount)}
@@ -879,12 +877,12 @@ export function PaymentsList({
 				)}
 				{!isLoading && payments.length > 0 && (
 					<div className="flex items-center justify-between px-1 pt-1 text-sm">
-						<span className="text-slate-500 dark:text-slate-400">
+						<span className="text-muted-foreground">
 							{t("finance.listControls.resultsCount", {
 								count: payments.length,
 							})}
 						</span>
-						<span className="font-semibold tabular-nums text-green-600 dark:text-green-400">
+						<span className="font-semibold tabular-nums text-success">
 							+<Currency amount={filteredTotal} />
 						</span>
 					</div>
@@ -955,7 +953,7 @@ export function PaymentsList({
 									{payments.map((payment: any) => (
 										<TableRow
 											key={`${payment._source ?? "org"}-${payment.id}`}
-											className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+											className="cursor-pointer hover:bg-muted/50"
 											onClick={() => openPayment(payment)}
 										>
 											<TableCell>
@@ -978,7 +976,7 @@ export function PaymentsList({
 												</div>
 											</TableCell>
 											<TableCell>
-												<div className="flex items-center gap-2 whitespace-nowrap text-slate-600 dark:text-slate-400">
+												<div className="flex items-center gap-2 whitespace-nowrap text-muted-foreground">
 													<Calendar className="h-4 w-4" />
 													{formatDate(
 														new Date(payment.date),
@@ -987,11 +985,11 @@ export function PaymentsList({
 											</TableCell>
 											<TableCell>
 												<div className="flex items-center gap-2">
-													<User className="h-4 w-4 text-slate-400" />
+													<User className="h-4 w-4 text-muted-foreground" />
 													<span>
 														{payment.client?.name ||
 															payment.clientName || (
-																<span className="text-slate-400">
+																<span className="text-muted-foreground">
 																	-
 																</span>
 															)}
@@ -1001,7 +999,7 @@ export function PaymentsList({
 											{!projectId && (
 												<TableCell>
 													{payment.project?.name || (
-														<span className="text-slate-400">
+														<span className="text-muted-foreground">
 															-
 														</span>
 													)}
@@ -1018,12 +1016,12 @@ export function PaymentsList({
 											</TableCell>
 											<TableCell>
 												<div className="flex items-center gap-2">
-													<Building className="h-4 w-4 text-slate-400" />
+													<Building className="h-4 w-4 text-muted-foreground" />
 													<span className="text-sm">
 														{payment
 															.destinationAccount
 															?.name || (
-															<span className="text-slate-400">
+															<span className="text-muted-foreground">
 																-
 															</span>
 														)}
@@ -1040,7 +1038,7 @@ export function PaymentsList({
 												</Badge>
 											</TableCell>
 											<TableCell className="text-end">
-												<span className="font-semibold tabular-nums text-green-600 dark:text-green-400">
+												<span className="font-semibold tabular-nums text-success">
 													+
 													<Currency
 														amount={Number(
@@ -1061,19 +1059,19 @@ export function PaymentsList({
 								</TableBody>
 							</Table>
 							{/* شريط الملخص أسفل الجدول */}
-							<div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-sm dark:border-slate-800">
-								<span className="text-slate-500 dark:text-slate-400">
+							<div className="flex items-center justify-between border-t-2 border-border px-4 py-3 text-sm">
+								<span className="text-muted-foreground">
 									{t("finance.listControls.resultsCount", {
 										count: payments.length,
 									})}
 								</span>
 								<span className="flex items-center gap-2">
-									<span className="text-slate-500 dark:text-slate-400">
+									<span className="text-muted-foreground">
 										{t(
 											"finance.listControls.filteredTotal",
 										)}
 									</span>
-									<span className="font-semibold tabular-nums text-green-600 dark:text-green-400">
+									<span className="font-semibold tabular-nums text-success">
 										+<Currency amount={filteredTotal} />
 									</span>
 								</span>

@@ -1,11 +1,9 @@
 "use client";
 
 import {
-	AlertTriangle,
 	CalendarClock,
 	Camera,
 	CircleCheck,
-	Clock,
 	MapPin,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,18 +16,13 @@ interface FieldActivity {
 		newReports: number;
 		stalest: { projectName: string; days: number } | null;
 	};
-	issues: {
-		openCount: number;
-		highPriorityCount: number;
-		avgResolutionDays: number | null;
-	};
 }
 
 /**
  * Botly-style field-activity widget (replaces the old average-progress card):
- * real site-update signals (projects touched today, new media, stalest site)
- * on top + open-issue counters below, split by the same 2px Stroke divider as
- * AttentionCard. Data comes from getFieldActivitySummary via dashboard.getAll.
+ * real site-update signals — projects touched today (headline), new media this
+ * week, and the stalest active site. Data comes from getFieldActivitySummary
+ * via dashboard.getAll.
  */
 export function FieldActivityCard({
 	fieldActivity,
@@ -45,11 +38,6 @@ export function FieldActivityCard({
 		newPhotos: 0,
 		newReports: 0,
 		stalest: null,
-	};
-	const issues = fieldActivity?.issues ?? {
-		openCount: 0,
-		highPriorityCount: 0,
-		avgResolutionDays: null,
 	};
 
 	const projectsHref = `/app/${organizationSlug}/projects`;
@@ -71,20 +59,23 @@ export function FieldActivityCard({
 					: t("dashboard.fieldActivity.noNewMedia");
 
 	return (
-		<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border-2 bg-card p-5">
-			<p className="shrink-0 text-base font-semibold text-card-foreground">
-				{t("dashboard.fieldActivity.title")}
+		<Link
+			href={projectsHref}
+			className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border-2 bg-card p-5 transition-colors hover:border-primary/20"
+		>
+			<div className="flex shrink-0 items-baseline justify-between gap-2">
+				<p className="truncate text-base font-semibold text-card-foreground">
+					{t("dashboard.fieldActivity.title")}
+				</p>
+				<p className="shrink-0 text-2xl font-bold tabular-nums text-card-foreground">
+					{site.updatedTodayCount}
+				</p>
+			</div>
+			<p className="shrink-0 text-sm font-medium text-muted-foreground">
+				{t("dashboard.fieldActivity.siteUpdates")}
 			</p>
 
-			{/* Site updates */}
-			<Link
-				href={projectsHref}
-				className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto"
-			>
-				<p className="text-sm font-semibold text-muted-foreground">
-					{t("dashboard.fieldActivity.siteUpdates")}
-				</p>
-
+			<div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto">
 				<div className="flex items-center gap-2.5">
 					<span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-chart-1/25 text-foreground">
 						<MapPin className="size-4" />
@@ -131,59 +122,7 @@ export function FieldActivityCard({
 						</>
 					)}
 				</div>
-			</Link>
-
-			{/* Open issues */}
-			<Link href={projectsHref} className="mt-3 shrink-0 border-t-2 pt-3">
-				<div className="flex items-baseline justify-between gap-2">
-					<p className="text-sm font-semibold text-muted-foreground">
-						{t("dashboard.fieldActivity.openIssues")}
-					</p>
-					<p className="shrink-0 text-2xl font-bold tabular-nums text-card-foreground">
-						{issues.openCount}
-					</p>
-				</div>
-
-				<div className="mt-2 space-y-1.5">
-					{issues.openCount === 0 ? (
-						<div className="flex items-center gap-2.5">
-							<span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-								<CircleCheck className="size-3.5" />
-							</span>
-							<span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-								{t("dashboard.fieldActivity.noOpenIssues")}
-							</span>
-						</div>
-					) : (
-						<>
-							{issues.highPriorityCount > 0 && (
-								<div className="flex items-center gap-2.5">
-									<span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-destructive/15 text-destructive">
-										<AlertTriangle className="size-3.5" />
-									</span>
-									<span className="min-w-0 flex-1 truncate text-xs font-medium text-card-foreground">
-										{t("dashboard.fieldActivity.highPriority", {
-											count: issues.highPriorityCount,
-										})}
-									</span>
-								</div>
-							)}
-							{issues.avgResolutionDays !== null && (
-								<div className="flex items-center gap-2.5">
-									<span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-chart-1/25 text-foreground">
-										<Clock className="size-3.5" />
-									</span>
-									<span className="min-w-0 flex-1 truncate text-xs text-card-foreground">
-										{t("dashboard.fieldActivity.avgResolution", {
-											days: issues.avgResolutionDays,
-										})}
-									</span>
-								</div>
-							)}
-						</>
-					)}
-				</div>
-			</Link>
-		</div>
+			</div>
+		</Link>
 	);
 }

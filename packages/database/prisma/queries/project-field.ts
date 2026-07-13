@@ -550,11 +550,6 @@ export async function getFieldActivitySummary(organizationId: string) {
 		photoLast,
 		reportLast,
 		progressLast,
-		// Open issues + high priority (across all org projects)
-		openCount,
-		highPriorityCount,
-		// Recently resolved issues for the average-resolution figure
-		resolvedIssues,
 	] = await Promise.all([
 		hasActive
 			? db.projectPhoto.findMany({
@@ -607,29 +602,6 @@ export async function getFieldActivitySummary(organizationId: string) {
 					_max: { createdAt: true },
 				})
 			: Promise.resolve([] as { projectId: string; _max: { createdAt: Date | null } }[]),
-		db.projectIssue.count({
-			where: {
-				project: { organizationId },
-				status: { in: ["OPEN", "IN_PROGRESS"] },
-			},
-		}),
-		db.projectIssue.count({
-			where: {
-				project: { organizationId },
-				status: { in: ["OPEN", "IN_PROGRESS"] },
-				severity: { in: ["HIGH", "CRITICAL"] },
-			},
-		}),
-		db.projectIssue.findMany({
-			where: {
-				project: { organizationId },
-				status: { in: ["RESOLVED", "CLOSED"] },
-				resolvedAt: { not: null },
-			},
-			select: { createdAt: true, resolvedAt: true },
-			orderBy: { resolvedAt: "desc" },
-			take: 200,
-		}),
 	]);
 
 	// Projects updated today = union of the three activity sources.
@@ -663,34 +635,12 @@ export async function getFieldActivitySummary(organizationId: string) {
 		}
 	}
 
-	// Average resolution time in whole days.
-	let avgResolutionDays: number | null = null;
-	if (resolvedIssues.length > 0) {
-		let sum = 0;
-		let n = 0;
-		for (const iss of resolvedIssues) {
-			if (!iss.resolvedAt) continue;
-			const diff = iss.resolvedAt.getTime() - iss.createdAt.getTime();
-			if (diff < 0) continue;
-			sum += diff;
-			n += 1;
-		}
-		if (n > 0) {
-			avgResolutionDays = Math.max(1, Math.round(sum / n / DAY_MS));
-		}
-	}
-
 	return {
 		siteUpdates: {
 			updatedTodayCount: updatedTodaySet.size,
 			newPhotos,
 			newReports: newDailyReports + newProgressUpdates,
 			stalest,
-		},
-		issues: {
-			openCount,
-			highPriorityCount,
-			avgResolutionDays,
 		},
 	};
 }

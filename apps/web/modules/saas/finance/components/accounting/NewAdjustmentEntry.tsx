@@ -166,7 +166,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 								<Input type="number" placeholder={t("finance.accounting.debit")} value={line.debit || ""} onChange={(e: any) => { const n = [...lines]; n[idx].debit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
 								<Input type="number" placeholder={t("finance.accounting.credit")} value={line.credit || ""} onChange={(e: any) => { const n = [...lines]; n[idx].credit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
 								{lines.length > 2 && (
-									<Button variant="ghost" size="sm" onClick={() => removeLine(idx)} className="text-red-500 px-2">×</Button>
+									<Button variant="ghost" size="sm" onClick={() => removeLine(idx)} className="text-destructive px-2">×</Button>
 								)}
 							</div>
 						))}
@@ -174,10 +174,10 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 					</div>
 
 					{/* Totals */}
-					<div className={`flex justify-between p-3 rounded-xl ${isBalanced ? "bg-green-50 dark:bg-green-950/20" : "bg-red-50 dark:bg-red-950/20"}`}>
+					<div className={`flex justify-between p-3 rounded-xl ${isBalanced ? "bg-success/10" : "bg-destructive/10"}`}>
 						<span className="text-sm font-medium">{t("finance.accounting.debit")}: {totalDebit.toLocaleString()}</span>
 						<span className="text-sm font-medium">{t("finance.accounting.credit")}: {totalCredit.toLocaleString()}</span>
-						<span className={`text-sm font-bold ${isBalanced ? "text-green-600" : "text-red-600"}`}>
+						<span className={`text-sm font-bold ${isBalanced ? "text-success" : "text-destructive"}`}>
 							{isBalanced ? t("finance.accounting.balanced") : `${t("finance.accounting.difference")}: ${diff}`}
 						</span>
 					</div>

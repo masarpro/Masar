@@ -180,7 +180,7 @@ function HealthCheckSection({
 	const isOk = count === 0;
 
 	return (
-		<Card className="rounded-2xl">
+		<Card className="rounded-2xl border-2 shadow-none">
 			<CardHeader className="pb-2">
 				<CardTitle className="flex items-center gap-3 text-base">
 					<div className={`flex size-9 items-center justify-center rounded-xl ${isOk ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>

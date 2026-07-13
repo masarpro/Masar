@@ -124,20 +124,20 @@ export function YearEndClosingPage({
 		<div className="space-y-6">
 			{/* Page Header */}
 			<div>
-				<h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<h1 className="text-2xl font-bold text-foreground">
 					{t("title")}
 				</h1>
-				<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+				<p className="text-sm text-muted-foreground mt-1">
 					{t("subtitle")}
 				</p>
 			</div>
 
 			{/* Year Selector + Preview Button */}
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardContent className="p-4">
 					<div className="flex flex-wrap items-center gap-3">
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<label className="text-sm font-medium text-foreground">
 								{t("fiscalYear")}
 							</label>
 							<Select
@@ -180,50 +180,50 @@ export function YearEndClosingPage({
 					{/* KPI Cards */}
 					<div className="grid gap-3 sm:grid-cols-3">
 						{/* Total Revenue */}
-						<Card className="rounded-2xl">
+						<Card className="rounded-2xl border-2 shadow-none">
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-xs text-slate-500">{t("totalRevenue")}</p>
-										<p className="text-lg font-bold text-green-600 mt-1">
+										<p className="text-xs text-muted-foreground">{t("totalRevenue")}</p>
+										<p className="text-lg font-bold text-success mt-1">
 											{formatAccounting(preview.totalRevenue)}
 										</p>
 									</div>
-									<div className="p-2.5 bg-green-100 dark:bg-green-900/30 rounded-xl">
-										<TrendingUp className="h-5 w-5 text-green-600" />
+									<div className="p-2.5 bg-success/15 rounded-xl">
+										<TrendingUp className="h-5 w-5 text-success" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
 
 						{/* Total Expenses */}
-						<Card className="rounded-2xl">
+						<Card className="rounded-2xl border-2 shadow-none">
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-xs text-slate-500">{t("totalExpenses")}</p>
-										<p className="text-lg font-bold text-red-600 mt-1">
+										<p className="text-xs text-muted-foreground">{t("totalExpenses")}</p>
+										<p className="text-lg font-bold text-destructive mt-1">
 											{formatAccounting(preview.totalExpenses)}
 										</p>
 									</div>
-									<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
-										<TrendingDown className="h-5 w-5 text-red-600" />
+									<div className="p-2.5 bg-destructive/15 rounded-xl">
+										<TrendingDown className="h-5 w-5 text-destructive" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
 
 						{/* Net Profit */}
-						<Card className="rounded-2xl">
+						<Card className="rounded-2xl border-2 shadow-none">
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-xs text-slate-500">{t("netProfit")}</p>
+										<p className="text-xs text-muted-foreground">{t("netProfit")}</p>
 										<p
 											className={`text-lg font-bold mt-1 ${
 												preview.netProfit >= 0
-													? "text-green-600"
-													: "text-red-600"
+													? "text-success"
+													: "text-destructive"
 											}`}
 										>
 											{formatAccounting(preview.netProfit)}
@@ -232,15 +232,15 @@ export function YearEndClosingPage({
 									<div
 										className={`p-2.5 rounded-xl ${
 											preview.netProfit >= 0
-												? "bg-green-100 dark:bg-green-900/30"
-												: "bg-red-100 dark:bg-red-900/30"
+												? "bg-success/15"
+												: "bg-destructive/15"
 										}`}
 									>
 										<DollarSign
 											className={`h-5 w-5 ${
 												preview.netProfit >= 0
-													? "text-green-600"
-													: "text-red-600"
+													? "text-success"
+													: "text-destructive"
 											}`}
 										/>
 									</div>
@@ -251,7 +251,7 @@ export function YearEndClosingPage({
 
 					{/* Profit Distribution Table */}
 					{preview.profitDistribution.length > 0 && (
-						<Card className="rounded-2xl">
+						<Card className="rounded-2xl border-2 shadow-none">
 							<CardHeader className="pb-3">
 								<CardTitle className="text-base">
 									{t("profitDistribution")}
@@ -281,14 +281,14 @@ export function YearEndClosingPage({
 													<TableCell className="text-end">
 														{formatAccounting(row.shareOfProfit)}
 													</TableCell>
-													<TableCell className="text-end text-red-600">
+													<TableCell className="text-end text-destructive">
 														{formatAccounting(row.drawings)}
 													</TableCell>
 													<TableCell
 														className={`text-end font-medium ${
 															row.netToRetained >= 0
-																? "text-green-600"
-																: "text-red-600"
+																? "text-success"
+																: "text-destructive"
 														}`}
 													>
 														{formatAccounting(row.netToRetained)}
@@ -300,21 +300,21 @@ export function YearEndClosingPage({
 												<TableCell colSpan={3} className="text-start">
 													{t("totalDrawings")}
 												</TableCell>
-												<TableCell className="text-end text-red-600">
+												<TableCell className="text-end text-destructive">
 													{formatAccounting(preview.totalDrawings)}
 												</TableCell>
 												<TableCell />
 											</TableRow>
 											{/* Retained Earnings Transfer */}
-											<TableRow className="font-semibold bg-slate-50 dark:bg-slate-800/50">
+											<TableRow className="font-semibold bg-muted">
 												<TableCell colSpan={4} className="text-start">
 													{t("retainedEarningsTransfer")}
 												</TableCell>
 												<TableCell
 													className={`text-end ${
 														preview.retainedEarningsTransfer >= 0
-															? "text-green-600"
-															: "text-red-600"
+															? "text-success"
+															: "text-destructive"
 													}`}
 												>
 													{formatAccounting(preview.retainedEarningsTransfer)}
@@ -334,11 +334,11 @@ export function YearEndClosingPage({
 								const severity: string = typeof warning === "string" ? "WARNING" : warning.severity;
 								const message = typeof warning === "string" ? warning : warning.message;
 								const colorMap: Record<string, string> = {
-									INFO: "bg-chart-4/15 dark:bg-chart-4/20 border-chart-4 dark:border-chart-4 text-chart-4 dark:text-chart-4",
-									WARNING: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",
-									ERROR: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300",
+									INFO: "bg-chart-4/10 border-chart-4/30 text-chart-4",
+									WARNING: "bg-chart-1/10 border-chart-1/30 text-chart-1",
+									ERROR: "bg-destructive/10 border-destructive/30 text-destructive",
 								};
-								const colors = colorMap[severity] ?? "bg-amber-50 border-amber-200 text-amber-700";
+								const colors = colorMap[severity] ?? "bg-chart-1/10 border-chart-1/30 text-chart-1";
 								return (
 									<div
 										key={idx}
@@ -372,9 +372,9 @@ export function YearEndClosingPage({
 					)}
 
 					{preview.isAlreadyClosed && (
-						<div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-							<CalendarCheck className="h-4 w-4 text-green-600 flex-shrink-0" />
-							<span className="text-sm text-green-700 dark:text-green-300">
+						<div className="flex items-center gap-2 p-3 bg-success/10 rounded-xl border border-success/30">
+							<CalendarCheck className="h-4 w-4 text-success flex-shrink-0" />
+							<span className="text-sm text-success">
 								{t("alreadyClosed")}
 							</span>
 						</div>
@@ -383,7 +383,7 @@ export function YearEndClosingPage({
 			)}
 
 			{/* History Section */}
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardHeader className="pb-3">
 					<CardTitle className="text-base flex items-center gap-2">
 						<History className="h-5 w-5" />
@@ -392,11 +392,11 @@ export function YearEndClosingPage({
 				</CardHeader>
 				<CardContent className="p-0">
 					{historyQuery.isLoading ? (
-						<div className="p-6 text-center text-sm text-slate-500">
+						<div className="p-6 text-center text-sm text-muted-foreground">
 							<Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" />
 						</div>
 					) : !historyQuery.data || historyQuery.data.length === 0 ? (
-						<div className="p-6 text-center text-sm text-slate-500">
+						<div className="p-6 text-center text-sm text-muted-foreground">
 							{t("noHistory")}
 						</div>
 					) : (
@@ -426,20 +426,20 @@ export function YearEndClosingPage({
 											<TableCell
 												className={`text-end ${
 													closing.netProfit >= 0
-														? "text-green-600"
-														: "text-red-600"
+														? "text-success"
+														: "text-destructive"
 												}`}
 											>
 												{formatAccounting(closing.netProfit)}
 											</TableCell>
-											<TableCell className="text-end text-red-600">
+											<TableCell className="text-end text-destructive">
 												{formatAccounting(closing.totalDrawings)}
 											</TableCell>
 											<TableCell
 												className={`text-end ${
 													closing.retainedEarningsTransfer >= 0
-														? "text-green-600"
-														: "text-red-600"
+														? "text-success"
+														: "text-destructive"
 												}`}
 											>
 												{formatAccounting(closing.retainedEarningsTransfer)}
@@ -453,7 +453,7 @@ export function YearEndClosingPage({
 													}
 													className={
 														closing.status === "COMPLETED"
-															? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-100"
+															? "bg-success/15 text-success hover:bg-success/15"
 															: ""
 													}
 												>
@@ -470,7 +470,7 @@ export function YearEndClosingPage({
 													<Button
 														variant="ghost"
 														size="sm"
-														className="rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50"
+														className="rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
 														onClick={() => {
 															setReverseYear(closing.fiscalYear);
 															setShowReverseDialog(true);
@@ -482,7 +482,7 @@ export function YearEndClosingPage({
 													</Button>
 												)}
 												{closing.status === "REVERSED" && closing.reversedBy && (
-													<span className="text-xs text-slate-500">
+													<span className="text-xs text-muted-foreground">
 														{t("reversedBy")}: {closing.reversedBy.name}
 													</span>
 												)}
@@ -512,7 +512,7 @@ export function YearEndClosingPage({
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<div className="space-y-2">
-						<p className="text-sm text-slate-600 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("typeYearToConfirm", { year: selectedYear })}
 						</p>
 						<Input
@@ -529,7 +529,7 @@ export function YearEndClosingPage({
 							{tCommon("common.cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
-							className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
+							className="rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground"
 							onClick={() =>
 								executeMutation.mutate({
 									organizationId,
@@ -563,7 +563,7 @@ export function YearEndClosingPage({
 							{tCommon("common.cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
-							className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
+							className="rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground"
 							onClick={() => {
 								if (reverseYear) {
 									reverseMutation.mutate({

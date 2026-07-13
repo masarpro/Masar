@@ -27,10 +27,10 @@ export function PaymentsClaimsHub({
 			{/* Header */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="text-xl font-semibold text-foreground">
 						{t("paymentsHub.title")}
 					</h2>
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("paymentsHub.subtitle")}
 					</p>
 				</div>
@@ -38,7 +38,7 @@ export function PaymentsClaimsHub({
 					<Button
 						asChild
 						size="sm"
-						className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+						className="rounded-xl"
 					>
 						<Link href={`${basePath}/finance/payments/new`}>
 							<Plus className="me-1.5 h-4 w-4" />
@@ -49,7 +49,7 @@ export function PaymentsClaimsHub({
 						asChild
 						size="sm"
 						variant="outline"
-						className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950/20"
+						className="rounded-xl border-chart-1/30 text-chart-1 hover:bg-chart-1/10"
 					>
 						<Link href={`${basePath}/finance/claims/new`}>
 							<Plus className="me-1.5 h-4 w-4" />

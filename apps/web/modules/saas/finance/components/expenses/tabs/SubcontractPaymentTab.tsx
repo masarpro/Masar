@@ -204,7 +204,7 @@ export const SubcontractPaymentTab = forwardRef<
 			{/* Row 1: Project, Subcontract */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						<FolderOpen className="h-3 w-3 inline me-1" />
 						{t("finance.expenses.subcontractPayment.selectProject")} *
 					</Label>
@@ -236,7 +236,7 @@ export const SubcontractPaymentTab = forwardRef<
 					</Select>
 				</div>
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						<FileSignature className="h-3 w-3 inline me-1" />
 						{t("finance.expenses.subcontractPayment.selectContract")} *
 					</Label>
@@ -277,13 +277,13 @@ export const SubcontractPaymentTab = forwardRef<
 
 			{/* Contract summary */}
 			{selectedContract && (
-				<div className="rounded-xl border border-violet-200/60 bg-violet-50/40 dark:border-violet-800/30 dark:bg-violet-950/20 px-3 sm:px-4 py-2.5">
+				<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/10 px-3 sm:px-4 py-2.5">
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center text-xs">
 						<div>
-							<p className="text-violet-500">
+							<p className="text-muted-foreground">
 								{t("finance.expenses.subcontractPayment.contractValue")}
 							</p>
-							<p className="font-semibold text-violet-700 dark:text-violet-300">
+							<p className="font-semibold text-foreground">
 								<Currency
 									amount={Number(
 										selectedContract.totalValue ?? 0,
@@ -295,7 +295,7 @@ export const SubcontractPaymentTab = forwardRef<
 							<p className="text-chart-4">
 								{t("finance.expenses.subcontractPayment.totalPaid")}
 							</p>
-							<p className="font-semibold text-chart-4 dark:text-chart-4">
+							<p className="font-semibold text-chart-4">
 								<Currency
 									amount={Number(
 										selectedContract.totalPaid ?? 0,
@@ -304,10 +304,10 @@ export const SubcontractPaymentTab = forwardRef<
 							</p>
 						</div>
 						<div>
-							<p className="text-amber-500">
+							<p className="text-chart-1">
 								{t("finance.expenses.subcontractPayment.remaining")}
 							</p>
-							<p className="font-semibold text-amber-700 dark:text-amber-300">
+							<p className="font-semibold text-chart-1">
 								<Currency
 									amount={
 										Number(
@@ -325,7 +325,7 @@ export const SubcontractPaymentTab = forwardRef<
 			{/* Row 2: Amount, Date */}
 			<div className="grid grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.amount")} *
 					</Label>
 					<Input
@@ -341,7 +341,7 @@ export const SubcontractPaymentTab = forwardRef<
 					/>
 				</div>
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.date")} *
 					</Label>
 					<Input
@@ -356,7 +356,7 @@ export const SubcontractPaymentTab = forwardRef<
 
 			{/* Source Account */}
 			<div className="space-y-1">
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+				<Label className="text-xs font-medium text-muted-foreground">
 					{t("finance.expenses.selectAccount")} *
 				</Label>
 				<Select
@@ -377,10 +377,10 @@ export const SubcontractPaymentTab = forwardRef<
 									{account.accountType === "BANK" ? (
 										<Building className="h-3.5 w-3.5 text-chart-4" />
 									) : (
-										<Wallet className="h-3.5 w-3.5 text-green-500" />
+										<Wallet className="h-3.5 w-3.5 text-success" />
 									)}
 									<span>{account.name}</span>
-									<span className="text-slate-400 text-xs">
+									<span className="text-muted-foreground text-xs">
 										(
 										<Currency
 											amount={Number(account.balance)}
@@ -396,21 +396,21 @@ export const SubcontractPaymentTab = forwardRef<
 
 			{/* Selected account info */}
 			{selectedAccount && (
-				<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+				<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/15 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 					<div className="flex items-center gap-2.5 min-w-0">
-						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20 shrink-0">
+						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 shrink-0">
 							{selectedAccount.accountType === "BANK" ? (
 								<Building className="h-3.5 w-3.5 text-chart-4" />
 							) : (
-								<Wallet className="h-3.5 w-3.5 text-green-600" />
+								<Wallet className="h-3.5 w-3.5 text-success" />
 							)}
 						</div>
 						<div className="min-w-0">
-							<p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+							<p className="text-sm font-medium text-foreground truncate">
 								{selectedAccount.name}
 							</p>
 							{selectedAccount.bankName && (
-								<p className="text-[11px] text-slate-500 truncate">
+								<p className="text-[11px] text-muted-foreground truncate">
 									{selectedAccount.bankName}
 								</p>
 							)}
@@ -424,8 +424,8 @@ export const SubcontractPaymentTab = forwardRef<
 						</span>
 						{numericAmount > 0 && (
 							<>
-								<ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-								<span className="text-red-500 font-semibold">
+								<ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+								<span className="text-destructive font-semibold">
 									<Currency
 										amount={
 											Number(selectedAccount.balance) -
@@ -442,7 +442,7 @@ export const SubcontractPaymentTab = forwardRef<
 			{/* Payment Method & Reference */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.paymentMethod")}
 					</Label>
 					<Select
@@ -462,7 +462,7 @@ export const SubcontractPaymentTab = forwardRef<
 					</Select>
 				</div>
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.referenceNo")}
 					</Label>
 					<Input
@@ -476,7 +476,7 @@ export const SubcontractPaymentTab = forwardRef<
 
 			{/* Description */}
 			<div className="space-y-1">
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+				<Label className="text-xs font-medium text-muted-foreground">
 					{t("finance.expenses.description")}
 				</Label>
 				<Input
@@ -489,7 +489,7 @@ export const SubcontractPaymentTab = forwardRef<
 
 			{/* Notes */}
 			<div className="space-y-1">
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+				<Label className="text-xs font-medium text-muted-foreground">
 					{t("finance.expenses.additionalNotes")}
 				</Label>
 				<Textarea

@@ -8,8 +8,11 @@ import {
 	FileText,
 	FolderOpen,
 	FolderPlus,
+	MapPin,
 	Plus,
 	Receipt,
+	TrendingDown,
+	TrendingUp,
 	Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -17,23 +20,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-function daysRemaining(endDate: Date | string | null): number | null {
-	if (!endDate) return null;
-	const now = new Date();
-	const end = new Date(endDate);
-	return Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-}
-
 interface Project {
 	id: string;
 	name: string | null;
-	status: string;
-	progress: number | string | null;
-	contractValue: number | string | { toString(): string } | null;
-	endDate: Date | string | null;
 	clientName: string | null;
-	photos?: { url: string }[];
+	progress: number | string | null;
 	coverPhoto?: { url: string } | null;
+	photos?: { url: string }[];
+	expensesTotal?: number;
+	paymentsTotal?: number;
+	currentMilestone?: { title: string; days: number | null } | null;
 }
 
 interface ActiveProjectsSectionProps {
@@ -42,9 +38,10 @@ interface ActiveProjectsSectionProps {
 }
 
 /**
- * Botly Earnings table (Figma 71:4242 / 71:4085 Bot row): white 32px card,
- * gray small column labels, rows separated by 2px Stroke borders — avatar
- * chip + name/sub, semibold value, yellow progress bar, trailing figure.
+ * Specialised active-project cards (Botly surface): per-project progress taken
+ * from the project's execution progress, مدفوعات (expenses) + مقبوضات (payments)
+ * instead of contract value, the current milestone with days-on-phase, and the
+ * latest published photos as thumbnails on the leading (visual-left) side.
  */
 export function ActiveProjectsSection({
 	projects,
@@ -91,7 +88,7 @@ export function ActiveProjectsSection({
 		);
 	}
 
-	const MAX_VISIBLE = 4;
+	const MAX_VISIBLE = 3;
 	const visibleProjects = projects.slice(0, MAX_VISIBLE);
 	const hasMore = projects.length > MAX_VISIBLE;
 
@@ -111,28 +108,24 @@ export function ActiveProjectsSection({
 				</Link>
 			</div>
 
-			{/* Column labels (Botly table title row) */}
-			<div className="mt-3 hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)] gap-3 border-b-2 pb-2 text-sm font-medium text-muted-foreground sm:grid">
-				<span>{t("dashboard.activeProjects")}</span>
-				<span>{t("projects.contractBar.contractValue")}</span>
-				<span>{t("projects.overview.progress")}</span>
-			</div>
-
-			{/* Rows */}
-			<div className="min-h-0 flex-1 overflow-y-auto">
+			{/* Cards */}
+			<div className="mt-2 min-h-0 flex-1 space-y-1 overflow-y-auto">
 				{visibleProjects.map((project) => {
-					const progress = Math.round(Number(project.progress ?? 0));
-					const contractValue = Number(project.contractValue ?? 0);
-					const days = daysRemaining(project.endDate);
+					const progress = Math.min(
+						Math.round(Number(project.progress ?? 0)),
+						100,
+					);
+					const milestone = project.currentMilestone ?? null;
+					const photos = (project.photos ?? []).slice(0, 4);
 
 					return (
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group grid grid-cols-1 items-center gap-3 border-b-2 py-3 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
+							className="group block rounded-xl border-b-2 px-1 py-3 transition-colors last:border-0 hover:bg-accent/40"
 						>
-							{/* Project: avatar chip + name/client */}
-							<div className="flex min-w-0 items-center gap-3">
+							{/* Top: cover + name/client — recent photos strip on the left */}
+							<div className="flex items-center gap-3">
 								<div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-chart-4/15 xl:h-11 xl:w-11">
 									<ProjectThumb
 										src={
@@ -143,7 +136,7 @@ export function ActiveProjectsSection({
 										alt={project.name || ""}
 									/>
 								</div>
-								<div className="min-w-0">
+								<div className="min-w-0 flex-1">
 									<p className="truncate text-base font-semibold text-card-foreground">
 										{project.name || t("projects.unnamed")}
 									</p>
@@ -151,30 +144,86 @@ export function ActiveProjectsSection({
 										{project.clientName || t("dashboard.noClient")}
 									</p>
 								</div>
+								{photos.length > 0 && (
+									<div className="flex shrink-0 items-center gap-1">
+										{photos.map((photo, i) => (
+											<div
+												key={i}
+												className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md bg-muted"
+											>
+												<ProjectThumb src={photo.url} alt="" />
+											</div>
+										))}
+									</div>
+								)}
 							</div>
 
-							{/* Contract value */}
-							<p className="truncate text-base font-semibold tabular-nums text-card-foreground">
-								<Currency amount={contractValue} />
-							</p>
-
 							{/* Progress bar + trailing figure */}
-							<div className="flex items-center gap-3">
+							<div className="mt-2.5 flex items-center gap-3">
 								<div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[4px] bg-muted">
 									<div
 										className="h-full rounded-[4px] bg-chart-1"
-										style={{ width: `${Math.min(progress, 100)}%` }}
+										style={{ width: `${progress}%` }}
 									/>
 								</div>
 								<p className="shrink-0 text-base font-semibold tabular-nums text-card-foreground">
 									{progress}
 									<span className="text-muted-foreground">%</span>
 								</p>
-								{days !== null && days > 0 && (
-									<p className="hidden shrink-0 text-xs text-muted-foreground lg:block">
-										{days} {t("dashboard.alerts.daysRemaining")}
-									</p>
+							</div>
+
+							{/* Current milestone + days on phase */}
+							<div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+								<MapPin className="size-3.5 shrink-0 text-chart-3" />
+								{milestone ? (
+									<span className="min-w-0 truncate">
+										<span className="font-medium text-card-foreground">
+											{milestone.title}
+										</span>
+										{milestone.days !== null && (
+											<>
+												{" · "}
+												{t("dashboard.projectCard.daysOnPhase", {
+													days: milestone.days,
+												})}
+											</>
+										)}
+									</span>
+								) : (
+									<span className="truncate">
+										{t("dashboard.projectCard.noPhase")}
+									</span>
 								)}
+							</div>
+
+							{/* Payments (out) / Receipts (in) */}
+							<div className="mt-2 grid grid-cols-2 gap-2">
+								<div className="flex items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
+									<span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-destructive/15 text-destructive">
+										<TrendingDown className="size-3.5" />
+									</span>
+									<div className="min-w-0">
+										<p className="truncate text-[11px] leading-tight text-muted-foreground">
+											{t("dashboard.projectCard.payments")}
+										</p>
+										<p className="truncate text-xs font-semibold tabular-nums text-card-foreground">
+											<Currency amount={project.expensesTotal ?? 0} />
+										</p>
+									</div>
+								</div>
+								<div className="flex items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
+									<span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-success/15 text-success">
+										<TrendingUp className="size-3.5" />
+									</span>
+									<div className="min-w-0">
+										<p className="truncate text-[11px] leading-tight text-muted-foreground">
+											{t("dashboard.projectCard.receipts")}
+										</p>
+										<p className="truncate text-xs font-semibold tabular-nums text-card-foreground">
+											<Currency amount={project.paymentsTotal ?? 0} />
+										</p>
+									</div>
+								</div>
 							</div>
 						</Link>
 					);
@@ -203,7 +252,7 @@ function ProjectThumb({ src, alt }: { src: string | null; alt: string }) {
 	if (!src || failed) {
 		return (
 			<div className="flex h-full w-full items-center justify-center bg-chart-4/15">
-				<FolderOpen className="h-5 w-5 text-chart-4" />
+				<FolderOpen className="h-4 w-4 text-chart-4" />
 			</div>
 		);
 	}

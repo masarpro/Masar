@@ -76,8 +76,8 @@ export function Dashboard({
 	});
 
 	const { data: projectsData, isLoading: projLoading } = useQuery({
-		...orpc.projects.list.queryOptions({
-			input: { organizationId, status: "ACTIVE" as const },
+		...orpc.dashboard.activeProjects.queryOptions({
+			input: { organizationId, limit: 4 },
 		}),
 		enabled: !!organizationId && showProjects,
 	});
@@ -115,7 +115,7 @@ export function Dashboard({
 				<>
 					{/* Left column — 2/3 */}
 					<div className="flex min-h-0 min-w-0 flex-col gap-4 xl:w-2/3">
-						<div className="min-h-0 xl:flex-[5]">
+						<div className="min-h-0 xl:flex-[4]">
 							{finLoading || statsLoading ? (
 								sectionSkeleton
 							) : (
@@ -144,7 +144,7 @@ export function Dashboard({
 						<QuickActionsGrid organizationSlug={organizationSlug} />
 
 						{showProjects && (
-							<div className="min-h-0 xl:flex-[4]">
+							<div className="min-h-0 xl:flex-[5]">
 								{projLoading ? (
 									sectionSkeleton
 								) : (

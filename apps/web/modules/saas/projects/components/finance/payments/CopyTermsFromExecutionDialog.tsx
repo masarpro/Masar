@@ -253,13 +253,13 @@ export function CopyTermsFromExecutionDialog({
 													<div className="min-w-0 flex-1 space-y-2">
 														<div className="flex items-center gap-2">
 															<Flag className="h-4 w-4 text-chart-4 shrink-0" />
-															<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+															<h4 className="text-sm font-semibold text-card-foreground truncate">
 																{milestone.title}
 															</h4>
 														</div>
 														{(startStr || endStr) && (
-															<div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-																<CalendarDays className="h-3.5 w-3.5 text-emerald-500" />
+															<div className="flex items-center gap-1 text-xs text-muted-foreground">
+																<CalendarDays className="h-3.5 w-3.5 text-success" />
 																{startStr ?? "—"} / {endStr ?? "—"}
 															</div>
 														)}
@@ -290,12 +290,12 @@ export function CopyTermsFromExecutionDialog({
 						</div>
 
 						{/* Footer */}
-						<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex items-center justify-between gap-3">
+						<div className="bg-muted border-t-2 px-5 py-3 flex items-center justify-between gap-3">
 							<div className="text-sm">
-								<span className="text-slate-500">
+								<span className="text-muted-foreground">
 									{t("projectPayments.copyExecution.totalPreview")}:{" "}
 								</span>
-								<span className="font-semibold text-chart-4 dark:text-chart-4">
+								<span className="font-semibold text-chart-4">
 									{formatCurrency(grandTotal, "SAR", "en-US")}
 								</span>
 							</div>
@@ -310,7 +310,7 @@ export function CopyTermsFromExecutionDialog({
 								</Button>
 								<Button
 									type="button"
-									className="rounded-xl h-10 bg-chart-4 text-white hover:bg-chart-4"
+									className="rounded-xl h-10"
 									disabled={
 										selectedRows.length === 0 ||
 										copyMutation.isPending
