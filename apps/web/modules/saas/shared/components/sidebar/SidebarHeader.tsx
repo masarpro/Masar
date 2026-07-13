@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useSidebar } from "./sidebar-context";
 import { useIsMobile } from "./use-is-mobile";
-import { Logo } from "@shared/components/Logo";
+import { MasarLogoSvg } from "@shared/components/Logo";
 
 interface SidebarHeaderProps {
 	collapsed: boolean;
@@ -36,7 +36,8 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 						href="/app"
 						className="absolute inset-0 flex items-center justify-center text-sidebar-accent-foreground"
 					>
-						<Logo mono />
+						{/* 30% smaller than the default h-10 wordmark (40px → 28px) */}
+						<MasarLogoSvg mono className="h-7 w-auto" />
 					</Link>
 				)}
 				<button
