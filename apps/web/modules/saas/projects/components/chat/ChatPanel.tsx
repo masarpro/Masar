@@ -85,7 +85,7 @@ export function ChatPanel({
 			label: t("projects.chat.ownerChannel"),
 			icon: Shield,
 			note: t("projects.chat.ownerChannelNote"),
-			noteColor: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+			noteColor: "bg-chart-1/15 text-chart-1 dark:bg-chart-1/20 dark:text-chart-1",
 		},
 	];
 
@@ -132,7 +132,7 @@ export function ChatPanel({
 							className={cn(
 								"flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
 								activeChannel === channel.key
-									? "bg-background text-foreground shadow-sm"
+									? "bg-background text-foreground"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>

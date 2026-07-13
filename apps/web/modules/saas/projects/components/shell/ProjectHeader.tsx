@@ -36,7 +36,7 @@ export const ProjectHeader = memo(function ProjectHeader({
 	return (
 		<div className="space-y-2">
 			<div
-				className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
+				className="flex items-center justify-between gap-4 p-4 rounded-xl bg-card border-2"
 				dir="rtl"
 			>
 				{/* Back button + Project name */}

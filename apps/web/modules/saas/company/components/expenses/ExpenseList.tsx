@@ -123,13 +123,13 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const getStatusBadge = (active: boolean) => {
 		if (active) {
 			return (
-				<Badge className="bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-0 text-[10px] px-2 py-0.5">
+				<Badge className="bg-chart-4/15 text-chart-4 border-0 text-[10px] px-2 py-0.5">
 					{t("company.expenses.statusActive")}
 				</Badge>
 			);
 		}
 		return (
-			<Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-500 border-0 text-[10px] px-2 py-0.5">
+			<Badge className="bg-muted text-muted-foreground border-0 text-[10px] px-2 py-0.5">
 				{t("company.expenses.statusInactive")}
 			</Badge>
 		);
@@ -137,11 +137,11 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 
 	const getRecurrenceBadge = (recurrence: string) => {
 		const styles: Record<string, string> = {
-			MONTHLY: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			QUARTERLY: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
-			SEMI_ANNUAL: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-			ANNUAL: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-			ONE_TIME: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-500",
+			MONTHLY: "bg-chart-4/15 text-chart-4",
+			QUARTERLY: "bg-chart-4/15 text-chart-4",
+			SEMI_ANNUAL: "bg-chart-1/15 text-chart-1",
+			ANNUAL: "bg-destructive/15 text-destructive",
+			ONE_TIME: "bg-muted text-muted-foreground",
 		};
 		return (
 			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${styles[recurrence] ?? styles.ONE_TIME}`}>
@@ -163,69 +163,69 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								label: t("company.expenses.totalMonthly"),
 								value: formatCurrency(summary.totalMonthlyAmount),
 								icon: Banknote,
-								iconClassName: "text-chart-4 dark:text-chart-4",
-								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
-								valueClassName: "text-chart-4 dark:text-chart-4",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
+								valueClassName: "text-chart-4",
 							},
 							{
 								label: t("company.expenses.totalAnnual"),
 								value: formatCurrency(summary.totalAnnualAmount),
 								icon: CalendarRange,
-								iconClassName: "text-indigo-600 dark:text-indigo-400",
-								iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
-								valueClassName: "text-indigo-700 dark:text-indigo-300",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
+								valueClassName: "text-chart-4",
 							},
 							{
 								label: t("company.expenses.activeCount"),
 								value: summary.totalActiveExpenses,
 								icon: Receipt,
-								iconClassName: "text-chart-4 dark:text-chart-4",
-								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
-								valueClassName: "text-chart-4 dark:text-chart-4",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
+								valueClassName: "text-chart-4",
 							},
 						]}
 					/>
 
 					{/* الديسكتوب كما هو */}
 					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-3">
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<Banknote className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.expenses.totalMonthly")}
 						</p>
-						<p className="text-xl font-bold text-chart-4 dark:text-chart-4">
+						<p className="text-xl font-bold text-chart-4">
 							{formatCurrency(summary.totalMonthlyAmount)}
 						</p>
 					</div>
 
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-								<CalendarRange className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<CalendarRange className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.expenses.totalAnnual")}
 						</p>
-						<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
+						<p className="text-xl font-bold text-chart-4">
 							{formatCurrency(summary.totalAnnualAmount)}
 						</p>
 					</div>
 
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-								<Receipt className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<Receipt className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.expenses.activeCount")}
 						</p>
-						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+						<p className="text-2xl font-bold text-chart-4">
 							{summary.totalActiveExpenses}
 						</p>
 					</div>
@@ -236,12 +236,12 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			{/* الجوال: بحث + ورقة فلاتر + أزرار مضغوطة في صف واحد */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("company.expenses.searchPlaceholder")}
 						value={search}
 						onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
-						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+						className="rounded-lg border border-input bg-card pe-10"
 					/>
 				</div>
 				<MobileFilterSheet activeCount={(categoryFilter !== "all" ? 1 : 0) + (activeFilter !== "all" ? 1 : 0)}>
@@ -272,7 +272,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				<Button
 					variant="outline"
 					onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-chart-4/50 dark:border-chart-4/30 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
+					className="h-10 shrink-0 rounded-xl px-2.5 text-xs border-chart-4/30 text-chart-4 hover:bg-chart-4/15"
 				>
 					<Send className="me-1 h-4 w-4" />
 					{t("company.expenses.postToFinance")}
@@ -281,7 +281,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					size="icon"
 					aria-label={t("company.expenses.addExpense")}
 					onClick={() => setShowAddDialog(true)}
-					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="h-5 w-5" />
 				</Button>
@@ -291,16 +291,16 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
-						<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+						<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder={t("company.expenses.searchPlaceholder")}
 							value={search}
 							onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-lg border border-input bg-card pe-10"
 						/>
 					</div>
 					<Select value={categoryFilter} onValueChange={(v: any) => { setCategoryFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[160px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.expenses.filterCategory")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -313,7 +313,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 						</SelectContent>
 					</Select>
 					<Select value={activeFilter} onValueChange={(v: any) => { setActiveFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[140px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.expenses.filterStatus")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -327,14 +327,14 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					<Button
 						variant="outline"
 						onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
-						className="rounded-xl border-chart-4/50 dark:border-chart-4/30 text-chart-4 hover:bg-chart-4/15 dark:text-chart-4 dark:hover:bg-chart-4/20"
+						className="rounded-xl border-chart-4/30 text-chart-4 hover:bg-chart-4/15"
 					>
 						<Send className="ms-2 h-4 w-4" />
 						{t("company.expenses.postToFinance")}
 					</Button>
 					<Button
 						onClick={() => setShowAddDialog(true)}
-						className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 					>
 						<Plus className="ms-2 h-4 w-4" />
 						{t("company.expenses.addExpense")}
@@ -343,10 +343,10 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			</div>
 
 			{/* Table - Glass Morphism */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-hidden overflow-x-auto">
 				<Table className="w-full">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
+						<TableRow className="border-b-2 hover:bg-transparent">
 							<TableHead className="w-10">
 								<Checkbox
 									checked={expenses.length > 0 && selectedIds.size === expenses.length}
@@ -354,19 +354,19 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 									aria-label={t("common.selectAll")}
 								/>
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.expenses.name")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.category")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.expenses.amount")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden md:table-cell">{t("company.expenses.recurrenceLabel")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden lg:table-cell">{t("company.expenses.vendor")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.status")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.expenses.name")}</TableHead>
+							<TableHead className="text-end text-muted-foreground hidden sm:table-cell">{t("company.expenses.category")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.expenses.amount")}</TableHead>
+							<TableHead className="text-end text-muted-foreground hidden md:table-cell">{t("company.expenses.recurrenceLabel")}</TableHead>
+							<TableHead className="text-end text-muted-foreground hidden lg:table-cell">{t("company.expenses.vendor")}</TableHead>
+							<TableHead className="text-end text-muted-foreground hidden sm:table-cell">{t("company.expenses.status")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(8)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -378,7 +378,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 							data.expenses.map((expense: any, index: any) => (
 								<TableRow
 									key={expense.id}
-									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="cursor-pointer border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/expenses/${expense.id}`)}
 								>
@@ -390,20 +390,20 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 										/>
 									</TableCell>
 									<TableCell className="text-end">
-										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">{expense.name}</p>
+										<p className="font-medium text-card-foreground truncate">{expense.name}</p>
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300 hidden sm:table-cell">
+									<TableCell className="text-end text-muted-foreground hidden sm:table-cell">
 										{t(`company.expenses.categories.${expense.category}`)}
 									</TableCell>
-									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-card-foreground">
 										{formatCurrency(Number(expense.amount))}
 									</TableCell>
 									<TableCell className="text-end hidden md:table-cell">{getRecurrenceBadge(expense.recurrence)}</TableCell>
 									<TableCell className="text-end hidden lg:table-cell">
 										{expense.vendor ? (
-											<span className="text-slate-600 dark:text-slate-300 truncate block">{expense.vendor}</span>
+											<span className="text-muted-foreground truncate block">{expense.vendor}</span>
 										) : (
-											<span className="text-xs text-slate-500">-</span>
+											<span className="text-xs text-muted-foreground">-</span>
 										)}
 									</TableCell>
 									<TableCell className="text-end hidden sm:table-cell">{getStatusBadge(expense.isActive)}</TableCell>
@@ -412,7 +412,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 											<Button
 												variant="ghost"
 												size="icon"
-												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+												className="rounded-xl hover:bg-destructive/10"
 												aria-label={t("company.expenses.deactivate")}
 												onClick={(e: any) => {
 													e.stopPropagation();

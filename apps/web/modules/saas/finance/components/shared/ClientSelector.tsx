@@ -74,16 +74,16 @@ export function ClientSelector({
 					>
 						{selectedClient ? (
 							<div className="flex items-center gap-2 text-start">
-								<User className="h-4 w-4 text-slate-400" />
+								<User className="h-4 w-4 text-muted-foreground" />
 								<span>{selectedClient.name}</span>
 								{selectedClient.company && (
-									<span className="text-slate-500">
+									<span className="text-muted-foreground">
 										- {selectedClient.company}
 									</span>
 								)}
 							</div>
 						) : (
-							<span className="text-slate-500">
+							<span className="text-muted-foreground">
 								{t("finance.clients.selectOrEnter")}
 							</span>
 						)}
@@ -100,7 +100,7 @@ export function ClientSelector({
 						<CommandList>
 							<CommandEmpty>
 								<div className="py-4 text-center">
-									<p className="text-sm text-slate-500">
+									<p className="text-sm text-muted-foreground">
 										{t("finance.clients.noResults")}
 									</p>
 									<Button
@@ -145,7 +145,7 @@ export function ClientSelector({
 										<div className="flex-1">
 											<p className="font-medium">{client.name}</p>
 											{client.company && (
-												<p className="text-sm text-slate-500">
+												<p className="text-sm text-muted-foreground">
 													{client.company}
 												</p>
 											)}
@@ -162,7 +162,7 @@ export function ClientSelector({
 					type="button"
 					variant="link"
 					size="sm"
-					className="text-slate-500"
+					className="text-muted-foreground"
 					onClick={() => onSelect(null)}
 				>
 					{t("finance.clients.clearSelection")}

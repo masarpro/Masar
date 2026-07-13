@@ -208,9 +208,9 @@ export function NotificationPreferencesPanel({
 
 	if (isError || !prefs) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-12 text-center dark:border-slate-800 dark:bg-slate-900/50">
-				<AlertCircle className="mb-3 h-8 w-8 text-slate-400" />
-				<p className="mb-4 text-sm text-slate-500">
+			<div className="flex flex-col items-center justify-center rounded-2xl border-2 bg-card py-12 text-center">
+				<AlertCircle className="mb-3 h-8 w-8 text-muted-foreground" />
+				<p className="mb-4 text-sm text-muted-foreground">
 					{t("settings.notifications.loadError")}
 				</p>
 				<Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -225,14 +225,14 @@ export function NotificationPreferencesPanel({
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
-					<div className="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-						<Bell className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+						<Bell className="h-5 w-5" />
 					</div>
 					<div>
-						<h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+						<h2 className="text-lg font-semibold text-foreground">
 							{t("settings.notifications.title")}
 						</h2>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("settings.notifications.description")}
 						</p>
 					</div>
@@ -249,8 +249,8 @@ export function NotificationPreferencesPanel({
 						{t("settings.notifications.resetDefaults")}
 					</Button>
 					<div className="flex items-center gap-2">
-						<BellOff className="h-4 w-4 text-slate-500" />
-						<span className="text-sm text-slate-700 dark:text-slate-300">
+						<BellOff className="h-4 w-4 text-muted-foreground" />
+						<span className="text-sm text-foreground">
 							{t("settings.notifications.muteAll")}
 						</span>
 						<Switch
@@ -276,15 +276,15 @@ export function NotificationPreferencesPanel({
 			)}
 
 			{/* Email Digest */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card p-6">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
-						<Mail className="h-5 w-5 text-slate-500" />
+						<Mail className="h-5 w-5 text-muted-foreground" />
 						<div>
-							<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+							<p className="text-sm font-medium text-foreground">
 								{t("settings.notifications.emailDigest")}
 							</p>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
+							<p className="text-xs text-muted-foreground">
 								{t(
 									"settings.notifications.emailDigestDescription",
 								)}
@@ -306,7 +306,7 @@ export function NotificationPreferencesPanel({
 
 			{/* Search */}
 			<div className="relative">
-				<Search className="absolute top-2.5 start-3 h-4 w-4 text-slate-400" />
+				<Search className="absolute top-2.5 start-3 h-4 w-4 text-muted-foreground" />
 				<Input
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
@@ -317,10 +317,10 @@ export function NotificationPreferencesPanel({
 
 			{/* Groups */}
 			<div
-				className={`rounded-2xl border border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 ${isMuted ? "pointer-events-none opacity-50" : ""}`}
+				className={`rounded-2xl border-2 bg-card px-4 ${isMuted ? "pointer-events-none opacity-50" : ""}`}
 			>
 				{filteredGroups.length === 0 ? (
-					<p className="py-8 text-center text-sm text-slate-500">
+					<p className="py-8 text-center text-sm text-muted-foreground">
 						{t("settings.notifications.searchEmpty")}
 					</p>
 				) : (
@@ -345,13 +345,13 @@ export function NotificationPreferencesPanel({
 								>
 									<AccordionTrigger className="hover:no-underline">
 										<div className="flex flex-1 items-center gap-3 pe-3">
-											<ModuleIcon className="h-4 w-4 shrink-0 text-slate-500" />
+											<ModuleIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
 											<span className="font-semibold">
 												{t(
 													`notifications.modules.${group.key}`,
 												)}
 											</span>
-											<Badge className="border-0 bg-slate-100 font-normal text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+											<Badge className="border-0 bg-muted font-normal text-muted-foreground">
 												{t(
 													"settings.notifications.enabledCount",
 													{
@@ -394,19 +394,19 @@ export function NotificationPreferencesPanel({
 									</AccordionTrigger>
 									<AccordionContent>
 										{/* Column headers */}
-										<div className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2 border-b border-slate-200/70 pb-2 dark:border-slate-700/50">
-											<span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+										<div className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2 border-b border-border pb-2">
+											<span className="text-xs font-semibold text-muted-foreground">
 												{t(
 													"settings.notifications.notificationType",
 												)}
 											</span>
-											<span className="flex items-center justify-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+											<span className="flex items-center justify-center gap-1 text-xs font-semibold text-muted-foreground">
 												<Smartphone className="h-3.5 w-3.5" />
 												{t(
 													"settings.notifications.inApp",
 												)}
 											</span>
-											<span className="flex items-center justify-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+											<span className="flex items-center justify-center gap-1 text-xs font-semibold text-muted-foreground">
 												<Mail className="h-3.5 w-3.5" />
 												{t(
 													"settings.notifications.email",

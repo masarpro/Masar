@@ -26,9 +26,9 @@ interface LeavesMiniSectionProps {
 type LeaveSection = "requests" | "balances" | "types";
 
 const SECTION_CONFIG: { id: LeaveSection; icon: typeof ClipboardList; color: string; bg: string }[] = [
-	{ id: "requests", icon: ClipboardList, color: "text-chart-4 dark:text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20" },
-	{ id: "balances", icon: Wallet, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
-	{ id: "types", icon: Settings, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-900/30" },
+	{ id: "requests", icon: ClipboardList, color: "text-chart-4", bg: "bg-chart-4/15" },
+	{ id: "balances", icon: Wallet, color: "text-success", bg: "bg-success/15" },
+	{ id: "types", icon: Settings, color: "text-chart-4", bg: "bg-chart-4/15" },
 ];
 
 export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMiniSectionProps) {
@@ -51,73 +51,73 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 						label: t("company.leaves.dashboard.onLeaveToday"),
 						value: isLoading ? "..." : data?.onLeaveToday?.length ?? 0,
 						icon: Users,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 					},
 					{
 						label: t("company.leaves.dashboard.pendingRequests"),
 						value: isLoading ? "..." : data?.pendingRequests ?? 0,
 						icon: Clock,
-						iconClassName: "text-amber-600 dark:text-amber-400",
-						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
 					},
 					{
 						label: t("company.leaves.dashboard.lowBalances"),
 						value: isLoading ? "..." : data?.lowBalances?.length ?? 0,
 						icon: AlertTriangle,
-						iconClassName: "text-red-600 dark:text-red-400",
-						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+						iconClassName: "text-destructive",
+						iconBgClassName: "bg-destructive/15",
 					},
 				]}
 			/>
 
 			{/* Summary Cards (الديسكتوب كما هو) */}
 			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Users className="h-5 w-5" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.leaves.dashboard.onLeaveToday")}
 					</p>
-					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+					<p className="text-2xl font-bold text-chart-4">
 						{isLoading ? "..." : data?.onLeaveToday?.length ?? 0}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-							<Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+							<Clock className="h-5 w-5" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.leaves.dashboard.pendingRequests")}
 					</p>
-					<p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+					<p className="text-2xl font-bold text-chart-1">
 						{isLoading ? "..." : data?.pendingRequests ?? 0}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-							<AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-destructive/15 text-destructive">
+							<AlertTriangle className="h-5 w-5" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.leaves.dashboard.lowBalances")}
 					</p>
-					<p className="text-2xl font-bold text-red-700 dark:text-red-300">
+					<p className="text-2xl font-bold text-destructive">
 						{isLoading ? "..." : data?.lowBalances?.length ?? 0}
 					</p>
 				</div>
 			</div>
 
 			{/* Segmented Pills */}
-			<div className="flex gap-2 p-1 rounded-xl backdrop-blur-xl bg-slate-100/80 dark:bg-slate-800/50 w-fit">
+			<div className="flex gap-2 p-1 rounded-xl bg-muted w-fit">
 				{SECTION_CONFIG.map((section) => {
 					const Icon = section.icon;
 					const isActive = activeSection === section.id;
@@ -128,8 +128,8 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 							onClick={() => setActiveSection(section.id)}
 							className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
 								isActive
-									? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-slate-100"
-									: "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+									? "bg-card text-card-foreground"
+									: "text-muted-foreground hover:text-card-foreground"
 							}`}
 						>
 							<Icon className="h-4 w-4" />

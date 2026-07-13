@@ -130,8 +130,8 @@ export function GanttRow({
 							cx={isRtl ? bar.x + bar.width + 8 : bar.x - 8}
 							cy={bar.y + BAR_HEIGHT / 2}
 							r={4}
-							fill="rgb(245, 158, 11)"
-							stroke="white"
+							fill="var(--chart-1)"
+							stroke="var(--background)"
 							strokeWidth={1}
 						/>
 					)}
@@ -199,7 +199,7 @@ export function GanttRow({
 					height={ACTUAL_BAR_HEIGHT}
 					rx={2}
 					ry={2}
-					fill={milestone.status === "COMPLETED" ? "rgb(34, 197, 94)" : "rgb(20, 184, 166)"}
+					fill={milestone.status === "COMPLETED" ? "var(--success)" : "var(--chart-3)"}
 					opacity={0.8}
 				/>
 			)}

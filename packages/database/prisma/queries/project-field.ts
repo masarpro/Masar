@@ -516,6 +516,186 @@ export async function addProgressUpdate(data: {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Field Activity Summary (org-wide) - ملخص النشاط الميداني على مستوى المنظمة
+// Powers the dashboard "النشاط الميداني" card: site updates + open issues.
+// All field models (photos/reports/progress/issues) are per-project, so every
+// aggregation is scoped through `project: { organizationId }`.
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getFieldActivitySummary(organizationId: string) {
+	const now = new Date();
+	const startOfToday = new Date(now);
+	startOfToday.setUTCHours(0, 0, 0, 0);
+	const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+	const DAY_MS = 24 * 60 * 60 * 1000;
+
+	// Active projects are the "sites" we track for freshness.
+	const activeProjects = await db.project.findMany({
+		where: { organizationId, status: "ACTIVE" },
+		select: { id: true, name: true, createdAt: true },
+	});
+	const activeIds = activeProjects.map((p) => p.id);
+	const hasActive = activeIds.length > 0;
+
+	const [
+		// Distinct projects with any activity today (3 sources)
+		photosToday,
+		reportsToday,
+		progressToday,
+		// New media/reports in the last 7 days
+		newPhotos,
+		newDailyReports,
+		newProgressUpdates,
+		// Last-activity timestamps per project (for the stalest site)
+		photoLast,
+		reportLast,
+		progressLast,
+		// Open issues + high priority (across all org projects)
+		openCount,
+		highPriorityCount,
+		// Recently resolved issues for the average-resolution figure
+		resolvedIssues,
+	] = await Promise.all([
+		hasActive
+			? db.projectPhoto.findMany({
+					where: { projectId: { in: activeIds }, createdAt: { gte: startOfToday } },
+					select: { projectId: true },
+					distinct: ["projectId"],
+				})
+			: Promise.resolve([] as { projectId: string }[]),
+		hasActive
+			? db.projectDailyReport.findMany({
+					where: { projectId: { in: activeIds }, reportDate: { gte: startOfToday } },
+					select: { projectId: true },
+					distinct: ["projectId"],
+				})
+			: Promise.resolve([] as { projectId: string }[]),
+		hasActive
+			? db.projectProgressUpdate.findMany({
+					where: { projectId: { in: activeIds }, createdAt: { gte: startOfToday } },
+					select: { projectId: true },
+					distinct: ["projectId"],
+				})
+			: Promise.resolve([] as { projectId: string }[]),
+		db.projectPhoto.count({
+			where: { project: { organizationId }, createdAt: { gte: sevenDaysAgo } },
+		}),
+		db.projectDailyReport.count({
+			where: { project: { organizationId }, createdAt: { gte: sevenDaysAgo } },
+		}),
+		db.projectProgressUpdate.count({
+			where: { project: { organizationId }, createdAt: { gte: sevenDaysAgo } },
+		}),
+		hasActive
+			? db.projectPhoto.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: activeIds } },
+					_max: { createdAt: true },
+				})
+			: Promise.resolve([] as { projectId: string; _max: { createdAt: Date | null } }[]),
+		hasActive
+			? db.projectDailyReport.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: activeIds } },
+					_max: { createdAt: true },
+				})
+			: Promise.resolve([] as { projectId: string; _max: { createdAt: Date | null } }[]),
+		hasActive
+			? db.projectProgressUpdate.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: activeIds } },
+					_max: { createdAt: true },
+				})
+			: Promise.resolve([] as { projectId: string; _max: { createdAt: Date | null } }[]),
+		db.projectIssue.count({
+			where: {
+				project: { organizationId },
+				status: { in: ["OPEN", "IN_PROGRESS"] },
+			},
+		}),
+		db.projectIssue.count({
+			where: {
+				project: { organizationId },
+				status: { in: ["OPEN", "IN_PROGRESS"] },
+				severity: { in: ["HIGH", "CRITICAL"] },
+			},
+		}),
+		db.projectIssue.findMany({
+			where: {
+				project: { organizationId },
+				status: { in: ["RESOLVED", "CLOSED"] },
+				resolvedAt: { not: null },
+			},
+			select: { createdAt: true, resolvedAt: true },
+			orderBy: { resolvedAt: "desc" },
+			take: 200,
+		}),
+	]);
+
+	// Projects updated today = union of the three activity sources.
+	const updatedTodaySet = new Set<string>();
+	for (const row of [...photosToday, ...reportsToday, ...progressToday]) {
+		updatedTodaySet.add(row.projectId);
+	}
+
+	// Last field activity per active project (fall back to nothing = never).
+	const lastActivity = new Map<string, number>();
+	for (const rows of [photoLast, reportLast, progressLast]) {
+		for (const r of rows) {
+			const ts = r._max.createdAt?.getTime();
+			if (ts === undefined) continue;
+			const prev = lastActivity.get(r.projectId);
+			if (prev === undefined || ts > prev) {
+				lastActivity.set(r.projectId, ts);
+			}
+		}
+	}
+
+	// Stalest site: the active project (that had activity at least once) whose
+	// last update is the oldest. Only surfaced once it has gone quiet (≥2 days).
+	let stalest: { projectName: string; days: number } | null = null;
+	for (const p of activeProjects) {
+		const last = lastActivity.get(p.id);
+		if (last === undefined) continue; // never had field activity → skip
+		const days = Math.floor((now.getTime() - last) / DAY_MS);
+		if (days >= 2 && (stalest === null || days > stalest.days)) {
+			stalest = { projectName: p.name, days };
+		}
+	}
+
+	// Average resolution time in whole days.
+	let avgResolutionDays: number | null = null;
+	if (resolvedIssues.length > 0) {
+		let sum = 0;
+		let n = 0;
+		for (const iss of resolvedIssues) {
+			if (!iss.resolvedAt) continue;
+			const diff = iss.resolvedAt.getTime() - iss.createdAt.getTime();
+			if (diff < 0) continue;
+			sum += diff;
+			n += 1;
+		}
+		if (n > 0) {
+			avgResolutionDays = Math.max(1, Math.round(sum / n / DAY_MS));
+		}
+	}
+
+	return {
+		siteUpdates: {
+			updatedTodayCount: updatedTodaySet.size,
+			newPhotos,
+			newReports: newDailyReports + newProgressUpdates,
+			stalest,
+		},
+		issues: {
+			openCount,
+			highPriorityCount,
+			avgResolutionDays,
+		},
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Field Timeline - الجدول الزمني الميداني
 // ═══════════════════════════════════════════════════════════════════════════
 

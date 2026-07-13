@@ -125,9 +125,9 @@ export function IsolatedCombinedFields({
 									hasTopLong: e.target.checked,
 								})
 							}
-							className="rounded border-green-500"
+							className="rounded border-success"
 						/>
-						<Label htmlFor="hasTopMesh" className="text-sm font-medium text-green-700">
+						<Label htmlFor="hasTopMesh" className="text-sm font-medium text-success">
 							الشبكة العلوية (الغطاء)
 						</Label>
 						{formData.type === "combined" && (
@@ -169,7 +169,7 @@ export function IsolatedCombinedFields({
 			<div className="border-t pt-4 space-y-4">
 				{/* الأغطية الخرسانية */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-purple-700">
+					<h5 className="text-sm font-medium text-chart-4">
 						{t("pricing.studies.structural.covers.label")}
 					</h5>
 					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -220,9 +220,9 @@ export function IsolatedCombinedFields({
 							id="foundationHasLeanConcrete"
 							checked={formData.foundationHasLeanConcrete}
 							onChange={(e: any) => setFormData({ ...formData, foundationHasLeanConcrete: e.target.checked })}
-							className="rounded border-gray-500"
+							className="rounded border-input"
 						/>
-						<Label htmlFor="foundationHasLeanConcrete" className="text-sm font-medium text-gray-700">
+						<Label htmlFor="foundationHasLeanConcrete" className="text-sm font-medium text-muted-foreground">
 							{t("pricing.studies.structural.leanConcrete.label")}
 						</Label>
 					</div>
@@ -250,9 +250,9 @@ export function IsolatedCombinedFields({
 							id="foundationHasColumnDowels"
 							checked={formData.foundationHasColumnDowels}
 							onChange={(e: any) => setFormData({ ...formData, foundationHasColumnDowels: e.target.checked })}
-							className="rounded border-teal-500"
+							className="rounded border-chart-3"
 						/>
-						<Label htmlFor="foundationHasColumnDowels" className="text-sm font-medium text-teal-700">
+						<Label htmlFor="foundationHasColumnDowels" className="text-sm font-medium text-chart-3">
 							{t("pricing.studies.structural.columnDowels.label")}
 						</Label>
 					</div>

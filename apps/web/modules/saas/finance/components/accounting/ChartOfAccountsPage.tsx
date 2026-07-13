@@ -134,7 +134,7 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 			{/* Search */}
 			<div className="flex items-center gap-3">
 				<div className="relative flex-1 max-w-sm">
-					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.accounting.search")}
 						value={search}
@@ -145,9 +145,9 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 			</div>
 
 			{/* Tree */}
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardContent className="p-0">
-					<div className="divide-y divide-slate-100 dark:divide-slate-800">
+					<div className="divide-y divide-border">
 						{filteredTree.map((node) => (
 							<AccountTreeNode
 								key={node.id}
@@ -189,7 +189,7 @@ function AccountTreeNode({
 	return (
 		<>
 			<div
-				className={`flex items-center gap-2 py-2.5 px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${
+				className={`flex items-center gap-2 py-2.5 px-4 hover:bg-accent cursor-pointer transition-colors ${
 					isLevel1 ? `${colors.bg} font-semibold` : ""
 				} ${!node.isActive ? "opacity-50" : ""}`}
 				style={{ paddingInlineStart: `${depth * 1.5 + 1}rem` }}
@@ -199,9 +199,9 @@ function AccountTreeNode({
 				<span className="w-5 flex-shrink-0">
 					{hasChildren ? (
 						isExpanded ? (
-							<ChevronDown className="h-4 w-4 text-slate-400" />
+							<ChevronDown className="h-4 w-4 text-muted-foreground" />
 						) : (
-							<ChevronLeft className="h-4 w-4 text-slate-400" />
+							<ChevronLeft className="h-4 w-4 text-muted-foreground" />
 						)
 					) : null}
 				</span>
@@ -214,7 +214,7 @@ function AccountTreeNode({
 				)}
 
 				{/* Code */}
-				<span className="text-xs font-mono text-slate-400 w-12 flex-shrink-0">
+				<span className="text-xs font-mono text-muted-foreground w-12 flex-shrink-0">
 					{node.code}
 				</span>
 
@@ -228,7 +228,7 @@ function AccountTreeNode({
 						{node.nameAr}
 					</Link>
 				) : (
-					<span className={`flex-1 text-sm ${isLevel1 ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
+					<span className={`flex-1 text-sm ${isLevel1 ? "text-card-foreground" : "text-muted-foreground"}`}>
 						{node.nameAr}
 					</span>
 				)}
@@ -244,7 +244,7 @@ function AccountTreeNode({
 				{node.isPostable && (
 					<Link
 						href={ledgerHref}
-						className="text-slate-400 hover:text-primary"
+						className="text-muted-foreground hover:text-primary"
 						onClick={(e) => e.stopPropagation()}
 						title={t("finance.accounting.viewLedger")}
 					>

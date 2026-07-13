@@ -91,19 +91,19 @@ export function CostCenterReport({ organizationId }: Props) {
 
 			{/* Totals */}
 			<div className="grid gap-4 sm:grid-cols-3">
-				<Card className="rounded-2xl bg-green-50 dark:bg-green-950/20 border-green-200">
+				<Card className="rounded-2xl bg-success/10 border-success/30">
 					<CardContent className="p-4 text-center">
-						<p className="text-xs text-green-600">{t("finance.accounting.incomeStatement.totalRevenue")}</p>
-						<p className="text-xl font-bold text-green-700">{formatAccounting(totals.totalRevenue)}</p>
+						<p className="text-xs text-success">{t("finance.accounting.incomeStatement.totalRevenue")}</p>
+						<p className="text-xl font-bold text-success">{formatAccounting(totals.totalRevenue)}</p>
 					</CardContent>
 				</Card>
-				<Card className="rounded-2xl bg-red-50 dark:bg-red-950/20 border-red-200">
+				<Card className="rounded-2xl bg-destructive/10 border-destructive/30">
 					<CardContent className="p-4 text-center">
-						<p className="text-xs text-red-600">{t("finance.accounting.expenses")}</p>
-						<p className="text-xl font-bold text-red-700">{formatAccounting(totals.totalExpenses)}</p>
+						<p className="text-xs text-destructive">{t("finance.accounting.expenses")}</p>
+						<p className="text-xl font-bold text-destructive">{formatAccounting(totals.totalExpenses)}</p>
 					</CardContent>
 				</Card>
-				<Card className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border-chart-4">
+				<Card className="rounded-2xl bg-chart-4/10 border-chart-4/30">
 					<CardContent className="p-4 text-center">
 						<p className="text-xs text-chart-4">{t("finance.accounting.incomeStatement.netProfit")}</p>
 						<p className="text-xl font-bold text-chart-4">{formatAccounting(totals.netProfit)}</p>
@@ -115,7 +115,7 @@ export function CostCenterReport({ organizationId }: Props) {
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
 					{projects.length === 0 ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.noEntries")}
 						</div>
 					) : (
@@ -134,25 +134,25 @@ export function CostCenterReport({ organizationId }: Props) {
 							<TableBody>
 								{projects.map((project: any) => {
 									const isExpanded = expandedProjects.has(project.projectId);
-									const marginColor = project.profitMargin >= 20 ? "text-green-600" : project.profitMargin >= 0 ? "text-amber-600" : "text-red-600";
+									const marginColor = project.profitMargin >= 20 ? "text-success" : project.profitMargin >= 0 ? "text-chart-1" : "text-destructive";
 									return (
 										<>
 											<TableRow
 												key={project.projectId ?? "unassigned"}
-												className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium"
+												className="cursor-pointer hover:bg-accent font-medium"
 												onClick={() => toggleExpand(project.projectId)}
 											>
 												<TableCell>
 													{isExpanded ? (
-														<ChevronDown className="h-4 w-4 text-slate-400" />
+														<ChevronDown className="h-4 w-4 text-muted-foreground" />
 													) : (
-														<ChevronLeft className="h-4 w-4 text-slate-400" />
+														<ChevronLeft className="h-4 w-4 text-muted-foreground" />
 													)}
 												</TableCell>
 												<TableCell>{project.projectName}</TableCell>
-												<TableCell className="text-end text-green-600">{formatAccounting(project.totalRevenue)}</TableCell>
-												<TableCell className="text-end text-red-600">{formatAccounting(project.totalExpenses)}</TableCell>
-												<TableCell className="text-end text-orange-600">
+												<TableCell className="text-end text-success">{formatAccounting(project.totalRevenue)}</TableCell>
+												<TableCell className="text-end text-destructive">{formatAccounting(project.totalExpenses)}</TableCell>
+												<TableCell className="text-end text-chart-1">
 													{project.allocatedCompanyExpenses
 														? formatAccounting(project.allocatedCompanyExpenses)
 														: "—"}
@@ -163,10 +163,10 @@ export function CostCenterReport({ organizationId }: Props) {
 												</TableCell>
 											</TableRow>
 											{isExpanded && project.accounts.map((acc: any) => (
-												<TableRow key={`${project.projectId}-${acc.code}`} className="bg-slate-50/50 dark:bg-slate-800/30">
+												<TableRow key={`${project.projectId}-${acc.code}`} className="bg-muted/50">
 													<TableCell />
 													<TableCell className="ps-8 text-sm">
-														<span className="text-slate-400 font-mono me-2">{acc.code}</span>
+														<span className="text-muted-foreground font-mono me-2">{acc.code}</span>
 														{acc.nameAr}
 														<Badge variant="outline" className="ms-2 text-[9px]">
 															{acc.type === "REVENUE" ? t("finance.accounting.revenue") : t("finance.accounting.expenses")}
@@ -183,12 +183,12 @@ export function CostCenterReport({ organizationId }: Props) {
 									);
 								})}
 								{/* Grand Total */}
-								<TableRow className="border-t-2 font-bold bg-slate-100 dark:bg-slate-800">
+								<TableRow className="border-t-2 font-bold bg-muted">
 									<TableCell />
 									<TableCell>{t("finance.accounting.aging.total")}</TableCell>
-									<TableCell className="text-end text-green-700">{formatAccounting(totals.totalRevenue)}</TableCell>
-									<TableCell className="text-end text-red-700">{formatAccounting(totals.totalExpenses)}</TableCell>
-									<TableCell className="text-end text-orange-700">
+									<TableCell className="text-end text-success">{formatAccounting(totals.totalRevenue)}</TableCell>
+									<TableCell className="text-end text-destructive">{formatAccounting(totals.totalExpenses)}</TableCell>
+									<TableCell className="text-end text-chart-1">
 										{totalAllocated ? formatAccounting(totalAllocated) : "—"}
 									</TableCell>
 									<TableCell className="text-end">{formatAccounting(totals.netProfit)}</TableCell>

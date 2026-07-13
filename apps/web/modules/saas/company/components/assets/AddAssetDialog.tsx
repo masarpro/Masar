@@ -105,7 +105,7 @@ export function AddAssetDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl">
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold text-end">
 						{t("company.assets.addAsset")}
 					</DialogTitle>
@@ -116,7 +116,7 @@ export function AddAssetDialog({
 						{/* Row 1: Name, Category, Type */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.name")} *
 								</Label>
 								<Input
@@ -127,7 +127,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.category")} *
 								</Label>
 								<Select
@@ -147,7 +147,7 @@ export function AddAssetDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.type")} *
 								</Label>
 								<Select
@@ -171,7 +171,7 @@ export function AddAssetDialog({
 						{/* Row 2: Brand, Model, Serial Number */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.brand")}
 								</Label>
 								<Input
@@ -181,7 +181,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.model")}
 								</Label>
 								<Input
@@ -191,7 +191,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.serialNumber")}
 								</Label>
 								<Input
@@ -205,7 +205,7 @@ export function AddAssetDialog({
 						{/* Row 3: Year, Purchase Price, Monthly Rent */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.year")}
 								</Label>
 								<Input
@@ -216,7 +216,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.purchasePrice")}
 								</Label>
 								<Input
@@ -230,7 +230,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.monthlyRent")}
 								</Label>
 								<Input
@@ -248,7 +248,7 @@ export function AddAssetDialog({
 						{/* Row 4: Current Value, Purchase Date, Warranty Expiry */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.currentValue")}
 								</Label>
 								<Input
@@ -262,7 +262,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.purchaseDate")}
 								</Label>
 								<Input
@@ -273,7 +273,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.warrantyExpiry")}
 								</Label>
 								<Input
@@ -288,7 +288,7 @@ export function AddAssetDialog({
 						{/* Row 5: Insurance Expiry, Notes */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.assets.insuranceExpiry")}
 								</Label>
 								<Input
@@ -299,7 +299,7 @@ export function AddAssetDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.common.notes")}
 								</Label>
 								<Input
@@ -312,7 +312,7 @@ export function AddAssetDialog({
 					</div>
 
 					{/* Footer Actions */}
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+					<div className="bg-muted/50 border-t-2 px-5 py-3 flex gap-3">
 						<Button
 							type="button"
 							variant="outline"

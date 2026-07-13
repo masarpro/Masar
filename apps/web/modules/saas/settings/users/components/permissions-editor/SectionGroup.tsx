@@ -32,8 +32,8 @@ export function SectionGroup({
 	};
 
 	return (
-		<div className="rounded-xl border border-border/60 bg-card/60">
-			<div className="flex items-center justify-between border-b border-border/60 px-4 py-2.5">
+		<div className="rounded-xl border-2 bg-card">
+			<div className="flex items-center justify-between border-b border-border px-4 py-2.5">
 				<div className="flex items-center gap-2">
 					<h4 className="font-semibold text-sm">
 						{SECTION_LABELS_AR[section]}
@@ -68,7 +68,7 @@ export function SectionGroup({
 								{actionLabels[action]}
 								{isCustomized && (
 									<span
-										className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-700 dark:bg-amber-900/50 dark:text-amber-400"
+										className="inline-flex items-center rounded-full bg-chart-1/15 px-1.5 py-0.5 text-[10px] text-chart-1"
 										title="مخصص — يختلف عن صلاحيات الدور"
 									>
 										مخصص

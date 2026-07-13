@@ -97,7 +97,7 @@ export function DigestSubscriptionsSection({
 	if (isLoading) {
 		return (
 			<div className="space-y-4" dir="rtl">
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
+				<div className="bg-card border-2 rounded-2xl p-6">
 					<div className="h-24 animate-pulse rounded bg-muted" />
 				</div>
 			</div>
@@ -121,31 +121,31 @@ export function DigestSubscriptionsSection({
 		<div className="space-y-6" dir="rtl">
 			{/* Header */}
 			<div className="flex items-center gap-3">
-				<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-					<Mail className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+				<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+					<Mail className="h-5 w-5" />
 				</div>
 				<div>
-					<h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+					<h2 className="text-lg font-semibold text-foreground">
 						{t("settings.digests.title")}
 					</h2>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("settings.digests.description")}
 					</p>
 				</div>
 			</div>
 
 			{/* Subscriptions List */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="divide-y divide-slate-100/50 dark:divide-slate-800/30">
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="divide-y divide-border">
 					{/* All Projects */}
-					<div className="flex items-center justify-between p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+					<div className="flex items-center justify-between p-4 hover:bg-accent transition-colors">
 						<div className="flex items-center gap-3">
-							<FolderKanban className="h-4 w-4 text-slate-400" />
+							<FolderKanban className="h-4 w-4 text-muted-foreground" />
 							<div>
-								<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+								<p className="text-sm font-medium text-foreground">
 									{t("settings.digests.allProjects")}
 								</p>
-								<p className="text-xs text-slate-500">
+								<p className="text-xs text-muted-foreground">
 									{t("settings.digests.weeklyDigest")}
 								</p>
 							</div>
@@ -168,15 +168,15 @@ export function DigestSubscriptionsSection({
 					{uniqueProjects.map((project) => (
 						<div
 							key={project.id}
-							className="flex items-center justify-between p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+							className="flex items-center justify-between p-4 hover:bg-accent transition-colors"
 						>
 							<div className="flex items-center gap-3">
-								<FolderKanban className="h-4 w-4 text-slate-400" />
+								<FolderKanban className="h-4 w-4 text-muted-foreground" />
 								<div>
-									<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+									<p className="text-sm font-medium text-foreground">
 										{project.name}
 									</p>
-									<p className="text-xs text-slate-500">
+									<p className="text-xs text-muted-foreground">
 										{t("settings.digests.weeklyDigest")}
 									</p>
 								</div>
@@ -198,11 +198,11 @@ export function DigestSubscriptionsSection({
 
 					{uniqueProjects.length === 0 && !isSubscribed(undefined) && (
 						<div className="p-8 text-center">
-							<Mail className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-3" />
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<Mail className="mx-auto h-8 w-8 text-muted-foreground/40 mb-3" />
+							<p className="text-sm text-muted-foreground">
 								{t("settings.digests.noSubscriptions")}
 							</p>
-							<p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+							<p className="text-xs text-muted-foreground mt-1">
 								{t("settings.digests.noSubscriptionsDescription")}
 							</p>
 						</div>

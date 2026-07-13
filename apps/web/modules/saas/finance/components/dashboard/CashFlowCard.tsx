@@ -65,23 +65,23 @@ export function CashFlowCard({ organizationId }: CashFlowCardProps) {
 	};
 
 	return (
-		<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
+		<div className="bg-card border-2 rounded-2xl p-6">
 			<div className="flex items-center justify-between mb-4">
-				<h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+				<h3 className="text-sm font-medium text-card-foreground">
 					{t("finance.dashboard.overview.cashFlow")}
 				</h3>
-				<span className="text-xs text-slate-500 dark:text-slate-400">
+				<span className="text-xs text-muted-foreground">
 					{t("finance.dashboard.overview.last8Weeks")}
 				</span>
 			</div>
 			{isLoading ? (
 				<Skeleton className="h-32 w-full rounded-xl" />
 			) : isError ? (
-				<div className="flex h-32 items-center justify-center text-sm text-slate-500 dark:text-slate-400">
+				<div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
 					{t("finance.dashboard.overview.cashFlowUnavailable")}
 				</div>
 			) : chartData.length === 0 ? (
-				<div className="flex h-32 items-center justify-center text-sm text-slate-500 dark:text-slate-400">
+				<div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
 					{t("finance.dashboard.overview.cashFlowEmpty")}
 				</div>
 			) : (

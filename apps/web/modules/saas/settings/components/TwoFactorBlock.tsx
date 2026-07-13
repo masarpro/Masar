@@ -165,7 +165,7 @@ export function TwoFactorBlock() {
 			{user?.twoFactorEnabled ? (
 				<div className="flex items-start flex-col gap-4">
 					<div className="flex items-center gap-1.5">
-						<ShieldCheckIcon className="size-6 text-green-500" />
+						<ShieldCheckIcon className="size-6 text-success" />
 						<p className="text-sm text-foreground">
 							{t("settings.account.security.twoFactor.enabled")}
 						</p>

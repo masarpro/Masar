@@ -173,7 +173,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 				</div>
 				<Button
 					onClick={openCreate}
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="ms-2 h-4 w-4" />
 					{t("company.leaves.types.create")}
@@ -181,22 +181,22 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 			</div>
 
 			{/* Table */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[700px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.name")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.nameEn")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.daysPerYear")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.isPaid")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.requiresApproval")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.types.name")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.types.nameEn")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.types.daysPerYear")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.types.isPaid")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.types.requiresApproval")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(6)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -208,7 +208,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 							types.map((lt, index) => (
 								<TableRow
 									key={lt.id}
-									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
 									<TableCell className="text-end">
@@ -216,22 +216,22 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 											{lt.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: lt.color }} />
 											)}
-											<span className="font-medium text-slate-900 dark:text-slate-100">{lt.name}</span>
+											<span className="font-medium text-card-foreground">{lt.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-muted-foreground">
 										{lt.nameEn || "-"}
 									</TableCell>
-									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-card-foreground">
 										{lt.daysPerYear}
 									</TableCell>
 									<TableCell className="text-end">
-										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.isPaid ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"}`}>
+										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.isPaid ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}`}>
 											{lt.isPaid ? t("company.leaves.types.paid") : t("company.leaves.types.unpaid")}
 										</Badge>
 									</TableCell>
 									<TableCell className="text-end">
-										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.requiresApproval ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"}`}>
+										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.requiresApproval ? "bg-chart-1/15 text-chart-1" : "bg-chart-4/15 text-chart-4"}`}>
 											{lt.requiresApproval ? t("company.leaves.types.yes") : t("company.leaves.types.no")}
 										</Badge>
 									</TableCell>
@@ -240,22 +240,22 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 											<Button
 												variant="ghost"
 												size="icon"
-												className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 h-8 w-8"
+												className="rounded-lg hover:bg-accent h-8 w-8"
 												onClick={() => openEdit(lt)}
 											>
-												<Pencil className="h-4 w-4 text-slate-500" />
+												<Pencil className="h-4 w-4 text-muted-foreground" />
 											</Button>
 											<Button
 												variant="ghost"
 												size="icon"
-												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 h-8 w-8"
+												className="rounded-xl hover:bg-destructive/10 h-8 w-8"
 												onClick={() => {
 													if (confirm(t("company.leaves.types.confirmDelete"))) {
 														deleteMutation.mutate(lt.id);
 													}
 												}}
 											>
-												<Trash2 className="h-4 w-4 text-red-500" />
+												<Trash2 className="h-4 w-4 text-destructive" />
 											</Button>
 										</div>
 									</TableCell>
@@ -265,10 +265,10 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 							<TableRow>
 								<TableCell colSpan={6} className="text-center py-16">
 									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<Settings className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+										<div className="mb-4 rounded-2xl bg-muted p-5">
+											<Settings className="h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
 										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+										<p className="text-sm text-muted-foreground mb-3">
 											{t("company.leaves.types.noTypes")}
 										</p>
 										<Button

@@ -109,9 +109,9 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 
 	const getStatusBadge = (status: string) => {
 		const styles: Record<string, string> = {
-			ACTIVE: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			ON_LEAVE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-			TERMINATED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+			ACTIVE: "bg-chart-4/15 text-chart-4",
+			ON_LEAVE: "bg-chart-1/15 text-chart-1",
+			TERMINATED: "bg-muted text-muted-foreground",
 		};
 		return (
 			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${styles[status] ?? ""}`}>
@@ -125,14 +125,14 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{employee.name}</h2>
+					<h2 className="text-xl font-bold text-card-foreground">{employee.name}</h2>
 					{employee.employeeNo && (
-						<p className="text-sm text-slate-500 dark:text-slate-400">{employee.employeeNo}</p>
+						<p className="text-sm text-muted-foreground">{employee.employeeNo}</p>
 					)}
 				</div>
 				<Button
 					variant="outline"
-					className="rounded-xl border-white/20 dark:border-slate-700/30"
+					className="rounded-lg"
 					onClick={() => router.push(`/app/${organizationSlug}/company/employees/${employeeId}/edit`)}
 				>
 					<Pencil className="ms-2 h-4 w-4" />
@@ -141,45 +141,45 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 			</div>
 
 			{/* Info Card */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Users className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.employees.basicInfo")}
 					</h3>
 				</div>
 				<div className="p-5">
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.type")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`company.employees.types.${employee.type}`)}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.type")}</p>
+							<p className="font-medium text-card-foreground">{t(`company.employees.types.${employee.type}`)}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.status")}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.status")}</p>
 							<div className="mt-1">{getStatusBadge(employee.status)}</div>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.joinDate")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{new Date(employee.joinDate).toLocaleDateString("ar-SA")}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.joinDate")}</p>
+							<p className="font-medium text-card-foreground">{new Date(employee.joinDate).toLocaleDateString("ar-SA")}</p>
 						</div>
 						{employee.phone && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.phone")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{employee.phone}</p>
+								<p className="text-xs text-muted-foreground">{t("company.employees.phone")}</p>
+								<p className="font-medium text-card-foreground">{employee.phone}</p>
 							</div>
 						)}
 						{employee.email && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.email")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{employee.email}</p>
+								<p className="text-xs text-muted-foreground">{t("company.employees.email")}</p>
+								<p className="font-medium text-card-foreground">{employee.email}</p>
 							</div>
 						)}
 						{employee.nationalId && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.nationalId")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{employee.nationalId}</p>
+								<p className="text-xs text-muted-foreground">{t("company.employees.nationalId")}</p>
+								<p className="font-medium text-card-foreground">{employee.nationalId}</p>
 							</div>
 						)}
 					</div>
@@ -187,40 +187,40 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 			</div>
 
 			{/* Financial Card */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Banknote className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.employees.financialInfo")}
 					</h3>
 				</div>
 				<div className="p-5">
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.baseSalary")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.baseSalary))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.baseSalary")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(employee.baseSalary))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.housingAllowance")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.housingAllowance))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.housingAllowance")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(employee.housingAllowance))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.transportAllowance")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.transportAllowance))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.transportAllowance")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(employee.transportAllowance))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.otherAllowances")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.otherAllowances))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.otherAllowances")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(employee.otherAllowances))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.gosiSubscription")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.gosiSubscription))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.employees.gosiSubscription")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(employee.gosiSubscription))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.totalCost")}</p>
-							<p className="text-lg font-bold text-chart-4 dark:text-chart-4">
+							<p className="text-xs text-muted-foreground">{t("company.employees.totalCost")}</p>
+							<p className="text-lg font-bold text-chart-4">
 								{formatCurrency(totalSalary + Number(employee.gosiSubscription))}
 							</p>
 						</div>
@@ -229,13 +229,13 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 			</div>
 
 			{/* Assignments Card */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center justify-between p-5 border-b border-white/10 dark:border-slate-700/30">
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center justify-between p-5 border-b-2">
 					<div className="flex items-center gap-3">
-						<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-							<Briefcase className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Briefcase className="h-5 w-5" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.employees.projectAssignments")}
 						</h3>
 					</div>
@@ -243,7 +243,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 						<Button
 							size="sm"
 							variant="outline"
-							className="rounded-xl border-white/20 dark:border-slate-700/30"
+							className="rounded-lg"
 							onClick={() => setShowAssignForm(!showAssignForm)}
 						>
 							<Plus className="ms-1 h-4 w-4" />
@@ -253,11 +253,11 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 				</div>
 				<div className="p-5">
 					{showAssignForm && (
-						<div className="mb-4 flex items-end gap-3 rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/30 p-3">
+						<div className="mb-4 flex items-end gap-3 rounded-xl border-2 bg-muted/50 p-3">
 							<div className="flex-1">
-								<label className="mb-1 block text-sm text-slate-600 dark:text-slate-400">{t("company.employees.project")}</label>
+								<label className="mb-1 block text-sm text-muted-foreground">{t("company.employees.project")}</label>
 								<Select value={assignProjectId} onValueChange={setAssignProjectId}>
-									<SelectTrigger className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70">
+									<SelectTrigger className="rounded-lg border border-input bg-card">
 										<SelectValue placeholder={t("company.employees.selectProject")} />
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
@@ -268,19 +268,19 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 								</Select>
 							</div>
 							<div className="w-24">
-								<label className="mb-1 block text-sm text-slate-600 dark:text-slate-400">{t("company.employees.percentage")}</label>
+								<label className="mb-1 block text-sm text-muted-foreground">{t("company.employees.percentage")}</label>
 								<Input
 									type="number"
 									min={1}
 									max={100}
 									value={assignPercentage}
 									onChange={(e: any) => setAssignPercentage(e.target.value)}
-									className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70"
+									className="rounded-lg border border-input bg-card"
 								/>
 							</div>
 							<Button
 								size="sm"
-								className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+								className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
 								onClick={() => assignMutation.mutate()}
 								disabled={!assignProjectId || assignMutation.isPending}
 							>
@@ -294,18 +294,18 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							{employee.assignments.map((assignment: any) => (
 								<div
 									key={assignment.id}
-									className="flex items-center justify-between rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/20 p-3 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40"
+									className="flex items-center justify-between rounded-xl border-2 bg-muted/50 p-3 transition-colors hover:bg-accent"
 								>
 									<div>
-										<p className="font-medium text-slate-900 dark:text-slate-100">{assignment.project.name}</p>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="font-medium text-card-foreground">{assignment.project.name}</p>
+										<p className="text-sm text-muted-foreground">
 											{Number(assignment.percentage)}% - {formatCurrency(totalSalary * Number(assignment.percentage) / 100)}
 										</p>
 									</div>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+										className="rounded-lg hover:bg-destructive/10"
 										onClick={() => {
 											if (confirm(t("company.employees.confirmRemoveAssignment"))) {
 												removeAssignmentMutation.mutate(assignment.id);
@@ -318,11 +318,11 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							))}
 						</div>
 					) : (
-						<div className="rounded-xl border border-chart-4/50 dark:border-chart-4/30 bg-chart-4/15 dark:bg-chart-4/20 p-4 text-center">
-							<p className="text-sm font-medium text-chart-4 dark:text-chart-4">
+						<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/15 p-4 text-center">
+							<p className="text-sm font-medium text-chart-4">
 								{t("company.employees.generalBudget")}
 							</p>
-							<p className="text-xs text-chart-4/70 dark:text-chart-4/70 mt-1">
+							<p className="text-xs text-chart-4/70 mt-1">
 								{t("company.employees.generalBudgetDesc")}
 							</p>
 						</div>
@@ -331,12 +331,12 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 			</div>
 
 			{/* Change History Card */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-						<History className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+						<History className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.employees.changeHistory.title")}
 					</h3>
 				</div>
@@ -346,32 +346,32 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							<div className="overflow-x-auto">
 								<table className="w-full text-sm">
 									<thead>
-										<tr className="border-b border-slate-200 dark:border-slate-700">
-											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.date")}</th>
-											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.changeType")}</th>
-											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.field")}</th>
-											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.oldValue")}</th>
-											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.newValue")}</th>
+										<tr className="border-b-2">
+											<th className="pb-2 text-end text-xs font-medium text-muted-foreground">{t("company.employees.changeHistory.date")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-muted-foreground">{t("company.employees.changeHistory.changeType")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-muted-foreground">{t("company.employees.changeHistory.field")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-muted-foreground">{t("company.employees.changeHistory.oldValue")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-muted-foreground">{t("company.employees.changeHistory.newValue")}</th>
 										</tr>
 									</thead>
 									<tbody>
 										{historyData.changes.map((change: any) => (
-											<tr key={change.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
-												<td className="py-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+											<tr key={change.id} className="border-b-2 last:border-0">
+												<td className="py-2.5 text-muted-foreground whitespace-nowrap">
 													{new Date(change.createdAt).toLocaleDateString("ar-SA")}
 												</td>
 												<td className="py-2.5">
-													<Badge className="border-0 text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+													<Badge className="border-0 text-[10px] px-2 py-0.5 bg-muted text-muted-foreground">
 														{t(`company.employees.changeHistory.types.${change.changeType}`)}
 													</Badge>
 												</td>
-												<td className="py-2.5 text-slate-700 dark:text-slate-300">
+												<td className="py-2.5 text-muted-foreground">
 													{t(`company.employees.changeHistory.fields.${change.fieldName}`)}
 												</td>
-												<td className="py-2.5 text-red-600 dark:text-red-400 line-through">
+												<td className="py-2.5 text-destructive line-through">
 													{change.oldValue ?? "-"}
 												</td>
-												<td className="py-2.5 text-chart-4 dark:text-chart-4 font-medium">
+												<td className="py-2.5 text-chart-4 font-medium">
 													{change.newValue ?? "-"}
 												</td>
 											</tr>
@@ -390,7 +390,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 									>
 										{t("common.previous")}
 									</Button>
-									<span className="text-sm text-slate-500 dark:text-slate-400">
+									<span className="text-sm text-muted-foreground">
 										{historyPage} / {Math.ceil(historyData.total / 10)}
 									</span>
 									<Button
@@ -406,11 +406,11 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							)}
 						</>
 					) : (
-						<div className="rounded-xl border border-amber-200/50 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-950/20 p-4 text-center">
-							<p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+						<div className="rounded-xl border-2 border-chart-1/30 bg-chart-1/15 p-4 text-center">
+							<p className="text-sm font-medium text-chart-1">
 								{t("company.employees.changeHistory.noChanges")}
 							</p>
-							<p className="text-xs text-amber-600/70 dark:text-amber-400/70 mt-1">
+							<p className="text-xs text-chart-1/70 mt-1">
 								{t("company.employees.changeHistory.noChangesDesc")}
 							</p>
 						</div>

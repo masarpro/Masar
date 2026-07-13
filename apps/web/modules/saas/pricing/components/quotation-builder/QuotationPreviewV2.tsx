@@ -372,7 +372,7 @@ export function QuotationPreviewV2({
 								<span className="text-muted-foreground">
 									{t("totals.discount")} {discountPercent > 0 ? `(${fmt(discountPercent)}%)` : ""}
 								</span>
-								<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
+								<span className="text-destructive" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
 							</div>
 						)}
 						{showDiscount && discountAmount > 0 && (

@@ -86,7 +86,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 	return (
 		<div className="space-y-4">
 			{/* Header */}
-			<div className="hidden sm:grid sm:grid-cols-12 gap-3 px-2 text-sm font-medium text-slate-500">
+			<div className="hidden sm:grid sm:grid-cols-12 gap-3 px-2 text-sm font-medium text-muted-foreground">
 				<div className="col-span-5">{t("finance.items.description")}</div>
 				<div className="col-span-2 text-center">{t("finance.items.quantity")}</div>
 				<div className="col-span-1 text-center">{t("finance.items.unit")}</div>
@@ -99,11 +99,11 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 				{items.map((item) => (
 					<div
 						key={item.id}
-						className="grid gap-3 sm:grid-cols-12 items-start p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+						className="grid gap-3 sm:grid-cols-12 items-start p-3 rounded-xl bg-muted/50"
 					>
 						{/* Description */}
 						<div className="sm:col-span-5">
-							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.description")}</span>
+							<span className="text-xs text-muted-foreground sm:hidden mb-1 block">{t("finance.items.description")}</span>
 							<Input
 								value={item.description}
 								onChange={(e: any) =>
@@ -117,7 +117,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Quantity */}
 						<div className="sm:col-span-2">
-							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.quantity")}</span>
+							<span className="text-xs text-muted-foreground sm:hidden mb-1 block">{t("finance.items.quantity")}</span>
 							<Input
 								type="number"
 								min="0"
@@ -133,7 +133,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Unit */}
 						<div className="sm:col-span-1">
-							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.unit")}</span>
+							<span className="text-xs text-muted-foreground sm:hidden mb-1 block">{t("finance.items.unit")}</span>
 							{readOnly ? (
 								<Input
 									value={item.unit}
@@ -162,7 +162,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Unit Price */}
 						<div className="sm:col-span-2">
-							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.unitPrice")}</span>
+							<span className="text-xs text-muted-foreground sm:hidden mb-1 block">{t("finance.items.unitPrice")}</span>
 							<Input
 								type="number"
 								min="0"
@@ -179,8 +179,8 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 						{/* Total */}
 						<div className="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
 							<div>
-								<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.total")}</span>
-								<span className="font-semibold text-slate-900 dark:text-slate-100">
+								<span className="text-xs text-muted-foreground sm:hidden mb-1 block">{t("finance.items.total")}</span>
+								<span className="font-semibold text-foreground">
 									<Currency amount={item.quantity * item.unitPrice} />
 								</span>
 							</div>
@@ -190,7 +190,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 									variant="ghost"
 									size="icon"
 									onClick={() => removeItem(item.id)}
-									className="h-8 w-8 text-slate-400 hover:text-red-500"
+									className="h-8 w-8 text-muted-foreground hover:text-destructive"
 								>
 									<Trash2 className="h-4 w-4" />
 								</Button>

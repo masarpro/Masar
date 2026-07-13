@@ -112,15 +112,15 @@ function getCategoryColor(category: string) {
 		case "PROGRESS":
 			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-chart-4 dark:border-chart-4";
 		case "ISSUE":
-			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
+			return "bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive border-destructive dark:border-destructive";
 		case "EQUIPMENT":
 			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 border-chart-4 dark:border-chart-4";
 		case "MATERIAL":
-			return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800";
+			return "bg-chart-1/15 text-chart-1 dark:bg-chart-1/20 dark:text-chart-1 border-chart-1 dark:border-chart-1";
 		case "SAFETY":
-			return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800";
+			return "bg-chart-2/15 text-chart-2 dark:bg-chart-2/20 dark:text-chart-2 border-chart-2 dark:border-chart-2";
 		default:
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700";
+			return "bg-muted text-muted-foreground border-border";
 	}
 }
 
@@ -390,10 +390,10 @@ export function PhotosPageContent({
 			{/* Header */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="text-2xl font-semibold text-foreground">
 						{t("projects.photos.title")}
 					</h1>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("projects.photos.subtitle", { count: totalCount })}
 					</p>
 				</div>
@@ -434,7 +434,7 @@ export function PhotosPageContent({
 
 			{/* Inline upload (collapsible) */}
 			{canEdit && isUploadOpen && (
-				<div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 dark:bg-primary/[0.04]">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<MultiPhotoUploadForm
 						organizationId={organizationId}
 						organizationSlug={organizationSlug}
@@ -450,7 +450,7 @@ export function PhotosPageContent({
 
 			{/* Filters bar */}
 			{totalCount > 0 && (
-				<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+				<div className="space-y-3 rounded-2xl border-2 bg-card p-4">
 					{/* Category filter pills */}
 					<div className="flex flex-wrap gap-1.5">
 						<button
@@ -458,8 +458,8 @@ export function PhotosPageContent({
 							onClick={() => setActiveCategory("ALL")}
 							className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
 								activeCategory === "ALL"
-									? "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900"
-									: "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+									? "bg-primary text-primary-foreground"
+									: "bg-muted text-muted-foreground hover:bg-accent"
 							}`}
 						>
 							{t("projects.field.allPhotos")} ({totalCount})
@@ -476,8 +476,8 @@ export function PhotosPageContent({
 									}
 									className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
 										activeCategory === cat
-											? "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900"
-											: "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+											? "bg-primary text-primary-foreground"
+											: "bg-muted text-muted-foreground hover:bg-accent"
 									}`}
 								>
 									{t(`projects.field.photoCategory.${cat}`)} ({count})
@@ -489,7 +489,7 @@ export function PhotosPageContent({
 					{/* Milestone + group toggle */}
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<div className="flex items-center gap-2">
-							<Filter className="h-3.5 w-3.5 text-slate-400" />
+							<Filter className="h-3.5 w-3.5 text-muted-foreground" />
 							<Select
 								value={activeMilestoneId}
 								onValueChange={setActiveMilestoneId}
@@ -514,7 +514,7 @@ export function PhotosPageContent({
 								</SelectContent>
 							</Select>
 						</div>
-						<div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+						<div className="flex overflow-hidden rounded-lg border border-border">
 							{(["milestone", "date", "category"] as GroupBy[]).map((g) => (
 								<button
 									key={g}
@@ -522,8 +522,8 @@ export function PhotosPageContent({
 									onClick={() => setGroupBy(g)}
 									className={`px-3 py-1.5 text-[11px] font-semibold transition-colors ${
 										groupBy === g
-											? "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900"
-											: "bg-white text-slate-500 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+											? "bg-primary text-primary-foreground"
+											: "bg-card text-muted-foreground hover:bg-accent"
 									}`}
 								>
 									{t(`projects.photos.groupBy.${g}`)}
@@ -536,9 +536,9 @@ export function PhotosPageContent({
 
 			{/* Selection toolbar */}
 			{canEdit && selectMode && totalCount > 0 && (
-				<div className="sticky top-2 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2.5 dark:bg-primary/10">
+				<div className="sticky top-2 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 bg-card px-4 py-2.5">
 					<div className="flex items-center gap-3">
-						<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+						<span className="text-sm font-semibold text-foreground">
 							{t("projects.photos.selectedCount", {
 								count: selectedIds.size,
 							})}
@@ -594,14 +594,14 @@ export function PhotosPageContent({
 			{isLoading ? (
 				<PhotoGridSkeleton withHeader={false} />
 			) : totalCount === 0 ? (
-				<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 dark:border-slate-700 dark:bg-slate-900/50">
-					<div className="mb-4 rounded-2xl bg-slate-100 p-5 dark:bg-slate-800">
-						<ImageIcon className="h-10 w-10 text-slate-300 dark:text-slate-600" />
+				<div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-card py-16">
+					<div className="mb-4 rounded-2xl bg-muted p-5">
+						<ImageIcon className="h-10 w-10 text-muted-foreground" />
 					</div>
-					<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+					<p className="text-sm font-medium text-foreground">
 						{t("projects.photos.empty")}
 					</p>
-					<p className="mt-1 text-xs text-slate-400">
+					<p className="mt-1 text-xs text-muted-foreground">
 						{t("projects.photos.emptyHint")}
 					</p>
 					{canEdit && (
@@ -618,13 +618,13 @@ export function PhotosPageContent({
 					{groupedPhotos.map((group) => (
 						<section key={group.key}>
 							<div className="mb-2.5 flex items-center gap-2">
-								<h3 className="shrink-0 text-sm font-semibold text-slate-700 dark:text-slate-300">
+								<h3 className="shrink-0 text-sm font-semibold text-foreground">
 									{group.label}
 								</h3>
-								<span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+								<span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
 									{group.items.length}
 								</span>
-								<div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+								<div className="h-px flex-1 bg-border" />
 							</div>
 							<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
 								{group.items.map((photo) => (
@@ -817,12 +817,12 @@ function PhotoCard({
 
 	return (
 		<div
-			className={`group relative aspect-square overflow-hidden rounded-xl border bg-slate-50 transition-all hover:shadow-lg dark:bg-slate-800/50 ${
+			className={`group relative aspect-square overflow-hidden rounded-xl border bg-muted transition-all ${
 				selected
 					? "border-primary ring-2 ring-primary/60"
 					: isCover
-						? "border-amber-400 ring-2 ring-amber-300 dark:border-amber-500"
-						: "border-slate-100 hover:border-primary/40 dark:border-slate-800"
+						? "border-chart-1 ring-2 ring-chart-1/50"
+						: "border-border hover:border-primary/40"
 			}`}
 		>
 			<button
@@ -840,8 +840,8 @@ function PhotoCard({
 							preload="metadata"
 						/>
 						<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
-							<div className="rounded-full bg-white/90 p-2 shadow-lg transition-transform group-hover:scale-110">
-								<Play className="size-5 fill-current text-slate-800" />
+							<div className="rounded-full bg-white/90 p-2 transition-transform group-hover:scale-110">
+								<Play className="size-5 fill-current text-black" />
 							</div>
 						</div>
 					</>
@@ -853,8 +853,8 @@ function PhotoCard({
 						onError={() => setImgError(true)}
 					/>
 				) : (
-					<div className="flex size-full items-center justify-center bg-slate-200 dark:bg-slate-700">
-						<ImageIcon className="h-8 w-8 text-slate-400" />
+					<div className="flex size-full items-center justify-center bg-muted">
+						<ImageIcon className="h-8 w-8 text-muted-foreground" />
 					</div>
 				)}
 			</button>
@@ -867,7 +867,7 @@ function PhotoCard({
 						e.stopPropagation();
 						onToggleSelect();
 					}}
-					className="absolute end-1.5 top-1.5 z-10 flex size-7 items-center justify-center rounded-lg bg-white/90 text-slate-700 shadow-md dark:bg-slate-900/90 dark:text-slate-200"
+					className="absolute end-1.5 top-1.5 z-10 flex size-7 items-center justify-center rounded-lg bg-black/60 text-white"
 					aria-label={t("projects.photos.selectMode")}
 				>
 					{selected ? (
@@ -881,7 +881,7 @@ function PhotoCard({
 			{/* Cover badge */}
 			{isCover && (
 				<div className="pointer-events-none absolute start-1.5 top-1.5">
-					<Badge className="border-amber-400 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+					<Badge className="border-chart-1 bg-chart-1/15 text-chart-1">
 						<Star className="me-0.5 h-3 w-3 fill-current" />
 						{t("projects.photos.currentCover")}
 					</Badge>
@@ -903,7 +903,7 @@ function PhotoCard({
 					{photo.milestone && (
 						<Badge
 							variant="secondary"
-							className="border bg-violet-100 text-[9px] text-violet-700 dark:bg-violet-900/40 dark:text-violet-300"
+							className="border bg-chart-4/15 text-[9px] text-chart-4"
 						>
 							{photo.milestone.title}
 						</Badge>
@@ -925,10 +925,10 @@ function PhotoCard({
 							e.stopPropagation();
 							isCover ? onUnsetCover() : onSetCover();
 						}}
-						className={`flex size-7 items-center justify-center rounded-lg text-white shadow-md transition-colors ${
+						className={`flex size-7 items-center justify-center rounded-lg text-white transition-colors ${
 							isCover
-								? "bg-amber-500/90 hover:bg-amber-600"
-								: "bg-slate-800/80 hover:bg-amber-500"
+								? "bg-chart-1 hover:bg-chart-1/90"
+								: "bg-black/70 hover:bg-chart-1"
 						}`}
 						aria-label={
 							isCover
@@ -953,7 +953,7 @@ function PhotoCard({
 							e.stopPropagation();
 							onEdit();
 						}}
-						className="flex size-7 items-center justify-center rounded-lg bg-slate-800/80 text-white shadow-md transition-colors hover:bg-primary"
+						className="flex size-7 items-center justify-center rounded-lg bg-black/70 text-white transition-colors hover:bg-primary"
 						aria-label={t("projects.photos.editPhoto")}
 						title={t("projects.photos.editPhoto")}
 					>
@@ -965,7 +965,7 @@ function PhotoCard({
 							e.stopPropagation();
 							onDelete();
 						}}
-						className="flex size-7 items-center justify-center rounded-lg bg-red-500/90 text-white shadow-md transition-colors hover:bg-red-600"
+						className="flex size-7 items-center justify-center rounded-lg bg-destructive/90 text-white transition-colors hover:bg-destructive"
 						aria-label={t("projects.field.deletePhoto")}
 						title={t("projects.field.deletePhoto")}
 					>
@@ -1043,7 +1043,7 @@ function EditPhotoDialog({
 				</DialogHeader>
 				<div className="space-y-4">
 					{photo && (
-						<div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+						<div className="overflow-hidden rounded-xl border border-border">
 							<img
 								src={photo.url}
 								alt=""
@@ -1198,7 +1198,7 @@ function BulkEditDialog({
 					</DialogTitle>
 				</DialogHeader>
 				<div className="space-y-4">
-					<p className="text-xs text-slate-500 dark:text-slate-400">
+					<p className="text-xs text-muted-foreground">
 						{t("projects.photos.bulkEditHint")}
 					</p>
 					<div className="space-y-2">

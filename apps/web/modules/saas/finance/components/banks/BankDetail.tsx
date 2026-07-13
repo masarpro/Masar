@@ -547,11 +547,11 @@ export function BankDetail({
 						<div className="space-y-4">
 							<div className="grid gap-4 sm:grid-cols-2">
 								<div>
-									<Label className="text-slate-500">{t("finance.banks.accountName")}</Label>
+									<Label className="text-muted-foreground">{t("finance.banks.accountName")}</Label>
 									<p className="font-medium">{account.name}</p>
 								</div>
 								<div>
-									<Label className="text-slate-500">{t("finance.banks.accountType")}</Label>
+									<Label className="text-muted-foreground">{t("finance.banks.accountType")}</Label>
 									<p className="font-medium">
 										{account.accountType === "BANK"
 											? t("finance.banks.types.bank")
@@ -560,25 +560,25 @@ export function BankDetail({
 								</div>
 								{account.bankName && (
 									<div>
-										<Label className="text-slate-500">{t("finance.banks.bankName")}</Label>
+										<Label className="text-muted-foreground">{t("finance.banks.bankName")}</Label>
 										<p className="font-medium">{account.bankName}</p>
 									</div>
 								)}
 								{account.accountNumber && (
 									<div>
-										<Label className="text-slate-500">{t("finance.banks.accountNumber")}</Label>
+										<Label className="text-muted-foreground">{t("finance.banks.accountNumber")}</Label>
 										<p className="font-medium font-mono">{account.accountNumber}</p>
 									</div>
 								)}
 								{account.iban && (
 									<div className="sm:col-span-2">
-										<Label className="text-slate-500">{t("finance.banks.iban")}</Label>
+										<Label className="text-muted-foreground">{t("finance.banks.iban")}</Label>
 										<p className="font-medium font-mono">{account.iban}</p>
 									</div>
 								)}
 								{account.notes && (
 									<div className="sm:col-span-2">
-										<Label className="text-slate-500">{t("finance.banks.notes")}</Label>
+										<Label className="text-muted-foreground">{t("finance.banks.notes")}</Label>
 										<p className="whitespace-pre-wrap">{account.notes}</p>
 									</div>
 								)}
@@ -589,15 +589,15 @@ export function BankDetail({
 			</Card>
 
 			{/* Danger Zone */}
-			<Card className="rounded-2xl border-red-200 dark:border-red-900">
+			<Card className="rounded-2xl border-destructive/30">
 				<CardHeader>
-					<CardTitle className="text-red-600">{t("common.dangerZone")}</CardTitle>
+					<CardTitle className="text-destructive">{t("common.dangerZone")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="flex items-center justify-between">
 						<div>
 							<p className="font-medium">{t("finance.banks.setAsDefault")}</p>
-							<p className="text-sm text-slate-500">
+							<p className="text-sm text-muted-foreground">
 								{t("finance.banks.setAsDefaultDescription")}
 							</p>
 						</div>
@@ -617,7 +617,7 @@ export function BankDetail({
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-medium">{t("finance.banks.deleteAccount")}</p>
-								<p className="text-sm text-slate-500">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.banks.deleteAccountDescription")}
 								</p>
 							</div>
@@ -652,7 +652,7 @@ export function BankDetail({
 						<AlertDialogAction
 							onClick={() => deleteMutation.mutate()}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
 						</AlertDialogAction>

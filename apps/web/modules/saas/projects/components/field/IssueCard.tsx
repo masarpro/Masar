@@ -19,30 +19,30 @@ function formatDate(date: Date | string | undefined | null): string {
 function getSeverityColor(severity: string) {
 	switch (severity) {
 		case "LOW":
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+			return "bg-muted text-muted-foreground";
 		case "MEDIUM":
-			return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+			return "bg-chart-1/15 text-chart-1 dark:bg-chart-1/20 dark:text-chart-1";
 		case "HIGH":
-			return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+			return "bg-chart-2/15 text-chart-2 dark:bg-chart-2/20 dark:text-chart-2";
 		case "CRITICAL":
-			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+			return "bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive";
 		default:
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+			return "bg-muted text-muted-foreground";
 	}
 }
 
 function getStatusColor(status: string) {
 	switch (status) {
 		case "OPEN":
-			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+			return "bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive";
 		case "IN_PROGRESS":
 			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
 		case "RESOLVED":
-			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
+			return "bg-success/15 text-success dark:bg-success/20 dark:text-success";
 		case "CLOSED":
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+			return "bg-muted text-muted-foreground";
 		default:
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+			return "bg-muted text-muted-foreground";
 	}
 }
 
@@ -59,18 +59,18 @@ export function IssueCard({ issue }: IssueCardProps) {
 	const createdAt = issue.createdAt as string;
 
 	return (
-		<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+		<div className="rounded-2xl border-2 bg-card p-5">
 			{/* Header */}
 			<div className="mb-3 flex items-start justify-between">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-red-100 p-2 dark:bg-red-900/30">
-						<AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+					<div className="rounded-xl bg-destructive/15 p-2">
+						<AlertTriangle className="h-4 w-4 text-destructive" />
 					</div>
 					<div>
-						<h3 className="font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="font-semibold text-card-foreground">
 							{title}
 						</h3>
-						<p className="text-xs text-slate-500">
+						<p className="text-xs text-muted-foreground">
 							{createdBy?.name} • {formatDate(createdAt)}
 						</p>
 					</div>
@@ -86,19 +86,19 @@ export function IssueCard({ issue }: IssueCardProps) {
 			</div>
 
 			{/* Description */}
-			<p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+			<p className="mb-4 text-sm text-muted-foreground">
 				{description}
 			</p>
 
 			{/* Footer */}
-			<div className="flex items-center justify-between text-sm text-slate-500">
+			<div className="flex items-center justify-between text-sm text-muted-foreground">
 				{assignee ? (
 					<div className="flex items-center gap-1">
 						<User className="h-4 w-4" />
 						<span>{assignee.name}</span>
 					</div>
 				) : (
-					<span className="text-slate-400">
+					<span className="text-muted-foreground">
 						{t("projects.field.notAssigned")}
 					</span>
 				)}

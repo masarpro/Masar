@@ -71,7 +71,7 @@ export function LumpSumAnalysis({
 		<Card dir="rtl">
 			<CardHeader className="pb-3">
 				<CardTitle className="text-base flex items-center gap-2">
-					<ShieldAlert className="h-4 w-4 text-amber-600" />
+					<ShieldAlert className="h-4 w-4 text-chart-1" />
 					{t("pricing.pipeline.lumpSumTitle")}
 				</CardTitle>
 			</CardHeader>
@@ -100,12 +100,12 @@ export function LumpSumAnalysis({
 							</tr>
 							<tr className={cn(
 								"border-t-2",
-								isPositive ? "bg-emerald-50/50" : "bg-red-50/50",
+								isPositive ? "bg-success/10" : "bg-destructive/10",
 							)}>
 								<td className="px-3 py-2 font-semibold">{t("pricing.pipeline.lumpSumExpectedProfit")}</td>
 								<td className={cn(
 									"px-3 py-2 tabular-nums text-start font-bold text-base",
-									isPositive ? "text-emerald-700" : "text-red-700",
+									isPositive ? "text-success" : "text-destructive",
 								)} dir="ltr">
 									{formatAmount(expectedProfit)} ر.س
 								</td>
@@ -128,7 +128,7 @@ export function LumpSumAnalysis({
 							/>
 							{isPositive && (
 								<div
-									className="bg-emerald-500 h-full transition-all duration-300"
+									className="bg-success h-full transition-all duration-300"
 									style={{ width: `${profitPct}%` }}
 								/>
 							)}
@@ -142,7 +142,7 @@ export function LumpSumAnalysis({
 						<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.lumpSumProfitPercent")}</p>
 						<p className={cn(
 							"text-sm font-bold tabular-nums",
-							isPositive ? "text-emerald-600" : "text-red-600",
+							isPositive ? "text-success" : "text-destructive",
 						)} dir="ltr">
 							{formatPercent(profitFromContract)}%
 						</p>
@@ -151,13 +151,13 @@ export function LumpSumAnalysis({
 						<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.lumpSumSafetyMargin")}</p>
 						<div className="flex items-center justify-center gap-1.5">
 							{isSafe ? (
-								<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+								<CheckCircle2 className="h-3.5 w-3.5 text-success" />
 							) : (
-								<AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+								<AlertTriangle className="h-3.5 w-3.5 text-chart-1" />
 							)}
 							<p className={cn(
 								"text-sm font-bold tabular-nums",
-								isSafe ? "text-emerald-600" : "text-amber-600",
+								isSafe ? "text-success" : "text-chart-1",
 							)} dir="ltr">
 								{formatPercent(safetyMargin)}%
 							</p>
@@ -167,9 +167,9 @@ export function LumpSumAnalysis({
 
 				{/* Warning for negative profit */}
 				{!isPositive && (
-					<div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
-						<AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
-						<p className="text-sm text-red-700">
+					<div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3">
+						<AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+						<p className="text-sm text-destructive">
 							{t("pricing.pipeline.lumpSumLossWarning")}
 						</p>
 					</div>

@@ -67,14 +67,14 @@ export function CashFlowReport({
 					<Label className="text-xs">
 						{t("finance.reports.cashFlow.periodType")}
 					</Label>
-					<div className="flex mt-1 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+					<div className="flex mt-1 rounded-xl border border-border overflow-hidden">
 						<button
 							type="button"
 							onClick={() => setPeriodType("monthly")}
 							className={`px-3 py-1.5 text-sm transition-colors ${
 								periodType === "monthly"
-									? "bg-primary text-white"
-									: "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
+									? "bg-primary text-primary-foreground"
+									: "bg-card text-muted-foreground hover:bg-accent"
 							}`}
 						>
 							{t("finance.reports.cashFlow.monthly")}
@@ -84,8 +84,8 @@ export function CashFlowReport({
 							onClick={() => setPeriodType("weekly")}
 							className={`px-3 py-1.5 text-sm transition-colors ${
 								periodType === "weekly"
-									? "bg-primary text-white"
-									: "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
+									? "bg-primary text-primary-foreground"
+									: "bg-card text-muted-foreground hover:bg-accent"
 							}`}
 						>
 							{t("finance.reports.cashFlow.weekly")}
@@ -119,24 +119,24 @@ export function CashFlowReport({
 			{isLoading ? (
 				<DashboardSkeleton />
 			) : !data || data.periods.length === 0 ? (
-				<div className="flex items-center justify-center py-12 text-slate-500">
+				<div className="flex items-center justify-center py-12 text-muted-foreground">
 					{t("finance.reports.cashFlow.noData")}
 				</div>
 			) : (
 				<>
 					{/* Summary KPI Cards */}
 					<div className="grid gap-4 sm:grid-cols-3">
-						<Card className="rounded-2xl bg-green-50 dark:bg-green-950/30 border-slate-200/60 dark:border-slate-700/50">
+						<Card className="rounded-2xl">
 							<CardContent className="p-5">
 								<div className="flex items-center gap-3">
-									<div className="shrink-0 rounded-xl bg-green-100 dark:bg-green-900/50 p-2.5">
-										<TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+									<div className="shrink-0 rounded-xl bg-success/15 p-2.5">
+										<TrendingUp className="h-5 w-5 text-success" />
 									</div>
 									<div className="min-w-0 flex-1">
-										<p className="text-xs text-green-600 dark:text-green-400">
+										<p className="text-xs text-success">
 											{t("finance.reports.cashFlow.totalInflows")}
 										</p>
-										<p className="truncate text-lg font-semibold text-green-700 dark:text-green-300">
+										<p className="truncate text-lg font-semibold text-success">
 											<Currency amount={data.summary.totalInflows} />
 										</p>
 									</div>
@@ -144,17 +144,17 @@ export function CashFlowReport({
 							</CardContent>
 						</Card>
 
-						<Card className="rounded-2xl bg-red-50 dark:bg-red-950/30 border-slate-200/60 dark:border-slate-700/50">
+						<Card className="rounded-2xl">
 							<CardContent className="p-5">
 								<div className="flex items-center gap-3">
-									<div className="shrink-0 rounded-xl bg-red-100 dark:bg-red-900/50 p-2.5">
-										<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+									<div className="shrink-0 rounded-xl bg-destructive/15 p-2.5">
+										<TrendingDown className="h-5 w-5 text-destructive" />
 									</div>
 									<div className="min-w-0 flex-1">
-										<p className="text-xs text-red-600 dark:text-red-400">
+										<p className="text-xs text-destructive">
 											{t("finance.reports.cashFlow.totalOutflows")}
 										</p>
-										<p className="truncate text-lg font-semibold text-red-700 dark:text-red-300">
+										<p className="truncate text-lg font-semibold text-destructive">
 											<Currency amount={data.summary.totalOutflows} />
 										</p>
 									</div>
@@ -162,27 +162,21 @@ export function CashFlowReport({
 							</CardContent>
 						</Card>
 
-						<Card
-							className={`rounded-2xl border-slate-200/60 dark:border-slate-700/50 ${
-								data.summary.netCashFlow >= 0
-									? "bg-emerald-50 dark:bg-emerald-950/30"
-									: "bg-orange-50 dark:bg-orange-950/30"
-							}`}
-						>
+						<Card className="rounded-2xl">
 							<CardContent className="p-5">
 								<div className="flex items-center gap-3">
 									<div
 										className={`shrink-0 rounded-xl p-2.5 ${
 											data.summary.netCashFlow >= 0
-												? "bg-emerald-100 dark:bg-emerald-900/50"
-												: "bg-orange-100 dark:bg-orange-900/50"
+												? "bg-success/15"
+												: "bg-chart-1/15"
 										}`}
 									>
 										<ArrowRightLeft
 											className={`h-5 w-5 ${
 												data.summary.netCashFlow >= 0
-													? "text-emerald-600 dark:text-emerald-400"
-													: "text-orange-600 dark:text-orange-400"
+													? "text-success"
+													: "text-chart-1"
 											}`}
 										/>
 									</div>
@@ -190,8 +184,8 @@ export function CashFlowReport({
 										<p
 											className={`text-xs ${
 												data.summary.netCashFlow >= 0
-													? "text-emerald-600 dark:text-emerald-400"
-													: "text-orange-600 dark:text-orange-400"
+													? "text-success"
+													: "text-chart-1"
 											}`}
 										>
 											{t("finance.reports.cashFlow.netCashFlow")}
@@ -199,8 +193,8 @@ export function CashFlowReport({
 										<p
 											className={`truncate text-lg font-semibold ${
 												data.summary.netCashFlow >= 0
-													? "text-emerald-700 dark:text-emerald-300"
-													: "text-orange-700 dark:text-orange-300"
+													? "text-success"
+													: "text-chart-1"
 											}`}
 										>
 											<Currency amount={data.summary.netCashFlow} />
@@ -226,10 +220,10 @@ export function CashFlowReport({
 										<TableHead>
 											{t("finance.reports.cashFlow.period")}
 										</TableHead>
-										<TableHead className="text-end text-green-600">
+										<TableHead className="text-end text-success">
 											{t("finance.reports.cashFlow.inflows")}
 										</TableHead>
-										<TableHead className="text-end text-red-600">
+										<TableHead className="text-end text-destructive">
 											{t("finance.reports.cashFlow.outflows")}
 										</TableHead>
 										<TableHead className="text-end">
@@ -242,7 +236,7 @@ export function CashFlowReport({
 								</TableHeader>
 								<TableBody>
 									{/* Opening Balance Row */}
-									<TableRow className="bg-slate-50 dark:bg-slate-800/50">
+									<TableRow className="bg-muted/50">
 										<TableCell className="font-medium">
 											{t("finance.reports.cashFlow.openingBalance")}
 										</TableCell>
@@ -259,17 +253,17 @@ export function CashFlowReport({
 											<TableCell className="font-medium whitespace-nowrap">
 												{period.periodStart} → {period.periodEnd}
 											</TableCell>
-											<TableCell className="text-end text-green-600">
+											<TableCell className="text-end text-success">
 												<Currency amount={period.inflows.total} />
 											</TableCell>
-											<TableCell className="text-end text-red-600">
+											<TableCell className="text-end text-destructive">
 												<Currency amount={period.outflows.total} />
 											</TableCell>
 											<TableCell
 												className={`text-end font-medium ${
 													period.netFlow >= 0
-														? "text-green-600"
-														: "text-red-600"
+														? "text-success"
+														: "text-destructive"
 												}`}
 											>
 												<Currency amount={period.netFlow} />
@@ -281,21 +275,21 @@ export function CashFlowReport({
 									))}
 
 									{/* Closing Balance Row */}
-									<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-semibold">
+									<TableRow className="bg-muted/50 font-semibold">
 										<TableCell>
 											{t("finance.reports.cashFlow.closingBalance")}
 										</TableCell>
-										<TableCell className="text-end text-green-600">
+										<TableCell className="text-end text-success">
 											<Currency amount={data.summary.totalInflows} />
 										</TableCell>
-										<TableCell className="text-end text-red-600">
+										<TableCell className="text-end text-destructive">
 											<Currency amount={data.summary.totalOutflows} />
 										</TableCell>
 										<TableCell
 											className={`text-end ${
 												data.summary.netCashFlow >= 0
-													? "text-green-600"
-													: "text-red-600"
+													? "text-success"
+													: "text-destructive"
 											}`}
 										>
 											<Currency amount={data.summary.netCashFlow} />
@@ -324,7 +318,7 @@ export function CashFlowReport({
 										<TableCell className="font-medium">
 											{t("finance.reports.cashFlow.expectedInflows")}
 										</TableCell>
-										<TableCell className="text-end text-green-600">
+										<TableCell className="text-end text-success">
 											<Currency amount={data.projected.expectedInflows} />
 										</TableCell>
 									</TableRow>
@@ -332,19 +326,19 @@ export function CashFlowReport({
 										<TableCell className="font-medium">
 											{t("finance.reports.cashFlow.expectedOutflows")}
 										</TableCell>
-										<TableCell className="text-end text-red-600">
+										<TableCell className="text-end text-destructive">
 											<Currency amount={data.projected.expectedOutflows} />
 										</TableCell>
 									</TableRow>
-									<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-semibold">
+									<TableRow className="bg-muted/50 font-semibold">
 										<TableCell>
 											{t("finance.reports.cashFlow.projectedBalance")}
 										</TableCell>
 										<TableCell
 											className={`text-end ${
 												data.projected.projectedBalance >= 0
-													? "text-green-600"
-													: "text-red-600"
+													? "text-success"
+													: "text-destructive"
 											}`}
 										>
 											<Currency amount={data.projected.projectedBalance} />

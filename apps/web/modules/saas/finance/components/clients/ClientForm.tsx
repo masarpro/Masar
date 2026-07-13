@@ -298,7 +298,7 @@ export function ClientForm({
 	return (
 		<form onSubmit={handleSubmit} className="pb-28 lg:pb-6 space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-chart-4/10 via-chart-4/5 to-transparent border border-border/50">
+			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl border bg-card">
 				<div className="flex items-center gap-3">
 					<div className="w-10 h-10 rounded-xl bg-chart-4/10 flex items-center justify-center">
 						<User className="h-5 w-5 text-chart-4" />
@@ -626,7 +626,7 @@ export function ClientForm({
 			</Collapsible>
 
 			{/* Mobile Fixed Bottom Bar */}
-			<div className="fixed bottom-0 inset-x-0 z-50 lg:hidden backdrop-blur-xl bg-white/95 dark:bg-slate-900/95 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+			<div className="fixed bottom-0 inset-x-0 z-50 lg:hidden bg-card border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 				<div className="flex items-center justify-between gap-4">
 					<Button type="button" variant="outline" size="lg" className="rounded-xl flex-1" onClick={() => router.back()}>
 						{t("common.cancel")}

@@ -69,7 +69,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 			<div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
 				<GlassStatCard
 					colorScheme="blue"
-					icon={<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />}
+					icon={<Users className="h-5 w-5 text-chart-4" />}
 					title={t("company.dashboard.totalSalaries")}
 					value={formatCurrency(Number(data.employees.totalMonthlyCost))}
 					badge={<>{data.employees.totalActive} {t("company.dashboard.activeEmployees")}</>}
@@ -83,7 +83,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 				/>
 				<GlassStatCard
 					colorScheme="sky"
-					icon={<Package className="h-5 w-5 text-chart-4 dark:text-chart-4" />}
+					icon={<Package className="h-5 w-5 text-chart-4" />}
 					title={t("company.dashboard.assetValue")}
 					value={formatCurrency(Number(data.assets.totalValue))}
 					badge={<>{data.assets.total} {t("company.dashboard.totalAssets")}</>}

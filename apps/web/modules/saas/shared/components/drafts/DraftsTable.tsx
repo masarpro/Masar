@@ -85,10 +85,10 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 
 	return (
 		<>
-			<div className="overflow-x-auto rounded-2xl border border-border/60 bg-card">
+			<div className="overflow-x-auto rounded-2xl border-2 border-border bg-card">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b bg-muted/40">
+						<tr className="border-b-2 border-border">
 							<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground">{t("drafts.columns.number")}</th>
 							<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground">{t("drafts.columns.client")}</th>
 							<th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground">{t("drafts.columns.lastSaved")}</th>
@@ -101,7 +101,7 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 							const source = isInvoice ? draft.sourceInvoice : draft.sourceQuotation;
 							const sourceNo = source?.invoiceNo ?? source?.quotationNo ?? null;
 							return (
-								<tr key={draft.id} className="border-b border-border/40 last:border-0 hover:bg-primary/[0.02] transition-colors">
+								<tr key={draft.id} className="border-b-2 border-border last:border-0 hover:bg-muted/50 transition-colors">
 									<td className="p-3">
 										<Link href={`${editBasePath}/${draft.id}`} className="font-medium text-primary hover:underline">
 											{sourceNo

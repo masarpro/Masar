@@ -79,7 +79,7 @@ export function MaterialPicker({ materials, value, onSelect, disabled }: Props) 
 										{m.brand && m.grade && <span> · </span>}
 										{m.grade && <span>{m.grade}</span>}
 										{m.suggestedPrice != null && (
-											<span className="ms-1 tabular-nums text-emerald-600 dark:text-emerald-400">
+											<span className="ms-1 tabular-nums text-success">
 												({m.suggestedPrice} ر.س)
 											</span>
 										)}

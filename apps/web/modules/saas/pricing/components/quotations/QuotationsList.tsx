@@ -128,7 +128,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 					<Link href={`/app/${organizationSlug}/pricing/quotations/drafts`}>
 						<FileText className="h-4 w-4" />
 						{draftCount > 0 && (
-							<span className="absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
+							<span className="absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-chart-1 px-1 text-[10px] font-bold text-primary">
 								{draftCount}
 							</span>
 						)}
@@ -168,7 +168,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 							<FileText className="h-4 w-4 me-1.5" />
 							{t("drafts.button")}
 							{draftCount > 0 && (
-								<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+								<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-chart-1 text-primary text-[10px] font-bold">
 									{draftCount}
 								</span>
 							)}

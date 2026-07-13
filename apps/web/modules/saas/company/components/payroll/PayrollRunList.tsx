@@ -116,8 +116,8 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 						label: t("company.payroll.totalRuns"),
 						value: runs.length,
 						icon: FileText,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 					},
 					{
 						label: t("company.payroll.currentMonthStatus"),
@@ -125,64 +125,64 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 							? getStatusBadge(currentMonthRun.status)
 							: t("company.payroll.noRuns"),
 						icon: CalendarRange,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 					},
 					{
 						label: t("company.payroll.totalSalaries"),
 						value: <Currency amount={Number(latestRun?.totalNetSalary ?? 0)} />,
 						icon: Banknote,
-						iconClassName: "text-indigo-600 dark:text-indigo-400",
-						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
-						valueClassName: "text-indigo-700 dark:text-indigo-300",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
+						valueClassName: "text-chart-4",
 					},
 				]}
 			/>
 
 			{/* Summary Cards - Glass Morphism (الديسكتوب كما هو) */}
 			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-3">
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<FileText className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<FileText className="h-5 w-5 text-chart-4" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.payroll.totalRuns")}
 					</p>
-					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+					<p className="text-2xl font-bold text-chart-4">
 						{runs.length}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<CalendarRange className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<CalendarRange className="h-5 w-5 text-chart-4" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.payroll.currentMonthStatus")}
 					</p>
 					<div className="mt-1">
 						{currentMonthRun ? (
 							getStatusBadge(currentMonthRun.status)
 						) : (
-							<span className="text-sm text-slate-400">{t("company.payroll.noRuns")}</span>
+							<span className="text-sm text-muted-foreground">{t("company.payroll.noRuns")}</span>
 						)}
 					</div>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="bg-card border-2 rounded-2xl p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-							<Banknote className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Banknote className="h-5 w-5 text-chart-4" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("company.payroll.totalSalaries")}
 					</p>
-					<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
+					<p className="text-xl font-bold text-chart-4">
 						{latestRun ? (
 							<Currency amount={Number(latestRun.totalNetSalary)} />
 						) : (
@@ -213,7 +213,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 					size="icon"
 					aria-label={t("company.payroll.createRun")}
 					onClick={() => setShowCreateDialog(true)}
-					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="h-5 w-5" />
 				</Button>
@@ -223,7 +223,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[160px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.payroll.status")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -238,7 +238,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 				</div>
 				<Button
 					onClick={() => setShowCreateDialog(true)}
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="ms-2 h-4 w-4" />
 					{t("company.payroll.createRun")}
@@ -246,22 +246,22 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 			</div>
 
 			{/* Table - Glass Morphism */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[760px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.runNo")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.month")} / {t("company.payroll.year")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.employeeCount")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.totalSalaries")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.status")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground w-[20%]">{t("company.payroll.runNo")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[20%]">{t("company.payroll.month")} / {t("company.payroll.year")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[15%]">{t("company.payroll.employeeCount")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[20%]">{t("company.payroll.totalSalaries")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[15%]">{t("company.payroll.status")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[10%]">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(6)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -273,22 +273,22 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 							runs.map((run: any, index: any) => (
 								<TableRow
 									key={run.id}
-									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="cursor-pointer border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/payroll/${run.id}`)}
 								>
 									<TableCell className="text-end">
-										<p className="font-medium text-slate-900 dark:text-slate-100">
+										<p className="font-medium text-card-foreground">
 											{getRunNo(run)}
 										</p>
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{run.month} / {run.year}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{run.employeeCount ?? 0}
 									</TableCell>
-									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-card-foreground">
 										<Currency amount={Number(run.totalNetSalary)} />
 									</TableCell>
 									<TableCell className="text-end">
@@ -298,14 +298,14 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 										<Button
 											variant="ghost"
 											size="icon"
-											className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50"
+											className="rounded-lg hover:bg-accent"
 											aria-label={t("company.payroll.viewDetails")}
 											onClick={(e: any) => {
 												e.stopPropagation();
 												router.push(`/app/${organizationSlug}/company/payroll/${run.id}`);
 											}}
 										>
-											<FileText className="h-4 w-4 text-slate-500" />
+											<FileText className="h-4 w-4 text-muted-foreground" />
 										</Button>
 									</TableCell>
 								</TableRow>
@@ -314,10 +314,10 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 							<TableRow>
 								<TableCell colSpan={6} className="text-center py-16">
 									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<FileText className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+										<div className="mb-4 rounded-2xl bg-muted p-5">
+											<FileText className="h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
 										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground">
 											{t("company.payroll.noRuns")}
 										</p>
 									</div>
@@ -332,7 +332,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 			{showCreateDialog && (
 				<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
 					<DialogContent className="sm:max-w-md p-0 gap-0 rounded-2xl">
-						<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+						<DialogHeader className="bg-card border-b-2 px-5 py-4">
 							<DialogTitle className="text-base font-semibold text-end">
 								{t("company.payroll.createRun")}
 							</DialogTitle>
@@ -347,7 +347,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 							<div className="p-5 space-y-4">
 								<div className="grid grid-cols-2 gap-3">
 									<div className="space-y-1">
-										<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+										<Label className="text-xs font-medium text-muted-foreground">
 											{t("company.payroll.month")} *
 										</Label>
 										<Select
@@ -367,7 +367,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 										</Select>
 									</div>
 									<div className="space-y-1">
-										<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+										<Label className="text-xs font-medium text-muted-foreground">
 											{t("company.payroll.year")} *
 										</Label>
 										<Input
@@ -384,7 +384,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 							</div>
 
 							{/* Footer Actions */}
-							<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+							<div className="bg-muted/50 border-t-2 px-5 py-3 flex gap-3">
 								<Button
 									type="button"
 									variant="outline"

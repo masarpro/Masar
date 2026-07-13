@@ -367,8 +367,8 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 
 			{/* Delayed Warning */}
 			{health && health.delayed > 0 && (
-				<Card className="p-4 border-red-200 bg-red-50">
-					<div className="flex items-center gap-2 text-red-700">
+				<Card className="p-4 border-destructive/40 bg-destructive/10">
+					<div className="flex items-center gap-2 text-destructive">
 						<AlertTriangleIcon className="h-5 w-5" />
 						<span className="font-medium">
 							{t("timeline.delayedWarning", { count: health.delayed })}
@@ -380,7 +380,7 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 			{/* Action Bar: Add Milestone + View Toggle */}
 			<div className="flex items-center justify-between gap-2">
 				{/* View Toggle */}
-				<div className="flex items-center gap-1 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-lg p-1">
+				<div className="flex items-center gap-1 border border-border bg-muted rounded-lg p-1">
 					<Button
 						size="sm"
 						variant={viewMode === "cards" ? "primary" : "ghost"}

@@ -289,7 +289,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 											onClick={() => copyToClipboard(link.shareUrl, link.token)}
 										>
 											{copiedToken === link.token ? (
-												<CheckIcon className="h-4 w-4 text-green-500" />
+												<CheckIcon className="h-4 w-4 text-success" />
 											) : (
 												<CopyIcon className="h-4 w-4" />
 											)}

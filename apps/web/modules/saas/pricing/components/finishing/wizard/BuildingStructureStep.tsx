@@ -183,7 +183,7 @@ export function BuildingStructureStep({
 						{config.floors.map((floor, index) => (
 							<div
 								key={floor.id}
-								className="flex flex-wrap items-center gap-2.5 rounded-lg border bg-card p-3 hover:shadow-sm transition-shadow duration-200"
+								className="flex flex-wrap items-center gap-2.5 rounded-lg border bg-card p-3"
 							>
 								<span className="w-6 text-center text-xs text-muted-foreground font-medium">
 									{index + 1}

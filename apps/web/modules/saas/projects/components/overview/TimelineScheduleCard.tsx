@@ -231,36 +231,36 @@ export function TimelineScheduleCard({
 
 				{/* Bottom Stats */}
 				<div className="mt-auto grid grid-cols-3 gap-1.5">
-					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
+					<div className="rounded-lg border bg-muted/50 p-2 text-center">
 						<div
 							className="text-[17px] font-bold text-chart-4"
 							dir="ltr"
 						>
 							{daysRemaining}
 						</div>
-						<div className="text-[10px] text-slate-400">
+						<div className="text-[10px] text-muted-foreground">
 							{t("projects.commandCenter.daysRemaining")}
 						</div>
 					</div>
-					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
+					<div className="rounded-lg border bg-muted/50 p-2 text-center">
 						<div
 							className="text-[17px] font-bold text-chart-4"
 							dir="ltr"
 						>
 							{projectProgress}%
 						</div>
-						<div className="text-[10px] text-slate-400">
+						<div className="text-[10px] text-muted-foreground">
 							{t("projects.commandCenter.actualProgress")}
 						</div>
 					</div>
-					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
+					<div className="rounded-lg border bg-muted/50 p-2 text-center">
 						<div
-							className="text-[17px] font-bold text-slate-500 dark:text-slate-400"
+							className="text-[17px] font-bold text-muted-foreground"
 							dir="ltr"
 						>
 							100%
 						</div>
-						<div className="text-[10px] text-slate-400">
+						<div className="text-[10px] text-muted-foreground">
 							{t("projects.commandCenter.plannedProgress")}
 						</div>
 					</div>

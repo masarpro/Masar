@@ -153,13 +153,13 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 	const getStatusBadge = (status: string) => {
 		switch (status) {
 			case "PENDING":
-				return <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusPending")}</Badge>;
+				return <Badge className="bg-chart-1/15 text-chart-1 border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusPending")}</Badge>;
 			case "APPROVED":
-				return <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusApproved")}</Badge>;
+				return <Badge className="bg-success/15 text-success border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusApproved")}</Badge>;
 			case "REJECTED":
-				return <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusRejected")}</Badge>;
+				return <Badge className="bg-destructive/15 text-destructive border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusRejected")}</Badge>;
 			case "CANCELLED":
-				return <Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusCancelled")}</Badge>;
+				return <Badge className="bg-muted text-muted-foreground border-0 text-[10px] px-2 py-0.5">{t("company.leaves.statusCancelled")}</Badge>;
 			default:
 				return null;
 		}
@@ -187,7 +187,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 					size="icon"
 					aria-label={t("company.leaves.requests.create")}
 					onClick={() => setShowCreateDialog(true)}
-					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="h-5 w-5" />
 				</Button>
@@ -197,7 +197,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[160px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.leaves.filterStatus")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -211,7 +211,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 				</div>
 				<Button
 					onClick={() => setShowCreateDialog(true)}
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="ms-2 h-4 w-4" />
 					{t("company.leaves.requests.create")}
@@ -219,23 +219,23 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 			</div>
 
 			{/* Table */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[800px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.employee")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.leaveType")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.startDate")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.endDate")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.totalDays")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.status")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.employee")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.leaveType")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.startDate")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.endDate")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.totalDays")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.requests.status")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(7)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -247,13 +247,13 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 							data.requests.map((req: any, index: any) => (
 								<TableRow
 									key={req.id}
-									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
 									<TableCell className="text-end">
 										<div>
-											<p className="font-medium text-slate-900 dark:text-slate-100">{req.employee.name}</p>
-											{req.employee.employeeNo && <p className="text-xs text-slate-400">{req.employee.employeeNo}</p>}
+											<p className="font-medium text-card-foreground">{req.employee.name}</p>
+											{req.employee.employeeNo && <p className="text-xs text-muted-foreground">{req.employee.employeeNo}</p>}
 										</div>
 									</TableCell>
 									<TableCell className="text-end">
@@ -261,16 +261,16 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 											{req.leaveType.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: req.leaveType.color }} />
 											)}
-											<span className="text-sm text-slate-700 dark:text-slate-300">{req.leaveType.name}</span>
+											<span className="text-sm text-card-foreground">{req.leaveType.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-muted-foreground">
 										{new Date(req.startDate).toLocaleDateString("ar-SA")}
 									</TableCell>
-									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-muted-foreground">
 										{new Date(req.endDate).toLocaleDateString("ar-SA")}
 									</TableCell>
-									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-card-foreground">
 										{req.totalDays}
 									</TableCell>
 									<TableCell className="text-end">{getStatusBadge(req.status)}</TableCell>
@@ -281,20 +281,20 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 													<Button
 														variant="ghost"
 														size="icon"
-														className="rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 h-8 w-8"
+														className="rounded-xl hover:bg-success/10 h-8 w-8"
 														onClick={() => approveMutation.mutate(req.id)}
 														title={t("company.leaves.requests.approve")}
 													>
-														<Check className="h-4 w-4 text-emerald-600" />
+														<Check className="h-4 w-4 text-success" />
 													</Button>
 													<Button
 														variant="ghost"
 														size="icon"
-														className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 h-8 w-8"
+														className="rounded-xl hover:bg-destructive/10 h-8 w-8"
 														onClick={() => { setShowRejectDialog(req.id); setRejectionReason(""); }}
 														title={t("company.leaves.requests.reject")}
 													>
-														<X className="h-4 w-4 text-red-600" />
+														<X className="h-4 w-4 text-destructive" />
 													</Button>
 												</>
 											)}
@@ -302,7 +302,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 												<Button
 													variant="ghost"
 													size="icon"
-													className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 h-8 w-8"
+													className="rounded-lg hover:bg-accent h-8 w-8"
 													onClick={() => {
 														if (confirm(t("company.leaves.requests.confirmCancel"))) {
 															cancelMutation.mutate(req.id);
@@ -310,7 +310,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 													}}
 													title={t("company.leaves.requests.cancel")}
 												>
-													<Ban className="h-4 w-4 text-slate-500" />
+													<Ban className="h-4 w-4 text-muted-foreground" />
 												</Button>
 											)}
 										</div>

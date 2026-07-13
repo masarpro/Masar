@@ -149,7 +149,7 @@ export function OwnerForm({
 						>
 							{/* Remaining ownership indicator */}
 							<div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3 text-sm">
-								<AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+								<AlertTriangle className="h-4 w-4 text-chart-1 shrink-0" />
 								<span>
 									{t("remaining")}:{" "}
 									<strong className="tabular-nums">

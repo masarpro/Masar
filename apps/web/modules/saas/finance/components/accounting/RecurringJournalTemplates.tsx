@@ -93,10 +93,10 @@ export function RecurringJournalTemplates({
 			</div>
 
 			{/* Templates Table */}
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardContent className="p-0">
 					{(!templates || templates.length === 0) ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.recurring.noTemplates")}
 						</div>
 					) : (
@@ -125,7 +125,7 @@ export function RecurringJournalTemplates({
 											</TableCell>
 											<TableCell className="text-sm">
 												{template.nextDueDate ? (
-													<span className={isDue ? "text-red-600 font-medium" : "text-slate-500"}>
+													<span className={isDue ? "text-destructive font-medium" : "text-muted-foreground"}>
 														{new Date(template.nextDueDate).toLocaleDateString("en-SA")}
 														{isDue && " ⏰"}
 													</span>
@@ -151,7 +151,7 @@ export function RecurringJournalTemplates({
 													<Button
 														variant="ghost"
 														size="sm"
-														className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+														className="h-7 w-7 p-0 text-destructive hover:text-destructive/80"
 														onClick={() => {
 															if (confirm(t("finance.accounting.confirmDelete"))) {
 																deleteMutation.mutate({ organizationId, id: template.id });

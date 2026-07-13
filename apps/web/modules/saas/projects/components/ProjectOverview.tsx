@@ -77,7 +77,7 @@ export function ProjectOverview({
 						projectStatus={projectData?.status}
 					/>
 					{summaryLoading ? (
-						<div className="h-full min-h-[220px] animate-pulse rounded-2xl border border-border/50 bg-muted/30" />
+						<div className="h-full min-h-[220px] animate-pulse rounded-2xl border-2 bg-muted/30" />
 					) : (
 					<FinanceBudgetCard
 						contractValue={

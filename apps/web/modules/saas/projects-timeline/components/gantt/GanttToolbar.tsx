@@ -41,7 +41,7 @@ export function GanttToolbar({
 	return (
 		<div className="flex items-center justify-between gap-3 flex-wrap">
 			{/* Zoom controls */}
-			<div className="flex items-center gap-1 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-lg p-1">
+			<div className="flex items-center gap-1 border border-border bg-muted rounded-lg p-1">
 				{(["week", "month", "quarter"] as ZoomLevel[]).map((level) => (
 					<Button
 						key={level}

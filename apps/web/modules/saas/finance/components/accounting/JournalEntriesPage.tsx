@@ -136,7 +136,7 @@ export function JournalEntriesPage({
 			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.accounting.search")}
 						value={search}
@@ -154,7 +154,7 @@ export function JournalEntriesPage({
 					<select
 						value={status}
 						onChange={(e) => setStatus(e.target.value)}
-						className="h-9 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm"
+						className="h-9 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
 					>
 						<option value="">{t("finance.accounting.draft")} / {t("finance.accounting.posted")} / {t("finance.accounting.reversed")}</option>
 						<option value="DRAFT">{t("finance.accounting.draft")}</option>
@@ -186,7 +186,7 @@ export function JournalEntriesPage({
 			<div className="hidden flex-wrap items-center justify-between gap-3 sm:flex">
 				<div className="flex flex-wrap items-center gap-2">
 					<div className="relative">
-						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							placeholder={t("finance.accounting.search")}
 							value={search}
@@ -197,7 +197,7 @@ export function JournalEntriesPage({
 					<select
 						value={status}
 						onChange={(e) => setStatus(e.target.value)}
-						className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm"
+						className="h-9 rounded-xl border border-input bg-transparent px-3 text-sm"
 					>
 						<option value="">{t("finance.accounting.draft")} / {t("finance.accounting.posted")} / {t("finance.accounting.reversed")}</option>
 						<option value="DRAFT">{t("finance.accounting.draft")}</option>
@@ -232,7 +232,7 @@ export function JournalEntriesPage({
 						<Button
 							variant="outline"
 							size="sm"
-							className="rounded-xl text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+							className="rounded-xl text-success border-success/30 hover:bg-success/10"
 							onClick={() => postAllMutation.mutate({ organizationId })}
 							disabled={postAllMutation.isPending}
 						>
@@ -257,31 +257,31 @@ export function JournalEntriesPage({
 
 			{/* Advanced Filters */}
 			{showFilters && (
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateFrom")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.ledger.dateFrom")}</label>
 								<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateTo")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.ledger.dateTo")}</label>
 								<Input type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountFrom")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.amountFrom")}</label>
 								<Input type="number" min={0} step={0.01} value={amountFrom} onChange={(e: any) => setAmountFrom(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
 							</div>
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountTo")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.amountTo")}</label>
 								<Input type="number" min={0} step={0.01} value={amountTo} onChange={(e: any) => setAmountTo(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
 							</div>
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.selectAccount")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.selectAccount")}</label>
 								<select
 									value={accountId}
 									onChange={(e) => setAccountId(e.target.value)}
-									className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-2 text-sm"
+									className="h-8 w-full rounded-xl border border-input bg-transparent px-2 text-sm"
 								>
 									<option value="">{t("finance.accounting.selectAccount")}</option>
 									{(accountsList ?? [])
@@ -292,11 +292,11 @@ export function JournalEntriesPage({
 								</select>
 							</div>
 							<div>
-								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.reference")}</label>
+								<label className="text-xs text-muted-foreground mb-1 block">{t("finance.accounting.reference")}</label>
 								<select
 									value={referenceType}
 									onChange={(e) => setReferenceType(e.target.value)}
-									className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-2 text-sm"
+									className="h-8 w-full rounded-xl border border-input bg-transparent px-2 text-sm"
 								>
 									<option value="">{t("common.all")}</option>
 									{["INVOICE", "INVOICE_PAYMENT", "EXPENSE", "TRANSFER", "SUBCONTRACT_PAYMENT", "PAYROLL", "ORG_PAYMENT", "CREDIT_NOTE", "REVERSAL", "ADJUSTMENT", "OPENING_BALANCE", "MANUAL"].map((key) => (
@@ -308,7 +308,7 @@ export function JournalEntriesPage({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="rounded-xl text-slate-500"
+									className="rounded-xl text-muted-foreground"
 									onClick={() => {
 										setDateFrom(""); setDateTo(""); setAmountFrom(""); setAmountTo("");
 										setAccountId(""); setReferenceType(""); setSearch(""); setStatus("");
@@ -325,9 +325,9 @@ export function JournalEntriesPage({
 
 			{/* Bulk action bar */}
 			{selectedIds.size > 0 && (
-				<div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
-					<CheckSquare className="h-4 w-4 text-emerald-600" />
-					<span className="text-sm text-emerald-700 dark:text-emerald-300">
+				<div className="flex items-center gap-3 p-3 bg-success/10 rounded-xl border border-success/30">
+					<CheckSquare className="h-4 w-4 text-success" />
+					<span className="text-sm text-success">
 						{selectedIds.size} {t("finance.accounting.selected")}
 					</span>
 					<Button
@@ -346,7 +346,7 @@ export function JournalEntriesPage({
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
 					{entries.length === 0 ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.noEntries")}
 						</div>
 					) : (
@@ -375,7 +375,7 @@ export function JournalEntriesPage({
 									const statusLabel = t(`finance.accounting.status.${entry.status === "POSTED" ? "posted" : entry.status === "REVERSED" ? "reversed" : "draft"}`);
 									const isDraft = entry.status === "DRAFT";
 									return (
-										<TableRow key={entry.id} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+										<TableRow key={entry.id} className="cursor-pointer hover:bg-accent">
 											<TableCell>
 												{isDraft ? (
 													<input
@@ -393,12 +393,12 @@ export function JournalEntriesPage({
 													{entry.entryNo}
 												</Link>
 											</TableCell>
-											<TableCell className="text-sm text-slate-500">
+											<TableCell className="text-sm text-muted-foreground">
 												{new Date(entry.date).toLocaleDateString("en-SA")}
 											</TableCell>
 											<TableCell className="text-sm max-w-[250px] truncate">
 												{entry.isAutoGenerated && (
-													<Zap className="h-3 w-3 text-amber-500 inline me-1" />
+													<Zap className="h-3 w-3 text-chart-1 inline me-1" />
 												)}
 												{entry.description}
 											</TableCell>

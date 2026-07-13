@@ -29,7 +29,7 @@ export function AutosaveConflictDialog({
 		<Dialog open={open} onOpenChange={() => {}}>
 			<DialogContent className="max-w-md">
 				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+					<DialogTitle className="flex items-center gap-2 text-chart-1">
 						<CircleAlert className="h-5 w-5" />
 						{t("autosave.conflictTitle")}
 					</DialogTitle>

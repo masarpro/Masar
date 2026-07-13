@@ -129,7 +129,7 @@ const MessageBubble = memo(function MessageBubble({
           title={t("copy")}
         >
           {copied ? (
-            <Check className="h-3 w-3 text-green-600" />
+            <Check className="h-3 w-3 text-success" />
           ) : (
             <Copy className="h-3 w-3" />
           )}
@@ -203,13 +203,13 @@ export function AssistantMessages({
         )}
 
         {error && (
-          <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
-            <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+          <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3">
+            <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
             <div className="text-xs">
-              <p className="font-medium text-red-700 dark:text-red-400">
+              <p className="font-medium text-destructive">
                 {t("error")}
               </p>
-              <p className="mt-0.5 text-red-600/70 dark:text-red-400/70">
+              <p className="mt-0.5 text-destructive/70">
                 {t("errorRetry")}
               </p>
             </div>

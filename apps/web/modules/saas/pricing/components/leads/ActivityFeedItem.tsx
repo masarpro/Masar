@@ -28,12 +28,12 @@ interface ActivityFeedItemProps {
 
 const TYPE_CONFIG: Record<string, { icon: typeof MessageSquare; color: string }> = {
 	COMMENT: { icon: MessageSquare, color: "text-chart-4 bg-chart-4/15 dark:bg-chart-4/20" },
-	STATUS_CHANGE: { icon: RefreshCw, color: "text-orange-500 bg-orange-100 dark:bg-orange-950/40" },
-	FILE_UPLOADED: { icon: FileUp, color: "text-purple-500 bg-purple-100 dark:bg-purple-950/40" },
-	COST_STUDY_LINKED: { icon: Link2, color: "text-green-500 bg-green-100 dark:bg-green-950/40" },
-	COST_STUDY_UNLINKED: { icon: Unlink, color: "text-red-500 bg-red-100 dark:bg-red-950/40" },
-	QUOTATION_LINKED: { icon: Link2, color: "text-green-500 bg-green-100 dark:bg-green-950/40" },
-	QUOTATION_UNLINKED: { icon: Unlink, color: "text-red-500 bg-red-100 dark:bg-red-950/40" },
+	STATUS_CHANGE: { icon: RefreshCw, color: "text-chart-1 bg-chart-1/15" },
+	FILE_UPLOADED: { icon: FileUp, color: "text-chart-4 bg-chart-4/15" },
+	COST_STUDY_LINKED: { icon: Link2, color: "text-success bg-success/15" },
+	COST_STUDY_UNLINKED: { icon: Unlink, color: "text-destructive bg-destructive/15" },
+	QUOTATION_LINKED: { icon: Link2, color: "text-success bg-success/15" },
+	QUOTATION_UNLINKED: { icon: Unlink, color: "text-destructive bg-destructive/15" },
 	CREATED: { icon: UserCircle, color: "text-chart-4 bg-chart-4/15 dark:bg-chart-4/20" },
 };
 

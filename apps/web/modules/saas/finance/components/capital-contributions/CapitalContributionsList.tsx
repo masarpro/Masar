@@ -29,8 +29,8 @@ interface CapitalContributionsListProps {
 
 const TYPE_COLORS: Record<string, string> = {
 	INITIAL: "border-chart-4 text-chart-4 bg-chart-4/15",
-	ADDITIONAL: "border-green-300 text-green-700 bg-green-50",
-	IN_KIND: "border-purple-300 text-purple-700 bg-purple-50",
+	ADDITIONAL: "border-success/30 text-success bg-success/15",
+	IN_KIND: "border-chart-4/30 text-chart-4 bg-chart-4/15",
 };
 
 export function CapitalContributionsList({
@@ -82,13 +82,13 @@ export function CapitalContributionsList({
 
 			{/* Summary Cards */}
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-3 md:grid-cols-2 md:gap-4">
-				<Card className="border-green-200">
+				<Card className="border-success/30">
 					<CardContent className="pt-3 sm:pt-4">
 						<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-							<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
+							<TrendingUp className="h-4 w-4 text-success shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalContributions")}</span>
 						</div>
-						<div className="mt-1 text-base sm:text-2xl font-bold text-green-600 tabular-nums">
+						<div className="mt-1 text-base sm:text-2xl font-bold text-success tabular-nums">
 							<Currency amount={totalAmount} />
 						</div>
 					</CardContent>

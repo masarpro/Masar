@@ -108,8 +108,8 @@ function DirectGroupItems({
 						className={cn(
 							"flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
 							isActive
-								? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/20"
-								: "text-muted-foreground hover:text-foreground hover:bg-muted/60 hover:scale-105",
+								? "bg-primary text-primary-foreground"
+								: "text-muted-foreground hover:text-foreground hover:bg-accent",
 						)}
 					>
 						<Icon className="h-4 w-4" />

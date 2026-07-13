@@ -79,29 +79,29 @@ function getCuttingEfficiency(wastePercentage: number) {
 	if (wastePercentage <= 5) {
 		return {
 			labelKey: "efficiencyExcellent",
-			color: "bg-green-500",
-			textColor: "text-green-600",
-			bgColor: "bg-green-50 dark:bg-green-950",
-			borderColor: "border-green-200 dark:border-green-800",
+			color: "bg-success",
+			textColor: "text-success",
+			bgColor: "bg-success/10",
+			borderColor: "border-success/30",
 			icon: CheckCircle2,
 		};
 	}
 	if (wastePercentage <= 10) {
 		return {
 			labelKey: "efficiencyGood",
-			color: "bg-yellow-500",
-			textColor: "text-yellow-600",
-			bgColor: "bg-yellow-50 dark:bg-yellow-950",
-			borderColor: "border-yellow-200 dark:border-yellow-800",
+			color: "bg-chart-1",
+			textColor: "text-chart-1",
+			bgColor: "bg-chart-1/10",
+			borderColor: "border-chart-1/30",
 			icon: AlertTriangle,
 		};
 	}
 	return {
 		labelKey: "efficiencyHigh",
-		color: "bg-red-500",
-		textColor: "text-red-600",
-		bgColor: "bg-red-50 dark:bg-red-950",
-		borderColor: "border-red-200 dark:border-red-800",
+		color: "bg-destructive",
+		textColor: "text-destructive",
+		bgColor: "bg-destructive/10",
+		borderColor: "border-destructive/30",
 		icon: XCircle,
 	};
 }
@@ -128,36 +128,36 @@ export function CalculationResultsPanel({
 			{/* القسم الأول: ملخص النتائج الرئيسية */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 				{/* حجم الخرسانة */}
-				<div className="bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 rounded-xl p-4 border border-chart-4 dark:border-chart-4">
+				<div className="rounded-xl p-4 border-2 bg-card">
 					<div className="flex items-center gap-2 mb-2">
-						<div className="p-2 bg-chart-4 rounded-lg">
-							<Box className="h-4 w-4 text-white" />
+						<div className="flex size-8 items-center justify-center bg-chart-4/15 rounded-lg">
+							<Box className="h-4 w-4 text-chart-4" />
 						</div>
-						<span className="text-sm font-medium text-chart-4 dark:text-chart-4">
+						<span className="text-sm font-medium text-chart-4">
 							{tCalc("concreteVolume")}
 						</span>
 					</div>
-					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+					<p className="text-2xl font-bold text-chart-4">
 						{formatNumber(concreteVolume)}
 						<span className="text-sm font-normal ms-1">م³</span>
 					</p>
 				</div>
 
 				{/* وزن الحديد */}
-				<div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 rounded-xl p-4 border border-red-200 dark:border-red-800">
+				<div className="rounded-xl p-4 border-2 bg-card">
 					<div className="flex items-center gap-2 mb-2">
-						<div className="p-2 bg-red-500 rounded-lg">
-							<Scale className="h-4 w-4 text-white" />
+						<div className="flex size-8 items-center justify-center bg-destructive/15 rounded-lg">
+							<Scale className="h-4 w-4 text-destructive" />
 						</div>
-						<span className="text-sm font-medium text-red-700 dark:text-red-300">
+						<span className="text-sm font-medium text-destructive">
 							{tCalc("rebarWeight")}
 						</span>
 					</div>
-					<p className="text-2xl font-bold text-red-900 dark:text-red-100">
+					<p className="text-2xl font-bold text-destructive">
 						{formatNumber(totals.grossWeight)}
 						<span className="text-sm font-normal ms-1">كجم</span>
 					</p>
-					<p className="text-xs text-red-600 dark:text-red-400 mt-1">
+					<p className="text-xs text-destructive mt-1">
 						({tons.toFixed(3)} طن)
 					</p>
 				</div>
@@ -207,10 +207,10 @@ export function CalculationResultsPanel({
 					<div className="grid grid-cols-3 gap-3">
 						<div className="bg-background rounded-lg p-3 text-center border">
 							<div className="flex items-center justify-center gap-1 mb-1">
-								<TrendingDown className="h-3 w-3 text-green-600" />
+								<TrendingDown className="h-3 w-3 text-success" />
 								<span className="text-xs text-muted-foreground">{t("netWeight")}</span>
 							</div>
-							<p className="text-lg font-bold text-green-600">
+							<p className="text-lg font-bold text-success">
 								{formatNumber(totals.netWeight)}
 							</p>
 							<p className="text-xs text-muted-foreground">كجم</p>
@@ -239,7 +239,7 @@ export function CalculationResultsPanel({
 
 					{/* جدول تفاصيل القص */}
 					{cuttingDetails.length > 0 && (
-						<div className="border rounded-lg overflow-hidden">
+						<div className="border-2 rounded-lg overflow-hidden">
 							<div className="bg-muted/50 px-3 py-2 border-b">
 								<h6 className="font-medium text-sm flex items-center gap-2">
 									<Scissors className="h-4 w-4" />
@@ -287,7 +287,7 @@ export function CalculationResultsPanel({
 														{detail.description}
 													</TableCell>
 													<TableCell className="text-center">
-														<span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+														<span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-muted text-muted-foreground border border-border">
 															{detail.diameter} مم
 														</span>
 													</TableCell>
@@ -305,7 +305,7 @@ export function CalculationResultsPanel({
 													<TableCell className="text-xs text-center">
 														{detail.stocksNeeded}
 														{detail.stockBarsPerUnit && detail.stockBarsPerUnit > 1 && (
-															<span className="text-orange-600 text-[10px] block">
+															<span className="text-chart-1 text-[10px] block">
 																{t("perBar", { count: detail.stockBarsPerUnit })}
 															</span>
 														)}
@@ -338,8 +338,8 @@ export function CalculationResultsPanel({
 
 					{/* تنبيه الوصلات */}
 					{cuttingDetails.some(d => d.splicesPerBar && d.splicesPerBar > 0) && (
-						<div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mt-2 mb-2">
-							<p className="text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1">
+						<div className="bg-chart-1/10 border border-chart-1/30 rounded-lg p-3 mt-2 mb-2">
+							<p className="text-xs text-chart-1 flex items-center gap-1">
 								<AlertTriangle className="h-3 w-3 flex-shrink-0" />
 								{t("spliceNotice")}
 							</p>
@@ -348,8 +348,8 @@ export function CalculationResultsPanel({
 
 					{/* الأسياخ المطلوبة من المصنع */}
 					{totals.stocksNeeded.length > 0 && (
-						<div className="bg-gradient-to-r from-chart-4/15 to-indigo-50 dark:from-chart-4/20 dark:to-indigo-950 rounded-lg p-4 border border-chart-4 dark:border-chart-4">
-							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-chart-4 dark:text-chart-4">
+						<div className="rounded-lg p-4 border-2 bg-card">
+							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-chart-4">
 								<Package className="h-4 w-4" />
 								{t("stocksFromFactory")}
 							</h6>
@@ -357,9 +357,9 @@ export function CalculationResultsPanel({
 								{totals.stocksNeeded.map((stock, idx) => (
 									<div
 										key={idx}
-										className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-chart-4 dark:border-chart-4 text-center"
+										className="bg-card rounded-lg p-3 border border-chart-4/30 text-center"
 									>
-										<p className="text-lg font-bold text-chart-4 dark:text-chart-4">
+										<p className="text-lg font-bold text-chart-4">
 											{stock.count}
 										</p>
 										<p className="text-xs text-muted-foreground">
@@ -373,8 +373,8 @@ export function CalculationResultsPanel({
 
 					{/* اقتراحات استخدام الفضلات */}
 					{waste && waste.length > 0 && (
-						<div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950 dark:to-amber-950 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
-							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+						<div className="rounded-lg p-4 border-2 bg-card">
+							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-chart-1">
 								<Lightbulb className="h-4 w-4" />
 								{t("wasteSuggestions")}
 							</h6>
@@ -382,10 +382,10 @@ export function CalculationResultsPanel({
 								{waste.map((w, idx) => (
 									<div
 										key={idx}
-										className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg px-3 py-2 border border-yellow-100 dark:border-yellow-900"
+										className="flex items-center justify-between bg-card rounded-lg px-3 py-2 border border-border"
 									>
 										<div className="flex items-center gap-2">
-											<span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+											<span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-muted text-muted-foreground border border-border">
 												{w.diameter} مم
 											</span>
 											<span className="text-xs">

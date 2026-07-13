@@ -207,7 +207,7 @@ export function ExpenseCategoriesManager({
 											{!cat.isActive && (
 												<Badge
 													variant="outline"
-													className="text-xs text-amber-600 border-amber-300"
+													className="text-xs text-chart-1 border-chart-1/30"
 												>
 													{t("inactiveBadge")}
 												</Badge>
@@ -297,7 +297,7 @@ export function ExpenseCategoriesManager({
 													{!sub.isActive && (
 														<Badge
 															variant="outline"
-															className="text-xs text-amber-600 border-amber-300"
+															className="text-xs text-chart-1 border-chart-1/30"
 														>
 															{t("inactiveBadge")}
 														</Badge>

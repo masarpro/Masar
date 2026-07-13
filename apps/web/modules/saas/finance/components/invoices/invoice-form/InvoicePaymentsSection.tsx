@@ -33,14 +33,14 @@ export function InvoicePaymentsSection({
 	if (payments.length === 0) return null;
 
 	return (
-		<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-			<div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+		<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+			<div className="flex items-center justify-between px-5 py-3.5 border-b-2 border-border">
 				<div className="flex items-center gap-2.5">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/40 dark:to-green-800/20 flex items-center justify-center">
-						<CreditCard className="h-[15px] w-[15px] text-green-500" />
+					<div className="flex size-8 items-center justify-center rounded-xl bg-success/15 text-success">
+						<CreditCard className="h-[15px] w-[15px]" />
 					</div>
-					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.payments")}</span>
-					<span className="px-2.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold">{payments.length}</span>
+					<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.payments")}</span>
+					<span className="px-2.5 py-0.5 rounded-full bg-success/15 text-success text-[11px] font-bold">{payments.length}</span>
 				</div>
 				{canAddPayment && (
 					<Button type="button" variant="ghost" size="sm" className="rounded-lg h-8 text-xs" onClick={onAddPayment}>
@@ -51,9 +51,9 @@ export function InvoicePaymentsSection({
 			</div>
 			<div className="p-4 space-y-2">
 				{payments.map((payment) => (
-					<div key={payment.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/40">
+					<div key={payment.id} className="flex items-center justify-between p-3 rounded-xl bg-muted border-2 border-border">
 						<div>
-							<p className="font-medium text-green-600 dark:text-green-400 text-sm">
+							<p className="font-medium text-success text-sm">
 								<Currency amount={payment.amount} />
 							</p>
 							<p className="text-xs text-muted-foreground mt-0.5">
@@ -66,7 +66,7 @@ export function InvoicePaymentsSection({
 							)}
 						</div>
 						{canAddPayment && (
-							<Button type="button" variant="ghost" size="sm" onClick={() => onDeletePayment(payment.id)} className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg h-8 w-8 p-0">
+							<Button type="button" variant="ghost" size="sm" onClick={() => onDeletePayment(payment.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-8 w-8 p-0">
 								<Trash2 className="h-4 w-4" />
 							</Button>
 						)}

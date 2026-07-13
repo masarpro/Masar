@@ -49,7 +49,7 @@ export function SubPageHeader({
 
 	return (
 		<div
-			className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
+			className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 rounded-2xl bg-card border-2 border-border"
 			dir="rtl"
 		>
 			<div className="flex min-w-0 items-center gap-3">
@@ -66,7 +66,7 @@ export function SubPageHeader({
 				</Button>
 
 				{SectionIcon && (
-					<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+					<div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
 						<SectionIcon className="h-5 w-5 text-primary" />
 					</div>
 				)}

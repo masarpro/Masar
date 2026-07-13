@@ -130,10 +130,10 @@ export function CostStudyOverview({
 				<Card>
 					<CardContent className="p-6">
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+							<div className="p-4 rounded-xl bg-muted/50 border border-border">
 								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-										<Building2 className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+										<Building2 className="h-5 w-5" />
 									</div>
 									<div>
 										<p className="text-xs text-muted-foreground">
@@ -147,10 +147,10 @@ export function CostStudyOverview({
 									</div>
 								</div>
 							</div>
-							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+							<div className="p-4 rounded-xl bg-muted/50 border border-border">
 								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-										<Layers className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+										<Layers className="h-5 w-5" />
 									</div>
 									<div>
 										<p className="text-xs text-muted-foreground">
@@ -163,10 +163,10 @@ export function CostStudyOverview({
 									</div>
 								</div>
 							</div>
-							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+							<div className="p-4 rounded-xl bg-muted/50 border border-border">
 								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-										<MapPin className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+										<MapPin className="h-5 w-5" />
 									</div>
 									<div>
 										<p className="text-xs text-muted-foreground">
@@ -178,10 +178,10 @@ export function CostStudyOverview({
 									</div>
 								</div>
 							</div>
-							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+							<div className="p-4 rounded-xl bg-muted/50 border border-border">
 								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-										<Sparkles className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+										<Sparkles className="h-5 w-5" />
 									</div>
 									<div>
 										<p className="text-xs text-muted-foreground">
@@ -227,7 +227,7 @@ export function CostStudyOverview({
 						ملخص سريع
 					</h3>
 					<div className="grid grid-cols-2 gap-4">
-						<div className="p-4 rounded-xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4">
+						<div className="p-4 rounded-xl border-2 bg-card">
 							<div className="flex items-start justify-between">
 								<div>
 									<p className="text-sm text-muted-foreground">
@@ -240,26 +240,26 @@ export function CostStudyOverview({
 										لم يتم إدخال بيانات بعد
 									</p>
 								</div>
-								<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-									<Box className="h-5 w-5 text-chart-4" />
+								<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+									<Box className="h-5 w-5" />
 								</div>
 							</div>
 						</div>
-						<div className="p-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
+						<div className="p-4 rounded-xl border-2 bg-card">
 							<div className="flex items-start justify-between">
 								<div>
 									<p className="text-sm text-muted-foreground">
 										إجمالي الحديد
 									</p>
-									<p className="text-2xl font-bold text-orange-600 mt-1">
+									<p className="text-2xl font-bold text-chart-1 mt-1">
 										—
 									</p>
 									<p className="text-xs text-muted-foreground mt-1">
 										لم يتم إدخال بيانات بعد
 									</p>
 								</div>
-								<div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/50">
-									<Columns3 className="h-5 w-5 text-orange-600" />
+								<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+									<Columns3 className="h-5 w-5" />
 								</div>
 							</div>
 						</div>
@@ -269,12 +269,12 @@ export function CostStudyOverview({
 
 			{/* Linked Lead Card */}
 			{(study as any).lead && (
-				<Card className="border-chart-4 dark:border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20">
+				<Card className="border-2">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-xl bg-chart-4/15 dark:bg-chart-4/20">
-									<UserSearch className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+								<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+									<UserSearch className="h-5 w-5" />
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">

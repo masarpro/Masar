@@ -140,7 +140,7 @@ export function CreateItemDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle>
 						{isEdit ? t("editDialog.title") : t("createDialog.title")}
 					</DialogTitle>
@@ -262,7 +262,7 @@ export function CreateItemDialog({
 						</div>
 					</div>
 
-					<div className="bg-slate-50 dark:bg-slate-800/50 border-t px-5 py-3 flex gap-3 justify-end">
+					<div className="bg-muted border-t-2 px-5 py-3 flex gap-3 justify-end">
 						<Button
 							type="button"
 							variant="outline"

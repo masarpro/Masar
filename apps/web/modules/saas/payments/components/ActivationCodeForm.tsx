@@ -90,8 +90,8 @@ export function ActivationCodeForm() {
 			</div>
 
 			{validatedData && (
-				<div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 space-y-3">
-					<div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+				<div className="rounded-lg border border-success/30 bg-success/10 p-4 space-y-3">
+					<div className="flex items-center gap-2 text-success">
 						<CheckCircle2Icon className="size-5" />
 						<span className="font-semibold">
 							{t("choosePlan.codeValid")}

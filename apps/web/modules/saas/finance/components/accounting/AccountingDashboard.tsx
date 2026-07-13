@@ -81,96 +81,96 @@ export function AccountingDashboard({
 						value: formatAccounting(data.totalAssets),
 						icon: DollarSign,
 						iconClassName: "text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconBgClassName: "bg-chart-4/15",
 					},
 					{
 						label: t("finance.accounting.totalLiabilities"),
 						value: formatAccounting(data.totalLiabilities),
 						icon: CreditCard,
-						iconClassName: "text-red-600",
-						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+						iconClassName: "text-destructive",
+						iconBgClassName: "bg-destructive/15",
 					},
 					{
 						label: t("finance.accounting.incomeStatement.netProfit"),
 						value: formatAccounting(data.netProfitThisMonth),
 						icon: TrendingUp,
-						iconClassName: "text-green-600",
-						iconBgClassName: "bg-green-100 dark:bg-green-900/30",
+						iconClassName: "text-success",
+						iconBgClassName: "bg-success/15",
 						valueClassName:
-							data.netProfitThisMonth >= 0 ? "text-green-600" : "text-red-600",
+							data.netProfitThisMonth >= 0 ? "text-success" : "text-destructive",
 					},
 					{
 						label: t("finance.accounting.dashboard.draftEntries"),
 						value: data.draftEntriesCount,
 						icon: ClipboardList,
-						iconClassName: "text-amber-600",
-						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
-						valueClassName: "text-amber-600",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
+						valueClassName: "text-chart-1",
 					},
 				]}
 			/>
 
 			{/* Primary KPI Cards — For the Contractor (الديسكتوب كما هو) */}
 			<div className="hidden gap-3 sm:grid sm:grid-cols-4">
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.totalAssets")}</p>
-								<p className="text-lg font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.totalAssets")}</p>
+								<p className="text-lg font-bold text-card-foreground mt-1">
 									{formatAccounting(data.totalAssets)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+							<div className="p-2.5 bg-chart-4/15 rounded-xl">
 								<DollarSign className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.totalLiabilities")}</p>
-								<p className="text-lg font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.totalLiabilities")}</p>
+								<p className="text-lg font-bold text-card-foreground mt-1">
 									{formatAccounting(data.totalLiabilities)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
-								<CreditCard className="h-5 w-5 text-red-600" />
+							<div className="p-2.5 bg-destructive/15 rounded-xl">
+								<CreditCard className="h-5 w-5 text-destructive" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.incomeStatement.netProfit")}</p>
-								<p className={`text-lg font-bold mt-1 ${data.netProfitThisMonth >= 0 ? "text-green-600" : "text-red-600"}`}>
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.incomeStatement.netProfit")}</p>
+								<p className={`text-lg font-bold mt-1 ${data.netProfitThisMonth >= 0 ? "text-success" : "text-destructive"}`}>
 									{formatAccounting(data.netProfitThisMonth)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-green-100 dark:bg-green-900/30 rounded-xl">
-								<TrendingUp className="h-5 w-5 text-green-600" />
+							<div className="p-2.5 bg-success/15 rounded-xl">
+								<TrendingUp className="h-5 w-5 text-success" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.draftEntries")}</p>
-								<p className="text-lg font-bold text-amber-600 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.draftEntries")}</p>
+								<p className="text-lg font-bold text-chart-1 mt-1">
 									{data.draftEntriesCount}
 								</p>
 							</div>
-							<div className="p-2.5 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-								<ClipboardList className="h-5 w-5 text-amber-600" />
+							<div className="p-2.5 bg-chart-1/15 rounded-xl">
+								<ClipboardList className="h-5 w-5 text-chart-1" />
 							</div>
 						</div>
 					</CardContent>
@@ -185,98 +185,98 @@ export function AccountingDashboard({
 						label: t("finance.accounting.dashboard.totalRevenue"),
 						value: formatAccounting(data.totalRevenue),
 						icon: TrendingUp,
-						iconClassName: "text-green-600",
-						iconBgClassName: "bg-green-100 dark:bg-green-900/30",
-						valueClassName: "text-green-600",
+						iconClassName: "text-success",
+						iconBgClassName: "bg-success/15",
+						valueClassName: "text-success",
 					},
 					{
 						label: t("finance.accounting.dashboard.totalExpenses"),
 						value: formatAccounting(data.totalExpenses),
 						icon: TrendingDown,
-						iconClassName: "text-red-600",
-						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
-						valueClassName: "text-red-600",
+						iconClassName: "text-destructive",
+						iconBgClassName: "bg-destructive/15",
+						valueClassName: "text-destructive",
 					},
 					{
 						label: t("finance.accounting.dashboard.accountsReceivable"),
 						value: formatAccounting(data.accountsReceivable),
 						icon: Users,
 						iconClassName: "text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconBgClassName: "bg-chart-4/15",
 						valueClassName: "text-chart-4",
 					},
 					{
 						label: t("finance.accounting.dashboard.accountsPayable"),
 						value: formatAccounting(data.accountsPayable),
 						icon: Building2,
-						iconClassName: "text-amber-600",
-						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
-						valueClassName: "text-amber-600",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
+						valueClassName: "text-chart-1",
 					},
 				]}
 			/>
 
 			{/* Secondary KPI Cards — Revenue, Expenses, Receivable, Payable (الديسكتوب كما هو) */}
 			<div className="hidden gap-3 sm:grid sm:grid-cols-4">
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.totalRevenue")}</p>
-								<p className="text-lg font-bold text-green-600 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.totalRevenue")}</p>
+								<p className="text-lg font-bold text-success mt-1">
 									{formatAccounting(data.totalRevenue)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-green-100 dark:bg-green-900/30 rounded-xl">
-								<TrendingUp className="h-5 w-5 text-green-600" />
+							<div className="p-2.5 bg-success/15 rounded-xl">
+								<TrendingUp className="h-5 w-5 text-success" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.totalExpenses")}</p>
-								<p className="text-lg font-bold text-red-600 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.totalExpenses")}</p>
+								<p className="text-lg font-bold text-destructive mt-1">
 									{formatAccounting(data.totalExpenses)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
-								<TrendingDown className="h-5 w-5 text-red-600" />
+							<div className="p-2.5 bg-destructive/15 rounded-xl">
+								<TrendingDown className="h-5 w-5 text-destructive" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.accountsReceivable")}</p>
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.accountsReceivable")}</p>
 								<p className="text-lg font-bold text-chart-4 mt-1">
 									{formatAccounting(data.accountsReceivable)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+							<div className="p-2.5 bg-chart-4/15 rounded-xl">
 								<Users className="h-5 w-5 text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.accountsPayable")}</p>
-								<p className="text-lg font-bold text-amber-600 mt-1">
+								<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.accountsPayable")}</p>
+								<p className="text-lg font-bold text-chart-1 mt-1">
 									{formatAccounting(data.accountsPayable)}
 								</p>
 							</div>
-							<div className="p-2.5 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-								<Building2 className="h-5 w-5 text-amber-600" />
+							<div className="p-2.5 bg-chart-1/15 rounded-xl">
+								<Building2 className="h-5 w-5 text-chart-1" />
 							</div>
 						</div>
 					</CardContent>
@@ -296,25 +296,25 @@ export function AccountingDashboard({
 									drawingsSummaryQuery.data.totalDrawingsThisYear,
 								),
 								icon: UserMinus,
-								iconClassName: "text-red-600",
-								iconBgClassName: "bg-red-100 dark:bg-red-900/30",
-								valueClassName: "text-red-600",
+								iconClassName: "text-destructive",
+								iconBgClassName: "bg-destructive/15",
+								valueClassName: "text-destructive",
 							},
 						]}
 					/>
 					{/* الديسكتوب كما هو */}
 					<div className="hidden gap-3 sm:grid sm:grid-cols-3">
-					<Card className="rounded-2xl">
+					<Card className="rounded-2xl border-2 shadow-none">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
 								<div>
-									<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.ownerDrawingsYtd")}</p>
-									<p className="text-lg font-bold text-red-600 mt-1">
+									<p className="text-xs text-muted-foreground">{t("finance.accounting.dashboard.ownerDrawingsYtd")}</p>
+									<p className="text-lg font-bold text-destructive mt-1">
 										{formatAccounting(drawingsSummaryQuery.data.totalDrawingsThisYear)}
 									</p>
 								</div>
-								<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
-									<UserMinus className="h-5 w-5 text-red-600" />
+								<div className="p-2.5 bg-destructive/15 rounded-xl">
+									<UserMinus className="h-5 w-5 text-destructive" />
 								</div>
 							</div>
 						</CardContent>
@@ -327,15 +327,15 @@ export function AccountingDashboard({
 			{healthQuery.data && (
 				<div className={`flex items-center gap-2 p-3 rounded-xl border ${
 					healthQuery.data.isHealthy
-						? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-						: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+						? "bg-success/10 border-success/30"
+						: "bg-destructive/10 border-destructive/30"
 				}`}>
 					{healthQuery.data.isHealthy ? (
-						<CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+						<CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
 					) : (
-						<HeartPulse className="h-4 w-4 text-red-600 flex-shrink-0" />
+						<HeartPulse className="h-4 w-4 text-destructive flex-shrink-0" />
 					)}
-					<span className={`text-sm ${healthQuery.data.isHealthy ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
+					<span className={`text-sm ${healthQuery.data.isHealthy ? "text-success" : "text-destructive"}`}>
 						{healthQuery.data.isHealthy
 							? t("finance.accounting.health.healthy")
 							: t("finance.accounting.health.issues", {
@@ -345,7 +345,7 @@ export function AccountingDashboard({
 									(healthQuery.data.expensesWithoutEntries?.length ?? 0),
 							})}
 					</span>
-					<Link href={`${basePath}/accounting-reports/health`} className={`text-sm hover:underline ms-auto ${healthQuery.data.isHealthy ? "text-green-600" : "text-red-600"}`}>
+					<Link href={`${basePath}/accounting-reports/health`} className={`text-sm hover:underline ms-auto ${healthQuery.data.isHealthy ? "text-success" : "text-destructive"}`}>
 						{t("finance.accountingReports.viewReport")}
 					</Link>
 				</div>
@@ -353,24 +353,24 @@ export function AccountingDashboard({
 
 			{/* Alerts */}
 			{!data.isTrialBalanceBalanced && (
-				<div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-					<AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
-					<span className="text-sm text-red-700 dark:text-red-300">
+				<div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-xl border border-destructive/30">
+					<AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+					<span className="text-sm text-destructive">
 						{t("finance.accounting.dashboard.trialBalanceAlert")}
 					</span>
-					<Link href={`${basePath}/accounting-reports/trial-balance`} className="text-sm text-red-600 hover:underline ms-auto">
+					<Link href={`${basePath}/accounting-reports/trial-balance`} className="text-sm text-destructive hover:underline ms-auto">
 						{t("finance.accountingReports.viewReport")}
 					</Link>
 				</div>
 			)}
 
 			{data.staleOpenPeriods > 0 && (
-				<div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-					<Clock className="h-4 w-4 text-amber-600 flex-shrink-0" />
-					<span className="text-sm text-amber-700 dark:text-amber-300">
+				<div className="flex items-center gap-2 p-3 bg-chart-1/10 rounded-xl border border-chart-1/30">
+					<Clock className="h-4 w-4 text-chart-1 flex-shrink-0" />
+					<span className="text-sm text-chart-1">
 						{t("finance.accounting.dashboard.stalePeriodsAlert", { count: data.staleOpenPeriods })}
 					</span>
-					<Link href={`${basePath}/accounting-periods`} className="text-sm text-amber-600 hover:underline ms-auto">
+					<Link href={`${basePath}/accounting-periods`} className="text-sm text-chart-1 hover:underline ms-auto">
 						{t("finance.accounting.periods.title")}
 					</Link>
 				</div>
@@ -378,13 +378,13 @@ export function AccountingDashboard({
 
 			{/* Backfill Result */}
 			{backfillMutation.data && backfillMutation.data.total > 0 && (
-				<div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-					<CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-					<span className="text-sm text-green-700 dark:text-green-300">
+				<div className="flex items-center gap-2 p-3 bg-success/10 rounded-xl border border-success/30">
+					<CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
+					<span className="text-sm text-success">
 						{t("finance.accounting.backfill.success", { total: backfillMutation.data.total })}
 					</span>
 					{backfillMutation.data.errors.length > 0 && (
-						<span className="text-sm text-amber-600 ms-2">
+						<span className="text-sm text-chart-1 ms-2">
 							({backfillMutation.data.errors.length} {t("finance.accounting.backfill.errors", { count: backfillMutation.data.errors.length })})
 						</span>
 					)}

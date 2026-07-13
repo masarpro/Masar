@@ -245,7 +245,7 @@ export function OwnerDrawingForm({
 												/>
 											</FormControl>
 											{bankInsufficient && (
-												<p className="text-sm text-red-600 flex items-center gap-1">
+												<p className="text-sm text-destructive flex items-center gap-1">
 													<AlertTriangle className="h-3 w-3" />
 													{t("finance.ownerDrawings.insufficientBankBalance")}
 												</p>
@@ -363,16 +363,16 @@ export function OwnerDrawingForm({
 									<InfoRow
 										label={t("finance.ownerDrawings.availableForOwner")}
 										value={
-											<span className={cr.availableForOwner < 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
+											<span className={cr.availableForOwner < 0 ? "text-destructive font-bold" : "text-success font-bold"}>
 												<Currency amount={cr.availableForOwner} />
 											</span>
 										}
 									/>
 								</div>
 								{cr.willExceed && (
-									<div className="mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2">
-										<AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-										<span className="text-xs text-amber-700">
+									<div className="mt-2 flex items-start gap-2 rounded-md border border-chart-1/30 bg-chart-1/10 p-2">
+										<AlertTriangle className="h-4 w-4 text-chart-1 mt-0.5 shrink-0" />
+										<span className="text-xs text-chart-1">
 											{t("finance.ownerDrawings.overdrawWarning", {
 												amount: new Intl.NumberFormat("en-US").format(cr.overdrawAmount),
 											})}
@@ -406,7 +406,7 @@ export function OwnerDrawingForm({
 
 					{/* Bank Balance Card */}
 					{cr && cr.bankBalance !== null && (
-						<Card className={bankInsufficient ? "border-red-200" : ""}>
+						<Card className={bankInsufficient ? "border-destructive/30" : ""}>
 							<CardHeader className="pb-2">
 								<CardTitle className="flex items-center gap-2 text-base">
 									<Banknote className="h-4 w-4" />
@@ -421,15 +421,15 @@ export function OwnerDrawingForm({
 								<InfoRow
 									label={t("finance.ownerDrawings.afterDrawing")}
 									value={
-										<span className={bankInsufficient ? "text-red-600 font-bold" : "font-medium"}>
+										<span className={bankInsufficient ? "text-destructive font-bold" : "font-medium"}>
 											<Currency amount={cr.balanceAfterDrawing ?? 0} />
 										</span>
 									}
 								/>
 								{bankInsufficient && (
-									<div className="mt-2 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2">
-										<AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-										<span className="text-xs text-red-700">
+									<div className="mt-2 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-2">
+										<AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+										<span className="text-xs text-destructive">
 											{t("finance.ownerDrawings.insufficientBankBalance")}
 										</span>
 									</div>
@@ -445,7 +445,7 @@ export function OwnerDrawingForm({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle className="flex items-center gap-2">
-							<AlertTriangle className="h-5 w-5 text-amber-500" />
+							<AlertTriangle className="h-5 w-5 text-chart-1" />
 							{t("finance.ownerDrawings.overdrawDialog.title")}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
@@ -475,7 +475,7 @@ export function OwnerDrawingForm({
 							</div>
 							<div className="flex justify-between border-t pt-1">
 								<span className="text-muted-foreground">{t("finance.ownerDrawings.availableForOwner")}</span>
-								<span className="font-bold text-red-600"><Currency amount={overdrawData.availableForOwner ?? 0} /></span>
+								<span className="font-bold text-destructive"><Currency amount={overdrawData.availableForOwner ?? 0} /></span>
 							</div>
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">{t("finance.ownerDrawings.requestedAmount")}</span>
@@ -497,7 +497,7 @@ export function OwnerDrawingForm({
 						<AlertDialogAction
 							onClick={handleOverdrawConfirm}
 							disabled={createMutation.isPending}
-							className="bg-amber-600 text-white hover:bg-amber-700"
+							className="bg-chart-1 text-foreground hover:bg-chart-1/90"
 						>
 							{t("finance.ownerDrawings.overdrawDialog.confirmDespite")}
 						</AlertDialogAction>

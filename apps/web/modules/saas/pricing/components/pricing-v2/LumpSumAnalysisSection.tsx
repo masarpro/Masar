@@ -75,9 +75,9 @@ function getRecommendation(profitPct: number) {
 	return {
 		labelKey: "lumpSum.recommendations.loss.label" as const,
 		descriptionKey: "lumpSum.recommendations.loss.description" as const,
-		color: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
-		borderColor: "border-red-200 dark:border-red-800",
-		bgColor: "bg-red-50/50 dark:bg-red-950/20",
+		color: "bg-destructive/15 text-destructive",
+		borderColor: "border-destructive",
+		bgColor: "bg-destructive/10",
 		icon: XCircle,
 	};
 }
@@ -155,7 +155,7 @@ export function LumpSumAnalysisSection({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* ═══ 1. Hero Comparison Card ═══ */}
-			<div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-bl from-primary/10 via-primary/5 to-background p-6 space-y-5">
+			<div className="rounded-2xl border-2 border-primary/20 bg-card p-6 space-y-5">
 				<h3 className="text-lg font-bold">{t("lumpSum.title")}</h3>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -174,8 +174,8 @@ export function LumpSumAnalysisSection({
 						className={cn(
 							"rounded-xl border-2 p-4 text-center space-y-1",
 							isProfit
-								? "border-emerald-300 dark:border-emerald-700 bg-emerald-50/60 dark:bg-emerald-950/30"
-								: "border-red-300 dark:border-red-700 bg-red-50/60 dark:bg-red-950/30",
+								? "border-success bg-success/10"
+								: "border-destructive bg-destructive/10",
 						)}
 					>
 						<p className="text-sm font-medium text-muted-foreground">
@@ -183,16 +183,16 @@ export function LumpSumAnalysisSection({
 						</p>
 						<div className="flex items-center justify-center gap-2">
 							{isProfit ? (
-								<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+								<TrendingUp className="h-5 w-5 text-success" />
 							) : (
-								<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+								<TrendingDown className="h-5 w-5 text-destructive" />
 							)}
 							<p
 								className={cn(
 									"text-2xl font-bold break-words",
 									isProfit
-										? "text-emerald-700 dark:text-emerald-300"
-										: "text-red-700 dark:text-red-300",
+										? "text-success"
+										: "text-destructive",
 								)}
 								dir="ltr"
 							>
@@ -203,8 +203,8 @@ export function LumpSumAnalysisSection({
 							className={cn(
 								"text-xs font-medium",
 								isProfit
-									? "text-emerald-600 dark:text-emerald-400"
-									: "text-red-600 dark:text-red-400",
+									? "text-success"
+									: "text-destructive",
 							)}
 						>
 							{isProfit ? t("lumpSum.profit") : t("lumpSum.loss")} (
@@ -234,10 +234,10 @@ export function LumpSumAnalysisSection({
 							className={cn(
 								"h-full rounded-full transition-all duration-1000 ease-out",
 								costAsPercentOfContract <= 80
-									? "bg-emerald-500"
+									? "bg-success"
 									: costAsPercentOfContract <= 95
-										? "bg-amber-500"
-										: "bg-red-500",
+										? "bg-chart-1"
+										: "bg-destructive",
 							)}
 							style={{ width: `${progressPct}%` }}
 						/>
@@ -251,9 +251,9 @@ export function LumpSumAnalysisSection({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-2">
 					<div className="flex items-center gap-2">
 						{isProfit ? (
-							<TrendingUp className="h-4 w-4 text-emerald-600" />
+							<TrendingUp className="h-4 w-4 text-success" />
 						) : (
-							<TrendingDown className="h-4 w-4 text-red-600" />
+							<TrendingDown className="h-4 w-4 text-destructive" />
 						)}
 						<span className="text-xs text-muted-foreground font-medium">
 							{t("lumpSum.profitPct")}
@@ -262,7 +262,7 @@ export function LumpSumAnalysisSection({
 					<p
 						className={cn(
 							"text-xl font-bold",
-							isProfit ? "text-emerald-600" : "text-red-600",
+							isProfit ? "text-success" : "text-destructive",
 						)}
 						dir="ltr"
 					>
@@ -288,9 +288,9 @@ export function LumpSumAnalysisSection({
 					<div className="rounded-xl border border-border bg-card p-4 space-y-2">
 						<div className="flex items-center gap-2">
 							{profitPerSqm >= 0 ? (
-								<TrendingUp className="h-4 w-4 text-emerald-600" />
+								<TrendingUp className="h-4 w-4 text-success" />
 							) : (
-								<TrendingDown className="h-4 w-4 text-red-600" />
+								<TrendingDown className="h-4 w-4 text-destructive" />
 							)}
 							<span className="text-xs text-muted-foreground font-medium">
 								{t("lumpSum.profitPerSqm")}
@@ -299,7 +299,7 @@ export function LumpSumAnalysisSection({
 						<p
 							className={cn(
 								"text-xl font-bold",
-								profitPerSqm >= 0 ? "text-emerald-600" : "text-red-600",
+								profitPerSqm >= 0 ? "text-success" : "text-destructive",
 							)}
 							dir="ltr"
 						>
@@ -312,9 +312,9 @@ export function LumpSumAnalysisSection({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-2">
 					<div className="flex items-center gap-2">
 						{costAsPercentOfContract <= 90 ? (
-							<CheckCircle2 className="h-4 w-4 text-emerald-600" />
+							<CheckCircle2 className="h-4 w-4 text-success" />
 						) : (
-							<AlertTriangle className="h-4 w-4 text-amber-600" />
+							<AlertTriangle className="h-4 w-4 text-chart-1" />
 						)}
 						<span className="text-xs text-muted-foreground font-medium">
 							{t("lumpSum.costPctOfContractShort")}
@@ -324,10 +324,10 @@ export function LumpSumAnalysisSection({
 						className={cn(
 							"text-xl font-bold",
 							costAsPercentOfContract <= 80
-								? "text-emerald-600"
+								? "text-success"
 								: costAsPercentOfContract <= 95
-									? "text-amber-600"
-									: "text-red-600",
+									? "text-chart-1"
+									: "text-destructive",
 						)}
 						dir="ltr"
 					>
@@ -418,8 +418,8 @@ export function LumpSumAnalysisSection({
 												className={cn(
 													"font-medium",
 													row.margin >= 0
-														? "text-emerald-600"
-														: "text-red-600",
+														? "text-success"
+														: "text-destructive",
 												)}
 											>
 												{row.margin >= 0 ? "+" : ""}{formatNum(row.margin)} ر.س
@@ -448,8 +448,8 @@ export function LumpSumAnalysisSection({
 											className={cn(
 												"font-bold",
 												difference >= 0
-													? "text-emerald-600"
-													: "text-red-600",
+													? "text-success"
+													: "text-destructive",
 											)}
 										>
 											{difference >= 0 ? "+" : ""}{formatNum(difference)} ر.س

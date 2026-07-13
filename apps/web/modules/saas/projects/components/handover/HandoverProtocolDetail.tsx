@@ -36,18 +36,18 @@ interface HandoverProtocolDetailProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-	ITEM_ACCEPTANCE: "bg-chart-4/15 text-chart-4",
-	PRELIMINARY: "bg-purple-100 text-purple-700",
-	FINAL: "bg-green-100 text-green-700",
-	DELIVERY: "bg-orange-100 text-orange-700",
+	ITEM_ACCEPTANCE: "bg-chart-3/15 text-chart-3",
+	PRELIMINARY: "bg-chart-4/15 text-chart-4",
+	FINAL: "bg-success/15 text-success",
+	DELIVERY: "bg-chart-1/15 text-chart-1",
 };
 
 const QUALITY_COLORS: Record<string, string> = {
-	EXCELLENT: "bg-green-100 text-green-700",
+	EXCELLENT: "bg-success/15 text-success",
 	GOOD: "bg-chart-4/15 text-chart-4",
-	ACCEPTABLE: "bg-amber-100 text-amber-700",
-	NEEDS_REWORK: "bg-orange-100 text-orange-700",
-	REJECTED: "bg-red-100 text-red-700",
+	ACCEPTABLE: "bg-chart-1/15 text-chart-1",
+	NEEDS_REWORK: "bg-chart-2/15 text-chart-2",
+	REJECTED: "bg-destructive/15 text-destructive",
 };
 
 export function HandoverProtocolDetail({
@@ -326,7 +326,7 @@ export function HandoverProtocolDetail({
 							<div>
 								<div className="flex justify-between text-sm mb-1">
 									<span>{t("handover.warranty.daysRemaining")}</span>
-									<span className={daysRemaining <= 30 ? "text-red-600 font-medium" : ""}>{daysRemaining}</span>
+									<span className={daysRemaining <= 30 ? "text-destructive font-medium" : ""}>{daysRemaining}</span>
 								</div>
 								<Progress value={warrantyProgress} className="h-2" />
 							</div>
@@ -341,7 +341,7 @@ export function HandoverProtocolDetail({
 						<CardContent className="space-y-3">
 							<InfoRow label={t("handover.retention.amount")} value={<Currency amount={Number(protocol.retentionReleaseAmount)} />} />
 							{protocol.status === "COMPLETED" && (
-								<div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
+								<div className="rounded-lg bg-success/15 p-3 text-sm text-success">
 									{t("handover.retention.title")} — {t("handover.statuses.COMPLETED")}
 								</div>
 							)}

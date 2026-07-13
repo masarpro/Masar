@@ -91,8 +91,8 @@ export function CascadeNotification({
 
 			{/* Skipped manual items warning */}
 			{(skippedManualCount > 0 || manualChanges.length > 0) && (
-				<div className="flex items-center gap-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm">
-					<AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+				<div className="flex items-center gap-2.5 rounded-lg bg-chart-1/10 border border-chart-1/30 p-3 text-sm">
+					<AlertTriangle className="h-4 w-4 text-chart-1 shrink-0" />
 					<span>
 						{t("manualSkipped", {
 							count: skippedManualCount || manualChanges.length,

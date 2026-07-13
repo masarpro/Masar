@@ -212,7 +212,7 @@ export function NeckColumnsSection({
 
 	if (groundColumns.length === 0) {
 		return (
-			<div className="rounded-xl border-2 border-dashed border-amber-300/50 bg-amber-50/30 dark:bg-amber-950/10 p-6 text-center">
+			<div className="rounded-xl border-2 border-dashed border-chart-1/40 bg-chart-1/10 p-6 text-center">
 				<p className="text-sm text-muted-foreground">
 					أضف أعمدة الدور الأرضي أولاً ليتم نسخها كرقاب تلقائياً
 				</p>
@@ -221,7 +221,7 @@ export function NeckColumnsSection({
 	}
 
 	return (
-		<Card className="border-amber-200/50 bg-amber-50/10 dark:bg-amber-950/10">
+		<Card className="border-chart-1/30 bg-chart-1/10">
 			<CardContent className="p-4 space-y-4">
 				{/* Header */}
 				<div className="flex items-center justify-between">
@@ -230,7 +230,7 @@ export function NeckColumnsSection({
 						<h4 className="font-semibold">رقاب الأعمدة</h4>
 						<Badge
 							variant="secondary"
-							className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+							className="text-xs bg-chart-1/15 text-chart-1"
 						>
 							{groundColumns.length} رقبة
 						</Badge>
@@ -253,7 +253,7 @@ export function NeckColumnsSection({
 				</p>
 
 				{/* Height selector */}
-				<div className="flex flex-wrap items-center gap-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 rounded-lg p-3">
+				<div className="flex flex-wrap items-center gap-3 bg-chart-1/10 border border-chart-1/30 rounded-lg p-3">
 					<Label className="font-medium text-sm whitespace-nowrap">
 						ارتفاع الرقبة:
 					</Label>
@@ -263,7 +263,7 @@ export function NeckColumnsSection({
 								key={h}
 								variant={neckHeight === h ? "primary" : "outline"}
 								size="sm"
-								className={`h-8 px-3 ${neckHeight === h ? "bg-amber-600 hover:bg-amber-700" : ""}`}
+								className="h-8 px-3"
 								onClick={() => onNeckHeightChange(h)}
 							>
 								{h} م
@@ -303,7 +303,7 @@ export function NeckColumnsSection({
 						</TableHeader>
 						<TableBody>
 							{neckCalcs.map((neck, idx) => (
-								<TableRow key={idx} className="bg-amber-50/20 dark:bg-amber-950/10">
+								<TableRow key={idx} className="bg-chart-1/10">
 									<TableCell className="font-medium">
 										رقبة {neck.name}
 									</TableCell>
@@ -411,7 +411,7 @@ export function NeckColumnsSection({
 				</div>
 
 				{/* Totals */}
-				<div className="bg-amber-100/50 dark:bg-amber-900/20 rounded-lg p-3">
+				<div className="bg-chart-1/15 rounded-lg p-3">
 					<div className="grid grid-cols-2 gap-4 text-sm">
 						<div>
 							<span className="text-muted-foreground">
@@ -434,7 +434,7 @@ export function NeckColumnsSection({
 
 				{/* حفظ الرقاب كعناصر فعلية — بدون الحفظ لا تدخل في BOQ والتسعير */}
 				<Button
-					className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+					className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
 					onClick={handleSaveNecks}
 					disabled={isSaving || neckCalcs.length === 0 || isSaved}
 				>
@@ -446,7 +446,7 @@ export function NeckColumnsSection({
 							: "حفظ الرقاب في الكميات"}
 				</Button>
 				{!isSaved && (
-					<p className="text-xs text-amber-700 dark:text-amber-400 text-center">
+					<p className="text-xs text-chart-1 text-center">
 						الرقاب لا تدخل في جدول الكميات والتسعير قبل الحفظ
 					</p>
 				)}

@@ -251,7 +251,7 @@ export function ProjectContractView({
 						<Button
 							asChild
 							variant="outline"
-							className="rounded-xl border-purple-200 px-5 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/30"
+							className="rounded-xl border-chart-4/30 px-5 text-chart-4 hover:bg-chart-4/10"
 						>
 							<Link href={`${basePath}/changes`}>
 								<FileDiff className="me-2 h-4 w-4" />
@@ -260,7 +260,7 @@ export function ProjectContractView({
 						</Button>
 						<Button
 							onClick={() => setIsEditing(true)}
-							className="rounded-xl bg-chart-4 px-6 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+							className="rounded-xl px-6"
 						>
 							<Pencil className="me-2 h-4 w-4" />
 							{t("projects.contract.editContract")}
@@ -276,7 +276,7 @@ export function ProjectContractView({
 								setIsEditing(false);
 							}}
 							disabled={isSaving}
-							className="rounded-xl border-slate-200 px-5 dark:border-slate-700"
+							className="rounded-xl px-5"
 						>
 							<X className="me-2 h-4 w-4" />
 							{t("projects.contract.cancelEdit")}
@@ -284,7 +284,7 @@ export function ProjectContractView({
 						<Button
 							onClick={handleSave}
 							disabled={isSaving}
-							className="rounded-xl bg-chart-4 px-6 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+							className="rounded-xl px-6"
 						>
 							{isSaving ? (
 								<>
@@ -312,9 +312,9 @@ export function ProjectContractView({
 
 			{/* Project Info (editable when isEditing) */}
 			{isEditing ? (
-				<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20">
-					<div className="border-b border-emerald-200/50 p-5 dark:border-emerald-800/30">
-						<h3 className="text-lg font-medium text-emerald-900 dark:text-emerald-100">
+				<div className="overflow-hidden rounded-2xl border-2 bg-card">
+					<div className="border-b-2 p-5">
+						<h3 className="text-lg font-medium text-card-foreground">
 							{t("projects.contract.projectInfo.title")}
 						</h3>
 					</div>
@@ -410,9 +410,9 @@ function ProjectInfoReadOnly({
 	const t = useTranslations();
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20">
-			<div className="border-b border-emerald-200/50 p-5 dark:border-emerald-800/30">
-				<h3 className="text-lg font-medium text-emerald-900 dark:text-emerald-100">
+		<div className="overflow-hidden rounded-2xl border-2 bg-card">
+			<div className="border-b-2 p-5">
+				<h3 className="text-lg font-medium text-card-foreground">
 					{t("projects.contract.projectInfo.title")}
 				</h3>
 			</div>
@@ -436,11 +436,11 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 
 	if (!contract) {
 		return (
-			<div className="rounded-2xl border border-dashed border-slate-200 py-16 text-center dark:border-slate-700">
-				<p className="text-sm text-slate-400">
+			<div className="rounded-2xl border-2 border-dashed py-16 text-center">
+				<p className="text-sm text-muted-foreground">
 					{t("projects.contract.title")}
 				</p>
-				<p className="mt-1 text-xs text-slate-300">
+				<p className="mt-1 text-xs text-muted-foreground">
 					{t("projects.contract.editContract")}
 				</p>
 			</div>
@@ -450,14 +450,14 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 	return (
 		<div className="space-y-6">
 			{/* Contract Details */}
-			<div className="overflow-hidden rounded-2xl border border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20">
-				<div className="border-b border-chart-4/50 p-5 dark:border-chart-4/30">
+			<div className="overflow-hidden rounded-2xl border-2 bg-card">
+				<div className="border-b-2 p-5">
 					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-medium text-chart-4 dark:text-chart-4">
+						<h3 className="text-lg font-medium text-card-foreground">
 							{t("projects.createProject.contractInfo")}
 						</h3>
 						{contract.contractNo && (
-							<span className="rounded-lg border border-chart-4 bg-chart-4/15 px-3 py-1 font-mono text-sm text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+							<span className="rounded-lg bg-chart-4/15 px-3 py-1 font-mono text-sm text-chart-4">
 								{contract.contractNo}
 							</span>
 						)}
@@ -530,11 +530,11 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 				</div>
 
 				{contract.scopeOfWork && (
-					<div className="border-t border-chart-4/50 p-5 dark:border-chart-4/30">
-						<p className="mb-1 text-xs text-slate-500">
+					<div className="border-t-2 p-5">
+						<p className="mb-1 text-xs text-muted-foreground">
 							{t("projects.createProject.scopeOfWork")}
 						</p>
-						<p className="text-sm text-slate-700 dark:text-slate-300">
+						<p className="text-sm text-card-foreground">
 							{contract.scopeOfWork}
 						</p>
 					</div>
@@ -543,9 +543,9 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 
 			{/* Payment Terms */}
 			{contract.paymentTerms?.length > 0 && (
-				<div className="overflow-hidden rounded-2xl border border-violet-200/50 bg-violet-50/50 dark:border-violet-800/30 dark:bg-violet-950/20">
-					<div className="border-b border-violet-200/50 p-5 dark:border-violet-800/30">
-						<h3 className="text-lg font-medium text-violet-900 dark:text-violet-100">
+				<div className="overflow-hidden rounded-2xl border-2 bg-card">
+					<div className="border-b-2 p-5">
+						<h3 className="text-lg font-medium text-card-foreground">
 							{t("projects.createProject.paymentTermsSection")}
 						</h3>
 					</div>
@@ -554,28 +554,28 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 							(term: any, idx: number) => (
 								<div
 									key={term.id ?? idx}
-									className="flex items-center justify-between rounded-xl border border-violet-100 bg-white p-3 dark:border-violet-800/30 dark:bg-slate-900/40"
+									className="flex items-center justify-between rounded-xl border-2 bg-card p-3"
 								>
 									<div className="flex items-center gap-3">
-										<span className="rounded-md bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+										<span className="rounded-full bg-chart-4/15 px-2.5 py-0.5 text-xs font-semibold text-chart-4">
 											{t(
 												`projects.createProject.termTypes.${term.type}`,
 											)}
 										</span>
 										{term.label && (
-											<span className="text-sm text-slate-600 dark:text-slate-400">
+											<span className="text-sm text-muted-foreground">
 												{term.label}
 											</span>
 										)}
 									</div>
 									<div className="flex items-center gap-3">
 										{term.percent != null && (
-											<span className="font-mono text-sm font-medium text-violet-700 dark:text-violet-300">
+											<span className="font-mono text-sm font-medium text-chart-4">
 												{term.percent}%
 											</span>
 										)}
 										{term.amount != null && (
-											<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
+											<span className="font-mono text-sm text-muted-foreground">
 												{formatNumber(Number(term.amount))}{" "}
 												{t("common.sar")}
 											</span>
@@ -593,9 +593,9 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 				contract.performanceBondPercent ||
 				contract.insuranceRequired ||
 				contract.penaltyPercent) && (
-				<div className="overflow-hidden rounded-2xl border border-amber-200/50 bg-amber-50/50 dark:border-amber-800/30 dark:bg-amber-950/20">
-					<div className="border-b border-amber-200/50 p-5 dark:border-amber-800/30">
-						<h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">
+				<div className="overflow-hidden rounded-2xl border-2 bg-card">
+					<div className="border-b-2 p-5">
+						<h3 className="text-lg font-medium text-card-foreground">
 							{t("projects.createProject.guaranteesSection")}
 						</h3>
 					</div>
@@ -659,8 +659,8 @@ function ReadOnlyField({
 }) {
 	return (
 		<div className="space-y-1">
-			<p className="text-xs text-slate-500">{label}</p>
-			<p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="text-sm font-medium text-card-foreground">
 				{value}
 			</p>
 		</div>

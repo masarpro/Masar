@@ -55,7 +55,7 @@ export function ItemCardCompactHeader({
 					<div className="flex items-center gap-1.5">
 						<p className="truncate text-sm font-medium">{item.displayName}</p>
 						{item.hasCustomMarkup && (
-							<Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />
+							<Star className="h-3.5 w-3.5 flex-shrink-0 fill-chart-1 text-chart-1" />
 						)}
 					</div>
 					<div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground tabular-nums">
@@ -73,16 +73,16 @@ export function ItemCardCompactHeader({
 
 				<div className="hidden flex-shrink-0 items-center gap-1.5 sm:flex">
 					{isProfit ? (
-						<TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+						<TrendingUp className="h-3.5 w-3.5 text-success" />
 					) : (
-						<TrendingDown className="h-3.5 w-3.5 text-red-600" />
+						<TrendingDown className="h-3.5 w-3.5 text-destructive" />
 					)}
 					<div className="text-end leading-tight">
 						<div
 							className={`text-sm font-semibold tabular-nums ${
 								isProfit
-									? "text-emerald-700 dark:text-emerald-400"
-									: "text-red-700 dark:text-red-400"
+									? "text-success"
+									: "text-destructive"
 							}`}
 						>
 							{isProfit ? "+" : ""}

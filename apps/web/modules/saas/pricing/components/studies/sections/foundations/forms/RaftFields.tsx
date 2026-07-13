@@ -68,8 +68,8 @@ export function RaftFields({
 					<div className="flex items-center gap-2">
 						<input type="checkbox" id="hasTopMeshRaft" checked={formData.hasTopMesh}
 							onChange={(e: any) => setFormData({ ...formData, hasTopMesh: e.target.checked })}
-							className="rounded border-green-500" />
-						<Label htmlFor="hasTopMeshRaft" className="text-sm font-medium text-green-700">الشبكة العلوية</Label>
+							className="rounded border-success" />
+						<Label htmlFor="hasTopMeshRaft" className="text-sm font-medium text-success">الشبكة العلوية</Label>
 					</div>
 					{formData.hasTopMesh && (
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -94,7 +94,7 @@ export function RaftFields({
 			<div className="border-t pt-4 space-y-4">
 				{/* الأغطية */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-purple-700">{t("pricing.studies.structural.raft.covers")}</h5>
+					<h5 className="text-sm font-medium text-chart-4">{t("pricing.studies.structural.raft.covers")}</h5>
 					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 						<div>
 							<Label className="text-xs">{t("pricing.studies.structural.raft.coverBottom")} (سم)</Label>
@@ -122,8 +122,8 @@ export function RaftFields({
 					<div className="flex items-center gap-2">
 						<input type="checkbox" id="hasLeanConcrete" checked={formData.hasLeanConcrete}
 							onChange={(e: any) => setFormData({ ...formData, hasLeanConcrete: e.target.checked })}
-							className="rounded border-gray-500" />
-						<Label htmlFor="hasLeanConcrete" className="text-sm font-medium text-gray-700">
+							className="rounded border-input" />
+						<Label htmlFor="hasLeanConcrete" className="text-sm font-medium text-muted-foreground">
 							{t("pricing.studies.structural.raft.leanConcrete")}
 						</Label>
 					</div>
@@ -142,8 +142,8 @@ export function RaftFields({
 					<div className="flex items-center gap-2">
 						<input type="checkbox" id="hasEdgeBeams" checked={formData.hasEdgeBeams}
 							onChange={(e: any) => setFormData({ ...formData, hasEdgeBeams: e.target.checked })}
-							className="rounded border-gray-500" />
-						<Label htmlFor="hasEdgeBeams" className="text-sm font-medium text-gray-700">
+							className="rounded border-input" />
+						<Label htmlFor="hasEdgeBeams" className="text-sm font-medium text-muted-foreground">
 							{t("pricing.studies.structural.raft.edgeBeams")}
 						</Label>
 					</div>
@@ -167,7 +167,7 @@ export function RaftFields({
 
 				{/* وصلة التراكب */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-orange-700">{t("pricing.studies.structural.raft.lapSplice")}</h5>
+					<h5 className="text-sm font-medium text-chart-1">{t("pricing.studies.structural.raft.lapSplice")}</h5>
 					<div className="flex items-center gap-3">
 						<div className="w-48">
 							<Label className="text-xs">{t("pricing.studies.structural.raft.lapSpliceMethod")}</Label>
@@ -191,7 +191,7 @@ export function RaftFields({
 						)}
 					</div>
 					{formData.length > 12 || formData.width > 12 ? (
-						<p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+						<p className="text-xs text-chart-1 bg-chart-1/10 p-2 rounded">
 							⚠ {t("pricing.studies.structural.raft.lapSpliceNote")}
 						</p>
 					) : null}
@@ -202,8 +202,8 @@ export function RaftFields({
 					<div className="flex items-center gap-2">
 						<input type="checkbox" id="hasChairBars" checked={formData.hasChairBars}
 							onChange={(e: any) => setFormData({ ...formData, hasChairBars: e.target.checked })}
-							className="rounded border-gray-500" />
-						<Label htmlFor="hasChairBars" className="text-sm font-medium text-gray-700">
+							className="rounded border-input" />
+						<Label htmlFor="hasChairBars" className="text-sm font-medium text-muted-foreground">
 							{t("pricing.studies.structural.raft.chairBars")}
 						</Label>
 					</div>
@@ -235,7 +235,7 @@ export function RaftFields({
 
 				{/* أسياخ انتظار الأعمدة */}
 				<div className="space-y-3">
-					<h5 className="text-sm font-medium text-teal-700">{t("pricing.studies.structural.raft.columnDowels")}</h5>
+					<h5 className="text-sm font-medium text-chart-3">{t("pricing.studies.structural.raft.columnDowels")}</h5>
 					<div className="w-48">
 						<Select value={formData.columnDowelMode} onValueChange={(v: any) => setFormData({ ...formData, columnDowelMode: v })}>
 							<SelectTrigger className="h-8"><SelectValue /></SelectTrigger>

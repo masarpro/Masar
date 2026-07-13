@@ -88,7 +88,7 @@ export function ExpenseCategoryCombobox({
 					role="combobox"
 					aria-expanded={open}
 					disabled={disabled || isLoading}
-					className="w-full justify-between rounded-xl h-10 font-normal bg-card shadow-xs"
+					className="w-full justify-between rounded-xl h-10 font-normal bg-card"
 				>
 					{selected ? (
 						<span className="truncate">{getName(selected)}</span>

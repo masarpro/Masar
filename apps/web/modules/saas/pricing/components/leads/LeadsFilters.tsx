@@ -72,12 +72,12 @@ export function LeadsFilters({
 			{/* بحث + زر فلترة واحد (الحالة/المصدر/الأولوية داخله) — للجوال والكمبيوتر */}
 			<div className="flex items-center gap-2">
 				<div className="relative min-w-0 flex-1 sm:max-w-md">
-					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("pricing.leads.searchPlaceholder")}
 						value={search}
 						onChange={(e: any) => onSearchChange(e.target.value)}
-						className="pe-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
+						className="pe-10 bg-card border-input rounded-xl"
 					/>
 				</div>
 				<MobileFilterSheet activeCount={activeFiltersCount}>
@@ -85,7 +85,7 @@ export function LeadsFilters({
 						value={status || "all"}
 						onValueChange={(v: any) => onStatusChange(v === "all" ? "" : v)}
 					>
-						<SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+						<SelectTrigger className="w-full bg-card border-input rounded-xl">
 							<SelectValue placeholder={t("pricing.leads.allStatuses")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -100,7 +100,7 @@ export function LeadsFilters({
 						</SelectContent>
 					</Select>
 					<Select value={source || "all"} onValueChange={(v: any) => onSourceChange(v === "all" ? "" : v)}>
-						<SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+						<SelectTrigger className="w-full bg-card border-input rounded-xl">
 							<SelectValue placeholder={t("pricing.leads.allSources")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -113,7 +113,7 @@ export function LeadsFilters({
 						</SelectContent>
 					</Select>
 					<Select value={priority || "all"} onValueChange={(v: any) => onPriorityChange(v === "all" ? "" : v)}>
-						<SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+						<SelectTrigger className="w-full bg-card border-input rounded-xl">
 							<SelectValue placeholder={t("pricing.leads.allPriorities")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -130,7 +130,7 @@ export function LeadsFilters({
 							variant="ghost"
 							size="sm"
 							onClick={onReset}
-							className="w-full gap-1.5 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+							className="w-full gap-1.5 rounded-xl text-muted-foreground hover:text-foreground"
 						>
 							<X className="h-3 w-3" />
 							{t("pricing.leads.resetFilters")}

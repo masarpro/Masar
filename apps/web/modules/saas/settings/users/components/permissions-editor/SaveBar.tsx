@@ -25,7 +25,7 @@ export function SaveBar({
 	onResetToRole: () => void;
 }) {
 	return (
-		<div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-border/60 bg-background/95 px-1 pt-3 backdrop-blur">
+		<div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-border bg-background px-1 pt-3">
 			<div className="flex items-center gap-2">
 				<Button
 					type="button"

@@ -145,9 +145,9 @@ export function InlineClientForm({
 	};
 
 	return (
-		<div className="rounded-xl border bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 overflow-hidden">
+		<div className="rounded-xl border bg-card overflow-hidden">
 			{/* Header */}
-			<div className="flex items-center justify-between p-3 border-b border-chart-4 dark:border-chart-4/50 bg-chart-4/5">
+			<div className="flex items-center justify-between p-3 border-b">
 				<div className="flex items-center gap-2">
 					<div className="w-8 h-8 rounded-lg bg-chart-4/10 flex items-center justify-center">
 						<Building2 className="h-4 w-4 text-chart-4 dark:text-chart-4" />

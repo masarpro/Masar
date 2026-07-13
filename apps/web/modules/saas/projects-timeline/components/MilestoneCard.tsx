@@ -78,14 +78,14 @@ export function MilestoneCard({
 
 	return (
 		<Card
-			className={`p-4 ${milestone.isCritical ? "border-orange-300 bg-orange-50/50" : ""}`}
+			className={`p-4 ${milestone.isCritical ? "border-chart-1/40 bg-chart-1/10" : ""}`}
 		>
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2 flex-wrap">
 						<h3 className="font-semibold text-lg truncate">{milestone.title}</h3>
 						{milestone.isCritical && (
-							<AlertTriangleIcon className="h-4 w-4 text-orange-500" />
+							<AlertTriangleIcon className="h-4 w-4 text-chart-1" />
 						)}
 						<MilestoneStatusBadge status={milestone.status} size="sm" />
 						{milestone.status !== "COMPLETED" && (
@@ -123,7 +123,7 @@ export function MilestoneCard({
 									{t("timeline.actualDates")}:
 								</span>
 								<div className="flex items-center gap-1 mt-0.5">
-									<CalendarIcon className="h-3 w-3 text-green-500" />
+									<CalendarIcon className="h-3 w-3 text-success" />
 									<span>
 										{formatDate(milestone.actualStart)} -{" "}
 										{formatDate(milestone.actualEnd)}

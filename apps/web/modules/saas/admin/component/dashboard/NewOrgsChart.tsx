@@ -33,8 +33,8 @@ export function NewOrgsChart({
 					<Tooltip />
 					<Bar
 						dataKey="count"
-						fill="var(--primary)"
-						radius={[4, 4, 0, 0]}
+						fill="var(--chart-1)"
+						radius={[10, 10, 10, 10]}
 					/>
 				</BarChart>
 			</ResponsiveContainer>

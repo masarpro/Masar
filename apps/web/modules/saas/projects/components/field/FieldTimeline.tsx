@@ -131,13 +131,13 @@ export function FieldTimeline({
 			label: t("projects.field.uploadPhoto"),
 			icon: Camera,
 			href: `${basePath}/execution/upload`,
-			color: "bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400",
+			color: "bg-success/15 text-success hover:bg-success/15 dark:bg-success/20 dark:text-success",
 		},
 		{
 			label: t("projects.field.newIssue"),
 			icon: AlertTriangle,
 			href: `${basePath}/execution/new-issue`,
-			color: "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400",
+			color: "bg-destructive/15 text-destructive hover:bg-destructive/15 dark:bg-destructive/20 dark:text-destructive",
 		},
 	];
 
@@ -158,7 +158,7 @@ export function FieldTimeline({
 				<button
 					type="button"
 					onClick={() => setShowProgressForm(!showProgressForm)}
-					className="flex items-center gap-3 rounded-xl p-4 transition-colors bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400"
+					className="flex items-center gap-3 rounded-xl p-4 transition-colors bg-chart-1/15 text-chart-1 hover:bg-chart-1/15 dark:bg-chart-1/20 dark:text-chart-1"
 				>
 					<TrendingUp className="h-5 w-5" />
 					<span className="text-sm font-medium">
@@ -168,9 +168,9 @@ export function FieldTimeline({
 			</div>
 
 			{/* Progress Card */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card p-5">
 				<div className="mb-3 flex items-center justify-between">
-					<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+					<span className="text-sm font-medium text-muted-foreground">
 						{t("projects.field.currentProgress")}
 					</span>
 					<span className="text-3xl font-bold text-chart-4 dark:text-chart-4">
@@ -182,8 +182,8 @@ export function FieldTimeline({
 
 			{/* Progress Update Form (Collapsible) */}
 			{showProgressForm && (
-				<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+				<div className="rounded-2xl border-2 bg-card p-5">
+					<h2 className="mb-4 text-lg font-semibold text-card-foreground">
 						{t("projects.field.updateProgress")}
 					</h2>
 					<ProgressUpdateForm
@@ -197,17 +197,17 @@ export function FieldTimeline({
 
 			{/* Timeline */}
 			<div className="space-y-4">
-				<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+				<h2 className="text-lg font-semibold text-foreground">
 					{t("projects.field.timeline")}
 				</h2>
 
 				{timeline.length === 0 ? (
-					<div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900/50">
-						<Clock className="mx-auto h-12 w-12 text-slate-400" />
-						<p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">
+					<div className="rounded-2xl border-2 border-dashed bg-card p-8 text-center">
+						<Clock className="mx-auto h-12 w-12 text-muted-foreground" />
+						<p className="mt-4 text-lg font-medium text-muted-foreground">
 							{t("projects.field.noActivities")}
 						</p>
-						<p className="mt-2 text-sm text-slate-500">
+						<p className="mt-2 text-sm text-muted-foreground">
 							{t("projects.field.startAdding")}
 						</p>
 					</div>
@@ -287,19 +287,19 @@ function TimelineItem({
 			return <DailyReportCard report={item.data} />;
 		case "photo":
 			return (
-				<div className="relative rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+				<div className="relative rounded-2xl border-2 bg-card p-4">
 					<div className="mb-3 flex items-center justify-between gap-2">
-						<div className="flex items-center gap-2 text-sm text-slate-500">
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
 							<Camera className="h-4 w-4" />
 							<span>{t("projects.field.photoUploaded")}</span>
-							<span className="text-slate-400">•</span>
+							<span className="text-muted-foreground">•</span>
 							<span>{formatDate(item.createdAt)}</span>
 						</div>
 						{isManager && onDeletePhoto && (
 							<button
 								type="button"
 								onClick={onDeletePhoto}
-								className="flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+								className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
 								aria-label={t("projects.field.deletePhoto")}
 							>
 								<Trash2 className="h-4 w-4" />
@@ -313,27 +313,27 @@ function TimelineItem({
 			return <IssueCard issue={item.data} />;
 		case "progress":
 			return (
-				<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<div className="flex items-center gap-3">
 						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
 							<TrendingUp className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div className="flex-1">
-							<p className="font-medium text-slate-900 dark:text-slate-100">
+							<p className="font-medium text-card-foreground">
 								{t("projects.field.progressUpdated")}
 							</p>
-							<p className="text-sm text-slate-500">
+							<p className="text-sm text-muted-foreground">
 								{(item.data as { progress: number }).progress}% -{" "}
 								{(item.data as { phaseLabel?: string }).phaseLabel ||
 									t("projects.field.noPhase")}
 							</p>
 						</div>
-						<div className="text-start text-sm text-slate-500">
+						<div className="text-start text-sm text-muted-foreground">
 							{formatDate(item.createdAt)}
 						</div>
 					</div>
 					{(item.data as { note?: string }).note && (
-						<p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+						<p className="mt-3 text-sm text-muted-foreground">
 							{(item.data as { note: string }).note}
 						</p>
 					)}

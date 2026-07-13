@@ -34,7 +34,7 @@ const Pagination = ({
 				>
 					<ChevronLeftIcon className="rtl:rotate-180" />
 				</Button>
-				<span className="text-gray-500 text-sm">
+				<span className="text-muted-foreground text-sm">
 					{t("pagination.rangeOf", {
 						start: currentPage * itemsPerPage - itemsPerPage + 1,
 						end: currentPage * itemsPerPage > totalItems

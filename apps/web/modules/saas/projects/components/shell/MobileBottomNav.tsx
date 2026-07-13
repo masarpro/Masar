@@ -265,7 +265,7 @@ function MobileSheetSlot({
 										className={cn(
 											"flex items-center justify-center w-12 h-12 rounded-2xl transition-colors",
 											isActive
-												? "bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20"
+												? "bg-primary"
 												: "bg-muted",
 										)}
 									>

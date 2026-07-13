@@ -199,7 +199,7 @@ export function StudyPipelineStepper({
 							className={cn(
 								"h-[2px] w-8 lg:w-12 shrink-0",
 								isApproved || status === "APPROVED"
-									? "bg-emerald-400 dark:bg-emerald-600"
+									? "bg-success"
 									: "bg-border",
 							)}
 						/>
@@ -225,21 +225,21 @@ export function StudyPipelineStepper({
 							className={cn(
 								"flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all min-w-[90px]",
 								isCurrent &&
-									"bg-primary text-primary-foreground shadow-md",
+									"bg-primary text-primary-foreground",
 								!isCurrent &&
 									isApproved &&
-									"hover:bg-emerald-50 dark:hover:bg-emerald-950/30",
+									"hover:bg-success/10",
 								!isCurrent &&
 									isDraft &&
-									"hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
+									"hover:bg-chart-4/15",
 								!isCurrent &&
 									isInReview &&
-									"hover:bg-amber-50 dark:hover:bg-amber-950/30",
+									"hover:bg-chart-1/10",
 								isLocked && "opacity-40 cursor-not-allowed",
 								!isCurrent &&
 									!isLocked &&
 									!isSkipped &&
-									"hover:shadow-sm",
+									"hover:bg-accent/50",
 							)}
 						>
 							{/* Icon circle */}
@@ -249,11 +249,11 @@ export function StudyPipelineStepper({
 									isCurrent &&
 										"bg-primary-foreground/20",
 									isApproved &&
-										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
+										"bg-success/15 text-success",
 									isDraft &&
-										"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+										"bg-chart-4/15 text-chart-4",
 									isInReview &&
-										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
+										"bg-chart-1/15 text-chart-1",
 									isLocked &&
 										"bg-muted text-muted-foreground",
 									isSkipped &&
@@ -275,11 +275,11 @@ export function StudyPipelineStepper({
 									"text-xs font-medium whitespace-nowrap",
 									isCurrent && "text-primary-foreground",
 									isApproved &&
-										"text-emerald-700 dark:text-emerald-400",
+										"text-success",
 									isDraft &&
-										"text-chart-4 dark:text-chart-4",
+										"text-chart-4",
 									isInReview &&
-										"text-amber-600 dark:text-amber-400",
+										"text-chart-1",
 									isLocked && "text-muted-foreground",
 									isSkipped && "text-muted-foreground/40",
 								)}
@@ -295,9 +295,9 @@ export function StudyPipelineStepper({
 										isCurrent
 											? "text-primary-foreground/70"
 											: isApproved
-												? "text-emerald-500 dark:text-emerald-500"
+												? "text-success"
 												: isDraft
-													? "text-chart-4 dark:text-chart-4"
+													? "text-chart-4"
 													: "text-muted-foreground",
 									)}
 								>
@@ -351,7 +351,7 @@ export function StudyPipelineStepper({
 							className={cn(
 								"h-[2px] w-4 shrink-0",
 								status === "APPROVED"
-									? "bg-emerald-400"
+									? "bg-success"
 									: "bg-border",
 							)}
 						/>
@@ -363,13 +363,13 @@ export function StudyPipelineStepper({
 								className={cn(
 									"flex h-10 w-10 items-center justify-center rounded-full transition-all",
 									isCurrent &&
-										"bg-primary text-primary-foreground shadow-md",
+										"bg-primary text-primary-foreground",
 									isApproved &&
-										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
+										"bg-success/15 text-success",
 									isDraft &&
-										"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+										"bg-chart-4/15 text-chart-4",
 									isInReview &&
-										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
+										"bg-chart-1/15 text-chart-1",
 									isLocked &&
 										"bg-muted/50 text-muted-foreground opacity-40",
 									isSkipped &&
@@ -389,9 +389,9 @@ export function StudyPipelineStepper({
 									"text-[10px] font-medium whitespace-nowrap",
 									isCurrent && "text-primary",
 									isApproved &&
-										"text-emerald-600 dark:text-emerald-400",
+										"text-success",
 									isDraft &&
-										"text-chart-4 dark:text-chart-4",
+										"text-chart-4",
 									isLocked && "text-muted-foreground/40",
 								)}
 							>

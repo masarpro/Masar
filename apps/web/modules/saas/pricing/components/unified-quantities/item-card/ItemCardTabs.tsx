@@ -160,7 +160,7 @@ function TabTrigger({ value, icon, children }: TabTriggerProps) {
 	return (
 		<TabsTrigger
 			value={value}
-			className="flex items-center gap-1.5 rounded-md border border-transparent bg-background px-3 py-1.5 text-xs data-[state=active]:border-border data-[state=active]:shadow-sm"
+			className="flex items-center gap-1.5 rounded-md border border-transparent bg-background px-3 py-1.5 text-xs data-[state=active]:border-border"
 		>
 			{icon}
 			{children}

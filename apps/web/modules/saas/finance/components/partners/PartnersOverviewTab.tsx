@@ -99,7 +99,7 @@ export function PartnersOverviewTab({
 	return (
 		<div className="space-y-6">
 			{level === "limited" && (
-				<div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
+				<div className="rounded-xl border border-chart-1/30 bg-chart-1/10 px-4 py-3 text-sm text-chart-1">
 					{t("finance.partners.access.limitedAccountant")}
 				</div>
 			)}
@@ -109,11 +109,11 @@ export function PartnersOverviewTab({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl shrink-0">
-									<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+								<div className="p-2 bg-success/15 rounded-xl shrink-0">
+									<TrendingUp className="h-5 w-5 text-success" />
 								</div>
 								<div className="min-w-0">
-									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+									<p className="text-sm text-muted-foreground truncate">
 										{t("finance.partners.summary.totalProfit")}
 									</p>
 									<p className="text-xl font-semibold tabular-nums">
@@ -130,7 +130,7 @@ export function PartnersOverviewTab({
 									<Wallet className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 								</div>
 								<div className="min-w-0">
-									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+									<p className="text-sm text-muted-foreground truncate">
 										{t("finance.partners.totalContributions")}
 									</p>
 									<p className="text-xl font-semibold tabular-nums">
@@ -143,11 +143,11 @@ export function PartnersOverviewTab({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-xl shrink-0">
-									<TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+								<div className="p-2 bg-chart-4/15 rounded-xl shrink-0">
+									<TrendingUp className="h-5 w-5 text-chart-4" />
 								</div>
 								<div className="min-w-0">
-									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+									<p className="text-sm text-muted-foreground truncate">
 										{t("finance.partners.totalDrawings")}
 									</p>
 									<p className="text-xl font-semibold tabular-nums">
@@ -160,11 +160,11 @@ export function PartnersOverviewTab({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl shrink-0">
-									<BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+								<div className="p-2 bg-chart-4/15 rounded-xl shrink-0">
+									<BarChart3 className="h-5 w-5 text-chart-4" />
 								</div>
 								<div className="min-w-0">
-									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+									<p className="text-sm text-muted-foreground truncate">
 										{t("finance.partners.shareOfProfit")}
 									</p>
 									<p className="text-xl font-semibold tabular-nums">
@@ -228,7 +228,7 @@ export function PartnersOverviewTab({
 							{partners.map((p: any) => (
 								<TableRow
 									key={p.id}
-									className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+									className="cursor-pointer hover:bg-muted/50"
 									onClick={() => router.push(`${basePath}/${p.id}`)}
 								>
 									<TableCell className="font-medium">{p.name}</TableCell>
@@ -243,7 +243,7 @@ export function PartnersOverviewTab({
 									<TableCell className="text-end tabular-nums hidden md:table-cell">
 										<Currency amount={p.totalContributions} />
 									</TableCell>
-									<TableCell className="text-end tabular-nums text-red-600 dark:text-red-400 hidden md:table-cell">
+									<TableCell className="text-end tabular-nums text-destructive hidden md:table-cell">
 										<Currency amount={p.totalDrawings} />
 									</TableCell>
 									{canViewProfits && (
@@ -265,8 +265,8 @@ export function PartnersOverviewTab({
 										<TableCell
 											className={`text-end tabular-nums font-semibold ${
 												(p.netBalance ?? 0) >= 0
-													? "text-emerald-600 dark:text-emerald-400"
-													: "text-red-600 dark:text-red-400"
+													? "text-success"
+													: "text-destructive"
 											}`}
 										>
 											<Currency amount={p.netBalance ?? 0} />

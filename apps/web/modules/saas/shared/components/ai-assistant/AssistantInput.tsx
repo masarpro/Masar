@@ -70,7 +70,7 @@ export function AssistantInput({
           className={cn(
             "absolute bottom-0.5 start-3 text-[10px]",
             value.length > 1900
-              ? "text-red-500"
+              ? "text-destructive"
               : "text-muted-foreground/50",
           )}
         >

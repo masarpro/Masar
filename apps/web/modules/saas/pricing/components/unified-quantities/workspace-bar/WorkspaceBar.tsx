@@ -64,7 +64,7 @@ export function WorkspaceBar({
 	onViewModeChange,
 }: Props) {
 	return (
-		<div className="sticky top-0 z-30 -mx-4 mb-4 border-b bg-background/95 px-4 pb-3 pt-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6">
+		<div className="sticky top-0 z-30 -mx-4 mb-4 border-b bg-background px-4 pb-3 pt-3 sm:-mx-6 sm:px-6">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 				<WorkspaceStatPills
 					totalGrossCost={totalGrossCost}
@@ -84,7 +84,7 @@ export function WorkspaceBar({
 							onClick={() => onViewModeChange("spreadsheet")}
 							className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs transition ${
 								viewMode === "spreadsheet"
-									? "bg-background text-foreground shadow-sm"
+									? "bg-background text-foreground"
 									: "text-muted-foreground hover:text-foreground"
 							}`}
 							aria-pressed={viewMode === "spreadsheet"}
@@ -98,7 +98,7 @@ export function WorkspaceBar({
 							onClick={() => onViewModeChange("cards")}
 							className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs transition ${
 								viewMode === "cards"
-									? "bg-background text-foreground shadow-sm"
+									? "bg-background text-foreground"
 									: "text-muted-foreground hover:text-foreground"
 							}`}
 							aria-pressed={viewMode === "cards"}
@@ -133,7 +133,7 @@ export function WorkspaceBar({
 					</Button>
 					<Button
 						size="sm"
-						className="bg-emerald-600 text-white hover:bg-emerald-700"
+						className="bg-success text-white hover:bg-success/90"
 						onClick={onGenerateQuote}
 						disabled={!canGenerateQuote}
 					>

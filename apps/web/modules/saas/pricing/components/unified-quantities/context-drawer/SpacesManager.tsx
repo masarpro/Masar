@@ -72,12 +72,12 @@ export function SpacesManager({
 								<div className="flex items-center gap-2">
 									<p className="font-medium">{s.name}</p>
 									{s.isWetArea && (
-										<span className="rounded-full bg-chart-4/15 px-2 py-0.5 text-[10px] text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+										<span className="rounded-full bg-chart-4/15 px-2 py-0.5 text-[10px] text-chart-4">
 											رطبة
 										</span>
 									)}
 									{s.isExterior && (
-										<span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+										<span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] text-success">
 											خارجية
 										</span>
 									)}

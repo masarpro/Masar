@@ -34,7 +34,7 @@ export function AuthWrapper({
 				<div className="container flex justify-center">
 					<main
 						className={cn(
-							"w-full max-w-md rounded-3xl bg-card p-6 border lg:p-8",
+							"w-full max-w-md rounded-3xl bg-card p-6 border-2 lg:p-8",
 							contentClass,
 						)}
 					>

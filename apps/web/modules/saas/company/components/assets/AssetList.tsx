@@ -80,10 +80,10 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 
 	const getStatusBadge = (status: string) => {
 		const styles: Record<string, string> = {
-			AVAILABLE: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			IN_USE: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			MAINTENANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-			RETIRED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+			AVAILABLE: "bg-chart-4/15 text-chart-4",
+			IN_USE: "bg-chart-4/15 text-chart-4",
+			MAINTENANCE: "bg-chart-1/15 text-chart-1",
+			RETIRED: "bg-muted text-muted-foreground",
 		};
 		return (
 			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${styles[status] ?? styles.RETIRED}`}>
@@ -105,89 +105,89 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 								label: t("company.assets.available"),
 								value: summary.available,
 								icon: CheckCircle2,
-								iconClassName: "text-chart-4 dark:text-chart-4",
-								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
 							},
 							{
 								label: t("company.assets.inUse"),
 								value: summary.inUse,
 								icon: Package,
-								iconClassName: "text-chart-4 dark:text-chart-4",
-								iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
 							},
 							{
 								label: t("company.assets.totalValue"),
 								value: formatCurrency(summary.totalValue),
 								icon: Banknote,
-								iconClassName: "text-indigo-600 dark:text-indigo-400",
-								iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
-								valueClassName: "text-indigo-700 dark:text-indigo-300",
+								iconClassName: "text-chart-4",
+								iconBgClassName: "bg-chart-4/15",
+								valueClassName: "text-chart-4",
 							},
 							{
 								label: t("company.assets.monthlyRent"),
 								value: formatCurrency(summary.totalMonthlyRent),
 								icon: Wrench,
-								iconClassName: "text-orange-600 dark:text-orange-400",
-								iconBgClassName: "bg-orange-100 dark:bg-orange-900/30",
-								valueClassName: "text-orange-700 dark:text-orange-300",
+								iconClassName: "text-chart-1",
+								iconBgClassName: "bg-chart-1/15",
+								valueClassName: "text-chart-1",
 							},
 						]}
 					/>
 
 					{/* الديسكتوب كما هو */}
 					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-								<CheckCircle2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<CheckCircle2 className="h-5 w-5" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.assets.available")}
 						</p>
-						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+						<p className="text-2xl font-bold text-chart-4">
 							{summary.available}
 						</p>
 					</div>
 
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-								<Package className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<Package className="h-5 w-5" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.assets.inUse")}
 						</p>
-						<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+						<p className="text-2xl font-bold text-chart-4">
 							{summary.inUse}
 						</p>
 					</div>
 
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-								<Banknote className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+								<Banknote className="h-5 w-5" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.assets.totalValue")}
 						</p>
-						<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
+						<p className="text-xl font-bold text-chart-4">
 							{formatCurrency(summary.totalValue)}
 						</p>
 					</div>
 
-					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="bg-card border-2 rounded-2xl p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
-								<Wrench className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+							<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+								<Wrench className="h-5 w-5" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-muted-foreground mb-1">
 							{t("company.assets.monthlyRent")}
 						</p>
-						<p className="text-xl font-bold text-orange-700 dark:text-orange-300">
+						<p className="text-xl font-bold text-chart-1">
 							{formatCurrency(summary.totalMonthlyRent)}
 						</p>
 					</div>
@@ -198,12 +198,12 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("company.assets.searchPlaceholder")}
 						value={search}
 						onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
-						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+						className="rounded-lg border border-input bg-card pe-10"
 					/>
 				</div>
 				<MobileFilterSheet activeCount={(categoryFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0)}>
@@ -238,7 +238,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 					size="icon"
 					aria-label={t("company.assets.addAsset")}
 					onClick={() => setShowAddDialog(true)}
-					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="h-5 w-5" />
 				</Button>
@@ -248,16 +248,16 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
-						<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder={t("company.assets.searchPlaceholder")}
 							value={search}
 							onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-lg border border-input bg-card pe-10"
 						/>
 					</div>
 					<Select value={categoryFilter} onValueChange={(v: any) => { setCategoryFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[160px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.assets.filterCategory")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -270,7 +270,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 						</SelectContent>
 					</Select>
 					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[140px] rounded-lg border border-input bg-card">
 							<SelectValue placeholder={t("company.assets.filterStatus")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -285,7 +285,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 				</div>
 				<Button
 					onClick={() => setShowAddDialog(true)}
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Plus className="ms-2 h-4 w-4" />
 					{t("company.assets.addAsset")}
@@ -293,22 +293,22 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 			</div>
 
 			{/* Table - Glass Morphism */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[760px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[22%]">{t("company.assets.name")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.category")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">{t("company.assets.type")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.value")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[12%]">{t("company.assets.status")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[16%]">{t("company.assets.currentProject")}</TableHead>
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground w-[22%]">{t("company.assets.name")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[18%]">{t("company.assets.category")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[14%]">{t("company.assets.type")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[18%]">{t("company.assets.value")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[12%]">{t("company.assets.status")}</TableHead>
+							<TableHead className="text-end text-muted-foreground w-[16%]">{t("company.assets.currentProject")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(6)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -320,33 +320,33 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							data.assets.map((asset: any, index: any) => (
 								<TableRow
 									key={asset.id}
-									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="cursor-pointer border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/assets/${asset.id}`)}
 								>
 									<TableCell className="text-end">
 										<div>
-											<p className="font-medium text-slate-900 dark:text-slate-100 truncate">{asset.name}</p>
-											{asset.assetNo && <p className="text-xs text-slate-400">{asset.assetNo}</p>}
+											<p className="font-medium text-card-foreground truncate">{asset.name}</p>
+											{asset.assetNo && <p className="text-xs text-muted-foreground">{asset.assetNo}</p>}
 										</div>
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{t(`company.assets.categories.${asset.category}`)}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{t(`company.assets.types.${asset.type}`)}
 									</TableCell>
-									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-card-foreground">
 										{formatCurrency(Number(asset.currentValue ?? asset.purchasePrice))}
 									</TableCell>
 									<TableCell className="text-end">{getStatusBadge(asset.status)}</TableCell>
 									<TableCell className="text-end">
 										{asset.currentProject ? (
-											<Badge variant="outline" className="text-[10px] rounded-lg border-slate-200/50 dark:border-slate-700/50 px-2 py-0.5">
+											<Badge variant="outline" className="text-[10px] rounded-lg px-2 py-0.5">
 												{asset.currentProject.name}
 											</Badge>
 										) : (
-											<span className="text-xs text-slate-400">-</span>
+											<span className="text-xs text-muted-foreground">-</span>
 										)}
 									</TableCell>
 								</TableRow>

@@ -77,13 +77,13 @@ function ChatListItem({
             ? "opacity-100"
             : "opacity-0 group-hover:opacity-100",
           confirmDelete
-            ? "bg-red-50 dark:bg-red-950/30 text-red-500"
-            : "hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500",
+            ? "bg-destructive/15 text-destructive"
+            : "hover:bg-destructive/15 hover:text-destructive",
         )}
         title={t("history.delete")}
       >
         {confirmDelete ? (
-          <span className="text-[10px] text-red-500 font-medium px-1">
+          <span className="text-[10px] text-destructive font-medium px-1">
             {t("history.confirmDelete")}
           </span>
         ) : (

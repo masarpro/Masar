@@ -31,13 +31,13 @@ export function GanttTooltip({ milestone, x, y, visible, locale }: GanttTooltipP
 			className="fixed z-50 pointer-events-none"
 			style={{ left: x, top: y - 8, transform: "translate(-50%, -100%)" }}
 		>
-			<div className="backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border border-white/30 dark:border-slate-700/40 rounded-lg shadow-lg px-3 py-2 min-w-[200px]">
+			<div className="bg-card border border-border rounded-lg shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] px-3 py-2 min-w-[200px]">
 				<div className="flex items-center gap-2 mb-1">
 					<span className="font-semibold text-sm truncate max-w-[180px]">
 						{milestone.title}
 					</span>
 					{milestone.isCritical && (
-						<span className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />
+						<span className="w-2 h-2 rounded-full bg-chart-1 flex-shrink-0" />
 					)}
 				</div>
 

@@ -50,14 +50,14 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 	const t = useTranslations();
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-violet-200/50 bg-violet-50/50 dark:border-violet-800/30 dark:bg-violet-950/20">
-			<div className="border-b border-violet-200/50 p-5 dark:border-violet-800/30">
+		<div className="overflow-hidden rounded-2xl border-2 bg-card">
+			<div className="border-b-2 p-5">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-violet-100 p-2.5 dark:bg-violet-900/50">
-							<CreditCard className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<CreditCard className="h-5 w-5 text-chart-4" />
 						</div>
-						<h2 className="text-lg font-medium text-violet-900 dark:text-violet-100">
+						<h2 className="text-lg font-medium text-card-foreground">
 							{t(
 								"projects.createProject.paymentTermsSection",
 							)}
@@ -68,7 +68,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 						variant="outline"
 						size="sm"
 						onClick={onAddTerm}
-						className="rounded-lg border-violet-200 text-violet-700 hover:bg-violet-100 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900/30"
+						className="rounded-lg border-chart-4/30 text-chart-4 hover:bg-chart-4/10"
 					>
 						<Plus className="me-1 h-4 w-4" />
 						{t("projects.createProject.addPaymentTerm")}
@@ -78,7 +78,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 
 			<div className="space-y-3 p-5">
 				{paymentTerms.length === 0 && (
-					<div className="rounded-xl border border-dashed border-violet-200 py-8 text-center text-sm text-slate-400 dark:border-violet-800/40">
+					<div className="rounded-xl border-2 border-dashed py-8 text-center text-sm text-muted-foreground">
 						{t("projects.createProject.addPaymentTerm")}
 					</div>
 				)}
@@ -86,10 +86,10 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 				{paymentTerms.map((term) => (
 					<div
 						key={term.id}
-						className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-end gap-3 rounded-xl border border-violet-100 bg-white p-3 dark:border-violet-800/30 dark:bg-slate-900/40"
+						className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-end gap-3 rounded-xl border-2 bg-card p-3"
 					>
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t("projects.createProject.termType")}
 							</Label>
 							<Select
@@ -98,7 +98,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 									onUpdateTerm(term.id, "type", val)
 								}
 							>
-								<SelectTrigger className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50">
+								<SelectTrigger className="h-9 rounded-lg text-xs">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -118,7 +118,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t("projects.createProject.termLabel")}
 							</Label>
 							<Input
@@ -130,12 +130,12 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 										e.target.value,
 									)
 								}
-								className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+								className="h-9 rounded-lg text-xs"
 							/>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t("projects.createProject.termPercent")}
 							</Label>
 							<div className="relative">
@@ -152,16 +152,16 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 											e.target.value,
 										)
 									}
-									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pe-6 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-6 text-xs"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									%
 								</span>
 							</div>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t("projects.createProject.termAmount")}
 							</Label>
 							<div className="relative">
@@ -177,9 +177,9 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 											e.target.value,
 										)
 									}
-									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pe-12 font-mono text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-12 font-mono text-xs"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									{t("common.sar")}
 								</span>
 							</div>
@@ -190,7 +190,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 							variant="ghost"
 							size="icon"
 							onClick={() => onRemoveTerm(term.id)}
-							className="h-9 w-9 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+							className="h-9 w-9 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
 						>
 							<Trash2 className="h-4 w-4" />
 						</Button>
@@ -201,28 +201,28 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 					<div
 						className={`flex items-center justify-between rounded-xl px-4 py-3 ${
 							Math.abs(termsTotalPercent - 100) < 0.01
-								? "bg-green-50 dark:bg-green-950/20"
+								? "bg-success/10"
 								: termsTotalPercent > 100
-									? "bg-red-50 dark:bg-red-950/20"
-									: "bg-violet-50 dark:bg-violet-950/20"
+									? "bg-destructive/10"
+									: "bg-muted"
 						}`}
 					>
-						<span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+						<span className="text-sm font-medium text-foreground">
 							{t("projects.createProject.totalPercent")}
 						</span>
 						<div className="flex items-center gap-4">
 							<span
 								className={`font-mono text-sm font-bold ${
 									Math.abs(termsTotalPercent - 100) < 0.01
-										? "text-green-700 dark:text-green-400"
+										? "text-success"
 										: termsTotalPercent > 100
-											? "text-red-700 dark:text-red-400"
-											: "text-violet-700 dark:text-violet-400"
+											? "text-destructive"
+											: "text-chart-4"
 								}`}
 							>
 								{termsTotalPercent.toFixed(1)}%
 							</span>
-							<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
+							<span className="font-mono text-sm text-muted-foreground">
 								{formatNumber(termsTotalAmount)} {t("common.sar")}
 							</span>
 						</div>

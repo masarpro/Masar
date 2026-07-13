@@ -100,15 +100,15 @@ interface BankLedgerProps {
 
 // Color accent per movement type
 const TYPE_BADGE: Record<LedgerType, string> = {
-	PAYMENT: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-	INVOICE_PAYMENT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-	PROJECT_PAYMENT: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
-	CAPITAL_CONTRIBUTION: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	TRANSFER_IN: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	EXPENSE: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
-	SUBCONTRACT_PAYMENT: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
-	OWNER_DRAWING: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-	TRANSFER_OUT: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+	PAYMENT: "bg-success/15 text-success",
+	INVOICE_PAYMENT: "bg-success/15 text-success",
+	PROJECT_PAYMENT: "bg-chart-3/15 text-chart-3",
+	CAPITAL_CONTRIBUTION: "bg-chart-4/15 text-chart-4",
+	TRANSFER_IN: "bg-chart-4/15 text-chart-4",
+	EXPENSE: "bg-destructive/15 text-destructive",
+	SUBCONTRACT_PAYMENT: "bg-chart-1/15 text-chart-1",
+	OWNER_DRAWING: "bg-chart-4/15 text-chart-4",
+	TRANSFER_OUT: "bg-chart-4/15 text-chart-4",
 };
 
 export function BankLedger({
@@ -207,7 +207,7 @@ export function BankLedger({
 						</SelectContent>
 					</Select>
 					<div className="relative">
-						<Search className="absolute top-1/2 -translate-y-1/2 start-3 h-4 w-4 text-slate-400" />
+						<Search className="absolute top-1/2 -translate-y-1/2 start-3 h-4 w-4 text-muted-foreground" />
 						<Input
 							value={search}
 							onChange={(e: any) => setSearch(e.target.value)}
@@ -223,7 +223,7 @@ export function BankLedger({
 						onChange={(e: any) => onDateFromChange(e.target.value)}
 						className="rounded-xl w-40"
 					/>
-					<span className="text-slate-400">—</span>
+					<span className="text-muted-foreground">—</span>
 					<Input
 						type="date"
 						value={dateTo}
@@ -253,7 +253,7 @@ export function BankLedger({
 			</div>
 
 			{data?.truncated && (
-				<p className="text-xs text-amber-600 dark:text-amber-400 print:hidden">
+				<p className="text-xs text-chart-1 print:hidden">
 					{t("finance.banks.ledger.truncatedNote")}
 				</p>
 			)}
@@ -262,17 +262,17 @@ export function BankLedger({
 			<div className="hidden print:block text-center mb-4">
 				<h1 className="text-xl font-bold">{t("finance.banks.ledger.title")}</h1>
 				{data && <p className="text-lg">{data.account.name}</p>}
-				<p className="text-sm text-slate-500">{dateFrom || "—"} — {dateTo || "—"}</p>
+				<p className="text-sm text-muted-foreground">{dateFrom || "—"} — {dateTo || "—"}</p>
 			</div>
 
 			{/* Table */}
 			<Card className="rounded-2xl print:rounded-none print:shadow-none print:border">
 				<CardContent className="p-0">
 					{isLoading ? (
-						<div className="text-center py-12 text-slate-500">{t("common.loading")}</div>
+						<div className="text-center py-12 text-muted-foreground">{t("common.loading")}</div>
 					) : visible.length === 0 ? (
-						<div className="text-center py-12 text-slate-500">
-							<FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+						<div className="text-center py-12 text-muted-foreground">
+							<FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
 							{t("finance.banks.ledger.noMovements")}
 						</div>
 					) : (
@@ -291,7 +291,7 @@ export function BankLedger({
 							</TableHeader>
 							<TableBody>
 								{/* Opening balance row */}
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium">
+								<TableRow className="bg-muted/50 font-medium">
 									<TableCell colSpan={7}>{t("finance.banks.ledger.openingBalance")}</TableCell>
 									<TableCell className="text-end font-bold">
 										<Currency amount={openingBalance} />
@@ -302,7 +302,7 @@ export function BankLedger({
 									const href = e.sourceLink ? `${basePath}${e.sourceLink}` : null;
 									return (
 										<TableRow key={e.id}>
-											<TableCell className="text-sm text-slate-500 whitespace-nowrap">
+											<TableCell className="text-sm text-muted-foreground whitespace-nowrap">
 												{new Date(e.date).toLocaleDateString("en-SA")}
 											</TableCell>
 											<TableCell>
@@ -319,16 +319,16 @@ export function BankLedger({
 													e.description || "—"
 												)}
 											</TableCell>
-											<TableCell className="text-sm text-slate-600 dark:text-slate-300 max-w-[180px] truncate">
+											<TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
 												{e.counterparty || "—"}
 											</TableCell>
-											<TableCell className="text-sm text-slate-500 font-mono">
+											<TableCell className="text-sm text-muted-foreground font-mono">
 												{e.referenceNo || "—"}
 											</TableCell>
-											<TableCell className="text-end text-green-600 dark:text-green-400">
+											<TableCell className="text-end text-success">
 												{e.direction === "IN" ? <Currency amount={e.amount} /> : "—"}
 											</TableCell>
-											<TableCell className="text-end text-red-600 dark:text-red-400">
+											<TableCell className="text-end text-destructive">
 												{e.direction === "OUT" ? <Currency amount={e.amount} /> : "—"}
 											</TableCell>
 											<TableCell className="text-end font-medium">
@@ -339,12 +339,12 @@ export function BankLedger({
 								})}
 
 								{/* Closing balance row */}
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium border-t-2">
+								<TableRow className="bg-muted/50 font-medium border-t-2">
 									<TableCell colSpan={5}>{t("finance.banks.ledger.closingBalance")}</TableCell>
-									<TableCell className="text-end font-bold text-green-600 dark:text-green-400">
+									<TableCell className="text-end font-bold text-success">
 										<Currency amount={visibleTotals.totalIn} />
 									</TableCell>
-									<TableCell className="text-end font-bold text-red-600 dark:text-red-400">
+									<TableCell className="text-end font-bold text-destructive">
 										<Currency amount={visibleTotals.totalOut} />
 									</TableCell>
 									<TableCell className="text-end font-bold text-primary">

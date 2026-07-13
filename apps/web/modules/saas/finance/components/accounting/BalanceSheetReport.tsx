@@ -48,17 +48,17 @@ export function BalanceSheetReport({ organizationId }: Props) {
 			{data && (
 				<>
 					{/* Balance Check */}
-					<Card className={`rounded-2xl ${data.isBalanced ? "bg-green-50 dark:bg-green-950/20 border-green-200" : "bg-red-50 dark:bg-red-950/20 border-red-200"}`}>
+					<Card className={`rounded-2xl ${data.isBalanced ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}>
 						<CardContent className="p-4 flex items-center gap-3">
 							{data.isBalanced ? (
 								<>
-									<CheckCircle className="h-5 w-5 text-green-600" />
-									<span className="font-medium text-green-700 dark:text-green-300">{t("finance.accounting.balanceSheet.balanced")}</span>
+									<CheckCircle className="h-5 w-5 text-success" />
+									<span className="font-medium text-success">{t("finance.accounting.balanceSheet.balanced")}</span>
 								</>
 							) : (
 								<>
-									<XCircle className="h-5 w-5 text-red-600" />
-									<span className="font-medium text-red-700 dark:text-red-300">{t("finance.accounting.balanceSheet.notBalanced")}</span>
+									<XCircle className="h-5 w-5 text-destructive" />
+									<span className="font-medium text-destructive">{t("finance.accounting.balanceSheet.notBalanced")}</span>
 								</>
 							)}
 						</CardContent>
@@ -68,7 +68,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 					<div className="grid gap-6 lg:grid-cols-2">
 						{/* Assets (Right side in RTL) */}
 						<Card className="rounded-2xl">
-							<CardHeader className="bg-chart-4/15 dark:bg-chart-4/20 rounded-t-2xl">
+							<CardHeader className="bg-chart-4/15 rounded-t-2xl">
 								<CardTitle className="text-chart-4 dark:text-chart-4">{t("finance.accounting.balanceSheet.assets")}</CardTitle>
 							</CardHeader>
 							<CardContent className="p-4 space-y-4">
@@ -94,8 +94,8 @@ export function BalanceSheetReport({ organizationId }: Props) {
 
 						{/* Liabilities + Equity (Left side in RTL) */}
 						<Card className="rounded-2xl">
-							<CardHeader className="bg-red-50 dark:bg-red-950/20 rounded-t-2xl">
-								<CardTitle className="text-red-700 dark:text-red-300">{t("finance.accounting.balanceSheet.liabilitiesAndEquity")}</CardTitle>
+							<CardHeader className="bg-destructive/10 rounded-t-2xl">
+								<CardTitle className="text-destructive">{t("finance.accounting.balanceSheet.liabilitiesAndEquity")}</CardTitle>
 							</CardHeader>
 							<CardContent className="p-4 space-y-4">
 								{/* Current Liabilities */}
@@ -106,19 +106,19 @@ export function BalanceSheetReport({ organizationId }: Props) {
 								/>
 								{/* Equity */}
 								<div>
-									<h4 className="font-semibold text-sm text-purple-700 dark:text-purple-300 mb-2 py-1 px-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+									<h4 className="font-semibold text-sm text-chart-4 mb-2 py-1 px-2 bg-chart-4/10 rounded-lg">
 										{t("finance.accounting.balanceSheet.equity")}
 									</h4>
 									{data.equity.accounts.map((acc: any) => (
 										<div key={acc.accountId} className="flex justify-between py-1 text-sm">
-											<span className="text-slate-600 dark:text-slate-400">{acc.nameAr}</span>
+											<span className="text-muted-foreground">{acc.nameAr}</span>
 											<span>{formatAccounting(acc.balance)}</span>
 										</div>
 									))}
 									{/* Current Year P&L */}
 									<div className="flex justify-between py-1 text-sm">
 										<span className="text-chart-4 dark:text-chart-4 italic">{t("finance.accounting.balanceSheet.currentYearPL")}</span>
-										<span className={`font-medium ${data.equity.currentYearPL >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+										<span className={`font-medium ${data.equity.currentYearPL >= 0 ? "text-success" : "text-destructive"}`}>
 											{formatAccounting(data.equity.currentYearPL)}
 										</span>
 									</div>
@@ -128,7 +128,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 									</div>
 								</div>
 								{/* Total L+E */}
-								<div className="flex justify-between py-2 border-t-2 border-double border-red-300 dark:border-red-700 font-bold text-red-700 dark:text-red-300">
+								<div className="flex justify-between py-2 border-t-2 border-double border-destructive/30 font-bold text-destructive">
 									<span>{t("finance.accounting.balanceSheet.totalLiabilities")} + {t("finance.accounting.balanceSheet.equity")}</span>
 									<span>{formatAccounting(data.liabilities.totalLiabilities + data.equity.totalEquity)}</span>
 								</div>
@@ -145,14 +145,14 @@ function BSSection({ title, accounts, total }: { title: string; accounts: { acco
 	if (accounts.length === 0 && total === 0) return null;
 	return (
 		<div>
-			<h4 className="font-semibold text-sm text-slate-700 dark:text-slate-300 mb-1">{title}</h4>
+			<h4 className="font-semibold text-sm text-foreground mb-1">{title}</h4>
 			{accounts.map((acc) => (
 				<div key={acc.accountId} className="flex justify-between py-1 text-sm">
-					<span className="text-slate-600 dark:text-slate-400">{acc.nameAr}</span>
+					<span className="text-muted-foreground">{acc.nameAr}</span>
 					<span>{formatAccounting(acc.balance)}</span>
 				</div>
 			))}
-			<div className="flex justify-between py-1 border-t border-slate-200 dark:border-slate-700 font-medium text-sm">
+			<div className="flex justify-between py-1 border-t border-border font-medium text-sm">
 				<span>{title}</span>
 				<span>{formatAccounting(total)}</span>
 			</div>

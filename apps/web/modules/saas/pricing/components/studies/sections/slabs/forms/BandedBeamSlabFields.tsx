@@ -85,9 +85,9 @@ export function BandedBeamSlabFields({
 			/>
 
 			{/* جدول الكمرات العريضة */}
-			<div className="border rounded-lg p-4 bg-indigo-50/30 space-y-3">
+			<div className="border rounded-lg p-4 bg-chart-4/10 space-y-3">
 				<div className="flex items-center justify-between">
-					<h5 className="font-medium text-indigo-700">
+					<h5 className="font-medium text-chart-4">
 						جدول الكمرات
 					</h5>
 					<Button
@@ -117,10 +117,10 @@ export function BandedBeamSlabFields({
 						setBandedBeamTemplates(prev => prev.map(t => t.id === tmpl.id ? { ...t, ...updates } : t));
 					};
 					return (
-						<div key={tmpl.id} className="border rounded-lg bg-white">
+						<div key={tmpl.id} className="border rounded-lg bg-card">
 							{/* Header row */}
 							<div
-								className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+								className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted"
 								onClick={() => setExpandedBandedIds(prev =>
 									prev.includes(tmpl.id) ? prev.filter(x => x !== tmpl.id) : [...prev, tmpl.id]
 								)}
@@ -137,7 +137,7 @@ export function BandedBeamSlabFields({
 									type="button"
 									variant="ghost"
 									size="sm"
-									className="text-red-500 hover:text-red-700"
+									className="text-destructive hover:text-destructive/80"
 									onClick={(e: any) => {
 										e.stopPropagation();
 										setBandedBeamTemplates(prev => prev.filter(t => t.id !== tmpl.id));
@@ -353,11 +353,11 @@ export function BandedBeamSlabFields({
 									hasTopMesh: e.target.checked,
 								})
 							}
-							className="rounded border-green-500"
+							className="rounded border-success"
 						/>
 						<Label
 							htmlFor="hasTopMesh-banded"
-							className="text-sm font-medium text-green-700 cursor-pointer"
+							className="text-sm font-medium text-success cursor-pointer"
 						>
 							الشبكة العلوية (الغطاء) - للسحب السالب
 						</Label>
@@ -432,7 +432,7 @@ export function BandedBeamSlabFields({
 						<div className="flex items-center gap-2 mb-2">
 							<Badge variant="outline" className={
 								calculations.structuralType === 'ONE_WAY'
-									? 'border-amber-500 text-amber-700'
+									? 'border-chart-1 text-chart-1'
 									: 'border-chart-4 text-chart-4'
 							}>
 								{calculations.structuralType === 'ONE_WAY'
@@ -446,9 +446,9 @@ export function BandedBeamSlabFields({
 					{/* تحذير اتجاه الحديد */}
 					{calculations.structuralType === 'ONE_WAY' &&
 					 formData.bottomMainDiameter < formData.bottomSecondaryDiameter && (
-						<div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
-							<AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-							<p className="text-xs text-amber-700">
+						<div className="bg-chart-1/10 border border-chart-1/30 rounded-lg p-3 flex items-center gap-2">
+							<AlertTriangle className="h-4 w-4 text-chart-1 flex-shrink-0" />
+							<p className="text-xs text-chart-1">
 								{t('pricing.studies.structural.rebarDirectionWarning')}
 							</p>
 						</div>

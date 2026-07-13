@@ -436,9 +436,9 @@ export function BuildingSetupWizard({
 								<span
 									className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 ${
 										isDone
-											? "bg-primary text-primary-foreground shadow-sm"
+											? "bg-primary text-primary-foreground"
 											: isActive
-												? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-sm"
+												? "bg-primary text-primary-foreground ring-4 ring-primary/20"
 												: "bg-muted text-muted-foreground"
 									}`}
 								>
@@ -465,7 +465,7 @@ export function BuildingSetupWizard({
 			</div>
 
 			{/* Step Content */}
-			<Card className="rounded-xl shadow-sm">
+			<Card className="rounded-xl">
 				<CardContent className="p-6">
 					<h2 className="text-lg font-semibold mb-5">
 						{stepTitles[step]}

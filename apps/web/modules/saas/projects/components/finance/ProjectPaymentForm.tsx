@@ -191,16 +191,16 @@ export function ProjectPaymentForm({
 		<form onSubmit={handleSubmit} className="space-y-6">
 			{/* Terms Overview Strip + Selector */}
 			{termsData && termsData.terms.length > 0 && (
-				<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
+				<div className="overflow-hidden rounded-2xl border-2 bg-card">
 					{/* Compact terms overview strip */}
-					<div className="flex gap-1.5 overflow-x-auto border-b border-slate-200/50 p-3 dark:border-slate-700/30">
+					<div className="flex gap-1.5 overflow-x-auto border-b-2 p-3">
 						{termsData.terms.map((term: any) => {
 							const isActive = term.id === selectedTermId;
 							const progressColor = term.isComplete
 								? "bg-chart-4"
 								: term.id === termsData.nextIncompleteTermId
 									? "bg-chart-4"
-									: "bg-slate-300 dark:bg-slate-600";
+									: "bg-muted-foreground/30";
 							return (
 								<button
 									key={term.id}
@@ -208,15 +208,15 @@ export function ProjectPaymentForm({
 									onClick={() => handleTermChange(term.id)}
 									className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs transition-colors ${
 										isActive
-											? "bg-chart-4/15 text-chart-4 ring-1 ring-chart-4 dark:bg-chart-4/20 dark:text-chart-4 dark:ring-chart-4"
-											: "bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+											? "bg-chart-4/15 text-chart-4 ring-1 ring-chart-4"
+											: "bg-muted text-muted-foreground hover:bg-accent"
 									}`}
 								>
 									<div className={`h-2 w-2 rounded-full ${progressColor}`} />
 									<span className="font-medium">
 										{t(`projects.createProject.termTypes.${term.type}`)}
 									</span>
-									<span className="font-mono text-[10px] text-slate-400">
+									<span className="font-mono text-[10px] text-muted-foreground">
 										{term.progressPercent.toFixed(0)}%
 									</span>
 								</button>
@@ -226,7 +226,7 @@ export function ProjectPaymentForm({
 
 					{/* Term selector dropdown */}
 					<div className="p-3">
-						<Label className="mb-1.5 block text-xs font-medium text-slate-500">
+						<Label className="mb-1.5 block text-xs font-medium text-muted-foreground">
 							{t("projectPayments.payingForPhase")}
 						</Label>
 						<Select
@@ -246,11 +246,11 @@ export function ProjectPaymentForm({
 													{t(`projects.createProject.termTypes.${term.type}`)}
 												</span>
 												{term.label && (
-													<span className="text-slate-400">
+													<span className="text-muted-foreground">
 														- {term.label}
 													</span>
 												)}
-												<span className="font-mono text-xs text-slate-400">
+												<span className="font-mono text-xs text-muted-foreground">
 													({formatNumber(Number(term.remainingAmount))} {t("common.sar")} {t("projectPayments.remaining")})
 												</span>
 											</div>
@@ -264,27 +264,27 @@ export function ProjectPaymentForm({
 
 			{/* Term Info Card */}
 			{selectedTerm && (
-				<div className="overflow-hidden rounded-2xl border border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20">
+				<div className="overflow-hidden rounded-2xl border-2 bg-card">
 					<div className="p-5">
 						<div className="mb-3 flex items-center gap-3">
-							<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
-								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+							<div className="rounded-xl bg-chart-4/15 p-2.5">
+								<Banknote className="h-5 w-5 text-chart-4" />
 							</div>
 							<div>
-								<h3 className="text-base font-medium text-chart-4 dark:text-chart-4">
+								<h3 className="text-base font-medium text-card-foreground">
 									{t("projectPayments.payingForPhase")}
 								</h3>
 								<div className="mt-1 flex items-center gap-2">
 									<Badge
 										variant="outline"
-										className="rounded-lg border-chart-4 bg-chart-4/15 text-xs text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
+										className="rounded-lg border-chart-4 bg-chart-4/15 text-xs text-chart-4"
 									>
 										{t(
 											`projects.createProject.termTypes.${selectedTerm.type}`,
 										)}
 									</Badge>
 									{selectedTerm.label && (
-										<span className="text-sm text-slate-600 dark:text-slate-400">
+										<span className="text-sm text-muted-foreground">
 											{selectedTerm.label}
 										</span>
 									)}
@@ -292,31 +292,31 @@ export function ProjectPaymentForm({
 							</div>
 						</div>
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-							<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
-								<p className="text-xs text-slate-500">
+							<div className="rounded-xl bg-muted p-3">
+								<p className="text-xs text-muted-foreground">
 									{t("projectPayments.required")}
 								</p>
-								<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
+								<p className="font-mono text-sm font-semibold text-card-foreground">
 									{formatNumber(Number(selectedTerm.amount))}{" "}
 									{t("common.sar")}
 								</p>
 							</div>
-							<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
-								<p className="text-xs text-slate-500">
+							<div className="rounded-xl bg-muted p-3">
+								<p className="text-xs text-muted-foreground">
 									{t("projectPayments.alreadyPaid")}
 								</p>
-								<p className="font-mono text-sm font-semibold text-chart-4 dark:text-chart-4">
+								<p className="font-mono text-sm font-semibold text-chart-4">
 									{formatNumber(
 										Number(selectedTerm.paidAmount),
 									)}{" "}
 									{t("common.sar")}
 								</p>
 							</div>
-							<div className="rounded-xl bg-chart-4/15 p-3 dark:bg-chart-4/20">
-								<p className="text-xs text-slate-500">
+							<div className="rounded-xl bg-chart-4/15 p-3">
+								<p className="text-xs text-muted-foreground">
 									{t("projectPayments.remaining")}
 								</p>
-								<p className="font-mono text-sm font-bold text-chart-4 dark:text-chart-4">
+								<p className="font-mono text-sm font-bold text-chart-4">
 									{formatNumber(
 										Number(selectedTerm.remainingAmount),
 									)}{" "}
@@ -329,13 +329,13 @@ export function ProjectPaymentForm({
 			)}
 
 			{/* Amount & Date */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
-				<div className="border-b border-slate-200/50 p-5 dark:border-slate-700/30">
+			<div className="overflow-hidden rounded-2xl border-2 bg-card">
+				<div className="border-b-2 p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
-							<TrendingUp className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<TrendingUp className="h-5 w-5 text-chart-4" />
 						</div>
-						<h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
+						<h3 className="text-base font-medium text-card-foreground">
 							{t("projectPayments.paymentDetails")}
 						</h3>
 					</div>
@@ -343,7 +343,7 @@ export function ProjectPaymentForm({
 				<div className="space-y-5 p-5">
 					<div className="grid gap-5 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("finance.payments.amount")} *
 							</Label>
 							<div className="relative">
@@ -363,13 +363,13 @@ export function ProjectPaymentForm({
 									dir="ltr"
 									required
 								/>
-								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
 									{t("common.sar")}
 								</span>
 							</div>
 						</div>
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("finance.payments.date")} *
 							</Label>
 							<Input
@@ -389,7 +389,7 @@ export function ProjectPaymentForm({
 
 					{/* Client Name */}
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("finance.payments.clientName")}
 						</Label>
 						<Input
@@ -409,7 +409,7 @@ export function ProjectPaymentForm({
 
 					{/* Description */}
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("finance.payments.description")}
 						</Label>
 						<Textarea
@@ -431,20 +431,20 @@ export function ProjectPaymentForm({
 			</div>
 
 			{/* Destination Account */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
-				<div className="border-b border-slate-200/50 p-5 dark:border-slate-700/30">
+			<div className="overflow-hidden rounded-2xl border-2 bg-card">
+				<div className="border-b-2 p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
-							<Building className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<Building className="h-5 w-5 text-chart-4" />
 						</div>
-						<h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
+						<h3 className="text-base font-medium text-card-foreground">
 							{t("finance.payments.destinationAccount")}
 						</h3>
 					</div>
 				</div>
 				<div className="space-y-5 p-5">
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("finance.payments.selectAccount")} *
 						</Label>
 						<Select
@@ -474,7 +474,7 @@ export function ProjectPaymentForm({
 											"BANK" ? (
 												<Building className="h-4 w-4 text-chart-4" />
 											) : (
-												<Wallet className="h-4 w-4 text-green-500" />
+												<Wallet className="h-4 w-4 text-success" />
 											)}
 											<span>{account.name}</span>
 										</div>
@@ -485,33 +485,33 @@ export function ProjectPaymentForm({
 					</div>
 
 					{selectedAccount && (
-						<div className="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+						<div className="rounded-xl border-2 border-success/20 bg-success/10 p-4">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{selectedAccount.accountType ===
 									"BANK" ? (
 										<Building className="h-5 w-5 text-chart-4" />
 									) : (
-										<Wallet className="h-5 w-5 text-green-500" />
+										<Wallet className="h-5 w-5 text-success" />
 									)}
 									<div>
 										<p className="font-medium">
 											{selectedAccount.name}
 										</p>
 										{selectedAccount.bankName && (
-											<p className="text-sm text-slate-500">
+											<p className="text-sm text-muted-foreground">
 												{selectedAccount.bankName}
 											</p>
 										)}
 									</div>
 								</div>
 								<div className="text-end">
-									<p className="text-sm text-slate-500">
+									<p className="text-sm text-muted-foreground">
 										{t(
 											"finance.banks.currentBalance",
 										)}
 									</p>
-									<p className="font-mono font-semibold text-green-600">
+									<p className="font-mono font-semibold text-success">
 										{formatNumber(
 											Number(
 												selectedAccount.balance,
@@ -520,7 +520,7 @@ export function ProjectPaymentForm({
 										{t("common.sar")}
 									</p>
 									{formData.amount && (
-										<p className="flex items-center gap-1 text-xs text-slate-500">
+										<p className="flex items-center gap-1 text-xs text-muted-foreground">
 											<ArrowRight className="h-3 w-3" />
 											{formatNumber(
 												Number(
@@ -542,7 +542,7 @@ export function ProjectPaymentForm({
 					{/* Payment Method & Reference */}
 					<div className="grid gap-5 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("finance.payments.paymentMethod")}
 							</Label>
 							<Select
@@ -572,7 +572,7 @@ export function ProjectPaymentForm({
 							</Select>
 						</div>
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("finance.payments.referenceNo")}
 							</Label>
 							<Input
@@ -595,10 +595,10 @@ export function ProjectPaymentForm({
 			</div>
 
 			{/* Notes */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
+			<div className="overflow-hidden rounded-2xl border-2 bg-card">
 				<div className="p-5">
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("finance.payments.additionalNotes")}
 						</Label>
 						<Textarea
@@ -632,7 +632,7 @@ export function ProjectPaymentForm({
 				<Button
 					type="submit"
 					disabled={createMutation.isPending}
-					className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+					className="rounded-xl"
 				>
 					{createMutation.isPending ? (
 						<>

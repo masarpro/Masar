@@ -101,7 +101,7 @@ export function AddEmployeeDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl">
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold text-end">
 						{t("company.employees.addEmployee")}
 					</DialogTitle>
@@ -112,7 +112,7 @@ export function AddEmployeeDialog({
 						{/* Row 1: Name, Type, Join Date */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.name")} *
 								</Label>
 								<Input
@@ -123,7 +123,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.type")} *
 								</Label>
 								<Select
@@ -143,7 +143,7 @@ export function AddEmployeeDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.joinDate")} *
 								</Label>
 								<Input
@@ -159,7 +159,7 @@ export function AddEmployeeDialog({
 						{/* Row 2: Phone, Email, National ID */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.phone")}
 								</Label>
 								<Input
@@ -169,7 +169,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.email")}
 								</Label>
 								<Input
@@ -180,7 +180,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.nationalId")}
 								</Label>
 								<Input
@@ -194,7 +194,7 @@ export function AddEmployeeDialog({
 						{/* Row 3: Salary Type, Base Salary, Housing Allowance */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.salaryType")}
 								</Label>
 								<Select
@@ -211,7 +211,7 @@ export function AddEmployeeDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.baseSalary")}
 								</Label>
 								<Input
@@ -225,7 +225,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.housingAllowance")}
 								</Label>
 								<Input
@@ -243,7 +243,7 @@ export function AddEmployeeDialog({
 						{/* Row 4: Transport, Other Allowances, GOSI */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.transportAllowance")}
 								</Label>
 								<Input
@@ -257,7 +257,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.otherAllowances")}
 								</Label>
 								<Input
@@ -271,7 +271,7 @@ export function AddEmployeeDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.employees.gosiSubscription")}
 								</Label>
 								<Input
@@ -288,7 +288,7 @@ export function AddEmployeeDialog({
 
 						{/* Row 5: Notes */}
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("company.common.notes")}
 							</Label>
 							<Input
@@ -300,7 +300,7 @@ export function AddEmployeeDialog({
 					</div>
 
 					{/* Footer Actions */}
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+					<div className="bg-muted/50 border-t-2 px-5 py-3 flex gap-3">
 						<Button
 							type="button"
 							variant="outline"

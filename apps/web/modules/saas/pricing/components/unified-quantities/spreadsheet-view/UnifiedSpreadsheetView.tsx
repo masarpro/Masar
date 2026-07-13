@@ -33,7 +33,7 @@ export function UnifiedSpreadsheetView({ items, onOpenDetail }: Props) {
 	return (
 		<div className="overflow-x-auto rounded-lg border bg-background">
 			<table className="w-full border-collapse text-sm" dir="rtl">
-				<thead className="sticky top-0 z-10 border-b bg-muted/60 backdrop-blur supports-[backdrop-filter]:bg-muted/40">
+				<thead className="sticky top-0 z-10 border-b bg-muted">
 					<tr className="text-xs font-medium text-muted-foreground">
 						<th className="min-w-[180px] px-2 py-2 text-start">البند</th>
 						<th className="min-w-[80px] px-2 py-2 text-center">الدور</th>

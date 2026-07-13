@@ -441,7 +441,7 @@ export function BlockForm({
 						<Label>
 							{t("pricing.studies.structural.height")} ({t("pricing.studies.units.m")})
 							{derivedBlockHeight != null && (
-								<span className="text-xs text-green-600 ms-1">{t("pricing.studies.structural.sections.blocks.derivedHint")}</span>
+								<span className="text-xs text-success ms-1">{t("pricing.studies.structural.sections.blocks.derivedHint")}</span>
 							)}
 						</Label>
 						<Input
@@ -463,7 +463,7 @@ export function BlockForm({
 				</div>
 
 				{/* الفتحات */}
-				<div className="border rounded-lg p-4 bg-amber-50/30">
+				<div className="border rounded-lg p-4 bg-chart-1/10">
 					<div className="flex items-center justify-between mb-3">
 						<h5 className="font-medium">{t("pricing.studies.structural.sections.blocks.openingsTitle")}</h5>
 						<div className="flex gap-2">

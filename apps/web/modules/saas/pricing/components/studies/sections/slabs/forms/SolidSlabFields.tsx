@@ -191,11 +191,11 @@ export function SolidSlabFields({
 									hasTopMesh: e.target.checked,
 								})
 							}
-							className="rounded border-green-500"
+							className="rounded border-success"
 						/>
 						<Label
 							htmlFor="hasTopMesh-solid"
-							className="text-sm font-medium text-green-700 cursor-pointer"
+							className="text-sm font-medium text-success cursor-pointer"
 						>
 							{t("pricing.studies.structural.sections.slabs.topMesh")}
 						</Label>
@@ -303,7 +303,7 @@ export function SolidSlabFields({
 				{/* زر إضافة كمرة */}
 				<Button
 					variant="outline"
-					className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-2 border-dashed border-indigo-400/40 hover:bg-indigo-500/20 hover:border-indigo-400/60 transition-all"
+					className="w-full bg-chart-4/10 text-chart-4 border-2 border-dashed border-chart-4/40 hover:bg-chart-4/20 hover:border-chart-4/60 transition-all"
 					onClick={addBeam}
 				>
 					<Plus className="h-4 w-4 me-2" />
@@ -313,7 +313,7 @@ export function SolidSlabFields({
 				{/* ملخص الكمرات */}
 				{beamsCalcs && beamsCalcs.totalConcrete > 0 && (
 					<div className="space-y-3">
-						<div className="bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/50 rounded-lg p-3">
+						<div className="bg-chart-4/10 border border-chart-4/30 rounded-lg p-3">
 							<div className="flex items-center gap-2 mb-2">
 								<span className="text-sm">📏</span>
 								<h5 className="font-semibold text-sm">
@@ -336,7 +336,7 @@ export function SolidSlabFields({
 									<span className="text-muted-foreground">
 										{t("pricing.studies.structural.sections.slabs.steelGross")}:
 									</span>
-									<span className="font-bold ms-1 text-orange-600">
+									<span className="font-bold ms-1 text-chart-1">
 										{formatNumber(
 											beamsCalcs.totalGrossWeight,
 										)}{" "}
@@ -347,7 +347,7 @@ export function SolidSlabFields({
 									<span className="text-muted-foreground">
 										{t("pricing.studies.structural.wastage")}:
 									</span>
-									<span className="font-bold ms-1 text-red-500">
+									<span className="font-bold ms-1 text-destructive">
 										{formatNumber(
 											beamsCalcs.wastePercentage,
 											1,
@@ -479,7 +479,7 @@ export function SolidSlabFields({
 						<div className="flex items-center gap-2 mb-2">
 							<Badge variant="outline" className={
 								calculations.structuralType === 'ONE_WAY'
-									? 'border-amber-500 text-amber-700'
+									? 'border-chart-1 text-chart-1'
 									: 'border-chart-4 text-chart-4'
 							}>
 								{calculations.structuralType === 'ONE_WAY'
@@ -493,9 +493,9 @@ export function SolidSlabFields({
 					{/* تحذير اتجاه الحديد */}
 					{calculations.structuralType === 'ONE_WAY' &&
 					 formData.bottomMainDiameter < formData.bottomSecondaryDiameter && (
-						<div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
-							<AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-							<p className="text-xs text-amber-700">
+						<div className="bg-chart-1/10 border border-chart-1/30 rounded-lg p-3 flex items-center gap-2">
+							<AlertTriangle className="h-4 w-4 text-chart-1 flex-shrink-0" />
+							<p className="text-xs text-chart-1">
 								{t('pricing.studies.structural.rebarDirectionWarning')}
 							</p>
 						</div>
@@ -579,7 +579,7 @@ export function SolidSlabFields({
 										<span className="text-muted-foreground text-xs">
 											{t("pricing.studies.structural.sections.slabs.beamsConcrete")}:
 										</span>
-										<p className="font-bold text-indigo-600">
+										<p className="font-bold text-chart-4">
 											{formatNumber(
 												combinedTotals.beamConcrete,
 											)}{" "}
@@ -601,7 +601,7 @@ export function SolidSlabFields({
 										<span className="text-muted-foreground text-xs">
 											{t("pricing.studies.structural.sections.slabs.beamsSteel")}:
 										</span>
-										<p className="font-bold text-indigo-600">
+										<p className="font-bold text-chart-4">
 											{formatNumber(
 												combinedTotals.beamSteel,
 											)}{" "}

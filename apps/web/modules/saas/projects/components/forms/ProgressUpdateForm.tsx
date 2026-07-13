@@ -77,7 +77,7 @@ export function ProgressUpdateForm({
 					step={1}
 					className="py-4"
 				/>
-				<div className="flex justify-between text-xs text-slate-500">
+				<div className="flex justify-between text-xs text-muted-foreground">
 					<span>0%</span>
 					<span>25%</span>
 					<span>50%</span>

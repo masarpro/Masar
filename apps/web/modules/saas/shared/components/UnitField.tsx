@@ -42,7 +42,7 @@ export function UnitField({ value, onChange, disabled }: UnitFieldProps) {
 					placeholder={t("finance.items.unitCustomPlaceholder")}
 					disabled={disabled}
 					maxLength={20}
-					className="rounded-[10px] h-9 text-xs text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]"
+					className="rounded-[10px] h-9 text-xs text-center border-transparent bg-transparent hover:bg-accent focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]"
 				/>
 				<Button
 					type="button"
@@ -75,7 +75,7 @@ export function UnitField({ value, onChange, disabled }: UnitFieldProps) {
 			}}
 			disabled={disabled}
 		>
-			<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30">
+			<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-accent focus:bg-background focus:border-primary/30">
 				<SelectValue placeholder={t("finance.items.unitPlaceholder")} />
 			</SelectTrigger>
 			<SelectContent className="rounded-xl">

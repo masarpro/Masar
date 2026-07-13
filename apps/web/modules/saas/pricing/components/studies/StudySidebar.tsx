@@ -119,7 +119,7 @@ export function StudySidebar({
 
 	return (
 		<aside
-			className="hidden lg:flex flex-col w-56 shrink-0 border-s border-border bg-card/50 rounded-xl p-3 self-start sticky top-4"
+			className="hidden lg:flex flex-col w-56 shrink-0 border-s border-border bg-card rounded-xl p-3 self-start sticky top-4"
 			dir="rtl"
 		>
 			{/* Back to studies list */}
@@ -180,9 +180,9 @@ export function StudySidebar({
 								"flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all group",
 								active && "bg-primary text-primary-foreground font-medium",
 								!active && skipped && "text-muted-foreground/40",
-								!active && !skipped && status === "APPROVED" && "text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30",
+								!active && !skipped && status === "APPROVED" && "text-success hover:bg-success/10",
 								!active && !skipped && status === "DRAFT" && "text-foreground hover:bg-muted/50",
-								!active && !skipped && status === "IN_REVIEW" && "text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30",
+								!active && !skipped && status === "IN_REVIEW" && "text-chart-1 hover:bg-chart-1/10",
 								!active && !skipped && status === "NOT_STARTED" && "text-muted-foreground hover:bg-muted/50",
 							)}
 						>

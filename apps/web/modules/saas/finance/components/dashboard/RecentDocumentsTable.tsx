@@ -35,13 +35,13 @@ interface RecentDocumentsTableProps {
 }
 
 const invoiceStatusConfig: Record<string, { bg: string; text: string }> = {
-	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	SENT: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
-	VIEWED: { bg: "bg-purple-100 dark:bg-purple-900/50", text: "text-purple-600 dark:text-purple-400" },
-	PARTIALLY_PAID: { bg: "bg-amber-100 dark:bg-amber-900/50", text: "text-amber-600 dark:text-amber-400" },
-	PAID: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },
-	OVERDUE: { bg: "bg-red-100 dark:bg-red-900/50", text: "text-red-600 dark:text-red-400" },
-	CANCELLED: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-500 dark:text-slate-500" },
+	DRAFT: { bg: "bg-muted", text: "text-muted-foreground" },
+	SENT: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	VIEWED: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	PARTIALLY_PAID: { bg: "bg-chart-1/15", text: "text-chart-1" },
+	PAID: { bg: "bg-success/15", text: "text-success" },
+	OVERDUE: { bg: "bg-destructive/15", text: "text-destructive" },
+	CANCELLED: { bg: "bg-muted", text: "text-muted-foreground" },
 };
 
 export function RecentDocumentsTable({
@@ -60,9 +60,9 @@ export function RecentDocumentsTable({
 		.slice(0, 10);
 
 	return (
-		<Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 transition-all duration-300 hover:shadow-xl">
+		<Card className="rounded-2xl">
 			<CardHeader className="flex flex-row items-center justify-between pb-4">
-				<CardTitle className="text-lg font-medium text-slate-900 dark:text-slate-100">
+				<CardTitle className="text-lg font-medium text-card-foreground">
 					{t("finance.dashboard.recentDocuments")}
 				</CardTitle>
 				<Link
@@ -106,7 +106,7 @@ export function RecentDocumentsTable({
 									return (
 										<TableRow
 											key={doc.id}
-											className="group hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors"
+											className="group hover:bg-muted/50 transition-colors"
 										>
 											<TableCell>
 												<Link
@@ -116,7 +116,7 @@ export function RecentDocumentsTable({
 													{doc.invoiceNo}
 												</Link>
 											</TableCell>
-											<TableCell className="text-slate-600 dark:text-slate-400">
+											<TableCell className="text-muted-foreground">
 												{doc.clientName}
 											</TableCell>
 											<TableCell className="text-end font-medium">
@@ -129,7 +129,7 @@ export function RecentDocumentsTable({
 													{t(`finance.invoices.status.${doc.status.toLowerCase()}`)}
 												</span>
 											</TableCell>
-											<TableCell className="text-slate-500 text-sm">
+											<TableCell className="text-muted-foreground text-sm">
 												{formatDate(doc.createdAt)}
 											</TableCell>
 											<TableCell>
@@ -137,7 +137,7 @@ export function RecentDocumentsTable({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8 hover:bg-white/80 dark:hover:bg-slate-700/80"
+														className="h-8 w-8 hover:bg-accent"
 														asChild
 													>
 														<Link href={detailPath}>
@@ -147,7 +147,7 @@ export function RecentDocumentsTable({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8 hover:bg-white/80 dark:hover:bg-slate-700/80"
+														className="h-8 w-8 hover:bg-accent"
 														asChild
 													>
 														<Link href={editPath}>
@@ -157,7 +157,7 @@ export function RecentDocumentsTable({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8 hover:bg-white/80 dark:hover:bg-slate-700/80"
+														className="h-8 w-8 hover:bg-accent"
 													>
 														<Download className="h-4 w-4" />
 													</Button>
@@ -170,7 +170,7 @@ export function RecentDocumentsTable({
 						</Table>
 					</div>
 				) : (
-					<p className="text-center text-slate-500 py-8">
+					<p className="text-center text-muted-foreground py-8">
 						{t("finance.dashboard.noRecentDocuments")}
 					</p>
 				)}

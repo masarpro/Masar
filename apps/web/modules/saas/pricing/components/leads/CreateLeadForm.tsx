@@ -182,7 +182,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
 			{/* Section 1: Client Information */}
-			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+			<div className="rounded-2xl bg-card border-2 overflow-hidden">
 				<div className="h-1 w-full bg-chart-4" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
@@ -190,32 +190,32 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							<User className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
-							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+							<h3 className="text-base font-semibold text-card-foreground">
 								{t("pricing.leads.form.clientInfo")}
 							</h3>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
+							<p className="text-xs text-muted-foreground">
 								{t("pricing.leads.form.clientInfoDescription")}
 							</p>
 						</div>
 					</div>
 
 					<div>
-						<Label htmlFor="name" className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.name")} *</Label>
+						<Label htmlFor="name" className="text-foreground">{t("pricing.leads.form.name")} *</Label>
 						<Input
 							id="name"
 							value={formData.name}
 							onChange={(e: any) => update("name", e.target.value)}
 							placeholder={t("pricing.leads.form.namePlaceholder")}
-							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							className="mt-1.5 rounded-xl bg-card border-input"
 							required
 						/>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div>
-							<Label htmlFor="phone" className="text-slate-700 dark:text-slate-300">
+							<Label htmlFor="phone" className="text-foreground">
 								<span className="inline-flex items-center gap-1.5">
-									<Phone className="h-3.5 w-3.5 text-slate-400" />
+									<Phone className="h-3.5 w-3.5 text-muted-foreground" />
 									{t("pricing.leads.form.phone")}
 								</span>
 							</Label>
@@ -224,14 +224,14 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								value={formData.phone}
 								onChange={(e: any) => update("phone", e.target.value)}
 								placeholder={t("pricing.leads.form.phonePlaceholder")}
-								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+								className="mt-1.5 rounded-xl bg-card border-input"
 								dir="ltr"
 							/>
 						</div>
 						<div>
-							<Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
+							<Label htmlFor="email" className="text-foreground">
 								<span className="inline-flex items-center gap-1.5">
-									<Mail className="h-3.5 w-3.5 text-slate-400" />
+									<Mail className="h-3.5 w-3.5 text-muted-foreground" />
 									{t("pricing.leads.form.email")}
 								</span>
 							</Label>
@@ -241,16 +241,16 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								value={formData.email}
 								onChange={(e: any) => update("email", e.target.value)}
 								placeholder={t("pricing.leads.form.emailPlaceholder")}
-								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+								className="mt-1.5 rounded-xl bg-card border-input"
 								dir="ltr"
 							/>
 						</div>
 					</div>
 
 					<div>
-						<Label htmlFor="company" className="text-slate-700 dark:text-slate-300">
+						<Label htmlFor="company" className="text-foreground">
 							<span className="inline-flex items-center gap-1.5">
-								<Building2 className="h-3.5 w-3.5 text-slate-400" />
+								<Building2 className="h-3.5 w-3.5 text-muted-foreground" />
 								{t("pricing.leads.form.company")}
 							</span>
 						</Label>
@@ -259,12 +259,12 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							value={formData.company}
 							onChange={(e: any) => update("company", e.target.value)}
 							placeholder={t("pricing.leads.form.companyPlaceholder")}
-							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							className="mt-1.5 rounded-xl bg-card border-input"
 						/>
 					</div>
 
 					<div>
-						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.clientType")}</Label>
+						<Label className="text-foreground">{t("pricing.leads.form.clientType")}</Label>
 						<div className="mt-2 flex gap-3">
 							<button
 								type="button"
@@ -272,7 +272,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								className={`flex-1 flex items-center justify-center gap-2 rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
 									formData.clientType === "INDIVIDUAL"
 										? "border-chart-4 bg-chart-4/15 dark:bg-chart-4/20 text-chart-4 dark:text-chart-4"
-										: "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+										: "border-input bg-card text-muted-foreground hover:border-primary/30"
 								}`}
 							>
 								<User className="h-4 w-4" />
@@ -283,8 +283,8 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								onClick={() => update("clientType", "COMMERCIAL")}
 								className={`flex-1 flex items-center justify-center gap-2 rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
 									formData.clientType === "COMMERCIAL"
-										? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400"
-										: "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+										? "border-chart-4 bg-chart-4/15 text-chart-4"
+										: "border-input bg-card text-muted-foreground hover:border-primary/30"
 								}`}
 							>
 								<Building2 className="h-4 w-4" />
@@ -296,30 +296,30 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 			</div>
 
 			{/* Section 2: Project Details */}
-			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
-				<div className="h-1 w-full bg-violet-500" />
+			<div className="rounded-2xl bg-card border-2 overflow-hidden">
+				<div className="h-1 w-full bg-chart-4" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-950/30">
-							<FolderKanban className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+						<div className="p-2.5 rounded-xl bg-chart-4/15">
+							<FolderKanban className="h-5 w-5 text-chart-4" />
 						</div>
 						<div>
-							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+							<h3 className="text-base font-semibold text-card-foreground">
 								{t("pricing.leads.form.projectInfo")}
 							</h3>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
+							<p className="text-xs text-muted-foreground">
 								{t("pricing.leads.form.projectInfoDescription")}
 							</p>
 						</div>
 					</div>
 
 					<div>
-						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.projectType")}</Label>
+						<Label className="text-foreground">{t("pricing.leads.form.projectType")}</Label>
 						<Select
 							value={formData.projectType || "none"}
 							onValueChange={(v: any) => update("projectType", v === "none" ? "" : v)}
 						>
-							<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+							<SelectTrigger className="mt-1.5 rounded-xl bg-card border-input">
 								<SelectValue placeholder={t("pricing.leads.form.selectProjectType")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
@@ -334,9 +334,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 					</div>
 
 					<div>
-						<Label htmlFor="projectLocation" className="text-slate-700 dark:text-slate-300">
+						<Label htmlFor="projectLocation" className="text-foreground">
 							<span className="inline-flex items-center gap-1.5">
-								<MapPin className="h-3.5 w-3.5 text-slate-400" />
+								<MapPin className="h-3.5 w-3.5 text-muted-foreground" />
 								{t("pricing.leads.form.projectLocation")}
 							</span>
 						</Label>
@@ -345,13 +345,13 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							value={formData.projectLocation}
 							onChange={(e: any) => update("projectLocation", e.target.value)}
 							placeholder={t("pricing.leads.form.projectLocationPlaceholder")}
-							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							className="mt-1.5 rounded-xl bg-card border-input"
 						/>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div>
-							<Label htmlFor="estimatedArea" className="text-slate-700 dark:text-slate-300">
+							<Label htmlFor="estimatedArea" className="text-foreground">
 								{t("pricing.leads.form.estimatedArea")}
 							</Label>
 							<div className="relative mt-1.5">
@@ -362,16 +362,16 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									step="any"
 									value={formData.estimatedArea}
 									onChange={(e: any) => update("estimatedArea", e.target.value)}
-									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
+									className="rounded-xl bg-card border-input pe-12"
 									dir="ltr"
 								/>
-								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">م²</span>
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">م²</span>
 							</div>
 						</div>
 						<div>
-							<Label htmlFor="estimatedValue" className="text-slate-700 dark:text-slate-300">
+							<Label htmlFor="estimatedValue" className="text-foreground">
 								<span className="inline-flex items-center gap-1.5">
-									<Banknote className="h-3.5 w-3.5 text-slate-400" />
+									<Banknote className="h-3.5 w-3.5 text-muted-foreground" />
 									{t("pricing.leads.form.estimatedValue")}
 								</span>
 							</Label>
@@ -383,10 +383,10 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									step="any"
 									value={formData.estimatedValue}
 									onChange={(e: any) => update("estimatedValue", e.target.value)}
-									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
+									className="rounded-xl bg-card border-input pe-12"
 									dir="ltr"
 								/>
-								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">ر.س</span>
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">ر.س</span>
 							</div>
 						</div>
 					</div>
@@ -394,7 +394,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 			</div>
 
 			{/* Section 3: Management Settings */}
-			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+			<div className="rounded-2xl bg-card border-2 overflow-hidden">
 				<div className="h-1 w-full bg-chart-4" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
@@ -402,10 +402,10 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							<Settings2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
 						<div>
-							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+							<h3 className="text-base font-semibold text-card-foreground">
 								{t("pricing.leads.form.managementInfo")}
 							</h3>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
+							<p className="text-xs text-muted-foreground">
 								{t("pricing.leads.form.managementInfoDescription")}
 							</p>
 						</div>
@@ -413,9 +413,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 
 					<div className="grid gap-4 sm:grid-cols-3">
 						<div>
-							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.source")}</Label>
+							<Label className="text-foreground">{t("pricing.leads.form.source")}</Label>
 							<Select value={formData.source} onValueChange={(v: any) => update("source", v)}>
-								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-card border-input">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -428,9 +428,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							</Select>
 						</div>
 						<div>
-							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.priority")}</Label>
+							<Label className="text-foreground">{t("pricing.leads.form.priority")}</Label>
 							<Select value={formData.priority} onValueChange={(v: any) => update("priority", v)}>
-								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-card border-input">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -443,9 +443,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							</Select>
 						</div>
 						<div>
-							<Label className="text-slate-700 dark:text-slate-300">
+							<Label className="text-foreground">
 								<span className="inline-flex items-center gap-1.5">
-									<UserPlus className="h-3.5 w-3.5 text-slate-400" />
+									<UserPlus className="h-3.5 w-3.5 text-muted-foreground" />
 									{t("pricing.leads.form.assignedTo")}
 								</span>
 							</Label>
@@ -453,7 +453,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								value={formData.assignedToId || "none"}
 								onValueChange={(v: any) => update("assignedToId", v === "none" ? "" : v)}
 							>
-								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-card border-input">
 									<SelectValue placeholder={t("pricing.leads.form.selectAssignee")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -469,9 +469,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 					</div>
 
 					<div>
-						<Label htmlFor="expectedCloseDate" className="text-slate-700 dark:text-slate-300">
+						<Label htmlFor="expectedCloseDate" className="text-foreground">
 							<span className="inline-flex items-center gap-1.5">
-								<CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+								<CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
 								{t("pricing.leads.form.expectedCloseDate")}
 							</span>
 						</Label>
@@ -480,19 +480,19 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							type="date"
 							value={formData.expectedCloseDate}
 							onChange={(e: any) => update("expectedCloseDate", e.target.value)}
-							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							className="mt-1.5 rounded-xl bg-card border-input"
 							dir="ltr"
 						/>
 					</div>
 
 					<div>
-						<Label htmlFor="notes" className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.notes")}</Label>
+						<Label htmlFor="notes" className="text-foreground">{t("pricing.leads.form.notes")}</Label>
 						<Textarea
 							id="notes"
 							value={formData.notes}
 							onChange={(e: any) => update("notes", e.target.value)}
 							placeholder={t("pricing.leads.form.notesPlaceholder")}
-							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 min-h-[80px]"
+							className="mt-1.5 rounded-xl bg-card border-input min-h-[80px]"
 							rows={3}
 						/>
 					</div>
@@ -500,19 +500,19 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 			</div>
 
 			{/* Section 4: Project Files (Optional) */}
-			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
-				<div className="h-1 w-full bg-amber-500" />
+			<div className="rounded-2xl bg-card border-2 overflow-hidden">
+				<div className="h-1 w-full bg-chart-1" />
 				<div className="p-6 space-y-4">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30">
-							<Paperclip className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						<div className="p-2.5 rounded-xl bg-chart-1/15">
+							<Paperclip className="h-5 w-5 text-chart-1" />
 						</div>
 						<div className="flex items-center gap-2">
 							<div>
-								<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+								<h3 className="text-base font-semibold text-card-foreground">
 									{t("pricing.leads.form.projectFiles")}
 								</h3>
-								<p className="text-xs text-slate-500 dark:text-slate-400">
+								<p className="text-xs text-muted-foreground">
 									{t("pricing.leads.form.projectFilesDescription")}
 								</p>
 							</div>
@@ -534,14 +534,14 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 				<Button
 					type="button"
 					variant="outline"
-					className="rounded-xl border-slate-200 dark:border-slate-700"
+					className="rounded-xl border-input"
 					onClick={() => router.back()}
 				>
 					{t("pricing.leads.form.cancel")}
 				</Button>
 				<Button
 					type="submit"
-					className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+					className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
 					disabled={isSubmitting}
 				>
 					{isSubmitting && (

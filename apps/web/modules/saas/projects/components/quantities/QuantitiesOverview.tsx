@@ -106,13 +106,13 @@ export function QuantitiesOverview({
 		return (
 			<>
 				<div className="flex flex-col items-center justify-center py-20 text-center">
-					<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-						<Calculator className="h-12 w-12 text-slate-400" />
+					<div className="mb-4 rounded-2xl bg-muted p-4">
+						<Calculator className="h-12 w-12 text-muted-foreground" />
 					</div>
-					<h2 className="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="mb-2 text-xl font-semibold text-foreground">
 						{t("empty.title")}
 					</h2>
-					<p className="mb-6 max-w-md text-sm text-slate-500 dark:text-slate-400">
+					<p className="mb-6 max-w-md text-sm text-muted-foreground">
 						{t("empty.description")}
 					</p>
 					<div className="flex items-center gap-3">
@@ -157,29 +157,29 @@ export function QuantitiesOverview({
 			label: t("summary.structural"),
 			value: summary?.totals?.structural ?? 0,
 			icon: Hammer,
-			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconColor: "text-chart-4 dark:text-chart-4",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
 		},
 		{
 			label: t("summary.finishing"),
 			value: summary?.totals?.finishing ?? 0,
 			icon: PaintBucket,
-			iconBg: "bg-purple-100 dark:bg-purple-900/50",
-			iconColor: "text-purple-600 dark:text-purple-400",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
 		},
 		{
 			label: t("summary.mep"),
 			value: summary?.totals?.mep ?? 0,
 			icon: Zap,
-			iconBg: "bg-amber-100 dark:bg-amber-900/50",
-			iconColor: "text-amber-600 dark:text-amber-400",
+			iconBg: "bg-success/15",
+			iconColor: "text-success",
 		},
 		{
 			label: t("summary.labor"),
 			value: summary?.totals?.labor ?? 0,
 			icon: HardHat,
-			iconBg: "bg-green-100 dark:bg-green-900/50",
-			iconColor: "text-green-600 dark:text-green-400",
+			iconBg: "bg-chart-2/15",
+			iconColor: "text-chart-2",
 		},
 	];
 
@@ -189,7 +189,7 @@ export function QuantitiesOverview({
 		<div className="space-y-6">
 			{/* Header with actions */}
 			<div className="flex items-center justify-between">
-				<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+				<h1 className="text-2xl font-semibold text-foreground">
 					{t("title")}
 				</h1>
 				<div className="flex items-center gap-2">
@@ -214,17 +214,17 @@ export function QuantitiesOverview({
 			{/* Summary Cards Row */}
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{summaryCards.map((card) => (
-					<Card key={card.label} className="rounded-2xl">
+					<Card key={card.label} className="rounded-2xl border-2">
 						<CardContent className="p-5">
 							<div className="flex items-start gap-3">
 								<div className={`rounded-xl ${card.iconBg} p-2.5`}>
 									<card.icon className={`h-5 w-5 ${card.iconColor}`} />
 								</div>
 								<div className="min-w-0 flex-1">
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+									<p className="text-sm text-muted-foreground">
 										{card.label}
 									</p>
-									<p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+									<p className="mt-1 text-xl font-bold text-card-foreground">
 										{formatNumber(Number(card.value), 2)}
 									</p>
 								</div>
@@ -235,18 +235,18 @@ export function QuantitiesOverview({
 			</div>
 
 			{/* Grand Total Card */}
-			<Card className="rounded-2xl border-2 border-slate-200 dark:border-slate-700">
+			<Card className="rounded-2xl border-2">
 				<CardContent className="p-5">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-								<Calculator className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+							<div className="rounded-xl bg-muted p-2.5">
+								<Calculator className="h-5 w-5 text-muted-foreground" />
 							</div>
-							<p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+							<p className="text-lg font-semibold text-card-foreground">
 								{t("summary.grandTotal")}
 							</p>
 						</div>
-						<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+						<p className="text-2xl font-bold text-card-foreground">
 							{formatNumber(grandTotal, 2)}
 						</p>
 					</div>
@@ -254,9 +254,9 @@ export function QuantitiesOverview({
 			</Card>
 
 			{/* Studies Table */}
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-				<div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
-					<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="border-b-2 px-6 py-4">
+					<h2 className="text-lg font-semibold text-card-foreground">
 						{t("studies.title")}
 					</h2>
 				</div>
@@ -273,12 +273,12 @@ export function QuantitiesOverview({
 						{studies.map((study: any) => (
 							<TableRow
 								key={study.id}
-								className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+								className="cursor-pointer hover:bg-muted/50"
 								onClick={() => router.push(studyPath(study.id))}
 							>
 								<TableCell>
 									<div className="flex items-center gap-2">
-										<span className="font-medium text-slate-900 dark:text-slate-100">
+										<span className="font-medium text-card-foreground">
 											{study.name}
 										</span>
 										{study.status && (
@@ -291,7 +291,7 @@ export function QuantitiesOverview({
 										)}
 									</div>
 								</TableCell>
-								<TableCell className="text-slate-600 dark:text-slate-400">
+								<TableCell className="text-muted-foreground">
 									{(
 										(study.itemCounts?.structuralItems ?? 0) +
 										(study.itemCounts?.finishingItems ?? 0) +
@@ -299,7 +299,7 @@ export function QuantitiesOverview({
 										(study.itemCounts?.laborItems ?? 0)
 									).toLocaleString("en-US")}
 								</TableCell>
-								<TableCell className="font-medium text-slate-900 dark:text-slate-100">
+								<TableCell className="font-medium text-card-foreground">
 									{formatNumber(Number(study.totalCost ?? 0), 2)}
 								</TableCell>
 								<TableCell>
@@ -324,7 +324,7 @@ export function QuantitiesOverview({
 												</Link>
 											</DropdownMenuItem>
 											<DropdownMenuItem
-												className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+												className="text-destructive focus:text-destructive"
 												onClick={(e: any) => {
 														e.stopPropagation();
 														unlinkMutation.mutate(study.id);

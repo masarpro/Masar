@@ -107,75 +107,75 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 						label: t("pricing.studies.stats.inProgress"),
 						value: stats.inProgress,
 						icon: Clock,
-						iconClassName: "text-amber-600 dark:text-amber-400",
-						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
-						valueClassName: "text-amber-700 dark:text-amber-300",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
+						valueClassName: "text-chart-1",
 					},
 					{
 						label: t("pricing.studies.stats.completed"),
 						value: stats.completed,
 						icon: CheckCircle2,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
-						valueClassName: "text-chart-4 dark:text-chart-4",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
+						valueClassName: "text-chart-4",
 					},
 					{
 						label: t("pricing.studies.stats.totalValue"),
 						value: formatSAR(stats.totalValue),
 						icon: TrendingUp,
-						iconClassName: "text-indigo-600 dark:text-indigo-400",
-						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
-						valueClassName: "text-indigo-700 dark:text-indigo-300",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
+						valueClassName: "text-chart-4",
 					},
 				]}
 			/>
 
 			{/* Statistics Cards - Modern 2026 Flat Design (الديسكتوب كما هو) */}
 			<div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-				<div className="group relative rounded-2xl bg-slate-50 dark:bg-slate-900/50 p-5 transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+				<div className="group relative rounded-2xl bg-card border-2 p-5 transition-all duration-200 hover:border-primary/30">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">{t("pricing.studies.stats.total")}</p>
-							<p className="text-3xl font-semibold mt-2 text-slate-900 dark:text-slate-100">{stats.total}</p>
+							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("pricing.studies.stats.total")}</p>
+							<p className="text-3xl font-semibold mt-2 text-card-foreground">{stats.total}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-slate-200/50 dark:bg-slate-700/50">
-							<FileStack className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+						<div className="flex size-11 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+							<FileStack className="h-5 w-5" />
 						</div>
 					</div>
 				</div>
 
-				<div className="group relative rounded-2xl bg-amber-50 dark:bg-amber-950/30 p-5 transition-all duration-200 hover:bg-amber-100 dark:hover:bg-amber-900/30">
+				<div className="group relative rounded-2xl bg-card border-2 p-5 transition-all duration-200 hover:border-primary/30">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">{t("pricing.studies.stats.inProgress")}</p>
-							<p className="text-3xl font-semibold mt-2 text-amber-700 dark:text-amber-300">{stats.inProgress}</p>
+							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("pricing.studies.stats.inProgress")}</p>
+							<p className="text-3xl font-semibold mt-2 text-chart-1">{stats.inProgress}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-amber-200/50 dark:bg-amber-800/30">
-							<Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						<div className="flex size-11 items-center justify-center rounded-2xl bg-chart-1/15 text-chart-1">
+							<Clock className="h-5 w-5" />
 						</div>
 					</div>
 				</div>
 
-				<div className="group relative rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 p-5 transition-all duration-200 hover:bg-chart-4/15 dark:hover:bg-chart-4/20">
+				<div className="group relative rounded-2xl bg-card border-2 p-5 transition-all duration-200 hover:border-primary/30">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-xs font-medium text-chart-4 dark:text-chart-4 uppercase tracking-wide">{t("pricing.studies.stats.completed")}</p>
-							<p className="text-3xl font-semibold mt-2 text-chart-4 dark:text-chart-4">{stats.completed}</p>
+							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("pricing.studies.stats.completed")}</p>
+							<p className="text-3xl font-semibold mt-2 text-chart-4">{stats.completed}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-chart-4/15 dark:bg-chart-4/30">
-							<CheckCircle2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-11 items-center justify-center rounded-2xl bg-chart-4/15 text-chart-4">
+							<CheckCircle2 className="h-5 w-5" />
 						</div>
 					</div>
 				</div>
 
-				<div className="group relative rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 p-5 transition-all duration-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 overflow-hidden">
+				<div className="group relative rounded-2xl bg-card border-2 p-5 transition-all duration-200 hover:border-primary/30 overflow-hidden">
 					<div className="flex items-center justify-between gap-2">
 						<div className="min-w-0 flex-1">
-							<p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">{t("pricing.studies.stats.totalValue")}</p>
-							<p className="text-lg sm:text-2xl font-semibold mt-2 text-indigo-700 dark:text-indigo-300 break-words leading-snug">{formatSAR(stats.totalValue)}</p>
+							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("pricing.studies.stats.totalValue")}</p>
+							<p className="text-lg sm:text-2xl font-semibold mt-2 text-chart-4 break-words leading-snug">{formatSAR(stats.totalValue)}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-indigo-200/50 dark:bg-indigo-800/30 shrink-0 max-sm:hidden">
-							<TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="flex size-11 items-center justify-center rounded-2xl bg-chart-4/15 text-chart-4 shrink-0 max-sm:hidden">
+							<TrendingUp className="h-5 w-5" />
 						</div>
 					</div>
 				</div>
@@ -184,12 +184,12 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 			{/* بحث + زر فلترة (الحالة داخله) + إنشاء — صف واحد للجوال والكمبيوتر */}
 			<div className="flex items-center gap-2">
 				<div className="relative min-w-0 flex-1 sm:max-w-md">
-					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("pricing.studies.searchPlaceholder")}
 						value={searchTerm}
 						onChange={(e: any) => setSearchTerm(e.target.value)}
-						className="pe-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
+						className="pe-10 bg-card border-border rounded-xl focus:ring-1 focus:ring-ring"
 					/>
 				</div>
 				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
@@ -210,13 +210,13 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 						size="icon"
 						aria-label={t("pricing.studies.newStudy")}
 						onClick={() => setShowCreateDialog(true)}
-						className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+						className="h-10 w-10 shrink-0 rounded-xl"
 					>
 						<Plus className="h-5 w-5" />
 					</Button>
 				</div>
 				<div className="hidden sm:block shrink-0">
-					<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
+					<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl">
 						<Plus className="me-2 h-4 w-4" />
 						{t("pricing.studies.newStudy")}
 					</Button>
@@ -243,14 +243,14 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="p-5 rounded-2xl bg-slate-100 dark:bg-slate-800/50 mb-5">
-						<FolderKanban className="h-12 w-12 text-slate-400 dark:text-slate-500" />
+					<div className="p-5 rounded-2xl bg-muted mb-5">
+						<FolderKanban className="h-12 w-12 text-muted-foreground" />
 					</div>
-					<h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">{t("pricing.studies.empty")}</h3>
-					<p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm text-sm">
+					<h3 className="text-lg font-medium text-card-foreground">{t("pricing.studies.empty")}</h3>
+					<p className="text-muted-foreground mt-2 max-w-sm text-sm">
 						{t("pricing.studies.emptyDescription")}
 					</p>
-					<Button onClick={() => setShowCreateDialog(true)} className="mt-5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200">
+					<Button onClick={() => setShowCreateDialog(true)} className="mt-5 rounded-xl">
 							<Plus className="me-2 h-4 w-4" />
 							{t("pricing.studies.newStudy")}
 					</Button>

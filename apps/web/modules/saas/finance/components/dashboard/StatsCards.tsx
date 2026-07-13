@@ -47,9 +47,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
 						label: t("finance.stats.outstanding"),
 						value: <Currency amount={stats?.invoices.outstandingValue ?? 0} />,
 						icon: Clock,
-						iconClassName: "text-amber-600 dark:text-amber-400",
-						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
-						valueClassName: "text-amber-700 dark:text-amber-300",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
+						valueClassName: "text-chart-1",
 					},
 					{
 						label: t("finance.stats.clients"),
@@ -73,7 +73,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
 			/>
 			<GlassStatCard
 				colorScheme="amber"
-				icon={<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
+				icon={<Clock className="h-4 w-4 text-chart-1" />}
 				title={t("finance.stats.outstanding")}
 				value={<Currency amount={stats?.invoices.outstandingValue ?? 0} />}
 				subtitle={<>{stats?.invoices.overdue ?? 0} {t("finance.stats.overdue")}</>}

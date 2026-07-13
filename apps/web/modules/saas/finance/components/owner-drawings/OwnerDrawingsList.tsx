@@ -29,7 +29,7 @@ interface OwnerDrawingsListProps {
 
 const TYPE_COLORS: Record<string, string> = {
 	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15",
-	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50",
+	PROJECT_SPECIFIC: "border-chart-4/30 text-chart-4 bg-chart-4/15",
 };
 
 export function OwnerDrawingsList({
@@ -90,24 +90,24 @@ export function OwnerDrawingsList({
 			{/* Summary Cards */}
 			{summary && (
 				<div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 md:gap-4">
-					<Card className="border-red-200">
+					<Card className="border-destructive/30">
 						<CardContent className="pt-3 sm:pt-4">
 							<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-								<TrendingDown className="h-4 w-4 text-red-500 shrink-0" />
+								<TrendingDown className="h-4 w-4 text-destructive shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.totalDrawn")}</span>
 							</div>
-							<div className="mt-1 text-base sm:text-2xl font-bold text-red-600 tabular-nums">
+							<div className="mt-1 text-base sm:text-2xl font-bold text-destructive tabular-nums">
 								<Currency amount={summary.totalDrawingsThisYear} />
 							</div>
 						</CardContent>
 					</Card>
-					<Card className="border-green-200">
+					<Card className="border-success/30">
 						<CardContent className="pt-3 sm:pt-4">
 							<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-								<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
+								<TrendingUp className="h-4 w-4 text-success shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.yearProfit")}</span>
 							</div>
-							<div className="mt-1 text-base sm:text-2xl font-bold text-green-600 tabular-nums">
+							<div className="mt-1 text-base sm:text-2xl font-bold text-success tabular-nums">
 								<Currency amount={summary.currentYearProfit} />
 							</div>
 						</CardContent>

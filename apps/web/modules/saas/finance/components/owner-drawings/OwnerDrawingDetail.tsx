@@ -32,7 +32,7 @@ interface OwnerDrawingDetailProps {
 
 const TYPE_COLORS: Record<string, string> = {
 	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15",
-	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50",
+	PROJECT_SPECIFIC: "border-chart-4/30 text-chart-4 bg-chart-4/15",
 };
 
 export function OwnerDrawingDetail({
@@ -189,7 +189,7 @@ export function OwnerDrawingDetail({
 							</Badge>
 						</div>
 						{drawing.hasOverdrawWarning && (
-							<div className="mt-1 flex items-center gap-1 text-sm text-amber-600">
+							<div className="mt-1 flex items-center gap-1 text-sm text-chart-1">
 								<AlertTriangle className="h-3 w-3" />
 								{t("finance.ownerDrawings.overdrawAcknowledged")}
 							</div>
@@ -309,9 +309,9 @@ export function OwnerDrawingDetail({
 
 					{/* Overdraw Info */}
 					{drawing.hasOverdrawWarning && (
-						<Card className="border-amber-200 bg-amber-50/50">
+						<Card className="border-chart-1/30 bg-chart-1/10">
 							<CardHeader className="pb-2">
-								<CardTitle className="flex items-center gap-2 text-base text-amber-700">
+								<CardTitle className="flex items-center gap-2 text-base text-chart-1">
 									<AlertTriangle className="h-4 w-4" />
 									{t("finance.ownerDrawings.overdrawInfo")}
 								</CardTitle>
@@ -320,7 +320,7 @@ export function OwnerDrawingDetail({
 								<InfoRow
 									label={t("finance.ownerDrawings.overdrawAmount")}
 									value={
-										<span className="text-amber-700 font-bold">
+										<span className="text-chart-1 font-bold">
 											<Currency amount={drawing.overdrawAmount ?? 0} />
 										</span>
 									}
@@ -347,12 +347,12 @@ export function OwnerDrawingDetail({
 					{drawing.status === "CANCELLED" && (
 						<>
 							{drawing.cancelledAt && (
-								<span className="text-red-600">
+								<span className="text-destructive">
 									{t("finance.ownerDrawings.cancelledAt")}: {formatDate(drawing.cancelledAt)}
 								</span>
 							)}
 							{drawing.cancelReason && (
-								<span className="text-red-600">
+								<span className="text-destructive">
 									{t("finance.ownerDrawings.cancelReason")}: {drawing.cancelReason}
 								</span>
 							)}

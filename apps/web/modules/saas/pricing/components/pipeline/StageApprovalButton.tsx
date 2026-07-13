@@ -153,7 +153,7 @@ export function StageApprovalButton({
 		return (
 			<div className={cn("flex items-center gap-3", className)} dir="rtl">
 				<Button variant="outline" disabled className="gap-2">
-					<CheckCircle2 className="h-4 w-4 text-emerald-600" />
+					<CheckCircle2 className="h-4 w-4 text-success" />
 					{t("pricing.pipeline.approved")}
 				</Button>
 				{canReopen && (

@@ -239,7 +239,7 @@ export function FinanceBudgetCard({
 				</div>
 
 				{/* Next Payment */}
-				<div className="relative mt-auto overflow-hidden rounded-xl border border-chart-4 bg-gradient-to-bl from-chart-4/15 to-chart-4/15 p-3.5 dark:border-chart-4/30 dark:from-chart-4/20 dark:to-chart-4/20">
+				<div className="relative mt-auto overflow-hidden rounded-xl border border-chart-4 bg-chart-4/15 p-3.5 dark:border-chart-4/30 dark:bg-chart-4/20">
 					<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-chart-4/10" />
 					<div className="relative flex items-center justify-between">
 						<div className="flex items-center gap-1.5">

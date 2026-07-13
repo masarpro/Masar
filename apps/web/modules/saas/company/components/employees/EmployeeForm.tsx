@@ -166,12 +166,12 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 			title: t("company.employees.step1Title"),
 			description: t("company.employees.step1Desc"),
 			content: (
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+				<div className="bg-card border-2 rounded-2xl overflow-hidden">
+					<div className="flex items-center gap-3 p-5 border-b-2">
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Users className="h-5 w-5" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.employees.basicInfo")}
 						</h3>
 					</div>
@@ -186,7 +186,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						<FormField control={form.control} name="employeeNo" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.employeeNo")}</FormLabel>
-								<FormControl><Input className="rounded-xl bg-slate-50 dark:bg-slate-800/50" readOnly disabled {...field} /></FormControl>
+								<FormControl><Input className="rounded-lg bg-muted" readOnly disabled {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
@@ -241,12 +241,12 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 			title: t("company.employees.step2Title"),
 			description: t("company.employees.step2Desc"),
 			content: (
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+				<div className="bg-card border-2 rounded-2xl overflow-hidden">
+					<div className="flex items-center gap-3 p-5 border-b-2">
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Banknote className="h-5 w-5" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.employees.financialInfo")}
 						</h3>
 					</div>
@@ -308,12 +308,12 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 			title: t("company.employees.step3Title"),
 			description: t("company.employees.step3Desc"),
 			content: (
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50">
-							<FileText className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+				<div className="bg-card border-2 rounded-2xl overflow-hidden">
+					<div className="flex items-center gap-3 p-5 border-b-2">
+						<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+							<FileText className="h-5 w-5" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.common.notes")}
 						</h3>
 					</div>

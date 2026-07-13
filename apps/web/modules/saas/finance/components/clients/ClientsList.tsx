@@ -133,7 +133,7 @@ export function ClientsList({
 					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
 					<div className="flex items-center gap-2 sm:hidden">
 						<div className="relative min-w-0 flex-1">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.clients.searchPlaceholder")}
 								value={searchQuery}
@@ -172,7 +172,7 @@ export function ClientsList({
 					{/* الديسكتوب كما هو */}
 					<div className="hidden flex-col sm:flex sm:flex-row gap-4">
 						<div className="flex-1 relative">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.clients.searchPlaceholder")}
 								value={searchQuery}
@@ -215,8 +215,8 @@ export function ClientsList({
 				<CardContent className="p-0">
 					{isLoading ? <ListTableSkeleton /> : clients.length === 0 ? (
 						<div className="text-center py-20">
-							<Users className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-							<p className="text-slate-500 dark:text-slate-400">
+							<Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+							<p className="text-muted-foreground">
 								{searchQuery
 									? t("finance.clients.noSearchResults")
 									: t("finance.clients.noClients")}
@@ -240,7 +240,7 @@ export function ClientsList({
 								{clients.map((client: any) => (
 									<TableRow
 										key={client.id}
-										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+										className="cursor-pointer hover:bg-muted/50"
 										onClick={() =>
 											router.push(
 												`/app/${organizationSlug}/finance/clients/${client.id}`,
@@ -253,24 +253,24 @@ export function ClientsList({
 													{client.code}
 												</Badge>
 											) : (
-												<span className="text-slate-400">-</span>
+												<span className="text-muted-foreground">-</span>
 											)}
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-3">
-												<div className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">
+												<div className="p-1.5 bg-muted rounded-lg">
 													{client.clientType === "COMMERCIAL" ? (
-														<Building2 className="h-4 w-4 text-slate-500" />
+														<Building2 className="h-4 w-4 text-muted-foreground" />
 													) : (
-														<User className="h-4 w-4 text-slate-500" />
+														<User className="h-4 w-4 text-muted-foreground" />
 													)}
 												</div>
 												<div>
-													<div className="font-medium text-slate-900 dark:text-slate-100">
+													<div className="font-medium text-card-foreground">
 														{client.name}
 													</div>
 													{client.businessName && client.clientType === "COMMERCIAL" && (
-														<div className="text-xs text-slate-500">
+														<div className="text-xs text-muted-foreground">
 															{client.businessName}
 														</div>
 													)}
@@ -294,36 +294,36 @@ export function ClientsList({
 										<TableCell>
 											<div className="space-y-1">
 												{client.mobile && (
-													<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+													<div className="flex items-center gap-2 text-sm text-muted-foreground">
 														<Smartphone className="h-3 w-3" />
 														<span dir="ltr">{client.mobile}</span>
 													</div>
 												)}
 												{client.phone && !client.mobile && (
-													<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+													<div className="flex items-center gap-2 text-sm text-muted-foreground">
 														<Phone className="h-3 w-3" />
 														<span dir="ltr">{client.phone}</span>
 													</div>
 												)}
 												{client.email && (
-													<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+													<div className="flex items-center gap-2 text-sm text-muted-foreground">
 														<Mail className="h-3 w-3" />
 														<span dir="ltr">{client.email}</span>
 													</div>
 												)}
 												{!client.phone && !client.mobile && !client.email && (
-													<span className="text-slate-400">-</span>
+													<span className="text-muted-foreground">-</span>
 												)}
 											</div>
 										</TableCell>
 										<TableCell className="text-center">
 											{client.isActive ? (
-												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-success/15 text-success">
 													<CheckCircle className="h-3 w-3" />
 													{t("finance.clients.active")}
 												</span>
 											) : (
-												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
 													<XCircle className="h-3 w-3" />
 													{t("finance.clients.inactive")}
 												</span>
@@ -380,7 +380,7 @@ export function ClientsList({
 													</DropdownMenuItem>
 													<DropdownMenuItem
 														onClick={() => setDeleteClientId(client.id)}
-														className="text-red-600"
+														className="text-destructive"
 													>
 														<Trash2 className="h-4 w-4 me-2" />
 														{t("common.delete")}
@@ -417,7 +417,7 @@ export function ClientsList({
 						<AlertDialogAction
 							onClick={() => deleteClientId && deleteMutation.mutate(deleteClientId)}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending
 								? t("common.deleting")

@@ -26,7 +26,7 @@ export function StatsCard({
 						</p>
 					)}
 				</div>
-				<div className="rounded-full bg-primary/10 p-3">
+				<div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
 					<Icon className="size-5 text-primary" />
 				</div>
 			</div>

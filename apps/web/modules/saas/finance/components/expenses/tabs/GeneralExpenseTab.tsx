@@ -432,7 +432,7 @@ export const GeneralExpenseTab = forwardRef<
 
 	if (isEditMode && isLoadingExpense) {
 		return (
-			<div className="flex items-center justify-center py-12 text-slate-400">
+			<div className="flex items-center justify-center py-12 text-muted-foreground">
 				<span className="animate-pulse">{t("common.loading")}</span>
 			</div>
 		);
@@ -443,7 +443,7 @@ export const GeneralExpenseTab = forwardRef<
 			{/* Row 1: Amount, Date */}
 			<div className="grid grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.amount")} *
 					</Label>
 					<Input
@@ -462,7 +462,7 @@ export const GeneralExpenseTab = forwardRef<
 					/>
 				</div>
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.date")} *
 					</Label>
 					<Input
@@ -480,7 +480,7 @@ export const GeneralExpenseTab = forwardRef<
 			{/* Row 2: Category, Subcategory */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.category")} *
 					</Label>
 					<ExpenseCategoryCombobox
@@ -496,7 +496,7 @@ export const GeneralExpenseTab = forwardRef<
 					/>
 				</div>
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.subcategory")}
 					</Label>
 					<ExpenseSubcategoryCombobox
@@ -513,7 +513,7 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Row 3: Account */}
 			<div className={`space-y-1 ${isObligation ? "opacity-60" : ""}`}>
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+				<Label className="text-xs font-medium text-muted-foreground">
 					{t("finance.expenses.selectAccount")} {!isObligation && "*"}
 				</Label>
 				<Select
@@ -537,10 +537,10 @@ export const GeneralExpenseTab = forwardRef<
 									{account.accountType === "BANK" ? (
 										<Building className="h-3.5 w-3.5 text-chart-4" />
 									) : (
-										<Wallet className="h-3.5 w-3.5 text-green-500" />
+										<Wallet className="h-3.5 w-3.5 text-success" />
 									)}
 									<span>{account.name}</span>
-									<span className="text-slate-400 text-xs">
+									<span className="text-muted-foreground text-xs">
 										(
 										<Currency
 											amount={Number(account.balance)}
@@ -556,21 +556,21 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Selected account info */}
 			{selectedAccount && !isObligation && (
-				<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+				<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/15 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 					<div className="flex items-center gap-2.5 min-w-0">
-						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20 shrink-0">
+						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 shrink-0">
 							{selectedAccount.accountType === "BANK" ? (
 								<Building className="h-3.5 w-3.5 text-chart-4" />
 							) : (
-								<Wallet className="h-3.5 w-3.5 text-green-600" />
+								<Wallet className="h-3.5 w-3.5 text-success" />
 							)}
 						</div>
 						<div className="min-w-0">
-							<p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+							<p className="text-sm font-medium text-foreground truncate">
 								{selectedAccount.name}
 							</p>
 							{selectedAccount.bankName && (
-								<p className="text-[11px] text-slate-500 truncate">
+								<p className="text-[11px] text-muted-foreground truncate">
 									{selectedAccount.bankName}
 								</p>
 							)}
@@ -584,8 +584,8 @@ export const GeneralExpenseTab = forwardRef<
 						</span>
 						{numericAmount > 0 && (
 							<>
-								<ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-								<span className="text-red-500 font-semibold">
+								<ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+								<span className="text-destructive font-semibold">
 									<Currency
 										amount={
 											Number(selectedAccount.balance) -
@@ -602,7 +602,7 @@ export const GeneralExpenseTab = forwardRef<
 			{/* Project Link — hidden when project is fixed by parent context */}
 			{!fixedProjectId && (
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						<FolderOpen className="h-3 w-3 inline me-1" />
 						{t("finance.expenses.projectLink")}
 					</Label>
@@ -638,7 +638,7 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Description */}
 			<div className="space-y-1">
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+				<Label className="text-xs font-medium text-muted-foreground">
 					{t("finance.expenses.description")}
 				</Label>
 				<Input
@@ -656,16 +656,16 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Obligation Toggle */}
 			{!isEditMode && (
-				<div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+				<div className="flex items-center justify-between p-3 bg-muted rounded-xl">
 					<div className="flex items-center gap-2.5">
-						<div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
-							<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+						<div className="p-1.5 bg-chart-1/15 rounded-lg">
+							<Clock className="h-3.5 w-3.5 text-chart-1" />
 						</div>
 						<div>
 							<p className="text-sm font-medium">
 								{t("finance.expenses.recordObligation")}
 							</p>
-							<p className="text-[11px] text-slate-500">
+							<p className="text-[11px] text-muted-foreground">
 								{t("finance.expenses.recordObligationHint")}
 							</p>
 						</div>
@@ -680,7 +680,7 @@ export const GeneralExpenseTab = forwardRef<
 			{/* Due Date (only for obligations) */}
 			{!isEditMode && isObligation && (
 				<div className="space-y-1">
-					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+					<Label className="text-xs font-medium text-muted-foreground">
 						{t("finance.expenses.dueDate")}
 					</Label>
 					<Input
@@ -702,7 +702,7 @@ export const GeneralExpenseTab = forwardRef<
 				<CollapsibleTrigger asChild>
 					<button
 						type="button"
-						className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors w-full"
+						className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
 					>
 						<ChevronDown
 							className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`}
@@ -716,7 +716,7 @@ export const GeneralExpenseTab = forwardRef<
 						className={`grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 ${isObligation ? "opacity-60" : ""}`}
 					>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.paymentMethod")}
 							</Label>
 							<Select
@@ -742,7 +742,7 @@ export const GeneralExpenseTab = forwardRef<
 							</Select>
 						</div>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.referenceNo")}
 							</Label>
 							<Input
@@ -766,7 +766,7 @@ export const GeneralExpenseTab = forwardRef<
 					{/* Vendor Name, Tax Number, Invoice Ref */}
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.vendorName")}
 							</Label>
 							<Input
@@ -784,7 +784,7 @@ export const GeneralExpenseTab = forwardRef<
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.vendorTaxNumber")}
 							</Label>
 							<Input
@@ -803,7 +803,7 @@ export const GeneralExpenseTab = forwardRef<
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.invoiceRef")}
 							</Label>
 							<Input
@@ -828,7 +828,7 @@ export const GeneralExpenseTab = forwardRef<
 						className={`grid gap-2 sm:gap-3 ${isEditMode ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}
 					>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.additionalNotes")}
 							</Label>
 							<Textarea
@@ -850,7 +850,7 @@ export const GeneralExpenseTab = forwardRef<
 						{/* Invoice Attachment Zone */}
 						{!isEditMode && (
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("finance.expenses.attachInvoice")}
 								</Label>
 								<input
@@ -865,7 +865,7 @@ export const GeneralExpenseTab = forwardRef<
 								/>
 
 								{attachedFile ? (
-									<div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-2.5 min-h-[88px] flex items-center gap-3">
+									<div className="relative rounded-xl border-2 border-border bg-muted p-2.5 min-h-[88px] flex items-center gap-3">
 										{filePreview ? (
 											<img
 												src={filePreview}
@@ -873,15 +873,15 @@ export const GeneralExpenseTab = forwardRef<
 												className="h-16 w-16 rounded-lg object-cover shrink-0"
 											/>
 										) : (
-											<div className="h-16 w-16 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center shrink-0">
-												<FileText className="h-7 w-7 text-red-500" />
+											<div className="h-16 w-16 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
+												<FileText className="h-7 w-7 text-destructive" />
 											</div>
 										)}
 										<div className="min-w-0 flex-1">
-											<p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+											<p className="text-sm font-medium text-foreground truncate">
 												{attachedFile.name}
 											</p>
-											<p className="text-xs text-slate-400 mt-0.5">
+											<p className="text-xs text-muted-foreground mt-0.5">
 												{formatFileSize(
 													attachedFile.size,
 												)}
@@ -890,9 +890,9 @@ export const GeneralExpenseTab = forwardRef<
 										<button
 											type="button"
 											onClick={removeFile}
-											className="absolute top-1.5 end-1.5 p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+											className="absolute top-1.5 end-1.5 p-1 rounded-md hover:bg-accent transition-colors"
 										>
-											<X className="h-3.5 w-3.5 text-slate-500" />
+											<X className="h-3.5 w-3.5 text-muted-foreground" />
 										</button>
 									</div>
 								) : (
@@ -906,18 +906,18 @@ export const GeneralExpenseTab = forwardRef<
 										className={`rounded-xl border-2 border-dashed min-h-[88px] flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors ${
 											isDragging
 												? "border-primary bg-primary/5"
-												: "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/30"
+												: "border-border hover:border-primary/40 hover:bg-accent"
 										}`}
 									>
-										<div className="flex items-center gap-1.5 text-slate-400">
+										<div className="flex items-center gap-1.5 text-muted-foreground">
 											<Upload className="h-4 w-4" />
 											<ImageIcon className="h-4 w-4" />
 											<FileText className="h-4 w-4" />
 										</div>
-										<p className="text-xs text-slate-500 dark:text-slate-400">
+										<p className="text-xs text-muted-foreground">
 											{t("upload.dragOrClick")}
 										</p>
-										<p className="text-[10px] text-slate-400">
+										<p className="text-[10px] text-muted-foreground">
 											{t("upload.acceptedFormats")}
 										</p>
 									</div>

@@ -152,20 +152,20 @@ function InfoRow({
 }
 
 const CONTRIBUTION_TYPE_COLORS: Record<string, string> = {
-	INITIAL: "border-chart-4 text-chart-4 bg-chart-4/15 dark:border-chart-4 dark:text-chart-4 dark:bg-chart-4/20",
-	ADDITIONAL: "border-green-300 text-green-700 bg-green-50 dark:border-green-700 dark:text-green-300 dark:bg-green-900/30",
-	IN_KIND: "border-purple-300 text-purple-700 bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:bg-purple-900/30",
+	INITIAL: "border-chart-4/30 text-chart-4 bg-chart-4/15",
+	ADDITIONAL: "border-success/30 text-success bg-success/15",
+	IN_KIND: "border-chart-4/30 text-chart-4 bg-chart-4/15",
 };
 
 const DRAWING_TYPE_COLORS: Record<string, string> = {
-	COMPANY_LEVEL: "border-chart-4 text-chart-4 bg-chart-4/15 dark:border-chart-4 dark:text-chart-4 dark:bg-chart-4/20",
-	PROJECT_SPECIFIC: "border-purple-300 text-purple-700 bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:bg-purple-900/30",
+	COMPANY_LEVEL: "border-chart-4/30 text-chart-4 bg-chart-4/15",
+	PROJECT_SPECIFIC: "border-chart-4/30 text-chart-4 bg-chart-4/15",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-	ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-	APPROVED: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+	ACTIVE: "bg-success/15 text-success",
+	APPROVED: "bg-success/15 text-success",
+	CANCELLED: "bg-destructive/15 text-destructive",
 };
 
 const MONTH_LABELS = [
@@ -378,8 +378,8 @@ export function OwnerDetailPage({
 							}
 							className={
 								owner.isActive
-									? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-									: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+									? "bg-success/15 text-success"
+									: "bg-muted text-muted-foreground"
 							}
 						>
 							{owner.isActive ? t("active") : t("inactive")}
@@ -455,7 +455,7 @@ export function OwnerDetailPage({
 			{/* ============================================================ */}
 			<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 				{/* Card 1: Capital Contributed */}
-				<Card className="border-chart-4 dark:border-chart-4">
+				<Card className="border-chart-4/30">
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
 							<Landmark className="h-4 w-4 text-chart-4" />
@@ -465,7 +465,7 @@ export function OwnerDetailPage({
 							<Skeleton className="h-8 w-24 mt-1" />
 						) : (
 							<>
-								<div className="mt-1 text-2xl font-bold text-chart-4 dark:text-chart-4 tabular-nums">
+								<div className="mt-1 text-2xl font-bold text-chart-4 tabular-nums">
 									{formatSARPrecise(
 										capitalData?.totalContributions ?? 0,
 									)}
@@ -481,17 +481,17 @@ export function OwnerDetailPage({
 				</Card>
 
 				{/* Card 2: Profit Share YTD */}
-				<Card className="border-green-200 dark:border-green-800">
+				<Card className="border-success/30">
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<TrendingUp className="h-4 w-4 text-green-500" />
+							<TrendingUp className="h-4 w-4 text-success" />
 							{t("dashboard.profitShareYTD")}
 						</div>
 						{summaryLoading ? (
 							<Skeleton className="h-8 w-24 mt-1" />
 						) : (
 							<>
-								<div className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400 tabular-nums">
+								<div className="mt-1 text-2xl font-bold text-success tabular-nums">
 									{formatSARPrecise(
 										ownerSummary?.expectedShareOfProfit ??
 											0,
@@ -511,17 +511,17 @@ export function OwnerDetailPage({
 				</Card>
 
 				{/* Card 3: Drawings YTD */}
-				<Card className="border-red-200 dark:border-red-800">
+				<Card className="border-destructive/30">
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<TrendingDown className="h-4 w-4 text-red-500" />
+							<TrendingDown className="h-4 w-4 text-destructive" />
 							{t("dashboard.totalDrawingsYTD")}
 						</div>
 						{summaryLoading ? (
 							<Skeleton className="h-8 w-24 mt-1" />
 						) : (
 							<>
-								<div className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400 tabular-nums">
+								<div className="mt-1 text-2xl font-bold text-destructive tabular-nums">
 									{formatSARPrecise(
 										ownerSummary?.totalDrawings ?? 0,
 									)}
@@ -540,13 +540,13 @@ export function OwnerDetailPage({
 				<Card
 					className={
 						balanceIsNegative
-							? "border-red-300 dark:border-red-700"
-							: "border-emerald-200 dark:border-emerald-800"
+							? "border-destructive/30"
+							: "border-success/30"
 					}
 				>
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<Wallet className="h-4 w-4 text-emerald-500" />
+							<Wallet className="h-4 w-4 text-success" />
 							{t("dashboard.availableBalance")}
 						</div>
 						{summaryLoading ? (
@@ -556,8 +556,8 @@ export function OwnerDetailPage({
 								<div
 									className={`mt-1 text-2xl font-bold tabular-nums ${
 										balanceIsNegative
-											? "text-red-600 dark:text-red-400"
-											: "text-emerald-600 dark:text-emerald-400"
+											? "text-destructive"
+											: "text-success"
 									}`}
 								>
 									{formatSARPrecise(
@@ -566,12 +566,12 @@ export function OwnerDetailPage({
 								</div>
 								<p className="text-xs mt-0.5">
 									{balanceIsNegative ? (
-										<span className="text-red-500 flex items-center gap-1">
+										<span className="text-destructive flex items-center gap-1">
 											<AlertTriangle className="h-3 w-3" />
 											{t("dashboard.exceedsShare")}
 										</span>
 									) : (
-										<span className="text-emerald-500">
+										<span className="text-success">
 											{t("dashboard.availableForDrawing")}
 										</span>
 									)}
@@ -590,7 +590,7 @@ export function OwnerDetailPage({
 				onValueChange={setActiveTab}
 				className="space-y-4"
 			>
-				<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+				<TabsList className="rounded-xl bg-muted p-1">
 					<TabsTrigger value="summary" className="rounded-lg">
 						<BarChart3 className="h-4 w-4 me-1.5" />
 						{t("dashboard.tabs.summary")}
@@ -644,7 +644,7 @@ export function OwnerDetailPage({
 								<InfoRow
 									label={`- ${t("dashboard.totalDrawingsYTD")}`}
 									value={
-										<span className="text-red-600">
+										<span className="text-destructive">
 											{formatSARPrecise(
 												ownerSummary.totalDrawings,
 											)}
@@ -660,8 +660,8 @@ export function OwnerDetailPage({
 											<span
 												className={`font-bold ${
 													balanceIsNegative
-														? "text-red-600"
-														: "text-green-600"
+														? "text-destructive"
+														: "text-success"
 												}`}
 											>
 												{formatSARPrecise(
@@ -672,9 +672,9 @@ export function OwnerDetailPage({
 									/>
 								</div>
 								{balanceIsNegative && (
-									<div className="mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 p-2">
-										<AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-										<span className="text-xs text-amber-700 dark:text-amber-300">
+									<div className="mt-2 flex items-start gap-2 rounded-md border border-chart-1/30 bg-chart-1/15 p-2">
+										<AlertTriangle className="h-4 w-4 text-chart-1 mt-0.5 shrink-0" />
+										<span className="text-xs text-chart-1">
 											{t("dashboard.exceedsShare")}
 										</span>
 									</div>
@@ -701,20 +701,20 @@ export function OwnerDetailPage({
 										<BarChart data={chartData}>
 											<CartesianGrid
 												strokeDasharray="3 3"
-												className="stroke-slate-200 dark:stroke-slate-700"
+												className="stroke-border"
 											/>
 											<XAxis
 												dataKey="name"
 												tick={{
 													fontSize: 11,
 												}}
-												className="text-slate-500"
+												className="text-muted-foreground"
 											/>
 											<YAxis
 												tick={{
 													fontSize: 11,
 												}}
-												className="text-slate-500"
+												className="text-muted-foreground"
 											/>
 											<Tooltip
 												formatter={(
@@ -958,7 +958,7 @@ export function OwnerDetailPage({
 												),
 											)}
 											{/* Total Row */}
-											<TableRow className="border-t-2 font-semibold bg-slate-50 dark:bg-slate-800/50">
+											<TableRow className="border-t-2 font-semibold bg-muted/50">
 												<TableCell
 													colSpan={2}
 													className="text-start"
@@ -1332,7 +1332,7 @@ function EditOwnerDialog({
 						/>
 						{newTotal > 0 && (
 							<p
-								className={`text-xs mt-1 ${newTotal > 100 ? "text-red-500" : "text-muted-foreground"}`}
+								className={`text-xs mt-1 ${newTotal > 100 ? "text-destructive" : "text-muted-foreground"}`}
 							>
 								{t("totalOwnership")}: {newTotal.toFixed(2)}%
 								{newTotal > 100 && ` — ${t("ownershipExceeded")}`}

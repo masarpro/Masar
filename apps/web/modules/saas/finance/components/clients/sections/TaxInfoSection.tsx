@@ -42,7 +42,7 @@ export function TaxInfoSection({
 							className="rounded-xl mt-1"
 							dir="ltr"
 						/>
-						<p className="text-xs text-slate-500 mt-1">
+						<p className="text-xs text-muted-foreground mt-1">
 							{t("finance.clients.taxNumberHint")}
 						</p>
 					</div>
@@ -60,7 +60,7 @@ export function TaxInfoSection({
 							className="rounded-xl mt-1"
 							dir="ltr"
 						/>
-						<p className="text-xs text-slate-500 mt-1">
+						<p className="text-xs text-muted-foreground mt-1">
 							{t("finance.clients.crNumberHint")}
 						</p>
 					</div>

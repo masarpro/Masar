@@ -340,23 +340,23 @@ export function EmptySectionTable({
 			</div>
 
 			{/* Table */}
-			<div className="overflow-x-auto rounded-xl border">
+			<div className="overflow-x-auto rounded-xl border-2">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b bg-muted/50">
-							<th className="px-3 py-2.5 text-start font-medium w-10">#</th>
+						<tr className="border-b-2">
+							<th className="px-3 py-2.5 text-start text-sm font-medium text-muted-foreground w-10">#</th>
 							{columns.map((col) => (
 								<th
 									key={col.key}
 									className={cn(
-										"px-3 py-2.5 text-start font-medium",
+										"px-3 py-2.5 text-start text-sm font-medium text-muted-foreground",
 										col.width,
 									)}
 								>
 									{col.label}
 								</th>
 							))}
-							<th className="px-3 py-2.5 text-center font-medium w-20">
+							<th className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground w-20">
 								{t("pricing.pipeline.emptyTable.actions")}
 							</th>
 						</tr>
@@ -393,7 +393,7 @@ export function EmptySectionTable({
 								return (
 									<tr
 										key={item.id as string}
-										className="border-b bg-chart-4/15 dark:bg-chart-4/20"
+										className="border-b-2 bg-chart-4/15"
 									>
 										<td className="px-3 py-1.5 text-muted-foreground">
 											{idx + 1}
@@ -415,7 +415,7 @@ export function EmptySectionTable({
 													onClick={handleUpdate}
 													disabled={updateMutation.isPending}
 												>
-													<Save className="h-3.5 w-3.5 text-emerald-600" />
+													<Save className="h-3.5 w-3.5 text-success" />
 												</Button>
 												<Button
 													size="icon"
@@ -434,7 +434,7 @@ export function EmptySectionTable({
 							return (
 								<tr
 									key={item.id as string}
-									className="border-b hover:bg-accent/30 transition-colors"
+									className="border-b-2 hover:bg-accent/30 transition-colors"
 								>
 									<td className="px-3 py-2.5 text-muted-foreground">
 										{idx + 1}
@@ -469,7 +469,7 @@ export function EmptySectionTable({
 
 						{/* New item row */}
 						{showNewRow && (
-							<tr className="border-b bg-emerald-50/50 dark:bg-emerald-950/20">
+							<tr className="border-b-2 bg-success/10">
 								<td className="px-3 py-1.5 text-muted-foreground">—</td>
 								{renderEditCells(
 									sectionType,
@@ -495,7 +495,7 @@ export function EmptySectionTable({
 											{createMutation.isPending ? (
 												<Loader2 className="h-3.5 w-3.5 animate-spin" />
 											) : (
-												<Save className="h-3.5 w-3.5 text-emerald-600" />
+												<Save className="h-3.5 w-3.5 text-success" />
 											)}
 										</Button>
 										<Button

@@ -125,7 +125,7 @@ export function OpeningBalancesPage({
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h2 className="text-lg font-bold">{t("finance.accounting.openingBalances.title")}</h2>
-					<p className="text-sm text-slate-500">{t("finance.accounting.openingBalances.description")}</p>
+					<p className="text-sm text-muted-foreground">{t("finance.accounting.openingBalances.description")}</p>
 				</div>
 				<Button
 					onClick={handleSave}
@@ -139,29 +139,29 @@ export function OpeningBalancesPage({
 
 			{/* Warning if existing */}
 			{data?.entryId && (
-				<div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-					<AlertTriangle className="h-4 w-4 text-amber-600" />
-					<span className="text-sm text-amber-700 dark:text-amber-300">
+				<div className="flex items-center gap-2 p-3 bg-chart-1/10 rounded-xl border border-chart-1/30">
+					<AlertTriangle className="h-4 w-4 text-chart-1" />
+					<span className="text-sm text-chart-1">
 						{t("finance.accounting.openingBalances.existingWarning")}
 					</span>
 				</div>
 			)}
 
 			{/* Totals */}
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardContent className="p-4">
 					<div className="flex items-center justify-between gap-4">
 						<div className="text-center">
-							<p className="text-xs text-slate-500">{t("finance.accounting.totalDebit")}</p>
-							<p className="text-lg font-bold text-emerald-600">{formatAccounting(totals.totalDebit)}</p>
+							<p className="text-xs text-muted-foreground">{t("finance.accounting.totalDebit")}</p>
+							<p className="text-lg font-bold text-success">{formatAccounting(totals.totalDebit)}</p>
 						</div>
 						<div className="text-center">
-							<p className="text-xs text-slate-500">{t("finance.accounting.totalCredit")}</p>
-							<p className="text-lg font-bold text-red-600">{formatAccounting(totals.totalCredit)}</p>
+							<p className="text-xs text-muted-foreground">{t("finance.accounting.totalCredit")}</p>
+							<p className="text-lg font-bold text-destructive">{formatAccounting(totals.totalCredit)}</p>
 						</div>
 						<div className="text-center">
-							<p className="text-xs text-slate-500">{t("finance.accounting.difference")}</p>
-							<p className={`text-lg font-bold ${Math.abs(totals.difference) < 0.01 ? "text-emerald-600" : "text-red-600"}`}>
+							<p className="text-xs text-muted-foreground">{t("finance.accounting.difference")}</p>
+							<p className={`text-lg font-bold ${Math.abs(totals.difference) < 0.01 ? "text-success" : "text-destructive"}`}>
 								{formatAccounting(totals.difference)}
 							</p>
 						</div>
@@ -173,7 +173,7 @@ export function OpeningBalancesPage({
 			{groupedAccounts.map((group) => {
 				const colors = ACCOUNT_TYPE_COLORS[group.type] ?? ACCOUNT_TYPE_COLORS.ASSET;
 				return (
-					<Card key={group.type} className="rounded-2xl">
+					<Card key={group.type} className="rounded-2xl border-2 shadow-none">
 						<CardHeader className={`py-3 ${colors.bg} rounded-t-2xl`}>
 							<CardTitle className={`text-sm font-semibold ${colors.text}`}>
 								{group.label}
@@ -194,7 +194,7 @@ export function OpeningBalancesPage({
 										const current = amounts.get(acc.accountId) ?? { debit: 0, credit: 0 };
 										return (
 											<TableRow key={acc.accountId}>
-												<TableCell className="font-mono text-xs text-slate-400">{acc.code}</TableCell>
+												<TableCell className="font-mono text-xs text-muted-foreground">{acc.code}</TableCell>
 												<TableCell className="text-sm">{acc.nameAr}</TableCell>
 												<TableCell>
 													<Input

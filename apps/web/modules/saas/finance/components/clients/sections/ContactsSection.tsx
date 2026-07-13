@@ -254,8 +254,8 @@ export function ContactsSection({
 			</CardHeader>
 			<CardContent>
 				{contacts.length === 0 ? (
-					<div className="text-center py-8 text-slate-500">
-						<Users2 className="h-12 w-12 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+					<div className="text-center py-8 text-muted-foreground">
+						<Users2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
 						<p>{t("finance.clients.contacts.noContacts")}</p>
 					</div>
 				) : (
@@ -279,25 +279,25 @@ export function ContactsSection({
 									</TableCell>
 									<TableCell>
 										{contact.position || (
-											<span className="text-slate-400">-</span>
+											<span className="text-muted-foreground">-</span>
 										)}
 									</TableCell>
 									<TableCell>
 										<div className="space-y-1">
 											{contact.phone && (
-												<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Phone className="h-3 w-3" />
 													{contact.phone}
 												</div>
 											)}
 											{contact.mobile && (
-												<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Smartphone className="h-3 w-3" />
 													{contact.mobile}
 												</div>
 											)}
 											{contact.email && (
-												<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Mail className="h-3 w-3" />
 													{contact.email}
 												</div>
@@ -306,12 +306,12 @@ export function ContactsSection({
 									</TableCell>
 									<TableCell className="text-center">
 										{contact.isPrimary ? (
-											<Star className="h-5 w-5 text-yellow-500 fill-yellow-500 mx-auto" />
+											<Star className="h-5 w-5 text-chart-1 fill-chart-1 mx-auto" />
 										) : (
 											<button
 												type="button"
 												onClick={() => handleSetPrimary(index)}
-												className="text-slate-300 hover:text-yellow-500 transition-colors"
+												className="text-muted-foreground hover:text-chart-1 transition-colors"
 											>
 												<Star className="h-5 w-5 mx-auto" />
 											</button>
@@ -331,7 +331,7 @@ export function ContactsSection({
 												</DropdownMenuItem>
 												<DropdownMenuItem
 													onClick={() => handleDelete(index)}
-													className="text-red-600"
+													className="text-destructive"
 												>
 													<Trash2 className="h-4 w-4 me-2" />
 													{t("common.delete")}

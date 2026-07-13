@@ -312,23 +312,18 @@ export function ExpensesList({
 
 	const getCategoryColor = (category: string) => {
 		const colors: Record<string, string> = {
-			MATERIALS:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			LABOR: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400",
-			SALARIES:
-				"bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400",
-			RENT: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-			UTILITIES:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			FUEL: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400",
-			MAINTENANCE:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			SUBCONTRACTOR:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+			MATERIALS: "bg-chart-4/15 text-chart-4",
+			LABOR: "bg-chart-4/15 text-chart-4",
+			SALARIES: "bg-chart-4/15 text-chart-4",
+			RENT: "bg-chart-1/15 text-chart-1",
+			UTILITIES: "bg-chart-4/15 text-chart-4",
+			FUEL: "bg-chart-1/15 text-chart-1",
+			MAINTENANCE: "bg-chart-4/15 text-chart-4",
+			SUBCONTRACTOR: "bg-chart-4/15 text-chart-4",
 		};
 		return (
 			colors[category] ||
-			"bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
+			"bg-muted text-muted-foreground"
 		);
 	};
 
@@ -350,15 +345,15 @@ export function ExpensesList({
 	const getSourceTypeColor = (sourceType: string) => {
 		switch (sourceType) {
 			case "FACILITY_PAYROLL":
-				return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400";
+				return "bg-chart-4/15 text-chart-4";
 			case "FACILITY_RECURRING":
-				return "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
+				return "bg-chart-1/15 text-chart-1";
 			case "FACILITY_ASSET":
-				return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
+				return "bg-chart-4/15 text-chart-4";
 			case "PROJECT":
-				return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
+				return "bg-chart-4/15 text-chart-4";
 			default:
-				return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+				return "bg-muted text-muted-foreground";
 		}
 	};
 
@@ -381,15 +376,11 @@ export function ExpensesList({
 		const key = getPaymentStatusKey(item);
 		if (!key) return null;
 		const classes: Record<string, string> = {
-			cancelled:
-				"bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-			paid: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			overdue:
-				"bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
-			partial:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			pending:
-				"bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
+			cancelled: "bg-muted text-muted-foreground",
+			paid: "bg-chart-4/15 text-chart-4",
+			overdue: "bg-destructive/15 text-destructive",
+			partial: "bg-chart-4/15 text-chart-4",
+			pending: "bg-chart-1/15 text-chart-1",
 		};
 		return (
 			<Badge className={`rounded-lg border-0 ${classes[key]}`}>
@@ -727,8 +718,8 @@ export function ExpensesList({
 						label: t("finance.expenses.totalExpenses"),
 						value: <Currency amount={grandTotal} />,
 						icon: TrendingDown,
-						iconClassName: "text-red-600 dark:text-red-400",
-						iconBgClassName: "bg-red-100 dark:bg-red-900/50",
+						iconClassName: "text-destructive",
+						iconBgClassName: "bg-destructive/15",
 						hint: t("finance.listControls.resultsCount", {
 							count: rawItems.length,
 						}),
@@ -737,8 +728,8 @@ export function ExpensesList({
 						label: t("finance.expenses.directExpenses"),
 						value: <Currency amount={expensesTotal} />,
 						icon: Receipt,
-						iconClassName: "text-orange-600 dark:text-orange-400",
-						iconBgClassName: "bg-orange-100 dark:bg-orange-900/50",
+						iconClassName: "text-chart-1",
+						iconBgClassName: "bg-chart-1/15",
 						hint: t("finance.listControls.resultsCount", {
 							count: expenseCount,
 						}),
@@ -764,9 +755,9 @@ export function ExpensesList({
 									),
 									icon: UserIcon,
 									iconClassName:
-										"text-violet-600 dark:text-violet-400",
+										"text-chart-4",
 									iconBgClassName:
-										"bg-violet-100 dark:bg-violet-900/50",
+										"bg-chart-4/15",
 									hint: t(
 										"finance.listControls.resultsCount",
 										{ count: drawingCount },
@@ -788,7 +779,7 @@ export function ExpensesList({
 				<GlassStatCard
 					colorScheme="red"
 					icon={
-						<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+						<TrendingDown className="h-5 w-5 text-destructive" />
 					}
 					title={t("finance.expenses.totalExpenses")}
 					value={<Currency amount={grandTotal} />}
@@ -799,7 +790,7 @@ export function ExpensesList({
 				<GlassStatCard
 					colorScheme="orange"
 					icon={
-						<Receipt className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+						<Receipt className="h-5 w-5 text-chart-1" />
 					}
 					title={t("finance.expenses.directExpenses")}
 					value={<Currency amount={expensesTotal} />}
@@ -822,7 +813,7 @@ export function ExpensesList({
 					<GlassStatCard
 						colorScheme="violet"
 						icon={
-							<UserIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+							<UserIcon className="h-5 w-5 text-chart-4" />
 						}
 						title={t("finance.expenses.ownerDrawingsTotal")}
 						value={<Currency amount={ownerDrawingsTotal} />}
@@ -836,7 +827,7 @@ export function ExpensesList({
 			{/* الجوال: بحث + ورقة فلاتر + زر إضافة */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.expenses.searchPlaceholder")}
 						value={searchInput}
@@ -876,7 +867,7 @@ export function ExpensesList({
 			{/* الديسكتوب: تولبار الفلاتر */}
 			<div className="hidden flex-wrap items-center gap-2 sm:flex">
 				<div className="relative w-64">
-					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("finance.expenses.searchPlaceholder")}
 						value={searchInput}
@@ -915,19 +906,19 @@ export function ExpensesList({
 						className="w-72 space-y-3 rounded-xl"
 					>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.filterBySource")}
 							</p>
 							{sourceSelect("w-full")}
 						</div>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.listControls.filterByStatus")}
 							</p>
 							{statusSelect("w-full")}
 						</div>
 						<div className="space-y-1.5">
-							<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<p className="text-xs font-medium text-muted-foreground">
 								{t("finance.listControls.filterByAccount")}
 							</p>
 							{accountSelect("w-full")}
@@ -984,7 +975,7 @@ export function ExpensesList({
 								<div className="flex items-start justify-between gap-3">
 									<div className="min-w-0 flex-1">
 										<div className="flex flex-wrap items-center gap-1.5">
-											<span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+											<span className="font-mono text-xs text-muted-foreground">
 												{item.refNo}
 											</span>
 											{item._type ===
@@ -997,7 +988,7 @@ export function ExpensesList({
 												</Badge>
 											) : item._type ===
 												"owner_drawing" ? (
-												<Badge className="rounded-lg border-0 bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-400">
+												<Badge className="rounded-lg border-0 bg-chart-4/15 text-chart-4">
 													<UserIcon className="h-3 w-3 me-1" />
 													{t(
 														"finance.expenses.ownerDrawingBadge",
@@ -1011,12 +1002,12 @@ export function ExpensesList({
 												</Badge>
 											)}
 										</div>
-										<p className="mt-1 truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+										<p className="mt-1 truncate text-sm font-medium text-foreground">
 											{item.description ||
 												item.contractName ||
 												getCategoryLabel(item)}
 										</p>
-										<p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+										<p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
 											<Calendar className="h-3 w-3" />
 											{formatDate(new Date(item.date))}
 											{item.sourceAccount?.name && (
@@ -1033,7 +1024,7 @@ export function ExpensesList({
 										</p>
 									</div>
 									<div className="flex shrink-0 flex-col items-end gap-1">
-										<span className="font-bold tabular-nums text-red-600 dark:text-red-400">
+										<span className="font-bold tabular-nums text-destructive">
 											-<Currency amount={item.amount} />
 										</span>
 										{getPaymentStatusBadge(item)}
@@ -1112,7 +1103,7 @@ export function ExpensesList({
 																	item.id,
 																)
 															}
-															className="text-red-600"
+															className="text-destructive"
 														>
 															<Trash2 className="h-4 w-4 me-2" />
 															{t("common.delete")}
@@ -1129,12 +1120,12 @@ export function ExpensesList({
 				)}
 				{!isLoading && items.length > 0 && (
 					<div className="flex items-center justify-between px-1 pt-1 text-sm">
-						<span className="text-slate-500 dark:text-slate-400">
+						<span className="text-muted-foreground">
 							{t("finance.listControls.resultsCount", {
 								count: items.length,
 							})}
 						</span>
-						<span className="font-semibold tabular-nums text-red-600 dark:text-red-400">
+						<span className="font-semibold tabular-nums text-destructive">
 							-<Currency amount={filteredTotal} />
 						</span>
 					</div>
@@ -1249,8 +1240,8 @@ export function ExpensesList({
 												key={`${item._type}-${item.id}`}
 												className={
 													item._type === "expense"
-														? "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
-														: "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+														? "cursor-pointer hover:bg-muted/50"
+														: "hover:bg-muted/50"
 												}
 												onClick={() =>
 													item._type === "expense" &&
@@ -1268,7 +1259,7 @@ export function ExpensesList({
 													</Badge>
 												</TableCell>
 												<TableCell>
-													<div className="flex items-center gap-2 whitespace-nowrap text-slate-600 dark:text-slate-400">
+													<div className="flex items-center gap-2 whitespace-nowrap text-muted-foreground">
 														<Calendar className="h-4 w-4" />
 														{formatDate(
 															new Date(item.date),
@@ -1287,14 +1278,14 @@ export function ExpensesList({
 													) : item._type ===
 														"owner_drawing" ? (
 														<div className="flex items-center gap-1">
-															<Badge className="rounded-lg border-0 bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-400">
+															<Badge className="rounded-lg border-0 bg-chart-4/15 text-chart-4">
 																<UserIcon className="h-3 w-3 me-1" />
 																{t(
 																	"finance.expenses.ownerDrawingBadge",
 																)}
 															</Badge>
 															{item.hasOverdrawWarning && (
-																<Badge className="rounded-lg border-0 bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400">
+																<Badge className="rounded-lg border-0 bg-destructive/15 text-destructive">
 																	<AlertCircle className="h-3 w-3 me-1" />
 																	{t(
 																		"finance.expenses.overdrawBadge",
@@ -1328,7 +1319,7 @@ export function ExpensesList({
 															)}
 														</Badge>
 													) : (
-														<span className="text-slate-400">
+														<span className="text-muted-foreground">
 															-
 														</span>
 													)}
@@ -1350,7 +1341,7 @@ export function ExpensesList({
 												<TableCell>
 													{item.sourceAccount ? (
 														<div className="flex items-center gap-2">
-															<Building className="h-4 w-4 text-slate-400" />
+															<Building className="h-4 w-4 text-muted-foreground" />
 															<span className="text-sm">
 																{
 																	item
@@ -1360,7 +1351,7 @@ export function ExpensesList({
 															</span>
 														</div>
 													) : (
-														<span className="text-slate-400">
+														<span className="text-muted-foreground">
 															-
 														</span>
 													)}
@@ -1375,14 +1366,14 @@ export function ExpensesList({
 																}
 															</span>
 														) : (
-															<span className="text-slate-400">
+															<span className="text-muted-foreground">
 																-
 															</span>
 														)}
 													</TableCell>
 												)}
 												<TableCell className="text-end">
-													<span className="font-semibold tabular-nums text-red-600 dark:text-red-400">
+													<span className="font-semibold tabular-nums text-destructive">
 														-
 														<Currency
 															amount={item.amount}
@@ -1477,7 +1468,7 @@ export function ExpensesList({
 																			item.id,
 																		)
 																	}
-																	className="text-red-600"
+																	className="text-destructive"
 																>
 																	<Trash2 className="h-4 w-4 me-2" />
 																	{t(
@@ -1501,19 +1492,19 @@ export function ExpensesList({
 								</table>
 							</div>
 							{/* شريط الملخص أسفل الجدول */}
-							<div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-sm dark:border-slate-800">
-								<span className="text-slate-500 dark:text-slate-400">
+							<div className="flex items-center justify-between border-t-2 border-border px-4 py-3 text-sm">
+								<span className="text-muted-foreground">
 									{t("finance.listControls.resultsCount", {
 										count: items.length,
 									})}
 								</span>
 								<span className="flex items-center gap-2">
-									<span className="text-slate-500 dark:text-slate-400">
+									<span className="text-muted-foreground">
 										{t(
 											"finance.listControls.filteredTotal",
 										)}
 									</span>
-									<span className="font-semibold tabular-nums text-red-600 dark:text-red-400">
+									<span className="font-semibold tabular-nums text-destructive">
 										-<Currency amount={filteredTotal} />
 									</span>
 								</span>
@@ -1555,7 +1546,7 @@ export function ExpensesList({
 								deleteMutation.mutate(deleteExpenseId)
 							}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending
 								? t("common.deleting")

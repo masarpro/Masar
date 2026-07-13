@@ -108,11 +108,11 @@ export function ProjectUpdates({
 	return (
 		<div className="space-y-6">
 			{/* Draft Preview or Editor */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card p-6">
 				{!isEditing ? (
 					<>
 						<div className="mb-6 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+							<h2 className="text-lg font-semibold text-card-foreground">
 								{t("projects.updates.createAutoUpdate")}
 							</h2>
 							<Button onClick={handleGenerateDraft} className="gap-2">
@@ -123,25 +123,25 @@ export function ProjectUpdates({
 
 						{/* Auto-generated Preview */}
 						{draftData?.draft && (
-							<div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+							<div className="space-y-4 rounded-xl border-2 bg-muted/40 p-4">
 								<div className="flex items-center gap-2">
 									<Megaphone className="h-5 w-5 text-chart-4" />
-									<span className="font-medium text-slate-900 dark:text-slate-100">
+									<span className="font-medium text-card-foreground">
 										{t("projects.updates.preview")}
 									</span>
 								</div>
 
 								<div className="space-y-3">
 									<div>
-										<span className="text-sm text-slate-500">{t("projects.updates.headline")}:</span>
-										<p className="font-medium text-slate-900 dark:text-slate-100">
+										<span className="text-sm text-muted-foreground">{t("projects.updates.headline")}:</span>
+										<p className="font-medium text-card-foreground">
 											{draftData.draft.headline}
 										</p>
 									</div>
 
 									<div className="flex items-center gap-4">
 										<div>
-											<span className="text-sm text-slate-500">{t("projects.updates.progress")}:</span>
+											<span className="text-sm text-muted-foreground">{t("projects.updates.progress")}:</span>
 											<div className="flex items-center gap-2">
 												<Progress
 													value={Number(draftData.draft.progress)}
@@ -154,7 +154,7 @@ export function ProjectUpdates({
 										</div>
 										{draftData.draft.phaseLabel && (
 											<div>
-												<span className="text-sm text-slate-500">{t("projects.updates.phase")}:</span>
+												<span className="text-sm text-muted-foreground">{t("projects.updates.phase")}:</span>
 												<Badge variant="outline" className="ms-1">
 													{draftData.draft.phaseLabel}
 												</Badge>
@@ -164,21 +164,21 @@ export function ProjectUpdates({
 
 									{draftData.draft.workDoneSummary && (
 										<div>
-											<span className="text-sm text-slate-500">
+											<span className="text-sm text-muted-foreground">
 												{t("projects.updates.workDone")}:
 											</span>
-											<p className="text-slate-700 dark:text-slate-300">
+											<p className="text-foreground">
 												{draftData.draft.workDoneSummary}
 											</p>
 										</div>
 									)}
 
 									{draftData.draft.nextPayment && (
-										<div className="rounded-lg bg-indigo-50 p-3 dark:bg-indigo-950/30">
-											<span className="text-sm text-indigo-600 dark:text-indigo-400">
+										<div className="rounded-lg bg-chart-4/10 p-3">
+											<span className="text-sm text-chart-4">
 												{t("projects.updates.nextPayment")}:
 											</span>
-											<p className="font-medium text-indigo-700 dark:text-indigo-300">
+											<p className="font-medium text-chart-4">
 												{t("projects.updates.claimNo", { no: draftData.draft.nextPayment.claimNo })} -{" "}
 												{draftData.draft.nextPayment.amount.toLocaleString("en-US")}{" "}
 												{t("common.sar")}
@@ -189,14 +189,14 @@ export function ProjectUpdates({
 									{draftData.draft.photos &&
 										draftData.draft.photos.length > 0 && (
 											<div>
-												<span className="text-sm text-slate-500">
+												<span className="text-sm text-muted-foreground">
 													<ImageIcon className="mb-0.5 inline h-4 w-4" /> {t("projects.updates.attachedPhotos")} ({draftData.draft.photos.length})
 												</span>
 												<div className="mt-2 flex gap-2">
 													{draftData.draft.photos.slice(0, 4).map((photo: any) => (
 														<div
 															key={photo.id}
-															className="h-16 w-16 rounded-lg bg-slate-200 dark:bg-slate-700"
+															className="h-16 w-16 rounded-lg bg-muted"
 														/>
 													))}
 												</div>
@@ -204,7 +204,7 @@ export function ProjectUpdates({
 										)}
 								</div>
 
-								<p className="mt-4 text-xs text-slate-400">
+								<p className="mt-4 text-xs text-muted-foreground">
 									{t("projects.updates.lastReport")}:{" "}
 									{draftData.lastReportDate
 										? new Date(draftData.lastReportDate).toLocaleDateString(
@@ -218,7 +218,7 @@ export function ProjectUpdates({
 				) : (
 					<>
 						<div className="mb-6 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+							<h2 className="text-lg font-semibold text-card-foreground">
 								{t("projects.updates.editUpdate")}
 							</h2>
 							<Button
@@ -232,20 +232,20 @@ export function ProjectUpdates({
 
 						<div className="space-y-4">
 							<div>
-								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+								<label className="mb-1.5 block text-sm font-medium text-foreground">
 									{t("projects.updates.headline")}
 								</label>
 								<input
 									type="text"
 									value={headline}
 									onChange={(e) => setHeadline(e.target.value)}
-									className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+									className="w-full rounded-lg border border-input bg-card px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 									placeholder={t("projects.updates.headlinePlaceholder")}
 								/>
 							</div>
 
 							<div>
-								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+								<label className="mb-1.5 block text-sm font-medium text-foreground">
 									{t("projects.updates.workDone")}
 								</label>
 								<Textarea
@@ -257,7 +257,7 @@ export function ProjectUpdates({
 							</div>
 
 							<div>
-								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+								<label className="mb-1.5 block text-sm font-medium text-foreground">
 									{t("projects.updates.blockersOptional")}
 								</label>
 								<Textarea
@@ -269,7 +269,7 @@ export function ProjectUpdates({
 							</div>
 
 							<div>
-								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+								<label className="mb-1.5 block text-sm font-medium text-foreground">
 									{t("projects.updates.nextSteps")}
 								</label>
 								<Textarea
@@ -281,10 +281,10 @@ export function ProjectUpdates({
 							</div>
 
 							{/* Progress display */}
-							<div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+							<div className="rounded-lg bg-muted/40 p-4">
 								<div className="flex items-center gap-4">
 									<div className="flex-1">
-										<span className="text-sm text-slate-500">
+										<span className="text-sm text-muted-foreground">
 											{t("projects.updates.progressLabel")}:
 										</span>
 										<div className="mt-1 flex items-center gap-3">
@@ -322,14 +322,16 @@ export function ProjectUpdates({
 			</div>
 
 			{/* Info Card */}
-			<div className="rounded-2xl border border-chart-4 bg-chart-4/15 p-4 dark:border-chart-4 dark:bg-chart-4/20">
+			<div className="rounded-2xl border-2 bg-card p-4">
 				<div className="flex items-start gap-3">
-					<Megaphone className="mt-0.5 h-5 w-5 text-chart-4 dark:text-chart-4" />
+					<div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Megaphone className="h-5 w-5" />
+					</div>
 					<div>
-						<p className="font-medium text-chart-4 dark:text-chart-4">
+						<p className="font-medium text-card-foreground">
 							{t("projects.updates.whatIsUpdate")}
 						</p>
-						<p className="text-sm text-chart-4 dark:text-chart-4">
+						<p className="text-sm text-muted-foreground">
 							{t("projects.updates.updateExplanation")}
 						</p>
 					</div>

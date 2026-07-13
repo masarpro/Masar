@@ -22,11 +22,11 @@ import { useTranslations } from "next-intl";
 import { formatNumber } from "@shared/lib/formatters";
 
 const sourceBadgeColors: Record<string, string> = {
-	MANUAL: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-	COST_STUDY: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	IMPORTED: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
-	CONTRACT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
-	QUOTATION: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+	MANUAL: "bg-muted text-muted-foreground",
+	COST_STUDY: "bg-chart-4/15 text-chart-4",
+	IMPORTED: "bg-chart-3/15 text-chart-3",
+	CONTRACT: "bg-success/15 text-success",
+	QUOTATION: "bg-chart-1/15 text-chart-1",
 };
 
 interface BOQItem {
@@ -106,7 +106,7 @@ export function BOQItemsTable({
 	const SortHeader = ({ field, children }: { field: string; children: React.ReactNode }) => (
 		<button
 			type="button"
-			className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-100"
+			className="flex items-center gap-1 hover:text-foreground"
 			onClick={() => onSortChange(field)}
 		>
 			{children}
@@ -118,11 +118,11 @@ export function BOQItemsTable({
 
 	return (
 		<div className="space-y-3">
-			<div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+			<div className="rounded-2xl border-2 overflow-hidden">
 				<div className="overflow-x-auto">
 					<Table>
 						<TableHeader>
-							<TableRow className="bg-slate-50 dark:bg-slate-800/50">
+							<TableRow className="hover:bg-transparent">
 								<TableHead className="w-10">
 									<Checkbox
 										checked={allSelected}
@@ -154,7 +154,7 @@ export function BOQItemsTable({
 						<TableBody>
 							{items.length === 0 ? (
 								<TableRow>
-									<TableCell colSpan={12} className="text-center py-10 text-slate-400">
+									<TableCell colSpan={12} className="text-center py-10 text-muted-foreground">
 										{t("emptyState.title")}
 									</TableCell>
 								</TableRow>
@@ -170,16 +170,16 @@ export function BOQItemsTable({
 												onCheckedChange={() => toggleItem(item.id)}
 											/>
 										</TableCell>
-										<TableCell className="text-center text-slate-400 text-sm">
+										<TableCell className="text-center text-muted-foreground text-sm">
 											{offset + idx + 1}
 										</TableCell>
-										<TableCell className="text-sm font-mono text-slate-600 dark:text-slate-400">
+										<TableCell className="text-sm font-mono text-muted-foreground">
 											{item.code || "—"}
 										</TableCell>
-										<TableCell className="text-sm text-slate-900 dark:text-slate-100">
+										<TableCell className="text-sm text-card-foreground">
 											{item.description}
 										</TableCell>
-										<TableCell className="text-sm text-slate-600 dark:text-slate-400">
+										<TableCell className="text-sm text-muted-foreground">
 											{item.unit}
 										</TableCell>
 										<TableCell className="text-end text-sm font-medium">
@@ -189,14 +189,14 @@ export function BOQItemsTable({
 											{item.unitPrice != null ? (
 												formatNumber(item.unitPrice, 2)
 											) : (
-												<span className="text-amber-500 text-xs">{t("table.noPrice")}</span>
+												<span className="text-chart-1 text-xs">{t("table.noPrice")}</span>
 											)}
 										</TableCell>
 										<TableCell className="text-end text-sm font-medium">
 											{item.totalPrice != null ? (
 												formatNumber(item.totalPrice, 2)
 											) : (
-												<span className="text-slate-300">—</span>
+												<span className="text-muted-foreground">—</span>
 											)}
 										</TableCell>
 										<TableCell>
@@ -209,7 +209,7 @@ export function BOQItemsTable({
 												{t(`source.${item.sourceType as "MANUAL" | "COST_STUDY" | "IMPORTED" | "CONTRACT" | "QUOTATION"}`)}
 											</Badge>
 										</TableCell>
-										<TableCell className="text-xs text-slate-500">
+										<TableCell className="text-xs text-muted-foreground">
 											{item.projectPhase?.title ?? "—"}
 										</TableCell>
 										<TableCell>
@@ -226,7 +226,7 @@ export function BOQItemsTable({
 													</DropdownMenuItem>
 													<DropdownMenuItem
 														onClick={() => onDelete(item)}
-														className="text-red-600 dark:text-red-400"
+														className="text-destructive"
 													>
 														<Trash2 className="h-4 w-4 me-2" />
 														{tCommon("delete")}
@@ -243,11 +243,11 @@ export function BOQItemsTable({
 
 				{/* Footer: Total + Pagination */}
 				{items.length > 0 && (
-					<div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div className="flex items-center justify-between border-t-2 bg-muted px-4 py-3">
+						<div className="text-sm font-semibold text-foreground">
 							{t("table.total")}: {formatNumber(visibleTotal, 2)} {tCommon("sar")}
 						</div>
-						<div className="flex items-center gap-2 text-sm text-slate-500">
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
 							<span>{currentPage} / {totalPages}</span>
 							<Button
 								variant="outline"

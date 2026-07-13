@@ -93,7 +93,7 @@ export function GlobalMarkupControl({
 		<Card className="space-y-3 p-4">
 			<div className="flex items-center justify-between">
 				<Label className="text-sm font-semibold">نسبة الربح العامة</Label>
-				<span className="text-2xl font-bold tabular-nums text-violet-700 dark:text-violet-300">
+				<span className="text-2xl font-bold tabular-nums text-chart-4">
 					{local.toFixed(0)}%
 				</span>
 			</div>
@@ -114,7 +114,7 @@ export function GlobalMarkupControl({
 			</div>
 
 			{customMarkupCount > 0 && (
-				<div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+				<div className="flex items-start gap-2 rounded-lg bg-chart-1/15 p-3 text-xs text-chart-1">
 					<AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
 					<div className="flex-1">
 						<p className="font-medium">

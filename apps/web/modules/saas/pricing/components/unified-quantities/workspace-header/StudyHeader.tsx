@@ -63,7 +63,7 @@ export function StudyHeader({
 					<Button
 						onClick={onGenerateQuote}
 						size="lg"
-						className="bg-emerald-600 hover:bg-emerald-700"
+						className="bg-success text-white hover:bg-success/90"
 						disabled={items.length === 0}
 					>
 						<FileText className="me-2 h-5 w-5" />

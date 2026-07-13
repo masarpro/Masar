@@ -59,8 +59,8 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 	return (
 		<div className="space-y-4">
 			{/* Client Info */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
 					<div className="h-[30px] w-[30px] rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
 						<User className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
@@ -89,10 +89,10 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 			</div>
 
 			{/* Project Info */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
-					<div className="h-[30px] w-[30px] rounded-lg bg-violet-50 dark:bg-violet-950/30 flex items-center justify-center">
-						<FolderKanban className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
+					<div className="h-[30px] w-[30px] rounded-lg bg-chart-4/15 flex items-center justify-center">
+						<FolderKanban className="h-4 w-4 text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.form.projectInfo")}
@@ -127,10 +127,10 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 			</div>
 
 			{/* Management Info */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
-					<div className="h-[30px] w-[30px] rounded-lg bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center">
-						<Settings className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
+					<div className="h-[30px] w-[30px] rounded-lg bg-muted flex items-center justify-center">
+						<Settings className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.managementInfo")}
@@ -168,16 +168,16 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 					</div>
 
 					{lead.notes && (
-						<div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+						<div className="pt-2 border-t-2">
 							<p className="text-xs text-muted-foreground mb-1">{t("pricing.leads.form.notes")}</p>
 							<p className="text-sm text-foreground whitespace-pre-wrap">{lead.notes}</p>
 						</div>
 					)}
 
 					{lead.lostReason && (
-						<div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+						<div className="pt-2 border-t-2">
 							<p className="text-xs text-muted-foreground mb-1">{t("pricing.leads.detail.lostReason")}</p>
-							<p className="text-sm text-red-600 dark:text-red-400 whitespace-pre-wrap">{lead.lostReason}</p>
+							<p className="text-sm text-destructive whitespace-pre-wrap">{lead.lostReason}</p>
 						</div>
 					)}
 				</div>

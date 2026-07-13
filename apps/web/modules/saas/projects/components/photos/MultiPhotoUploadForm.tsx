@@ -389,17 +389,17 @@ export function MultiPhotoUploadForm({
 						variant="ghost"
 						size="icon"
 						asChild
-						className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+						className="shrink-0 rounded-xl hover:bg-accent"
 					>
 						<Link href={returnTo ?? defaultReturnTo}>
 							<ChevronRight className="h-5 w-5" />
 						</Link>
 					</Button>
 					<div>
-						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+						<h1 className="text-2xl font-semibold text-foreground">
 							{t("projects.photos.uploadButton")}
 						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("projects.photos.uploadHint")}
 						</p>
 					</div>
@@ -408,7 +408,7 @@ export function MultiPhotoUploadForm({
 
 			<form onSubmit={handleSubmit} className="space-y-6">
 				{/* Batch settings: date + category + milestone */}
-				<div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 rounded-2xl border-2 bg-card p-5 sm:grid-cols-2 lg:grid-cols-3">
 					<div className="space-y-2">
 						<Label>{t("projects.photos.photoDate")}</Label>
 						<Input
@@ -465,21 +465,21 @@ export function MultiPhotoUploadForm({
 					className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
 						isDragActive
 							? "border-primary bg-primary/5"
-							: "border-slate-300 bg-slate-50 hover:border-primary/50 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-primary/50 dark:hover:bg-slate-800/50"
+							: "border-input bg-card hover:border-primary/50 hover:bg-accent"
 					}`}
 				>
 					<input {...getInputProps()} />
 					<div className="flex flex-col items-center gap-3">
-						<div className="rounded-2xl bg-slate-200 p-3 dark:bg-slate-700">
-							<Upload className="h-6 w-6 text-slate-500 dark:text-slate-400" />
+						<div className="rounded-2xl bg-muted p-3">
+							<Upload className="h-6 w-6 text-muted-foreground" />
 						</div>
 						<div>
-							<p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<p className="text-sm font-medium text-foreground">
 								{isDragActive
 									? t("projects.documents.dropHere")
 									: t("projects.photos.dragDropMedia")}
 							</p>
-							<p className="mt-1 text-xs text-slate-500">
+							<p className="mt-1 text-xs text-muted-foreground">
 								{t("projects.photos.acceptedTypes")}
 							</p>
 						</div>
@@ -490,10 +490,10 @@ export function MultiPhotoUploadForm({
 				{items.length > 0 && (
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
-							<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+							<h3 className="text-sm font-semibold text-foreground">
 								{t("projects.photos.queueTitle", { count: items.length })}
 							</h3>
-							<span className="text-xs text-slate-500">
+							<span className="text-xs text-muted-foreground">
 								{t("projects.photos.readyCount", {
 									ready: uploadedReady,
 									total: items.length,
@@ -504,9 +504,9 @@ export function MultiPhotoUploadForm({
 							{items.map((item) => (
 								<div
 									key={item.id}
-									className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+									className="flex gap-3 rounded-xl border-2 bg-card p-3"
 								>
-									<div className="relative size-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
+									<div className="relative size-24 shrink-0 overflow-hidden rounded-lg bg-muted">
 										{item.mediaType === "VIDEO" ? (
 											<>
 												<video
@@ -518,7 +518,7 @@ export function MultiPhotoUploadForm({
 												/>
 												<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
 													<div className="rounded-full bg-white/90 p-1.5">
-														<Play className="size-4 fill-current text-slate-800" />
+														<Play className="size-4 fill-current text-black" />
 													</div>
 												</div>
 											</>
@@ -530,7 +530,7 @@ export function MultiPhotoUploadForm({
 											/>
 										)}
 										{item.status === "saved" && (
-											<div className="absolute inset-0 flex items-center justify-center bg-green-500/70">
+											<div className="absolute inset-0 flex items-center justify-center bg-success/70">
 												<CheckCircle className="size-8 text-white" />
 											</div>
 										)}
@@ -538,10 +538,10 @@ export function MultiPhotoUploadForm({
 									<div className="flex min-w-0 flex-1 flex-col gap-2">
 										<div className="flex items-start justify-between gap-2">
 											<div className="min-w-0 flex-1">
-												<p className="truncate text-xs font-medium text-slate-700 dark:text-slate-300">
+												<p className="truncate text-xs font-medium text-foreground">
 													{item.file.name}
 												</p>
-												<p className="text-[11px] text-slate-400">
+												<p className="text-[11px] text-muted-foreground">
 													{formatFileSize(item.file.size)}
 												</p>
 											</div>
@@ -549,7 +549,7 @@ export function MultiPhotoUploadForm({
 												type="button"
 												variant="ghost"
 												size="icon"
-												className="size-7 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
+												className="size-7 shrink-0 rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
 												onClick={() => removeItem(item.id)}
 												disabled={submitting}
 											>
@@ -583,31 +583,31 @@ export function MultiPhotoUploadForm({
 														value={item.progress}
 														className="h-1.5 flex-1"
 													/>
-													<span className="text-slate-500">
+													<span className="text-muted-foreground">
 														{item.progress}%
 													</span>
 												</>
 											)}
 											{item.status === "uploaded" && (
 												<>
-													<CheckCircle className="size-3 text-green-600" />
-													<span className="text-green-600">
+													<CheckCircle className="size-3 text-success" />
+													<span className="text-success">
 														{t("projects.photos.uploadedReady")}
 													</span>
 												</>
 											)}
 											{item.status === "saved" && (
 												<>
-													<CheckCircle className="size-3 text-green-600" />
-													<span className="text-green-600">
+													<CheckCircle className="size-3 text-success" />
+													<span className="text-success">
 														{t("projects.photos.saved")}
 													</span>
 												</>
 											)}
 											{item.status === "error" && (
 												<>
-													<AlertCircle className="size-3 text-red-500" />
-													<span className="flex-1 truncate text-red-500">
+													<AlertCircle className="size-3 text-destructive" />
+													<span className="flex-1 truncate text-destructive">
 														{item.errorMessage}
 													</span>
 													<Button

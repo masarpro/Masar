@@ -53,10 +53,10 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 			icon: TrendingDown,
 			browsePath: `${basePath}/expenses`,
 			createPath: `${basePath}/expenses/new`,
-			iconColor: "text-rose-500 dark:text-rose-400",
-			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
-			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
-			borderColor: "border-rose-200/50 dark:border-rose-800/50",
+			iconColor: "text-destructive",
+			bgColor: "bg-destructive/15",
+			hoverBg: "hover:bg-destructive/15",
+			borderColor: "border-destructive/30",
 		},
 		{
 			id: "payments",
@@ -88,7 +88,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 								className="flex min-w-0 flex-1 items-center gap-3"
 							>
 								<div
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor}`}
+									className={`shrink-0 rounded-lg bg-card p-2 ${section.iconColor}`}
 								>
 									<Icon className="h-5 w-5" />
 								</div>
@@ -105,7 +105,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 											? setExpenseDialogOpen(true)
 											: setPaymentDialogOpen(true)
 									}
-									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card/60 ${section.iconColor}`}
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card ${section.iconColor}`}
 								>
 									<Plus className="h-4 w-4" />
 								</button>
@@ -113,7 +113,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 								<Link
 									href={section.createPath}
 									aria-label={t(`finance.dashboard.nav.${section.id}New`)}
-									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card/60 ${section.iconColor}`}
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card ${section.iconColor}`}
 								>
 									<Plus className="h-4 w-4" />
 								</Link>
@@ -132,7 +132,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 					return (
 						<div
 							key={section.id}
-							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
+							className="bg-card border-2 rounded-2xl overflow-hidden transition-colors"
 						>
 							{/* Browse Section (Top) */}
 							<Link
@@ -140,7 +140,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 								className={`flex flex-col items-center gap-2 p-4 ${section.bgColor} ${section.hoverBg} transition-colors border-b ${section.borderColor}`}
 							>
 								<div
-									className={`p-3 rounded-xl bg-card/60 ${section.iconColor}`}
+									className={`p-3 rounded-xl bg-card ${section.iconColor}`}
 								>
 									<Icon className="h-6 w-6" />
 								</div>
@@ -158,7 +158,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 											? setExpenseDialogOpen(true)
 											: setPaymentDialogOpen(true)
 									}
-									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+									className="flex w-full items-center justify-center gap-2 p-3 bg-card hover:bg-accent transition-colors"
 								>
 									<Plus className={`h-4 w-4 ${section.iconColor}`} />
 									<span className={`text-xs font-medium ${section.iconColor}`}>
@@ -168,7 +168,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 							) : (
 								<Link
 									href={section.createPath}
-									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+									className="flex items-center justify-center gap-2 p-3 bg-card hover:bg-accent transition-colors"
 								>
 									<Plus className={`h-4 w-4 ${section.iconColor}`} />
 									<span className={`text-xs font-medium ${section.iconColor}`}>

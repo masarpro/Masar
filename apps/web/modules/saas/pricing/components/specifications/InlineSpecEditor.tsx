@@ -414,30 +414,30 @@ export function InlineSpecEditor({
 
 			{/* Floor/Room Overrides Summary */}
 			{floorOverrides.length > 0 && (
-				<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 overflow-hidden">
-					<div className="flex items-center gap-2 px-4 py-2.5 bg-amber-100/50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800">
-						<AlertTriangle className="h-4 w-4 text-amber-600" />
-						<span className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+				<div className="rounded-lg border border-chart-1/30 bg-chart-1/10 overflow-hidden">
+					<div className="flex items-center gap-2 px-4 py-2.5 bg-chart-1/15 border-b border-chart-1/30">
+						<AlertTriangle className="h-4 w-4 text-chart-1" />
+						<span className="text-sm font-semibold text-chart-1">
 							تخصيصات خاصة
 						</span>
 						<Badge variant="secondary" className="text-xs h-5 px-2 rounded-full">
 							{floorOverrides.length}
 						</Badge>
 					</div>
-					<div className="px-4 py-2 text-xs text-amber-700 dark:text-amber-400">
+					<div className="px-4 py-2 text-xs text-chart-1">
 						التخصيصات التالية تختلف عن الإعداد الافتراضي:
 					</div>
-					<div className="divide-y divide-amber-200/50 dark:divide-amber-800/50">
+					<div className="divide-y divide-chart-1/20">
 						{floorOverrides.map((ov) => (
 							<div
 								key={ov.itemKey}
-								className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-amber-100/30 dark:hover:bg-amber-900/10 cursor-pointer"
+								className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-chart-1/10 cursor-pointer"
 								onClick={() => setExpandedRow(ov.itemKey)}
 							>
 								<span className="font-medium">{ov.itemName}</span>
 								<span className="text-xs text-muted-foreground">({ov.floorName})</span>
 								<span className="text-xs text-muted-foreground mx-1">—</span>
-								<Badge variant="outline" className="text-xs h-5 rounded-full border-amber-300 dark:border-amber-700">
+								<Badge variant="outline" className="text-xs h-5 rounded-full border-chart-1/40">
 									{ov.currentSpec}
 								</Badge>
 								<span className="text-xs text-muted-foreground">
@@ -538,7 +538,7 @@ function SpecRow({
 				{/* Status */}
 				<div className="flex justify-center">
 					{hasSpec ? (
-						<CheckCircle2 className="h-4 w-4 text-emerald-500" />
+						<CheckCircle2 className="h-4 w-4 text-success" />
 					) : (
 						<Circle className="h-4 w-4 text-muted-foreground/30" />
 					)}

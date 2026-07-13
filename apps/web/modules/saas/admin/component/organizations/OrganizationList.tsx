@@ -280,7 +280,7 @@ export function OrganizationList() {
 							{plan}
 						</Badge>
 						{isFreeOverride && (
-							<CrownIcon className="size-3 text-amber-500" />
+							<CrownIcon className="size-3 text-chart-1" />
 						)}
 					</div>
 				),

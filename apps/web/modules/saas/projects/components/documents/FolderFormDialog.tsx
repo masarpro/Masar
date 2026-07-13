@@ -134,7 +134,7 @@ export function FolderFormDialog({
 										"h-8 w-8 rounded-full transition-transform",
 										c.swatch,
 										color === c.key
-											? "ring-2 ring-offset-2 ring-primary scale-110 dark:ring-offset-slate-900"
+											? "ring-2 ring-offset-2 ring-primary scale-110 ring-offset-background"
 											: "hover:scale-105",
 									)}
 								/>

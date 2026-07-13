@@ -85,17 +85,17 @@ export function ProjectTemplates({
 						variant="ghost"
 						size="icon"
 						asChild
-						className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+						className="rounded-xl hover:bg-accent hover:text-accent-foreground"
 					>
 						<Link href={basePath}>
-							<ChevronLeft className="h-5 w-5 text-slate-500" />
+							<ChevronLeft className="rtl-flip h-5 w-5 text-muted-foreground" />
 						</Link>
 					</Button>
 					<div>
-						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+						<h1 className="text-2xl font-semibold text-foreground">
 							{t("projects.templates.title")}
 						</h1>
-						<p className="text-sm text-slate-500">
+						<p className="text-sm text-muted-foreground">
 							{t("projects.templates.descriptionFull")}
 						</p>
 					</div>
@@ -125,13 +125,13 @@ export function ProjectTemplates({
 
 			{/* Create Form */}
 			{showCreateForm && (
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+				<div className="rounded-2xl border-2 bg-card p-6">
+					<h2 className="mb-4 text-lg font-semibold text-card-foreground">
 						{t("projects.templates.createTemplate")}
 					</h2>
 					<div className="space-y-4">
 						<div>
-							<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+							<label className="mb-1.5 block text-sm font-medium text-foreground">
 								{t("projects.templates.templateName")}
 							</label>
 							<Input
@@ -141,7 +141,7 @@ export function ProjectTemplates({
 							/>
 						</div>
 						<div>
-							<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+							<label className="mb-1.5 block text-sm font-medium text-foreground">
 								{t("projects.templates.descriptionOptional")}
 							</label>
 							<Input
@@ -169,36 +169,36 @@ export function ProjectTemplates({
 			)}
 
 			{/* Templates List */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card p-6">
 				{data?.templates && data.templates.length > 0 ? (
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{data.templates.map((template: any) => (
 							<div
 								key={template.id}
-								className="group rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50"
+								className="group rounded-xl border-2 bg-muted/40 p-4 transition-colors hover:border-primary/30"
 							>
 								<div className="mb-3 flex items-start justify-between">
-									<div className="rounded-xl bg-primary/10 p-2.5">
-										<Layout className="h-5 w-5 text-primary" />
+									<div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+										<Layout className="h-5 w-5" />
 									</div>
 									<Badge variant="outline" className="text-xs">
 										{template.itemsCount} {t("projects.templates.items")}
 									</Badge>
 								</div>
-								<h3 className="mb-1 font-medium text-slate-900 dark:text-slate-100">
+								<h3 className="mb-1 font-medium text-card-foreground">
 									{template.name}
 								</h3>
 								{template.description && (
-									<p className="mb-3 text-sm text-slate-500 line-clamp-2">
+									<p className="mb-3 text-sm text-muted-foreground line-clamp-2">
 										{template.description}
 									</p>
 								)}
 								{template.sourceProject && (
-									<p className="text-xs text-slate-400">
+									<p className="text-xs text-muted-foreground">
 										{t("projects.templates.fromProject")}: {template.sourceProject.name}
 									</p>
 								)}
-								<p className="mt-2 text-xs text-slate-400">
+								<p className="mt-2 text-xs text-muted-foreground">
 									{t("projects.templates.createdBy")}: {template.createdBy.name}
 								</p>
 							</div>
@@ -206,13 +206,13 @@ export function ProjectTemplates({
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-							<FileStack className="h-10 w-10 text-slate-400" />
+						<div className="mb-4 rounded-2xl bg-muted p-4">
+							<FileStack className="h-10 w-10 text-muted-foreground" />
 						</div>
-						<h3 className="mb-1 font-medium text-slate-900 dark:text-slate-100">
+						<h3 className="mb-1 font-medium text-card-foreground">
 							{t("projects.templates.noTemplates")}
 						</h3>
-						<p className="mb-4 text-sm text-slate-500">
+						<p className="mb-4 text-sm text-muted-foreground">
 							{t("projects.templates.createFirstDescription")}
 						</p>
 						<Button
@@ -228,14 +228,16 @@ export function ProjectTemplates({
 			</div>
 
 			{/* Info Card */}
-			<div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-950/30">
+			<div className="rounded-2xl border-2 bg-card p-4">
 				<div className="flex items-start gap-3">
-					<Layout className="mt-0.5 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+					<div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Layout className="h-5 w-5" />
+					</div>
 					<div>
-						<p className="font-medium text-indigo-800 dark:text-indigo-200">
+						<p className="font-medium text-card-foreground">
 							{t("projects.templates.whatIsTemplate")}
 						</p>
-						<p className="text-sm text-indigo-700 dark:text-indigo-300">
+						<p className="text-sm text-muted-foreground">
 							{t("projects.templates.templateExplanation")}
 						</p>
 					</div>

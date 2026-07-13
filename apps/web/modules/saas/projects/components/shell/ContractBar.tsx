@@ -20,9 +20,9 @@ interface ContractBarProps {
 }
 
 function getProgressColor(percent: number, isOverdue: boolean): string {
-	if (isOverdue) return "rgb(220, 38, 38)"; // red-600
-	if (percent >= 90) return "rgb(239, 68, 68)"; // red-500
-	if (percent >= 70) return "rgb(245, 158, 11)"; // amber-500
+	if (isOverdue) return "var(--destructive)";
+	if (percent >= 90) return "var(--destructive)";
+	if (percent >= 70) return "var(--chart-1)";
 	return "var(--primary)";
 }
 
@@ -97,7 +97,7 @@ function ContractBarInner({
 	return (
 		<Link
 			href={contractHref}
-			className="group block rounded-lg border border-border/50 bg-card/50 px-4 py-2.5 transition-colors hover:bg-accent/50"
+			className="group block rounded-lg border border-border/50 bg-card px-4 py-2.5 transition-colors hover:bg-accent/50"
 			dir="rtl"
 		>
 			{/* Desktop layout */}
@@ -164,7 +164,7 @@ function ContractBarInner({
 
 						<div className="flex items-center gap-1.5 text-sm shrink-0">
 							{isOverdue ? (
-								<span className="font-medium text-red-600 dark:text-red-400">
+								<span className="font-medium text-destructive">
 									{t("projects.contractBar.daysOverdue", { days: Math.abs(remainingDays) })}
 								</span>
 							) : (
@@ -197,7 +197,7 @@ function ContractBarInner({
 					<div className="flex items-center gap-2 text-xs shrink-0">
 						{hasDates && totalDays > 0 && (
 							isOverdue ? (
-								<span className="font-medium text-red-600 dark:text-red-400">
+								<span className="font-medium text-destructive">
 									{t("projects.contractBar.daysOverdue", { days: Math.abs(remainingDays) })}
 								</span>
 							) : (

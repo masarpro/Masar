@@ -44,9 +44,9 @@ export function SpecificationsSection({ item, catalogEntry }: Props) {
 	};
 
 	return (
-		<Card className="border-amber-200 bg-amber-50/40 p-4 dark:border-amber-900 dark:bg-amber-950/20">
+		<Card className="border-2 border-chart-1/30 bg-card p-4">
 			<div className="space-y-4">
-				<h4 className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+				<h4 className="text-sm font-semibold text-chart-1">
 					📝 المواصفات
 				</h4>
 

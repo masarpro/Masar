@@ -44,8 +44,8 @@ export function StudyPageShell({
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
 				<div className="relative mb-6">
-					<div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-full blur-2xl" />
-					<div className="relative p-6 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-muted-foreground/10">
+					<div className="absolute inset-0 bg-muted/40 rounded-full" />
+					<div className="relative p-6 rounded-2xl bg-muted border-2">
 						<Calculator className="h-16 w-16 text-muted-foreground" />
 					</div>
 				</div>

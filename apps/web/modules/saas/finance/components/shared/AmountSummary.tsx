@@ -28,9 +28,9 @@ export function AmountSummary({
 	const taxableAmount = subtotal - discountAmount;
 
 	return (
-		<div className="w-full max-w-sm space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+		<div className="w-full max-w-sm space-y-2 p-4 rounded-2xl bg-muted/50">
 			<div className="flex justify-between text-sm">
-				<span className="text-slate-600 dark:text-slate-400">
+				<span className="text-muted-foreground">
 					{t("finance.summary.subtotal")}
 				</span>
 				<span className="font-medium"><Currency amount={subtotal} /></span>
@@ -38,10 +38,10 @@ export function AmountSummary({
 
 			{discountPercent > 0 && (
 				<div className="flex justify-between text-sm">
-					<span className="text-slate-600 dark:text-slate-400">
+					<span className="text-muted-foreground">
 						{t("finance.summary.discount")} ({discountPercent}%)
 					</span>
-					<span className="font-medium text-red-600">
+					<span className="font-medium text-destructive">
 						<Currency amount={-Math.abs(discountAmount)} />
 					</span>
 				</div>
@@ -49,7 +49,7 @@ export function AmountSummary({
 
 			{discountPercent > 0 && (
 				<div className="flex justify-between text-sm">
-					<span className="text-slate-600 dark:text-slate-400">
+					<span className="text-muted-foreground">
 						{t("finance.summary.taxableAmount")}
 					</span>
 					<span className="font-medium"><Currency amount={taxableAmount} /></span>
@@ -57,15 +57,15 @@ export function AmountSummary({
 			)}
 
 			<div className="flex justify-between text-sm">
-				<span className="text-slate-600 dark:text-slate-400">
+				<span className="text-muted-foreground">
 					{t("finance.summary.vat")} ({vatPercent}%)
 				</span>
 				<span className="font-medium"><Currency amount={vatAmount} /></span>
 			</div>
 
-			<div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
+			<div className="border-t border-border pt-2 mt-2">
 				<div className="flex justify-between">
-					<span className="font-bold text-lg text-slate-900 dark:text-slate-100">
+					<span className="font-bold text-lg text-foreground">
 						{t("finance.summary.total")}
 					</span>
 					<span className="font-bold text-lg text-primary">
@@ -76,7 +76,7 @@ export function AmountSummary({
 
 			{paidAmount != null && paidAmount > 0 && (
 				<>
-					<div className="flex justify-between text-sm text-green-600 dark:text-green-400 pt-1">
+					<div className="flex justify-between text-sm text-success pt-1">
 						<span>{t("finance.summary.paidAmount")}</span>
 						<span>-<Currency amount={paidAmount} /></span>
 					</div>
@@ -84,8 +84,8 @@ export function AmountSummary({
 						<span
 							className={
 								(remainingAmount ?? 0) > 0
-									? "text-red-600 dark:text-red-400"
-									: "text-green-600 dark:text-green-400"
+									? "text-destructive"
+									: "text-success"
 							}
 						>
 							{t("finance.summary.remainingAmount")}
@@ -93,8 +93,8 @@ export function AmountSummary({
 						<span
 							className={
 								(remainingAmount ?? 0) > 0
-									? "text-red-600 dark:text-red-400"
-									: "text-green-600 dark:text-green-400"
+									? "text-destructive"
+									: "text-success"
 							}
 						>
 							<Currency amount={remainingAmount ?? 0} />

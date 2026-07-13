@@ -198,10 +198,10 @@ export function TransferForm({
 											{account.accountType === "BANK" ? (
 												<Building className="h-4 w-4 text-chart-4" />
 											) : (
-												<Wallet className="h-4 w-4 text-green-500" />
+												<Wallet className="h-4 w-4 text-success" />
 											)}
 											<span>{account.name}</span>
-											<span className="text-slate-400">
+											<span className="text-muted-foreground">
 												(<Currency amount={Number(account.balance)} />)
 											</span>
 										</div>
@@ -211,28 +211,28 @@ export function TransferForm({
 					</Select>
 
 					{fromAccount && (
-						<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+						<div className="p-4 bg-destructive/5 rounded-xl border-2 border-destructive/20">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{fromAccount.accountType === "BANK" ? (
 										<Building className="h-5 w-5 text-chart-4" />
 									) : (
-										<Wallet className="h-5 w-5 text-green-500" />
+										<Wallet className="h-5 w-5 text-success" />
 									)}
 									<div>
 										<p className="font-medium">{fromAccount.name}</p>
 										{fromAccount.bankName && (
-											<p className="text-sm text-slate-500">{fromAccount.bankName}</p>
+											<p className="text-sm text-muted-foreground">{fromAccount.bankName}</p>
 										)}
 									</div>
 								</div>
 								<div className="text-end">
-									<p className="text-sm text-slate-500">{t("finance.banks.currentBalance")}</p>
-									<p className="font-semibold text-red-600">
+									<p className="text-sm text-muted-foreground">{t("finance.banks.currentBalance")}</p>
+									<p className="font-semibold text-destructive">
 										<Currency amount={Number(fromAccount.balance)} />
 									</p>
 									{formData.amount && (
-										<p className="text-xs text-slate-500">
+										<p className="text-xs text-muted-foreground">
 											{t("finance.transfers.afterTransfer")}:{" "}
 											<Currency amount={Number(fromAccount.balance) - parseFloat(formData.amount || "0")} />
 										</p>
@@ -275,10 +275,10 @@ export function TransferForm({
 											{account.accountType === "BANK" ? (
 												<Building className="h-4 w-4 text-chart-4" />
 											) : (
-												<Wallet className="h-4 w-4 text-green-500" />
+												<Wallet className="h-4 w-4 text-success" />
 											)}
 											<span>{account.name}</span>
-											<span className="text-slate-400">
+											<span className="text-muted-foreground">
 												(<Currency amount={Number(account.balance)} />)
 											</span>
 										</div>
@@ -288,28 +288,28 @@ export function TransferForm({
 					</Select>
 
 					{toAccount && (
-						<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+						<div className="p-4 bg-success/5 rounded-xl border-2 border-success/20">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{toAccount.accountType === "BANK" ? (
 										<Building className="h-5 w-5 text-chart-4" />
 									) : (
-										<Wallet className="h-5 w-5 text-green-500" />
+										<Wallet className="h-5 w-5 text-success" />
 									)}
 									<div>
 										<p className="font-medium">{toAccount.name}</p>
 										{toAccount.bankName && (
-											<p className="text-sm text-slate-500">{toAccount.bankName}</p>
+											<p className="text-sm text-muted-foreground">{toAccount.bankName}</p>
 										)}
 									</div>
 								</div>
 								<div className="text-end">
-									<p className="text-sm text-slate-500">{t("finance.banks.currentBalance")}</p>
-									<p className="font-semibold text-green-600">
+									<p className="text-sm text-muted-foreground">{t("finance.banks.currentBalance")}</p>
+									<p className="font-semibold text-success">
 										<Currency amount={Number(toAccount.balance)} />
 									</p>
 									{formData.amount && (
-										<p className="text-xs text-slate-500">
+										<p className="text-xs text-muted-foreground">
 											{t("finance.transfers.afterTransfer")}:{" "}
 											<Currency amount={Number(toAccount.balance) + parseFloat(formData.amount || "0")} />
 										</p>

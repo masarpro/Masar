@@ -52,14 +52,14 @@ export function ItemCardHeader({
 						<span
 							className={
 								isProfit
-									? "text-emerald-700 dark:text-emerald-400"
-									: "text-red-700 dark:text-red-400"
+									? "text-success"
+									: "text-destructive"
 							}
 						>
 							{fmt(item.sellTotalAmount)} ر.س بيع
 						</span>
 						{item.hasCustomMarkup && (
-							<span className="ms-2 text-amber-600 dark:text-amber-400">
+							<span className="ms-2 text-chart-1">
 								★ مخصّص
 							</span>
 						)}

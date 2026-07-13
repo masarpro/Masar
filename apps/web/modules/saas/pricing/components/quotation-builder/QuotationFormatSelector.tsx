@@ -59,9 +59,9 @@ export function QuotationFormatSelector({
 							type="button"
 							onClick={() => onChange(fmt.value)}
 							className={cn(
-								"flex flex-col items-center gap-3 rounded-xl border-2 p-5 text-center transition-all hover:shadow-sm",
+								"flex flex-col items-center gap-3 rounded-xl border-2 p-5 text-center transition-all",
 								isSelected
-									? "border-primary bg-primary/5 shadow-sm"
+									? "border-primary bg-primary/5"
 									: "border-border hover:border-muted-foreground/30",
 							)}
 						>

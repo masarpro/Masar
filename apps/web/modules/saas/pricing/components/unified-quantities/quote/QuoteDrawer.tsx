@@ -139,7 +139,7 @@ export function QuoteDrawer({
 					</Button>
 					<Button
 						onClick={handlePrint}
-						className="bg-emerald-600 hover:bg-emerald-700"
+						className="bg-success text-white hover:bg-success/90"
 					>
 						<Download className="me-2 h-4 w-4" />
 						توليد PDF (طباعة)

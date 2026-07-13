@@ -380,8 +380,8 @@ export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
 
 /** Glassmorphism shared CSS classes */
 export const GLASS_CLASSES = {
-	bar: "bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg",
-	barHover: "hover:bg-white/80 dark:hover:bg-slate-900/70",
+	bar: "bg-card border-2 border-border",
+	barHover: "hover:bg-accent",
 } as const;
 
 /**

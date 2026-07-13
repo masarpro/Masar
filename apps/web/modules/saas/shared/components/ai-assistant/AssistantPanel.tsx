@@ -318,7 +318,7 @@ export function AssistantPanel() {
         role="dialog"
         aria-label={t("title")}
         className={cn(
-          "fixed z-[60] flex flex-col overflow-hidden rounded-2xl border bg-background shadow-2xl",
+          "fixed z-[60] flex flex-col overflow-hidden rounded-2xl border bg-background shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
           "transition-all duration-200 ease-out",
           // Mobile
           "bottom-[96px] inset-x-4 h-[70vh]",
@@ -389,7 +389,7 @@ export function AssistantPanel() {
         </div>
 
         {/* Gradient line */}
-        <div className="h-[1px] bg-gradient-to-r from-transparent via-chart-4/30 to-transparent" />
+        <div className="h-[1px] bg-border" />
 
         {/* Context Badge */}
         <AssistantContextBadge pageContext={pageContext} />
@@ -455,13 +455,13 @@ export function AssistantPanel() {
                 </span>
               )}
               {saveStatus === "saved" && (
-                <span className="text-[10px] text-green-600/60 flex items-center gap-1">
+                <span className="text-[10px] text-success/60 flex items-center gap-1">
                   <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   {t("history.saved")}
                 </span>
               )}
               {saveStatus === "error" && (
-                <span className="text-[10px] text-red-500/60">
+                <span className="text-[10px] text-destructive/60">
                   {t("history.saveFailed")}
                 </span>
               )}

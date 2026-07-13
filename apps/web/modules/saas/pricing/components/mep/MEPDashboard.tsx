@@ -92,8 +92,8 @@ export function MEPDashboard({
 
 			{/* Cascade notification */}
 			{hasNewItems && (
-				<div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 px-4 py-3 flex items-center justify-between">
-					<p className="text-sm text-amber-800 dark:text-amber-200">
+				<div className="rounded-lg border border-chart-1/30 bg-chart-1/10 px-4 py-3 flex items-center justify-between">
+					<p className="text-sm text-chart-1">
 						{t("cascade.message")}
 					</p>
 					<Button
@@ -101,7 +101,7 @@ export function MEPDashboard({
 						variant="outline"
 						onClick={onRederive}
 						disabled={isRederiving}
-						className="border-amber-300 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:text-amber-200"
+						className="border-chart-1/40 text-chart-1 hover:bg-chart-1/15"
 					>
 						<RefreshCw
 							className={`h-3.5 w-3.5 me-1.5 ${isRederiving ? "animate-spin" : ""}`}

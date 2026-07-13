@@ -35,8 +35,8 @@ export function TimelineHealthBadge({
 		case "ON_TRACK":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-green-500 hover:bg-green-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-success/15 text-success ${sizeClasses[size]}`}
 				>
 					{showIcon && <CheckCircleIcon className={`${iconSize[size]} ms-1`} />}
 					{t("timeline.health.onTrack")}
@@ -45,8 +45,8 @@ export function TimelineHealthBadge({
 		case "AT_RISK":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-orange-500 hover:bg-orange-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-chart-1/15 text-chart-1 ${sizeClasses[size]}`}
 				>
 					{showIcon && (
 						<AlertTriangleIcon className={`${iconSize[size]} ms-1`} />
@@ -57,8 +57,8 @@ export function TimelineHealthBadge({
 		case "DELAYED":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-red-500 hover:bg-red-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-destructive/15 text-destructive ${sizeClasses[size]}`}
 				>
 					{showIcon && <XCircleIcon className={`${iconSize[size]} ms-1`} />}
 					{t("timeline.health.delayed")}
@@ -95,8 +95,8 @@ export function MilestoneStatusBadge({
 		case "COMPLETED":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-green-500 hover:bg-green-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-success/15 text-success ${sizeClasses[size]}`}
 				>
 					{t("timeline.status.completed")}
 				</Badge>
@@ -104,8 +104,8 @@ export function MilestoneStatusBadge({
 		case "IN_PROGRESS":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-chart-4 hover:bg-chart-4 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-chart-4/15 text-chart-4 ${sizeClasses[size]}`}
 				>
 					{t("timeline.status.inProgress")}
 				</Badge>
@@ -113,8 +113,8 @@ export function MilestoneStatusBadge({
 		case "DELAYED":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-red-500 hover:bg-red-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-destructive/15 text-destructive ${sizeClasses[size]}`}
 				>
 					{t("timeline.status.delayed")}
 				</Badge>
@@ -122,8 +122,8 @@ export function MilestoneStatusBadge({
 		case "CANCELLED":
 			return (
 				<Badge
-					variant="default"
-					className={`bg-gray-500 hover:bg-gray-600 ${sizeClasses[size]}`}
+					variant="secondary"
+					className={`border-0 bg-muted text-muted-foreground ${sizeClasses[size]}`}
 				>
 					{t("execution.milestone.cancelled")}
 				</Badge>

@@ -125,7 +125,7 @@ export function GanttView({
 			{/* Legend */}
 			<div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
 				<div className="flex items-center gap-1.5">
-					<div className="w-3 h-3 rounded-sm bg-slate-400/30 border border-slate-400" />
+					<div className="w-3 h-3 rounded-sm bg-muted-foreground/30 border border-muted-foreground" />
 					<span>{t("timeline.status.planned")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
@@ -133,19 +133,19 @@ export function GanttView({
 					<span>{t("timeline.status.inProgress")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="w-3 h-3 rounded-sm bg-green-500/30 border border-green-500" />
+					<div className="w-3 h-3 rounded-sm bg-success/30 border border-success" />
 					<span>{t("timeline.status.completed")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="w-3 h-3 rounded-sm bg-red-500/30 border border-red-500" />
+					<div className="w-3 h-3 rounded-sm bg-destructive/30 border border-destructive" />
 					<span>{t("timeline.status.delayed")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="w-2 h-2 rounded-full bg-orange-500" />
+					<div className="w-2 h-2 rounded-full bg-chart-1" />
 					<span>{t("timeline.gantt.critical")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="w-3 h-0.5 bg-red-500" />
+					<div className="w-3 h-0.5 bg-destructive" />
 					<span>{t("timeline.gantt.todayLine")}</span>
 				</div>
 			</div>

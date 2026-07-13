@@ -92,7 +92,7 @@ export function LinkStudyDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("projectQuantities.linkDialog.title")}
 					</DialogTitle>
@@ -101,7 +101,7 @@ export function LinkStudyDialog({
 				<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 					{/* Search Input */}
 					<div className="relative">
-						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							value={search}
 							onChange={(e: any) => setSearch(e.target.value)}
@@ -119,7 +119,7 @@ export function LinkStudyDialog({
 								{[1, 2, 3].map((i) => (
 									<div
 										key={i}
-										className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3"
+										className="rounded-xl border-2 p-4 space-y-3"
 									>
 										<Skeleton className="h-5 w-48" />
 										<div className="flex gap-4">
@@ -133,15 +133,15 @@ export function LinkStudyDialog({
 							</>
 						) : studyList.length === 0 ? (
 							<div className="flex flex-col items-center justify-center py-12 text-center">
-								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-									<PackageOpen className="h-7 w-7 text-slate-400" />
+								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+									<PackageOpen className="h-7 w-7 text-muted-foreground" />
 								</div>
-								<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+								<p className="text-sm font-medium text-muted-foreground">
 									{t(
 										"projectQuantities.linkDialog.emptyState.title",
 									)}
 								</p>
-								<p className="text-xs text-slate-400 mt-1 max-w-xs">
+								<p className="text-xs text-muted-foreground mt-1 max-w-xs">
 									{t(
 										"projectQuantities.linkDialog.emptyState.description",
 									)}
@@ -151,19 +151,19 @@ export function LinkStudyDialog({
 							studyList.map((study: any) => (
 								<div
 									key={study.id}
-									className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
+									className="rounded-xl border-2 bg-card p-4 hover:bg-accent transition-colors"
 								>
 									{/* Study Name */}
 									<div className="flex items-start justify-between gap-3">
 										<div className="min-w-0 flex-1">
-											<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+											<h4 className="text-sm font-semibold text-card-foreground truncate">
 												{study.name}
 											</h4>
 										</div>
 									</div>
 
 									{/* Study Details */}
-									<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+									<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
 										{study.projectType && (
 											<span className="flex items-center gap-1">
 												<Building2 className="h-3.5 w-3.5" />
@@ -194,7 +194,7 @@ export function LinkStudyDialog({
 											</span>
 										)}
 										{study.totalCost != null && (
-											<span className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+											<span className="flex items-center gap-1 font-medium text-success">
 												<Calculator className="h-3.5 w-3.5" />
 												{formatSAR(
 													Number(study.totalCost),
@@ -243,7 +243,7 @@ export function LinkStudyDialog({
 				</div>
 
 				{/* Footer */}
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex justify-end">
+				<div className="bg-muted border-t-2 px-5 py-3 flex justify-end">
 					<Button
 						type="button"
 						variant="outline"

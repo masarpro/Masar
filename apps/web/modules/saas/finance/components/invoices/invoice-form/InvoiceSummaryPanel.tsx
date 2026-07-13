@@ -36,12 +36,12 @@ export function InvoiceSummaryPanel({
 	const t = useTranslations();
 
 	return (
-		<div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col">
-			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-				<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900/40 dark:to-pink-800/20 flex items-center justify-center">
-					<Receipt className="h-[15px] w-[15px] text-pink-500" />
+		<div className="bg-card rounded-2xl border-2 border-border overflow-hidden flex flex-col">
+			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+				<div className="flex size-8 items-center justify-center rounded-xl bg-destructive/15 text-destructive">
+					<Receipt className="h-[15px] w-[15px]" />
 				</div>
-				<span className="text-sm font-semibold text-foreground">{t("finance.summary.total")}</span>
+				<span className="text-sm font-semibold text-card-foreground">{t("finance.summary.total")}</span>
 			</div>
 			<div className="p-5 flex-1 flex flex-col justify-between">
 				<AmountSummary
@@ -53,19 +53,19 @@ export function InvoiceSummaryPanel({
 					totalAmount={totalAmount}
 				/>
 				{isEditMode && invoice && invoice.paidAmount > 0 && (
-					<div className="mt-2 space-y-1.5 pt-2 border-t border-dashed border-slate-200 dark:border-slate-700">
-						<div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+					<div className="mt-2 space-y-1.5 pt-2 border-t border-dashed border-border">
+						<div className="flex justify-between text-sm text-success">
 							<span>{t("finance.invoices.paidAmount")}</span>
 							<span>-<Currency amount={invoice.paidAmount} /></span>
 						</div>
-						<div className={`flex justify-between text-sm font-bold ${remainingAmount > 0 ? "text-amber-600 dark:text-amber-400" : "text-green-600 dark:text-green-400"}`}>
+						<div className={`flex justify-between text-sm font-bold ${remainingAmount > 0 ? "text-chart-1" : "text-success"}`}>
 							<span>{t("finance.invoices.remainingAmount")}</span>
 							<span><Currency amount={remainingAmount} /></span>
 						</div>
 					</div>
 				)}
-				{/* Gradient Total Bar */}
-				<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-primary-glow">
+				{/* Total Bar */}
+				<div className="mt-4 p-4 rounded-xl bg-primary flex items-center justify-between">
 					<div>
 						<div className="text-[11px] text-primary-foreground/70 font-medium tracking-wide">{t("finance.summary.total")}</div>
 					</div>

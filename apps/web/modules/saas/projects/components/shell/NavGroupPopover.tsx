@@ -50,7 +50,7 @@ export function NavGroupPopover({
 				align={align}
 				sideOffset={8}
 				className={cn(
-					"w-auto min-w-[180px] p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 shadow-xl rounded-xl",
+					"w-auto min-w-[180px] p-2 bg-card border-2 rounded-xl shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
 					className,
 				)}
 			>
@@ -75,8 +75,8 @@ export function NavGroupPopover({
 								className={cn(
 									"flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
 									isActive
-										? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-sm"
-										: "text-foreground hover:bg-muted/80",
+										? "bg-primary text-primary-foreground"
+										: "text-foreground hover:bg-accent hover:text-accent-foreground",
 								)}
 							>
 								<div

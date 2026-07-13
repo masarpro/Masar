@@ -12,8 +12,8 @@ import { useTranslations } from "next-intl";
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
 import { AttentionCard } from "./sections/AttentionCard";
 import { BotlyHero } from "./sections/BotlyHero";
+import { FieldActivityCard } from "./sections/FieldActivityCard";
 import { FinancePanel } from "./sections/FinancePanel";
-import { PortfolioPulseCard } from "./sections/PortfolioPulseCard";
 import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { WelcomeSection } from "./sections/WelcomeSection";
 
@@ -175,10 +175,13 @@ export function Dashboard({
 						)}
 						{showProjects && (
 							<div className="min-h-0 xl:flex-[3]">
-								{projLoading ? (
+								{projLoading || statsLoading ? (
 									cardSkeleton
 								) : (
-									<PortfolioPulseCard projects={projects} />
+									<FieldActivityCard
+										fieldActivity={dashboardData?.fieldActivity ?? null}
+										organizationSlug={organizationSlug}
+									/>
 								)}
 							</div>
 						)}

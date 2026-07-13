@@ -34,7 +34,7 @@ export function MiniPnLCard({
 		<div className="grid grid-cols-1 gap-3 md:grid-cols-3">
 			<Card className="p-4">
 				<div className="flex items-start gap-3">
-					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-success/15 text-success">
 						<Wallet className="h-5 w-5" />
 					</div>
 					<div className="min-w-0 flex-1">
@@ -51,7 +51,7 @@ export function MiniPnLCard({
 
 			<Card className="p-4">
 				<div className="flex items-start gap-3">
-					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+					<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-chart-4/15 text-chart-4">
 						<DollarSign className="h-5 w-5" />
 					</div>
 					<div className="min-w-0 flex-1">
@@ -66,16 +66,16 @@ export function MiniPnLCard({
 			<Card
 				className={`p-4 ${
 					isProfit
-						? "border-emerald-200 dark:border-emerald-900"
-						: "border-red-200 dark:border-red-900"
+						? "border-success"
+						: "border-destructive"
 				}`}
 			>
 				<div className="flex items-start gap-3">
 					<div
 						className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${
 							isProfit
-								? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
-								: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+								? "bg-success/15 text-success"
+								: "bg-destructive/15 text-destructive"
 						}`}
 					>
 						{isProfit ? (
@@ -91,8 +91,8 @@ export function MiniPnLCard({
 						<p
 							className={`text-lg font-bold tabular-nums ${
 								isProfit
-									? "text-emerald-700 dark:text-emerald-300"
-									: "text-red-700 dark:text-red-300"
+									? "text-success"
+									: "text-destructive"
 							}`}
 						>
 							{fmt(totalProfitAmount)} ر.س

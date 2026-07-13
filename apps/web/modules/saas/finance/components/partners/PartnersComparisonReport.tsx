@@ -97,8 +97,8 @@ export function PartnersComparisonReport({
 			{/* Company summary */}
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<SummaryCard
-					icon={<TrendingUp className="h-5 w-5 text-emerald-600" />}
-					bg="bg-emerald-100 dark:bg-emerald-900/50"
+					icon={<TrendingUp className="h-5 w-5 text-success" />}
+					bg="bg-success/15"
 					label={t("finance.partners.summary.totalProfit")}
 					value={company.netProfit}
 				/>
@@ -109,8 +109,8 @@ export function PartnersComparisonReport({
 					value={totals.totalContributions}
 				/>
 				<SummaryCard
-					icon={<BarChart3 className="h-5 w-5 text-purple-600" />}
-					bg="bg-purple-100 dark:bg-purple-900/50"
+					icon={<BarChart3 className="h-5 w-5 text-chart-4" />}
+					bg="bg-chart-4/15"
 					label={t("finance.partners.totalDrawings")}
 					value={totals.totalDrawings}
 				/>
@@ -143,7 +143,7 @@ export function PartnersComparisonReport({
 							{rows.map((r) => (
 								<TableRow
 									key={r.id}
-									className="cursor-pointer hover:bg-slate-50"
+									className="cursor-pointer hover:bg-muted/50"
 									onClick={() => router.push(`${basePath}/${r.id}`)}
 								>
 									<TableCell className="font-medium">{r.name}</TableCell>
@@ -161,14 +161,14 @@ export function PartnersComparisonReport({
 									<TableCell className="text-end">
 										<Currency amount={r.shareOfProfit} />
 									</TableCell>
-									<TableCell className="text-end text-red-600">
+									<TableCell className="text-end text-destructive">
 										<Currency amount={r.totalDrawings} />
 									</TableCell>
 									<TableCell
 										className={`text-end font-semibold ${
 											r.netBalance >= 0
-												? "text-emerald-600"
-												: "text-red-600"
+												? "text-success"
+												: "text-destructive"
 										}`}
 									>
 										<Currency amount={r.netBalance} />
@@ -200,7 +200,7 @@ function SummaryCard({
 				<div className="flex items-center gap-3">
 					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
 					<div>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{label}
 						</p>
 						<p className="text-xl font-semibold">

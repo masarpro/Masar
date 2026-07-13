@@ -44,7 +44,7 @@ export function MobileFilterSheet({
 					size="icon"
 					aria-label={t("common.filters")}
 					className={cn(
-						"relative h-10 w-10 shrink-0 rounded-xl border-white/20 bg-white/70 backdrop-blur-xl dark:border-slate-700/30 dark:bg-slate-900/70",
+						"relative h-10 w-10 shrink-0 rounded-xl bg-card",
 						className,
 					)}
 				>

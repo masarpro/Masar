@@ -19,7 +19,7 @@ export function GanttSidebar({ milestones, scrollTop, onMilestoneClick }: GanttS
 
 	return (
 		<div
-			className="flex-shrink-0 border-e border-border/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70"
+			className="flex-shrink-0 border-e border-border bg-card"
 			style={{ width: SIDEBAR_WIDTH }}
 		>
 			{/* Header */}
@@ -40,7 +40,7 @@ export function GanttSidebar({ milestones, scrollTop, onMilestoneClick }: GanttS
 						onClick={() => onMilestoneClick(m)}
 					>
 						{m.isCritical && (
-							<AlertTriangleIcon className="h-3.5 w-3.5 text-orange-500 flex-shrink-0" />
+							<AlertTriangleIcon className="h-3.5 w-3.5 text-chart-1 flex-shrink-0" />
 						)}
 						<span className="text-sm font-medium truncate flex-1">{m.title}</span>
 						<MilestoneStatusBadge status={m.status} size="sm" />

@@ -130,7 +130,7 @@ export function PeriodFilter({
 			>
 				<SelectTrigger className={cn("rounded-xl", triggerClassName)}>
 					<span className="flex min-w-0 items-center gap-1.5">
-						<CalendarRange className="h-4 w-4 shrink-0 text-slate-400" />
+						<CalendarRange className="h-4 w-4 shrink-0 text-muted-foreground" />
 						<SelectValue />
 					</span>
 				</SelectTrigger>
@@ -162,7 +162,7 @@ export function PeriodFilter({
 						)}
 					/>
 					{!stacked && (
-						<span className="text-xs text-slate-400">–</span>
+						<span className="text-xs text-muted-foreground">–</span>
 					)}
 					<Input
 						type="date"
@@ -220,7 +220,7 @@ export function ActiveFilterChips({
 			<Button
 				variant="ghost"
 				size="sm"
-				className="h-7 rounded-full px-2.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+				className="h-7 rounded-full px-2.5 text-xs text-muted-foreground hover:text-foreground"
 				onClick={onClearAll}
 			>
 				{t("clearFilters")}
@@ -251,8 +251,8 @@ export function SortableColumnButton({
 			type="button"
 			onClick={onClick}
 			className={cn(
-				"group inline-flex items-center gap-1 whitespace-nowrap transition-colors hover:text-slate-900 dark:hover:text-slate-100",
-				active && "font-semibold text-slate-900 dark:text-slate-100",
+				"group inline-flex items-center gap-1 whitespace-nowrap transition-colors hover:text-foreground",
+				active && "font-semibold text-foreground",
 				className,
 			)}
 		>

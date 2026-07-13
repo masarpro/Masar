@@ -190,7 +190,7 @@ export function ChatInput({
 						onChange={(e) => setIsUpdate(e.target.checked)}
 						className="h-3.5 w-3.5 rounded"
 					/>
-					<Shield className="h-3.5 w-3.5 text-amber-500" />
+					<Shield className="h-3.5 w-3.5 text-chart-1" />
 					<span className="text-muted-foreground">
 						{t("projects.chat.markAsOfficialUpdate")}
 					</span>

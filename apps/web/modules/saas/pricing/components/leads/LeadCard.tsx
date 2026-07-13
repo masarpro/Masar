@@ -111,9 +111,9 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 
 	return (
 		<>
-			<div className="group relative rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 overflow-hidden transition-all duration-200 hover:shadow-xl">
+			<div className="group relative rounded-2xl border-2 bg-card overflow-hidden transition-colors">
 				{/* Card Header */}
-				<div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3">
+				<div className="border-b-2 px-4 py-3">
 					<div className="flex items-start justify-between gap-3">
 						<div className="flex items-center gap-2 flex-1 min-w-0">
 							{/* Avatar */}
@@ -125,14 +125,14 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 									href={`${basePath}/${lead.id}`}
 									className="group/link inline-block"
 								>
-									<h3 className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300 transition-colors">
+									<h3 className="font-medium text-card-foreground line-clamp-1 group-hover/link:text-muted-foreground transition-colors">
 										{lead.name}
 									</h3>
 								</Link>
 								{lead.company && (
 									<div className="flex items-center gap-1 mt-0.5">
-										<Building2 className="h-3 w-3 text-slate-400 dark:text-slate-500 shrink-0" />
-										<p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+										<Building2 className="h-3 w-3 text-muted-foreground shrink-0" />
+										<p className="text-xs text-muted-foreground line-clamp-1">
 											{lead.company}
 										</p>
 									</div>
@@ -144,9 +144,9 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 								<Button
 									variant="ghost"
 									size="icon"
-									className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+									className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent rounded-lg"
 								>
-									<MoreVertical className="h-3.5 w-3.5 text-slate-500" />
+									<MoreVertical className="h-3.5 w-3.5 text-muted-foreground" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="rounded-xl w-40">
@@ -164,7 +164,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
-									className="text-red-600 dark:text-red-400 rounded-lg focus:text-red-600 dark:focus:text-red-400"
+									className="text-destructive rounded-lg focus:text-destructive"
 									onClick={() => setShowDeleteDialog(true)}
 								>
 									<Trash2 className="me-2 h-4 w-4" />
@@ -185,21 +185,21 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 				<div className="px-4 pb-3">
 					<div className="space-y-1.5">
 						{lead.phone && (
-							<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+							<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 								<Phone className="h-3 w-3 shrink-0" />
 								<span dir="ltr">{lead.phone}</span>
 							</div>
 						)}
 						{lead.projectLocation && (
-							<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+							<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 								<MapPin className="h-3 w-3 shrink-0" />
 								<span className="truncate">{lead.projectLocation}</span>
 							</div>
 						)}
 						{lead.projectType && (
 							<div className="flex items-center gap-1.5 text-xs">
-								<Building2 className="h-3 w-3 shrink-0 text-slate-400 dark:text-slate-500" />
-								<span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300">
+								<Building2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+								<span className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
 									{t(`pricing.leads.projectType.${lead.projectType}`)}
 								</span>
 							</div>
@@ -208,7 +208,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 				</div>
 
 				{/* Card Footer */}
-				<div className="px-4 pb-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+				<div className="px-4 pb-3 pt-3 border-t-2">
 					<div className="flex items-center justify-between">
 						{/* Estimated Value */}
 						<div>
@@ -243,7 +243,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 							<div
 								className={cn(
 									"h-full rounded-full transition-all",
-									lead.status === "WON" ? "bg-green-500" : "bg-primary",
+									lead.status === "WON" ? "bg-success" : "bg-primary",
 								)}
 								style={{ width: getStatusProgress(lead.status) }}
 							/>
@@ -264,7 +264,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 						<AlertDialogCancel className="rounded-xl">{t("pricing.leads.form.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={handleDelete}
-							className="rounded-xl bg-red-600 text-white hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{t("pricing.leads.actions.delete")}
 						</AlertDialogAction>

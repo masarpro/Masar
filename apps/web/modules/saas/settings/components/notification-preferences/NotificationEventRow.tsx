@@ -25,12 +25,12 @@ export function NotificationEventRow({
 	const leaf = eventLeafName(event.key);
 
 	return (
-		<div className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2 border-b border-slate-100/50 py-3 last:border-0 dark:border-slate-800/30">
+		<div className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2 border-b border-border py-3 last:border-0">
 			<div className="min-w-0">
-				<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+				<p className="text-sm font-medium text-foreground">
 					{t(`notifications.events.${event.module}.${leaf}.title`)}
 				</p>
-				<p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+				<p className="mt-0.5 text-xs text-muted-foreground">
 					{t(
 						`notifications.events.${event.module}.${leaf}.description`,
 					)}

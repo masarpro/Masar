@@ -114,13 +114,13 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 							<Button
 								variant="outline"
 								size="sm"
-								className="rounded-xl border-slate-200 dark:border-slate-800"
+								className="rounded-xl border-border"
 								disabled={page <= 1}
 								onClick={() => setPage((p) => p - 1)}
 							>
 								{t("pricing.leads.pagination.previous")}
 							</Button>
-							<span className="text-sm text-slate-500 dark:text-slate-400">
+							<span className="text-sm text-muted-foreground">
 								{t("pricing.leads.pagination.pageOf", {
 									page: data.page,
 									total: data.totalPages,
@@ -129,7 +129,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 							<Button
 								variant="outline"
 								size="sm"
-								className="rounded-xl border-slate-200 dark:border-slate-800"
+								className="rounded-xl border-border"
 								disabled={page >= data.totalPages}
 								onClick={() => setPage((p) => p + 1)}
 							>
@@ -141,13 +141,13 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 			) : (
 				/* Empty State */
 				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 p-5 mb-5">
-						<UserSearch className="h-12 w-12 text-slate-400 dark:text-slate-500" />
+					<div className="rounded-2xl border-2 bg-card p-5 mb-5">
+						<UserSearch className="h-12 w-12 text-muted-foreground" />
 					</div>
-					<h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
+					<h3 className="text-lg font-medium text-foreground">
 						{t("pricing.leads.empty")}
 					</h3>
-					<p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm text-sm">
+					<p className="text-muted-foreground mt-2 max-w-sm text-sm">
 						{t("pricing.leads.emptyDescription")}
 					</p>
 					<Button asChild className="mt-5 rounded-xl gap-2">

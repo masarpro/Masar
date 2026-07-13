@@ -117,7 +117,7 @@ export function CopyFromExecutionDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("copyExecution.title")}
 					</DialogTitle>
@@ -136,7 +136,7 @@ export function CopyFromExecutionDialog({
 									toggleAll();
 								}
 							}}
-							className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-2.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50"
+							className="flex items-center justify-between rounded-xl border-2 bg-muted px-4 py-2.5 cursor-pointer hover:bg-accent"
 						>
 							<span className="flex items-center gap-2 text-sm">
 								<Checkbox
@@ -144,11 +144,11 @@ export function CopyFromExecutionDialog({
 									checked={allSelected}
 									tabIndex={-1}
 								/>
-								<span className="font-medium text-slate-700 dark:text-slate-200">
+								<span className="font-medium text-foreground">
 									{t("copyExecution.selectAll")}
 								</span>
 							</span>
-							<span className="text-xs text-slate-500">
+							<span className="text-xs text-muted-foreground">
 								{t("copyExecution.rowsToCreate", {
 									count: totalRowsToCreate,
 								})}
@@ -163,7 +163,7 @@ export function CopyFromExecutionDialog({
 								{[1, 2, 3].map((i) => (
 									<div
 										key={i}
-										className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3"
+										className="rounded-xl border-2 p-4 space-y-3"
 									>
 										<Skeleton className="h-5 w-48" />
 										<div className="flex gap-4">
@@ -175,10 +175,10 @@ export function CopyFromExecutionDialog({
 							</>
 						) : milestoneList.length === 0 ? (
 							<div className="flex flex-col items-center justify-center py-12 text-center">
-								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-									<ClipboardList className="h-7 w-7 text-slate-400" />
+								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+									<ClipboardList className="h-7 w-7 text-muted-foreground" />
 								</div>
-								<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+								<p className="text-sm font-medium text-muted-foreground">
 									{t("copyExecution.noMilestones")}
 								</p>
 							</div>
@@ -199,7 +199,7 @@ export function CopyFromExecutionDialog({
 												toggleOne(milestone.id);
 											}
 										}}
-										className="block rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-colors hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer"
+										className="block rounded-xl border-2 bg-card p-4 transition-colors hover:bg-accent cursor-pointer"
 									>
 										<div className="flex items-start gap-3">
 											<Checkbox
@@ -210,24 +210,24 @@ export function CopyFromExecutionDialog({
 											<div className="min-w-0 flex-1">
 												<div className="flex items-center gap-2">
 													<Flag className="h-4 w-4 text-chart-4 shrink-0" />
-													<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+													<h4 className="text-sm font-semibold text-card-foreground truncate">
 														{milestone.title}
 													</h4>
 												</div>
 												{milestone.description && (
-													<p className="mt-1 text-xs text-slate-500 line-clamp-2">
+													<p className="mt-1 text-xs text-muted-foreground line-clamp-2">
 														{milestone.description}
 													</p>
 												)}
-												<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+												<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
 													{isEmpty ? (
-														<span className="flex items-center gap-1 text-slate-400">
+														<span className="flex items-center gap-1 text-muted-foreground">
 															<Hammer className="h-3.5 w-3.5" />
 															{t("copyExecution.willCreateOne")}
 														</span>
 													) : (
 														<span className="flex items-center gap-1">
-															<Hammer className="h-3.5 w-3.5 text-amber-500" />
+															<Hammer className="h-3.5 w-3.5 text-chart-1" />
 															{t("copyExecution.activitiesCount", {
 																count: milestone.activitiesCount,
 															})}
@@ -235,7 +235,7 @@ export function CopyFromExecutionDialog({
 													)}
 													{(startStr || endStr) && (
 														<span className="flex items-center gap-1">
-															<CalendarDays className="h-3.5 w-3.5 text-emerald-500" />
+															<CalendarDays className="h-3.5 w-3.5 text-success" />
 															{startStr ?? "—"} / {endStr ?? "—"}
 														</span>
 													)}
@@ -250,7 +250,7 @@ export function CopyFromExecutionDialog({
 				</div>
 
 				{/* Footer */}
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex justify-between items-center gap-3">
+				<div className="bg-muted border-t-2 px-5 py-3 flex justify-between items-center gap-3">
 					<Button
 						type="button"
 						variant="outline"

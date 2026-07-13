@@ -104,11 +104,11 @@ export function ChatBubble({ message, isMine, organizationId }: ChatBubbleProps)
 						isMine
 							? "rounded-ee-sm bg-primary text-primary-foreground"
 							: "rounded-es-sm bg-muted text-foreground",
-						message.isUpdate && "border-2 border-amber-400/50",
+						message.isUpdate && "border-2 border-chart-1/50",
 					)}
 				>
 					{message.isUpdate && (
-						<Badge className="mb-1.5 border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px]">
+						<Badge className="mb-1.5 border-0 bg-chart-1/15 text-chart-1 text-[10px]">
 							<Shield className="h-3 w-3 me-1" />
 							{t("projects.chat.officialUpdate")}
 						</Badge>

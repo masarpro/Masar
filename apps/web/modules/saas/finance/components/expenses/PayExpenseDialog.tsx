@@ -137,7 +137,7 @@ export function PayExpenseDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-lg p-0 gap-0 rounded-2xl">
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 border-border px-5 py-4">
 					<DialogTitle className="text-base font-semibold text-end">
 						{t("finance.expenses.payExpense")}
 					</DialogTitle>
@@ -146,9 +146,9 @@ export function PayExpenseDialog({
 				<form onSubmit={handleSubmit}>
 					<div className="p-5 space-y-4">
 						{/* Expense Info */}
-						<div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4 space-y-2">
+						<div className="rounded-xl border-2 border-border bg-muted p-4 space-y-2">
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-slate-500 dark:text-slate-400">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.expenses.expenseNo")}
 								</span>
 								<span className="text-sm font-semibold font-mono">
@@ -157,7 +157,7 @@ export function PayExpenseDialog({
 							</div>
 							{expense.description && (
 								<div className="flex items-center justify-between">
-									<span className="text-sm text-slate-500 dark:text-slate-400">
+									<span className="text-sm text-muted-foreground">
 										{t("finance.expenses.description")}
 									</span>
 									<span className="text-sm line-clamp-1 max-w-[60%] text-end">
@@ -166,7 +166,7 @@ export function PayExpenseDialog({
 								</div>
 							)}
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-slate-500 dark:text-slate-400">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.expenses.totalAmount")}
 								</span>
 								<span className="text-sm font-semibold">
@@ -174,18 +174,18 @@ export function PayExpenseDialog({
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-slate-500 dark:text-slate-400">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.expenses.alreadyPaid")}
 								</span>
-								<span className="text-sm font-semibold text-green-600 dark:text-green-400">
+								<span className="text-sm font-semibold text-success">
 									<Currency amount={paidAmount} />
 								</span>
 							</div>
-							<div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-2">
-								<span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<div className="flex items-center justify-between border-t-2 border-border pt-2">
+								<span className="text-sm font-medium text-foreground">
 									{t("finance.expenses.remaining")}
 								</span>
-								<span className="text-base font-bold text-red-600 dark:text-red-400">
+								<span className="text-base font-bold text-destructive">
 									<Currency amount={remaining} />
 								</span>
 							</div>
@@ -193,7 +193,7 @@ export function PayExpenseDialog({
 
 						{/* Source Account */}
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.selectAccount")} *
 							</Label>
 							<Select
@@ -212,10 +212,10 @@ export function PayExpenseDialog({
 												{account.accountType === "BANK" ? (
 													<Building className="h-3.5 w-3.5 text-chart-4" />
 												) : (
-													<Wallet className="h-3.5 w-3.5 text-green-500" />
+													<Wallet className="h-3.5 w-3.5 text-success" />
 												)}
 												<span>{account.name}</span>
-												<span className="text-slate-400 text-xs">
+												<span className="text-muted-foreground text-xs">
 													(<Currency amount={Number(account.balance)} />)
 												</span>
 											</div>
@@ -227,21 +227,21 @@ export function PayExpenseDialog({
 
 						{/* Selected account balance preview */}
 						{selectedAccount && (
-							<div className="rounded-xl border border-chart-4/60 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20 px-4 py-2.5 flex items-center justify-between">
+							<div className="rounded-xl border-2 border-chart-4/30 bg-chart-4/15 px-4 py-2.5 flex items-center justify-between">
 								<div className="flex items-center gap-2.5">
-									<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
+									<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-chart-4/15">
 										{selectedAccount.accountType === "BANK" ? (
 											<Building className="h-3.5 w-3.5 text-chart-4" />
 										) : (
-											<Wallet className="h-3.5 w-3.5 text-green-600" />
+											<Wallet className="h-3.5 w-3.5 text-success" />
 										)}
 									</div>
 									<div>
-										<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+										<p className="text-sm font-medium text-foreground">
 											{selectedAccount.name}
 										</p>
 										{selectedAccount.bankName && (
-											<p className="text-[11px] text-slate-500">
+											<p className="text-[11px] text-muted-foreground">
 												{selectedAccount.bankName}
 											</p>
 										)}
@@ -253,8 +253,8 @@ export function PayExpenseDialog({
 									</span>
 									{numericAmount > 0 && (
 										<>
-											<ArrowRight className="h-3.5 w-3.5 text-slate-400" />
-											<span className="text-red-500 font-semibold">
+											<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+											<span className="text-destructive font-semibold">
 												<Currency
 													amount={Number(selectedAccount.balance) - numericAmount}
 												/>
@@ -267,7 +267,7 @@ export function PayExpenseDialog({
 
 						{/* Payment Amount */}
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground">
 								{t("finance.expenses.paymentAmount")} *
 							</Label>
 							<Input
@@ -283,7 +283,7 @@ export function PayExpenseDialog({
 								required
 							/>
 							{numericAmount > 0 && numericAmount < remaining && (
-								<p className="text-xs text-amber-600 dark:text-amber-400">
+								<p className="text-xs text-chart-1">
 									{t("finance.expenses.partialPaymentNote")}
 								</p>
 							)}
@@ -292,7 +292,7 @@ export function PayExpenseDialog({
 						{/* Payment Method & Reference */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("finance.expenses.paymentMethod")}
 								</Label>
 								<Select
@@ -314,7 +314,7 @@ export function PayExpenseDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("finance.expenses.referenceNo")}
 								</Label>
 								<Input
@@ -329,7 +329,7 @@ export function PayExpenseDialog({
 					</div>
 
 					{/* Footer Actions */}
-					<DialogFooter className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+					<DialogFooter className="bg-muted/50 border-t-2 border-border px-5 py-3 flex gap-3">
 						<Button
 							type="button"
 							variant="outline"

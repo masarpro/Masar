@@ -29,19 +29,19 @@ const CUSTOM_COUNT_SENTINEL = "__custom__";
 
 const COLOR_SCHEMES = {
 	blue: {
-		bg: "bg-chart-4/15 dark:bg-chart-4/20",
-		border: "border-chart-4 dark:border-chart-4",
-		text: "text-chart-4 dark:text-chart-4",
+		bg: "bg-chart-4/15",
+		border: "border-chart-4/30",
+		text: "text-chart-4",
 	},
 	green: {
-		bg: "bg-green-50 dark:bg-green-950",
-		border: "border-green-200 dark:border-green-800",
-		text: "text-green-700 dark:text-green-300",
+		bg: "bg-success/10",
+		border: "border-success/30",
+		text: "text-success",
 	},
 	indigo: {
-		bg: "bg-indigo-50 dark:bg-indigo-950",
-		border: "border-indigo-200 dark:border-indigo-800",
-		text: "text-indigo-700 dark:text-indigo-300",
+		bg: "bg-chart-4/10",
+		border: "border-chart-4/30",
+		text: "text-chart-4",
 	},
 	gray: {
 		bg: "bg-muted/50",

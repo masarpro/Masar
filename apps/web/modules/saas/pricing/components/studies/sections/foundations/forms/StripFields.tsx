@@ -116,8 +116,8 @@ export function StripFields({
 						<div className="flex items-center gap-2">
 							<input type="checkbox" id="hasTopMain" checked={formData.hasTopMain}
 								onChange={(e: any) => setFormData({ ...formData, hasTopMain: e.target.checked })}
-								className="rounded border-green-500" />
-							<Label htmlFor="hasTopMain" className="text-sm font-medium text-green-700">
+								className="rounded border-success" />
+							<Label htmlFor="hasTopMain" className="text-sm font-medium text-success">
 								{t("pricing.studies.structural.strip.topBars")}
 							</Label>
 						</div>
@@ -138,7 +138,7 @@ export function StripFields({
 					</div>
 
 					<div className="space-y-3">
-						<h5 className="text-sm font-medium text-orange-700">الكانات</h5>
+						<h5 className="text-sm font-medium text-chart-1">الكانات</h5>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 							<StirrupsInput
 								diameter={formData.stirrupDiameter}
@@ -183,8 +183,8 @@ export function StripFields({
 						<div className="flex items-center gap-2">
 							<input type="checkbox" id="stripHasTopMesh" checked={formData.stripHasTopMesh}
 								onChange={(e: any) => setFormData({ ...formData, stripHasTopMesh: e.target.checked })}
-								className="rounded border-green-500" />
-							<Label htmlFor="stripHasTopMesh" className="text-sm font-medium text-green-700">
+								className="rounded border-success" />
+							<Label htmlFor="stripHasTopMesh" className="text-sm font-medium text-success">
 								{t("pricing.studies.structural.strip.topMesh")}
 							</Label>
 						</div>
@@ -208,7 +208,7 @@ export function StripFields({
 
 					{/* وصلة التراكب */}
 					<div className="space-y-3">
-						<h5 className="text-sm font-medium text-orange-700">{t("pricing.studies.structural.raft.lapSplice")}</h5>
+						<h5 className="text-sm font-medium text-chart-1">{t("pricing.studies.structural.raft.lapSplice")}</h5>
 						<div className="flex items-center gap-3">
 							<div className="w-48">
 								<Label className="text-xs">{t("pricing.studies.structural.raft.lapSpliceMethod")}</Label>
@@ -232,7 +232,7 @@ export function StripFields({
 							)}
 						</div>
 						{formData.stripLength > 12 ? (
-							<p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+							<p className="text-xs text-chart-1 bg-chart-1/10 p-2 rounded">
 								{t("pricing.studies.structural.raft.lapSpliceNote")}
 							</p>
 						) : null}
@@ -243,7 +243,7 @@ export function StripFields({
 			{/* إعدادات متقدمة */}
 			<div className="border-t pt-4 space-y-4">
 				<button type="button"
-					className="flex items-center gap-2 text-sm font-medium text-purple-700 hover:text-purple-900"
+					className="flex items-center gap-2 text-sm font-medium text-chart-4 hover:text-chart-4/80"
 					onClick={() => setFormData({ ...formData, stripShowAdvanced: !formData.stripShowAdvanced })}
 				>
 					<span className={`transition-transform ${formData.stripShowAdvanced ? 'rotate-90' : ''}`}>&#9654;</span>
@@ -251,10 +251,10 @@ export function StripFields({
 				</button>
 
 				{formData.stripShowAdvanced && (
-					<div className="space-y-4 ps-2 border-s-2 border-purple-200">
+					<div className="space-y-4 ps-2 border-s-2 border-chart-4/30">
 						{/* الأغطية */}
 						<div className="space-y-3">
-							<h5 className="text-sm font-medium text-purple-700">{t("pricing.studies.structural.covers.label")}</h5>
+							<h5 className="text-sm font-medium text-chart-4">{t("pricing.studies.structural.covers.label")}</h5>
 							<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 								<div>
 									<Label className="text-xs">{t("pricing.studies.structural.covers.bottom")} (سم)</Label>
@@ -282,8 +282,8 @@ export function StripFields({
 							<div className="flex items-center gap-2">
 								<input type="checkbox" id="stripHasLeanConcrete" checked={formData.stripHasLeanConcrete}
 									onChange={(e: any) => setFormData({ ...formData, stripHasLeanConcrete: e.target.checked })}
-									className="rounded border-gray-500" />
-								<Label htmlFor="stripHasLeanConcrete" className="text-sm font-medium text-gray-700">
+									className="rounded border-input" />
+								<Label htmlFor="stripHasLeanConcrete" className="text-sm font-medium text-muted-foreground">
 									{t("pricing.studies.structural.leanConcrete.label")}
 								</Label>
 							</div>
@@ -302,8 +302,8 @@ export function StripFields({
 							<div className="flex items-center gap-2">
 								<input type="checkbox" id="stripHasIntersectionDeduction" checked={formData.stripHasIntersectionDeduction}
 									onChange={(e: any) => setFormData({ ...formData, stripHasIntersectionDeduction: e.target.checked })}
-									className="rounded border-amber-500" />
-								<Label htmlFor="stripHasIntersectionDeduction" className="text-sm font-medium text-amber-700">
+									className="rounded border-chart-1" />
+								<Label htmlFor="stripHasIntersectionDeduction" className="text-sm font-medium text-chart-1">
 									{t("pricing.studies.structural.strip.intersectionDeduction")}
 								</Label>
 							</div>
@@ -323,7 +323,7 @@ export function StripFields({
 												step={0.05} min={0.2} max={2} className="h-8" />
 										</div>
 									</div>
-									<p className="text-xs text-muted-foreground bg-amber-50 p-2 rounded">
+									<p className="text-xs text-muted-foreground bg-chart-1/10 p-2 rounded">
 										{t("pricing.studies.structural.strip.intersectionNote")}
 									</p>
 								</>
@@ -335,8 +335,8 @@ export function StripFields({
 							<div className="flex items-center gap-2">
 								<input type="checkbox" id="stripHasColumnDowels" checked={formData.stripHasColumnDowels}
 									onChange={(e: any) => setFormData({ ...formData, stripHasColumnDowels: e.target.checked })}
-									className="rounded border-teal-500" />
-								<Label htmlFor="stripHasColumnDowels" className="text-sm font-medium text-teal-700">
+									className="rounded border-chart-3" />
+								<Label htmlFor="stripHasColumnDowels" className="text-sm font-medium text-chart-3">
 									{t("pricing.studies.structural.columnDowels.label")}
 								</Label>
 							</div>
@@ -380,8 +380,8 @@ export function StripFields({
 								<div className="flex items-center gap-2">
 									<input type="checkbox" id="stripHasChairBars" checked={formData.stripHasChairBars}
 										onChange={(e: any) => setFormData({ ...formData, stripHasChairBars: e.target.checked })}
-										className="rounded border-gray-500" />
-									<Label htmlFor="stripHasChairBars" className="text-sm font-medium text-gray-700">
+										className="rounded border-input" />
+									<Label htmlFor="stripHasChairBars" className="text-sm font-medium text-muted-foreground">
 										{t("pricing.studies.structural.raft.chairBars")}
 									</Label>
 								</div>

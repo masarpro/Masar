@@ -110,7 +110,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 					size="icon"
 					aria-label={t("company.leaves.balances.adjust")}
 					onClick={() => setShowAdjustDialog(true)}
-					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Pencil className="h-4 w-4" />
 				</Button>
@@ -120,7 +120,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
 					<Select value={String(year)} onValueChange={(v: any) => setYear(Number(v))}>
-						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[140px] rounded-lg border border-input bg-card">
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -132,7 +132,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 				</div>
 				<Button
 					onClick={() => setShowAdjustDialog(true)}
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					<Pencil className="ms-2 h-4 w-4" />
 					{t("company.leaves.balances.adjust")}
@@ -140,21 +140,21 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 			</div>
 
 			{/* Table */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[640px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.employee")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.leaveType")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.total")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.used")}</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.remaining")}</TableHead>
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.balances.employee")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.balances.leaveType")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.balances.total")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.balances.used")}</TableHead>
+							<TableHead className="text-end text-muted-foreground">{t("company.leaves.balances.remaining")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
-								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
+								<TableRow key={i} className="border-b-2">
 									{[...Array(5)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
@@ -166,13 +166,13 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 							balances.balances.map((bal: any, index: any) => (
 								<TableRow
 									key={bal.id}
-									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
 									<TableCell className="text-end">
 										<div>
-											<p className="font-medium text-slate-900 dark:text-slate-100">{bal.employee.name}</p>
-											{bal.employee.employeeNo && <p className="text-xs text-slate-400">{bal.employee.employeeNo}</p>}
+											<p className="font-medium text-card-foreground">{bal.employee.name}</p>
+											{bal.employee.employeeNo && <p className="text-xs text-muted-foreground">{bal.employee.employeeNo}</p>}
 										</div>
 									</TableCell>
 									<TableCell className="text-end">
@@ -180,20 +180,20 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 											{bal.leaveType.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: bal.leaveType.color }} />
 											)}
-											<span className="text-sm text-slate-700 dark:text-slate-300">{bal.leaveType.name}</span>
+											<span className="text-sm text-card-foreground">{bal.leaveType.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-card-foreground">
 										{bal.totalDays} {t("company.leaves.days")}
 									</TableCell>
-									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-muted-foreground">
 										{bal.usedDays} {t("company.leaves.days")}
 									</TableCell>
 									<TableCell className="text-end">
 										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${
 											bal.remainingDays <= 3
-												? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-												: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+												? "bg-destructive/15 text-destructive"
+												: "bg-success/15 text-success"
 										}`}>
 											{bal.remainingDays} {t("company.leaves.days")}
 										</Badge>
@@ -204,10 +204,10 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 							<TableRow>
 								<TableCell colSpan={5} className="text-center py-16">
 									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<Wallet className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+										<div className="mb-4 rounded-2xl bg-muted p-5">
+											<Wallet className="h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
 										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground">
 											{t("company.leaves.balances.noBalances")}
 										</p>
 									</div>

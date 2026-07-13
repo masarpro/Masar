@@ -85,7 +85,7 @@ export function AccountDataSection({
 							className="rounded-xl mt-1"
 							dir="ltr"
 						/>
-						<p className="text-xs text-slate-500 mt-1">
+						<p className="text-xs text-muted-foreground mt-1">
 							{t("finance.clients.codeHint")}
 						</p>
 					</div>
@@ -131,7 +131,7 @@ export function AccountDataSection({
 									<button
 										type="button"
 										onClick={() => removeClassification(c)}
-										className="hover:text-red-500"
+										className="hover:text-destructive"
 									>
 										<X className="h-3 w-3" />
 									</button>

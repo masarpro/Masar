@@ -50,15 +50,15 @@ interface ExpenseRunDetailProps {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-	DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
-	POSTED: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
+	DRAFT: "bg-muted text-muted-foreground",
+	POSTED: "bg-chart-4/15 text-chart-4",
+	CANCELLED: "bg-destructive/15 text-destructive",
 };
 
 const FINANCE_STATUS_STYLES: Record<string, string> = {
-	PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-	COMPLETED: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
+	PENDING: "bg-chart-1/15 text-chart-1",
+	COMPLETED: "bg-chart-4/15 text-chart-4",
+	CANCELLED: "bg-destructive/15 text-destructive",
 };
 
 export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: ExpenseRunDetailProps) {
@@ -222,7 +222,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 			{/* Back Button */}
 			<Button
 				variant="ghost"
-				className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 gap-2"
+				className="rounded-lg hover:bg-accent gap-2"
 				onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
 			>
 				<ArrowRight className="h-4 w-4" />
@@ -230,12 +230,12 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 			</Button>
 
 			{/* Header Card */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<FileText className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<FileText className="h-5 w-5 text-chart-4" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.expenseRuns.runDetail")}
 					</h3>
 				</div>
@@ -243,10 +243,10 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 					<div className="flex flex-wrap items-start justify-between gap-y-3">
 						<div className="space-y-3">
 							<div>
-								<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+								<h2 className="text-xl font-bold text-card-foreground">
 									{getRunNo(run)}
 								</h2>
-								<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+								<p className="text-sm text-muted-foreground mt-1">
 									{run.month} / {run.year}
 								</p>
 							</div>
@@ -254,17 +254,17 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 								{getStatusBadge(run.status)}
 							</div>
 							{run.createdBy && (
-								<p className="text-xs text-slate-500 dark:text-slate-400">
+								<p className="text-xs text-muted-foreground">
 									{t("company.expenseRuns.createdBy")}: {run.createdBy.name}
 								</p>
 							)}
 							{run.postedBy && (
-								<p className="text-xs text-slate-500 dark:text-slate-400">
+								<p className="text-xs text-muted-foreground">
 									{t("company.expenseRuns.postedBy")}: {run.postedBy.name}
 								</p>
 							)}
 							{run.notes && (
-								<p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+								<p className="text-sm text-muted-foreground mt-2">
 									{run.notes}
 								</p>
 							)}
@@ -276,7 +276,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 								<>
 									<Button
 										variant="outline"
-										className="rounded-xl border-white/20 dark:border-slate-700/30"
+										className="rounded-lg"
 										onClick={() => populateMutation.mutate()}
 										disabled={populateMutation.isPending}
 									>
@@ -288,7 +288,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										{t("company.expenseRuns.populate")}
 									</Button>
 									<Button
-										className="rounded-xl bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
+										className="rounded-lg bg-chart-4 text-white hover:bg-chart-4/90"
 										onClick={() => setShowPostDialog(true)}
 										disabled={postMutation.isPending}
 									>
@@ -297,7 +297,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 									</Button>
 									<Button
 										variant="outline"
-										className="rounded-xl border-red-200/50 dark:border-red-800/30 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+										className="rounded-lg border-destructive/30 text-destructive hover:bg-destructive/10"
 										onClick={() => setShowCancelDialog(true)}
 										disabled={cancelMutation.isPending}
 									>
@@ -309,7 +309,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 							{run.status === "POSTED" && (
 								<Button
 									variant="outline"
-									className="rounded-xl border-red-200/50 dark:border-red-800/30 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+									className="rounded-lg border-destructive/30 text-destructive hover:bg-destructive/10"
 									onClick={() => setShowCancelDialog(true)}
 									disabled={cancelMutation.isPending}
 								>
@@ -324,71 +324,71 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 
 			{/* Summary Cards — مضغوطة على الجوال */}
 			<div className="grid grid-cols-2 gap-2 sm:gap-4">
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+				<div className="bg-card border-2 rounded-2xl p-3 sm:p-4">
 					<div className="flex items-center justify-between mb-2 sm:mb-3">
-						<div className="p-1.5 sm:p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-							<Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="p-1.5 sm:flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4" />
 						</div>
 					</div>
-					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-1">
 						{t("company.expenseRuns.totalAmount")}
 					</p>
-					<p className="truncate text-base sm:text-lg font-bold text-indigo-700 dark:text-indigo-300">
+					<p className="truncate text-base sm:text-lg font-bold text-chart-4">
 						{formatCurrency(totalAmount)}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+				<div className="bg-card border-2 rounded-2xl p-3 sm:p-4">
 					<div className="flex items-center justify-between mb-2 sm:mb-3">
-						<div className="p-1.5 sm:p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4 dark:text-chart-4" />
+						<div className="p-1.5 sm:flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-chart-4" />
 						</div>
 					</div>
-					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-1">
 						{t("company.expenseRuns.itemCount")}
 					</p>
-					<p className="truncate text-base sm:text-lg font-bold text-chart-4 dark:text-chart-4">
+					<p className="truncate text-base sm:text-lg font-bold text-chart-4">
 						{items.length}
 					</p>
 				</div>
 			</div>
 
 			{/* Expense Items Table */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-						<Receipt className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Receipt className="h-5 w-5 text-chart-4" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.expenseRuns.expenseItems")}
 					</h3>
-					<Badge className="border-0 text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">
+					<Badge className="border-0 text-[10px] px-2 py-0.5 bg-muted text-muted-foreground">
 						{items.length}
 					</Badge>
 				</div>
 				<Table className="table-fixed w-full min-w-[860px]">
 					<TableHeader>
-						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[22%]">
+						<TableRow className="border-b-2 hover:bg-transparent">
+							<TableHead className="text-end text-muted-foreground w-[22%]">
 								{t("company.expenseRuns.expenseName")}
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">
+							<TableHead className="text-end text-muted-foreground w-[15%]">
 								{t("company.expenseRuns.category")}
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">
+							<TableHead className="text-end text-muted-foreground w-[15%]">
 								{t("company.expenseRuns.vendor")}
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">
+							<TableHead className="text-end text-muted-foreground w-[14%]">
 								{t("company.expenseRuns.originalAmount")}
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">
+							<TableHead className="text-end text-muted-foreground w-[14%]">
 								{t("company.expenseRuns.amount")}
 							</TableHead>
-							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[12%]">
+							<TableHead className="text-end text-muted-foreground w-[12%]">
 								{t("company.expenseRuns.financeStatus")}
 							</TableHead>
 							{run.status === "DRAFT" && items.length > 0 && (
-								<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[8%]">
+								<TableHead className="text-end text-muted-foreground w-[8%]">
 									{t("company.common.actions")}
 								</TableHead>
 							)}
@@ -399,31 +399,31 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 							items.map((item: any, index: any) => (
 								<TableRow
 									key={item.id}
-									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+									className="border-b-2 hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
 									<TableCell className="text-end">
-										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">
+										<p className="font-medium text-card-foreground truncate">
 											{item.name ?? "-"}
 										</p>
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{item.category ? t(`company.expenses.categories.${item.category}`) : "-"}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{item.vendor ?? "-"}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-muted-foreground">
 										{formatCurrency(Number(item.originalAmount ?? 0))}
 									</TableCell>
-									<TableCell className="text-end font-semibold text-slate-900 dark:text-slate-100">
+									<TableCell className="text-end font-semibold text-card-foreground">
 										{formatCurrency(Number(item.amount ?? 0))}
 									</TableCell>
 									<TableCell className="text-end">
 										{item.financeExpense?.status ? (
 											getFinanceStatusBadge(item.financeExpense.status)
 										) : (
-											<span className="text-xs text-slate-400">-</span>
+											<span className="text-xs text-muted-foreground">-</span>
 										)}
 									</TableCell>
 									{run.status === "DRAFT" && (
@@ -432,7 +432,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-chart-4/15 hover:text-chart-4 dark:text-slate-400 dark:hover:bg-chart-4/20 dark:hover:text-chart-4"
+													className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-chart-4/15 hover:text-chart-4"
 													onClick={() => setEditItem(item)}
 													title={t("company.common.edit")}
 												>
@@ -441,7 +441,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 rounded-lg text-slate-600 hover:bg-red-100 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+													className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
 													onClick={() => setDeleteItemId(item.id)}
 													title={t("company.common.delete")}
 												>
@@ -456,10 +456,10 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 							<TableRow>
 								<TableCell colSpan={7} className="text-center py-16">
 									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<Receipt className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+										<div className="mb-4 rounded-2xl bg-muted p-5">
+											<Receipt className="h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
 										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground">
 											{t("company.expenseRuns.noItems")}
 										</p>
 									</div>
@@ -521,7 +521,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 						<AlertDialogAction
 							onClick={() => cancelMutation.mutate()}
 							disabled={cancelMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{cancelMutation.isPending ? (
 								<>
@@ -573,7 +573,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 						<AlertDialogAction
 							onClick={() => deleteItemId && deleteItemMutation.mutate(deleteItemId)}
 							disabled={deleteItemMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{deleteItemMutation.isPending ? (
 								<>

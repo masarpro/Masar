@@ -61,7 +61,7 @@ export function AutosaveIndicator({ state, onRetry, className, mode = "default" 
 			<span
 				className={cn(
 					baseClasses,
-					"text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30",
+					"text-chart-1 bg-chart-1/15",
 					className,
 				)}
 			>
@@ -76,7 +76,7 @@ export function AutosaveIndicator({ state, onRetry, className, mode = "default" 
 			<span
 				className={cn(
 					baseClasses,
-					"text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30",
+					"text-success bg-success/15",
 					className,
 				)}
 			>
@@ -93,7 +93,7 @@ export function AutosaveIndicator({ state, onRetry, className, mode = "default" 
 				onClick={onRetry}
 				className={cn(
 					baseClasses,
-					"text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 cursor-pointer",
+					"text-destructive bg-destructive/15 hover:bg-destructive/25 cursor-pointer",
 					className,
 				)}
 				title={state.errorMessage ?? undefined}
@@ -109,7 +109,7 @@ export function AutosaveIndicator({ state, onRetry, className, mode = "default" 
 			<span
 				className={cn(
 					baseClasses,
-					"text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30",
+					"text-chart-1 bg-chart-1/15",
 					className,
 				)}
 			>

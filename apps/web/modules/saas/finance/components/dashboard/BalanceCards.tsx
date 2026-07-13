@@ -42,8 +42,8 @@ export function BalanceCards({ cashBalance, bankBalance, netProfit }: BalanceCar
 						label: t("finance.dashboard.overview.netProfit"),
 						value: <Currency amount={netProfit} />,
 						icon: TrendingUp,
-						iconClassName: "text-violet-600 dark:text-violet-400",
-						iconBgClassName: "bg-violet-100 dark:bg-violet-900/30",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 					},
 				]}
 			/>
@@ -51,46 +51,46 @@ export function BalanceCards({ cashBalance, bankBalance, netProfit }: BalanceCar
 			{/* الديسكتوب كما هو */}
 			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 			{/* Cash Balance */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+			<div className="bg-card border-2 rounded-2xl p-4">
 				<div className="flex items-center justify-between mb-3">
 					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
 						<Wallet className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+				<p className="text-xs font-medium text-muted-foreground mb-1">
 					{t("finance.dashboard.overview.cashBalance")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-card-foreground">
 					<Currency amount={cashBalance} />
 				</p>
 			</div>
 
 			{/* Bank Balance */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+			<div className="bg-card border-2 rounded-2xl p-4">
 				<div className="flex items-center justify-between mb-3">
 					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
 						<Landmark className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 					</div>
 				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+				<p className="text-xs font-medium text-muted-foreground mb-1">
 					{t("finance.dashboard.overview.bankBalance")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-card-foreground">
 					<Currency amount={bankBalance} />
 				</p>
 			</div>
 
 			{/* Net Profit */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+			<div className="bg-card border-2 rounded-2xl p-4">
 				<div className="flex items-center justify-between mb-3">
-					<div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
-						<TrendingUp className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+					<div className="p-2 rounded-lg bg-chart-4/15">
+						<TrendingUp className="h-5 w-5 text-chart-4" />
 					</div>
 				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+				<p className="text-xs font-medium text-muted-foreground mb-1">
 					{t("finance.dashboard.overview.netProfit")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-card-foreground">
 					<Currency amount={netProfit} />
 				</p>
 			</div>

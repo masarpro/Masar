@@ -163,7 +163,7 @@ export function DashboardChecklist() {
 								}`}
 							>
 								{item.done ? (
-									<CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />
+									<CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
 								) : (
 									<Circle className="h-5 w-5 shrink-0 text-muted-foreground/40" />
 								)}

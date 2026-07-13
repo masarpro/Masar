@@ -254,7 +254,7 @@ export function QuotationDataForm({
 					{discountAmount > 0 && (
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-muted-foreground">{t("totals.discount")}</span>
-							<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
+							<span className="text-destructive" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
 						</div>
 					)}
 					<div className="flex items-center justify-between text-sm">

@@ -67,7 +67,7 @@ export function MEPItemRow({
 					<TooltipProvider delayDuration={200}>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Pencil className="h-3 w-3 shrink-0 text-amber-500" />
+								<Pencil className="h-3 w-3 shrink-0 text-chart-1" />
 							</TooltipTrigger>
 							<TooltipContent side="top" className="text-xs">
 								{t("itemRow.manualOverride", { qty: formatNumber(item.derivedQuantity ?? 0, 1) })}

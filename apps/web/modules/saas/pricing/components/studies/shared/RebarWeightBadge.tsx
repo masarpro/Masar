@@ -26,7 +26,7 @@ export function RebarWeightBadge({
 	return (
 		<div className="flex justify-center mt-4">
 			<div
-				className={`inline-flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 rounded-full font-bold dark:bg-red-950 dark:text-red-300 dark:border-red-800 ${sizeClasses[size]} ${className || ""}`}
+				className={`inline-flex items-center gap-2 bg-destructive/10 text-destructive border border-destructive/30 rounded-full font-bold ${sizeClasses[size]} ${className || ""}`}
 			>
 				<Scale className="h-4 w-4" />
 				<span>وزن الحديد: {weight.toFixed(2)} كجم</span>

@@ -99,12 +99,12 @@ export function ProfitControlCard({
 		<Card className="space-y-4 p-4">
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div className="flex items-center gap-3">
-					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-4/15 text-chart-4">
 						<Sparkles className="h-5 w-5" />
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground">هامش الربح العام</p>
-						<p className="text-2xl font-bold tabular-nums leading-none text-violet-700 dark:text-violet-300">
+						<p className="text-2xl font-bold tabular-nums leading-none text-chart-4">
 							{fmt(local)}
 							<span className="ms-0.5 text-base font-medium">%</span>
 						</p>
@@ -121,7 +121,7 @@ export function ProfitControlCard({
 								onClick={() => setValue(c)}
 								className={`rounded-full border px-3 py-1 text-xs tabular-nums transition ${
 									active
-										? "border-violet-600 bg-violet-600 text-white"
+										? "border-chart-4 bg-chart-4 text-white"
 										: "border-border bg-background hover:bg-muted"
 								}`}
 							>
@@ -156,7 +156,7 @@ export function ProfitControlCard({
 
 				{customMarkupCount > 0 && (
 					<div className="flex items-center gap-2">
-						<span className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+						<span className="flex items-center gap-1.5 rounded-full border border-chart-1 bg-chart-1/15 px-2.5 py-1 text-chart-1">
 							<AlertTriangle className="h-3.5 w-3.5" />
 							<span className="tabular-nums">
 								{customMarkupCount} بهامش خاص

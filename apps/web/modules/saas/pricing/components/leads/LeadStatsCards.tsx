@@ -37,29 +37,29 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 			label: t("pricing.leads.stats.total"),
 			value: String(stats.total),
 			icon: Users,
-			iconBg: "bg-slate-50 dark:bg-slate-800/50",
-			iconColor: "text-slate-600 dark:text-slate-300",
+			iconBg: "bg-muted",
+			iconColor: "text-muted-foreground",
 		},
 		{
 			label: t("pricing.leads.stats.open"),
 			value: String(openCount),
 			icon: Clock,
-			iconBg: "bg-amber-50 dark:bg-amber-900/30",
-			iconColor: "text-amber-600 dark:text-amber-400",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
 		},
 		{
 			label: t("pricing.leads.stats.won"),
 			value: String(stats.byStatus.WON ?? 0),
 			icon: CheckCircle2,
-			iconBg: "bg-teal-50 dark:bg-teal-900/30",
-			iconColor: "text-teal-600 dark:text-teal-400",
+			iconBg: "bg-chart-3/15",
+			iconColor: "text-chart-3",
 		},
 		{
 			label: t("pricing.leads.stats.estimatedValue"),
 			value: `${formatNumber(stats.openEstimatedValue, 0)} ر.س`,
 			icon: Banknote,
-			iconBg: "bg-indigo-50 dark:bg-indigo-900/30",
-			iconColor: "text-indigo-600 dark:text-indigo-400",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
 			smallValue: true,
 		},
 	];
@@ -69,7 +69,7 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 			{cards.map((card) => (
 				<div
 					key={card.label}
-					className="rounded-xl sm:rounded-2xl border border-slate-200/60 bg-white shadow-sm sm:shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 p-3 sm:p-5 transition-all duration-200 hover:shadow-xl"
+					className="rounded-xl sm:rounded-2xl border-2 bg-card p-3 sm:p-5 transition-colors"
 				>
 					<div className="flex items-center justify-between gap-2">
 						<div className="min-w-0 flex-1">

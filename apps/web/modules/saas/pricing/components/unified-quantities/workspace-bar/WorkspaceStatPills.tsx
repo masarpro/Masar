@@ -66,11 +66,11 @@ const TONE: Record<PillProps["tone"], string> = {
 	neutral:
 		"bg-muted/60 text-foreground border-border",
 	info:
-		"bg-chart-4/15 text-chart-4 border-chart-4 dark:bg-chart-4/20 dark:text-chart-4 dark:border-chart-4",
+		"bg-chart-4/15 text-chart-4 border-chart-4",
 	success:
-		"bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-100 dark:border-emerald-900",
+		"bg-success/15 text-success border-success",
 	danger:
-		"bg-red-50 text-red-900 border-red-200 dark:bg-red-950/30 dark:text-red-100 dark:border-red-900",
+		"bg-destructive/15 text-destructive border-destructive",
 };
 
 function Pill({ icon, label, value, suffix, tone }: PillProps) {

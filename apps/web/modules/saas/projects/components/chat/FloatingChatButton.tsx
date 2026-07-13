@@ -53,7 +53,7 @@ export function FloatingChatButton({
 						"flex items-center justify-center",
 						"h-14 w-14 rounded-full",
 						"bg-primary text-primary-foreground",
-						"shadow-2xl shadow-primary/30",
+						"shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
 						"hover:scale-110 active:scale-95 transition-all duration-200",
 					)}
 				>

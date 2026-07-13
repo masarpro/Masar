@@ -22,7 +22,7 @@ export function FloatingAssistantButton() {
       aria-haspopup="dialog"
       title={`${t("title")} (${t("shortcut")})`}
       className={cn(
-        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-chart-4 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
+        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-chart-4 text-white shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105 active:scale-95",
       )}
     >
       <span
@@ -36,7 +36,7 @@ export function FloatingAssistantButton() {
 
       {/* Unread badge */}
       {unreadCount > 0 && !isOpen && (
-        <span className="absolute -end-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white animate-in zoom-in-50">
+        <span className="absolute -end-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-in zoom-in-50">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       )}

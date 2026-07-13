@@ -66,9 +66,9 @@ export function RibbedSlabFields({
 			/>
 
 			{/* إعدادات الهوردي */}
-			<div className="border rounded-lg p-4 bg-orange-50/30">
+			<div className="border rounded-lg p-4 bg-chart-1/10">
 				<h5 className="font-medium mb-3 flex items-center gap-2">
-					<Package className="h-4 w-4 text-orange-600" />
+					<Package className="h-4 w-4 text-chart-1" />
 					إعدادات سقف الهوردي
 				</h5>
 				<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -164,11 +164,11 @@ export function RibbedSlabFields({
 							</SelectContent>
 						</Select>
 					</div>
-					<div className="bg-orange-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
+					<div className="bg-chart-1/15 rounded-lg p-3 flex flex-col justify-center items-center">
 						<span className="text-xs text-muted-foreground">
 							السماكة الكلية
 						</span>
-						<span className="font-bold text-lg text-orange-700">
+						<span className="font-bold text-lg text-chart-1">
 							{formData.blockHeight + formData.toppingThickness}{" "}
 							سم
 						</span>
@@ -179,7 +179,7 @@ export function RibbedSlabFields({
 			{/* تسليح الهوردي */}
 			<div className="border-t pt-4 space-y-4">
 				<h4 className="font-medium flex items-center gap-2">
-					<span className="w-2 h-2 rounded-full bg-orange-500" />
+					<span className="w-2 h-2 rounded-full bg-chart-1" />
 					تسليح الأعصاب
 				</h4>
 
@@ -237,7 +237,7 @@ export function RibbedSlabFields({
 						</Select>
 					</div>
 					<div className="space-y-1.5">
-						<Label className="text-sm text-green-700">
+						<Label className="text-sm text-success">
 							عدد أسياخ الرأس
 						</Label>
 						<Select
@@ -249,7 +249,7 @@ export function RibbedSlabFields({
 								})
 							}
 						>
-							<SelectTrigger className="border-green-200">
+							<SelectTrigger className="border-success/30">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -262,7 +262,7 @@ export function RibbedSlabFields({
 						</Select>
 					</div>
 					<div className="space-y-1.5">
-						<Label className="text-sm text-green-700">
+						<Label className="text-sm text-success">
 							قطر سيخ الرأس
 						</Label>
 						<Select
@@ -274,7 +274,7 @@ export function RibbedSlabFields({
 								})
 							}
 						>
-							<SelectTrigger className="border-green-200">
+							<SelectTrigger className="border-success/30">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -305,7 +305,7 @@ export function RibbedSlabFields({
 									hasRibStirrup: e.target.checked,
 								})
 							}
-							className="rounded border-gray-500"
+							className="rounded border-input"
 						/>
 						<Label
 							htmlFor="hasRibStirrup"
@@ -424,8 +424,8 @@ export function RibbedSlabFields({
 					{/* البلوكات */}
 					{calculations.blocksCount &&
 						calculations.blocksCount > 0 && (
-							<div className="bg-orange-100/50 rounded p-3">
-								<div className="flex items-center gap-2 text-orange-700">
+							<div className="bg-chart-1/15 rounded p-3">
+								<div className="flex items-center gap-2 text-chart-1">
 									<Package className="h-4 w-4" />
 									<span className="font-medium">
 										عدد البلوكات:{" "}

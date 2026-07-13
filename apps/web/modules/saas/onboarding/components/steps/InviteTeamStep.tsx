@@ -114,15 +114,15 @@ export function InviteTeamStep({
 							className="flex items-center gap-3 rounded-lg border p-3"
 						>
 							{result.status === "sent" ? (
-								<CheckCircle className="h-5 w-5 text-green-500" />
+								<CheckCircle className="h-5 w-5 text-success" />
 							) : (
-								<XCircle className="h-5 w-5 text-red-500" />
+								<XCircle className="h-5 w-5 text-destructive" />
 							)}
 							<span className="flex-1" dir="ltr">
 								{result.email}
 							</span>
 							<span
-								className={`text-sm ${result.status === "sent" ? "text-green-600" : "text-red-600"}`}
+								className={`text-sm ${result.status === "sent" ? "text-success" : "text-destructive"}`}
 							>
 								{result.status === "sent"
 									? t("onboarding.wizard.inviteTeam.sent")

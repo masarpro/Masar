@@ -22,9 +22,9 @@ interface GanttPrintCanvasProps {
 
 const STATUS_COLORS: Record<string, { bar: string; fill: string; text: string }> = {
 	PLANNED: {
-		bar: "bg-slate-200 border-slate-400",
-		fill: "bg-slate-500",
-		text: "text-slate-700",
+		bar: "bg-muted border-border",
+		fill: "bg-muted-foreground",
+		text: "text-muted-foreground",
 	},
 	IN_PROGRESS: {
 		bar: "bg-chart-4/15 border-chart-4",
@@ -42,9 +42,9 @@ const STATUS_COLORS: Record<string, { bar: string; fill: string; text: string }>
 		text: "text-destructive",
 	},
 	CANCELLED: {
-		bar: "bg-gray-100 border-gray-400",
-		fill: "bg-gray-400",
-		text: "text-gray-500",
+		bar: "bg-muted border-border",
+		fill: "bg-muted-foreground",
+		text: "text-muted-foreground",
 	},
 };
 
@@ -152,7 +152,7 @@ export function GanttPrintCanvas({
 
 	if (milestones.length === 0) {
 		return (
-			<div className="border border-slate-300 rounded p-8 text-center text-slate-500 text-sm">
+			<div className="border border-border rounded p-8 text-center text-muted-foreground text-sm">
 				{t("timeline.emptyTitle")}
 			</div>
 		);
@@ -161,20 +161,20 @@ export function GanttPrintCanvas({
 	const titleColWidth = "180px";
 
 	return (
-		<div className="border border-slate-300 rounded overflow-hidden text-slate-800 bg-white">
+		<div className="border border-border rounded overflow-hidden text-foreground bg-white">
 			{/* Header row: timeline axis */}
 			<div
-				className="grid border-b-2 border-slate-400 bg-slate-100"
+				className="grid border-b-2 border-border bg-muted"
 				style={{ gridTemplateColumns: `${titleColWidth} 1fr` }}
 			>
-				<div className="px-2 py-2 text-xs font-bold border-e border-slate-300">
+				<div className="px-2 py-2 text-xs font-bold border-e border-border">
 					{t("execution.print.milestone")}
 				</div>
 				<div className="relative h-10">
 					{months.map((m, i) => (
 						<div
 							key={i}
-							className="absolute top-0 h-full border-e border-slate-300 text-[10px] px-1 text-slate-700 flex items-center font-semibold"
+							className="absolute top-0 h-full border-e border-border text-[10px] px-1 text-muted-foreground flex items-center font-semibold"
 							style={{ insetInlineStart: `${m.x}%`, width: `${m.w}%` }}
 						>
 							{m.label}
@@ -192,12 +192,12 @@ export function GanttPrintCanvas({
 				return (
 					<div
 						key={m.id}
-						className="grid border-b border-slate-200 hover:bg-slate-50"
+						className="grid border-b border-border hover:bg-muted/50"
 						style={{ gridTemplateColumns: `${titleColWidth} 1fr` }}
 					>
-						<div className="px-2 py-2 text-xs border-e border-slate-300">
+						<div className="px-2 py-2 text-xs border-e border-border">
 							<div className="flex items-baseline gap-1">
-								<span className="text-slate-400 text-[10px] w-4 shrink-0">
+								<span className="text-muted-foreground text-[10px] w-4 shrink-0">
 									{idx + 1}
 								</span>
 								<span className="font-semibold truncate">
@@ -211,7 +211,7 @@ export function GanttPrintCanvas({
 								)}
 							>
 								<span>{statusLabel(m.status)}</span>
-								<span className="text-slate-400">•</span>
+								<span className="text-muted-foreground">•</span>
 								<span className="font-mono">{progress.toFixed(0)}%</span>
 							</div>
 						</div>
@@ -221,7 +221,7 @@ export function GanttPrintCanvas({
 							{months.map((mo, i) => (
 								<div
 									key={i}
-									className="absolute top-0 bottom-0 border-e border-slate-100"
+									className="absolute top-0 bottom-0 border-e border-border"
 									style={{ insetInlineStart: `${mo.x + mo.w}%`, width: 0 }}
 								/>
 							))}
@@ -258,8 +258,8 @@ export function GanttPrintCanvas({
 			})}
 
 			{/* Legend */}
-			<div className="grid border-t-2 border-slate-300 bg-slate-50">
-				<div className="flex items-center gap-4 px-3 py-2 text-[10px] text-slate-600 flex-wrap">
+			<div className="grid border-t-2 border-border bg-muted">
+				<div className="flex items-center gap-4 px-3 py-2 text-[10px] text-muted-foreground flex-wrap">
 					<span className="font-semibold">{t("execution.print.legend")}:</span>
 					{Object.entries(STATUS_COLORS).map(([key, colors]) => (
 						<span key={key} className="inline-flex items-center gap-1">

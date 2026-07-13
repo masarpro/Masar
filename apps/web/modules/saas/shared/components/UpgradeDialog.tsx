@@ -28,8 +28,8 @@ export function UpgradeDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-md text-center" dir="rtl">
 				<DialogHeader className="items-center">
-					<div className="flex size-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 mb-2">
-						<LockIcon className="size-6 text-amber-600 dark:text-amber-400" />
+					<div className="flex size-12 items-center justify-center rounded-full bg-chart-1/15 mb-2">
+						<LockIcon className="size-6 text-chart-1" />
 					</div>
 					<DialogTitle className="text-xl">
 						{t("featureGate.title")}

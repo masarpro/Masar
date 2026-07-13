@@ -223,7 +223,7 @@ export function AddressSection({
 					</CollapsibleTrigger>
 
 					<CollapsibleContent className="mt-4 space-y-4 border-t pt-4">
-						<h4 className="font-medium text-slate-700 dark:text-slate-300">
+						<h4 className="font-medium text-muted-foreground">
 							{t("finance.clients.secondaryAddress")}
 						</h4>
 

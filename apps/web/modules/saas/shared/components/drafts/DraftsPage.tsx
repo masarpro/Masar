@@ -24,9 +24,9 @@ export function DraftsPage({ kind, organizationId, organizationSlug }: DraftsPag
 	return (
 		<div className="space-y-5 max-w-6xl mx-auto">
 			{/* Header */}
-			<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+			<div className="sticky top-0 z-20 py-3 px-4 rounded-2xl bg-card border-2 border-border">
 				<div className="flex items-center gap-3">
-					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border">
 						<Link href={backHref}>
 							<ArrowRight className="h-4 w-4 rtl:rotate-180" />
 						</Link>

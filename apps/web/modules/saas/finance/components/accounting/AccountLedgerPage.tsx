@@ -79,7 +79,7 @@ export function AccountLedgerPage({
 					{account && (
 						<div>
 							<h2 className="text-lg font-bold">{account.code} — {account.nameAr}</h2>
-							<p className="text-sm text-slate-500">{t("finance.accounting.ledger.title")}</p>
+							<p className="text-sm text-muted-foreground">{t("finance.accounting.ledger.title")}</p>
 						</div>
 					)}
 				</div>
@@ -90,7 +90,7 @@ export function AccountLedgerPage({
 						onChange={(e: any) => { setDateFrom(e.target.value); setPage(1); }}
 						className="rounded-xl w-40"
 					/>
-					<span className="text-slate-400">—</span>
+					<span className="text-muted-foreground">—</span>
 					<Input
 						type="date"
 						value={dateTo}
@@ -126,14 +126,14 @@ export function AccountLedgerPage({
 			<div className="hidden print:block text-center mb-6">
 				<h1 className="text-xl font-bold">{t("finance.accounting.ledger.title")}</h1>
 				{account && <p className="text-lg">{account.code} — {account.nameAr}</p>}
-				<p className="text-sm text-slate-500">{dateFrom} — {dateTo}</p>
+				<p className="text-sm text-muted-foreground">{dateFrom} — {dateTo}</p>
 			</div>
 
 			{/* Table */}
 			<Card className="rounded-2xl print:rounded-none print:shadow-none print:border">
 				<CardContent className="p-0">
 					{entries.length === 0 && !data?.openingBalance ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.ledger.noMovements")}
 						</div>
 					) : (
@@ -152,7 +152,7 @@ export function AccountLedgerPage({
 							<TableBody>
 								{/* Opening Balance Row */}
 								{page === 1 && (
-									<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium">
+									<TableRow className="bg-muted font-medium">
 										<TableCell colSpan={4}>{t("finance.accounting.ledger.openingBalance")}</TableCell>
 										<TableCell className="text-end">—</TableCell>
 										<TableCell className="text-end">—</TableCell>
@@ -164,7 +164,7 @@ export function AccountLedgerPage({
 
 								{entries.map((entry: any) => (
 									<TableRow key={`${entry.entryId}-${entry.debit}-${entry.credit}`}>
-										<TableCell className="text-sm text-slate-500">
+										<TableCell className="text-sm text-muted-foreground">
 											{new Date(entry.date).toLocaleDateString("en-SA")}
 										</TableCell>
 										<TableCell>
@@ -178,7 +178,7 @@ export function AccountLedgerPage({
 										<TableCell className="text-sm max-w-[250px] truncate">
 											{entry.description}
 										</TableCell>
-										<TableCell className="text-sm text-slate-500">
+										<TableCell className="text-sm text-muted-foreground">
 											{entry.referenceNo || entry.referenceType || "—"}
 										</TableCell>
 										<TableCell className="text-end">
@@ -194,7 +194,7 @@ export function AccountLedgerPage({
 								))}
 
 								{/* Closing Balance Row */}
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium border-t-2">
+								<TableRow className="bg-muted font-medium border-t-2">
 									<TableCell colSpan={4}>{t("finance.accounting.ledger.closingBalance")}</TableCell>
 									<TableCell className="text-end font-bold">
 										{formatAccounting(data?.totalDebit ?? 0)}
@@ -224,7 +224,7 @@ export function AccountLedgerPage({
 					>
 						{t("common.previous")}
 					</Button>
-					<span className="text-sm text-slate-500">
+					<span className="text-sm text-muted-foreground">
 						{page} / {totalPages}
 					</span>
 					<Button

@@ -68,7 +68,7 @@ export function FlatSlabFields({
 			/>
 
 			{/* إعدادات الفلات سلاب */}
-			<div className="border rounded-lg p-4 bg-purple-50/30">
+			<div className="border rounded-lg p-4 bg-chart-4/10">
 				<div className="flex items-center gap-2 mb-3">
 					<input
 						type="checkbox"
@@ -82,11 +82,11 @@ export function FlatSlabFields({
 								hasDropPanels: e.target.checked,
 							})
 						}
-						className="rounded border-purple-500"
+						className="rounded border-chart-4"
 					/>
 					<Label
 						htmlFor="hasDropPanels"
-						className="text-sm font-medium text-purple-700 cursor-pointer"
+						className="text-sm font-medium text-chart-4 cursor-pointer"
 					>
 						يوجد تكثيف (Drop Panels)
 					</Label>
@@ -174,7 +174,7 @@ export function FlatSlabFields({
 						? (longerSpan * 1000) / 36
 						: (longerSpan * 1000) / 33;
 					return formData.thickness < minThickness && formData.length > 0 && formData.width > 0 ? (
-						<div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-2 rounded-lg text-sm">
+						<div className="bg-chart-1/10 border border-chart-1/30 text-chart-1 px-3 py-2 rounded-lg text-sm">
 							{t("structural.flatSlab.minThicknessWarning", {
 								entered: formData.thickness,
 								minimum: Math.ceil(minThickness / 10),
@@ -185,7 +185,7 @@ export function FlatSlabFields({
 
 				{/* تحذير عدم وجود شبكة علوية */}
 				{!formData.hasTopMesh && (
-					<div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-2 rounded-lg text-sm">
+					<div className="bg-chart-1/10 border border-chart-1/30 text-chart-1 px-3 py-2 rounded-lg text-sm">
 						{t("structural.flatSlab.noTopMeshWarning")}
 					</div>
 				)}
@@ -277,11 +277,11 @@ export function FlatSlabFields({
 									hasTopMesh: e.target.checked,
 								})
 							}
-							className="rounded border-green-500"
+							className="rounded border-success"
 						/>
 						<Label
 							htmlFor="hasTopMesh-flat"
-							className="text-sm font-medium text-green-700 cursor-pointer"
+							className="text-sm font-medium text-success cursor-pointer"
 						>
 							الشبكة العلوية (الغطاء) - للسحب السالب
 						</Label>
@@ -356,7 +356,7 @@ export function FlatSlabFields({
 						<div className="flex items-center gap-2 mb-2">
 							<Badge variant="outline" className={
 								calculations.structuralType === 'ONE_WAY'
-									? 'border-amber-500 text-amber-700'
+									? 'border-chart-1 text-chart-1'
 									: 'border-chart-4 text-chart-4'
 							}>
 								{calculations.structuralType === 'ONE_WAY'
@@ -370,9 +370,9 @@ export function FlatSlabFields({
 					{/* تحذير اتجاه الحديد */}
 					{calculations.structuralType === 'ONE_WAY' &&
 					 formData.bottomMainDiameter < formData.bottomSecondaryDiameter && (
-						<div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
-							<AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-							<p className="text-xs text-amber-700">
+						<div className="bg-chart-1/10 border border-chart-1/30 rounded-lg p-3 flex items-center gap-2">
+							<AlertTriangle className="h-4 w-4 text-chart-1 flex-shrink-0" />
+							<p className="text-xs text-chart-1">
 								{t('pricing.studies.structural.rebarDirectionWarning')}
 							</p>
 						</div>
@@ -411,8 +411,8 @@ export function FlatSlabFields({
 					{/* شارة حساب فعلي/تقديري */}
 					<div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
 						calculations.rebarDetails[0]?.diameter > 0
-							? "bg-green-50 text-green-700 border border-green-200"
-							: "bg-amber-50 text-amber-700 border border-amber-200"
+							? "bg-success/10 text-success border border-success/30"
+							: "bg-chart-1/10 text-chart-1 border border-chart-1/30"
 					}`}>
 						{calculations.rebarDetails[0]?.diameter > 0
 							? t("structural.flatSlab.actualCalculation")

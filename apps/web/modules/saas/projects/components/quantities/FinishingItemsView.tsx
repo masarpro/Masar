@@ -158,7 +158,7 @@ export function FinishingItemsView({
 	if (allItems.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<p className="text-sm text-slate-500 dark:text-slate-400">
+				<p className="text-sm text-muted-foreground">
 					{t("projectQuantities.empty.noFinishingItems")}
 				</p>
 			</div>
@@ -191,24 +191,24 @@ export function FinishingItemsView({
 						<TableBody>
 							{allItems.map((item) => (
 								<TableRow key={item.id}>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{studyMap.get(item.costStudyId) ?? "-"}
 									</TableCell>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{item.category}
 									</TableCell>
-									<TableCell className="font-medium text-slate-900 dark:text-slate-100">
+									<TableCell className="font-medium text-card-foreground">
 										{item.name}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-400">
+									<TableCell className="text-end text-muted-foreground">
 										{(item.area ?? item.quantity)?.toLocaleString("en-US") ?? "-"}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-400">
+									<TableCell className="text-end text-muted-foreground">
 										{item.materialPrice != null
 											? formatNumber(item.materialPrice, 2)
 											: "-"}
 									</TableCell>
-									<TableCell className="text-end font-medium text-slate-900 dark:text-slate-100">
+									<TableCell className="text-end font-medium text-card-foreground">
 										{formatNumber(item.totalCost, 2)}
 									</TableCell>
 									<TableCell
@@ -254,11 +254,11 @@ export function FinishingItemsView({
 							<TableRow className="bg-slate-50 font-semibold dark:bg-slate-800/50">
 								<TableCell
 									colSpan={5}
-									className="text-slate-900 dark:text-slate-100"
+									className="text-card-foreground"
 								>
 									{t("projectQuantities.table.grandTotal")}
 								</TableCell>
-								<TableCell className="text-end text-slate-900 dark:text-slate-100">
+								<TableCell className="text-end text-card-foreground">
 									{formatNumber(grandTotal, 2)}
 								</TableCell>
 								<TableCell />

@@ -43,7 +43,7 @@ export function AdditionalSection({
 				{/* الملاحظات */}
 				<div>
 					<Label className="flex items-center gap-2">
-						<FileText className="h-4 w-4 text-slate-400" />
+						<FileText className="h-4 w-4 text-muted-foreground" />
 						{t("finance.clients.notes")}
 					</Label>
 					<Textarea
@@ -63,7 +63,7 @@ export function AdditionalSection({
 				{/* لغة العرض */}
 				<div className="max-w-xs">
 					<Label className="flex items-center gap-2">
-						<Globe className="h-4 w-4 text-slate-400" />
+						<Globe className="h-4 w-4 text-muted-foreground" />
 						{t("finance.clients.displayLanguage")}
 					</Label>
 					<Select
@@ -83,7 +83,7 @@ export function AdditionalSection({
 							))}
 						</SelectContent>
 					</Select>
-					<p className="text-xs text-slate-500 mt-1">
+					<p className="text-xs text-muted-foreground mt-1">
 						{t("finance.clients.displayLanguageHint")}
 					</p>
 				</div>

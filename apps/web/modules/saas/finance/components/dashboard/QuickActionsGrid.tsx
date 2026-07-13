@@ -31,36 +31,36 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			id: "invoice",
 			icon: Receipt,
 			href: `${basePath}/invoices/new`,
-			color: "text-green-600 dark:text-green-400",
-			bgColor: "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50",
+			color: "text-success",
+			bgColor: "bg-success/15 hover:bg-success/20",
 		},
 		{
 			id: "templates",
 			icon: LayoutTemplate,
 			href: `${basePath}/templates`,
-			color: "text-purple-600 dark:text-purple-400",
-			bgColor: "bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50",
+			color: "text-chart-4",
+			bgColor: "bg-chart-4/15 hover:bg-chart-4/20",
 		},
 		{
 			id: "clients",
 			icon: Users,
 			href: `${basePath}/clients`,
-			color: "text-amber-600 dark:text-amber-400",
-			bgColor: "bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50",
+			color: "text-chart-1",
+			bgColor: "bg-chart-1/15 hover:bg-chart-1/20",
 		},
 		{
 			id: "reports",
 			icon: BarChart3,
 			href: `${basePath}/reports`,
-			color: "text-chart-4 dark:text-chart-4",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20 hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
+			color: "text-chart-4",
+			bgColor: "bg-chart-4/15 hover:bg-chart-4/20",
 		},
 		{
 			id: "settings",
 			icon: Settings,
 			href: `${basePath}/settings`,
-			color: "text-slate-600 dark:text-slate-400",
-			bgColor: "bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800",
+			color: "text-muted-foreground",
+			bgColor: "bg-muted hover:bg-accent",
 		},
 	];
 
@@ -83,7 +83,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 							>
 								<Icon className="h-6 w-6" />
 							</div>
-							<span className="text-xs font-medium text-center text-slate-700 dark:text-slate-300">
+							<span className="text-xs font-medium text-center text-foreground">
 								{t(`finance.dashboard.actions.${action.id}`)}
 							</span>
 						</Link>

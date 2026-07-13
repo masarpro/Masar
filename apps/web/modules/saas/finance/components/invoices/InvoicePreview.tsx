@@ -78,9 +78,9 @@ export function InvoicePreview({
 
 	if (!invoice) {
 		return (
-			<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+			<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 				<div className="text-center py-20">
-					<p className="text-slate-500 dark:text-slate-400">
+					<p className="text-muted-foreground">
 						{t("finance.invoices.notFound")}
 					</p>
 				</div>
@@ -108,33 +108,33 @@ export function InvoicePreview({
 	};
 
 	return (
-		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 			{/* ─── Sticky Header ────────────────────────────────── */}
-			<div className="sticky top-0 z-20 py-3 px-4 mb-6 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50 print:hidden">
+			<div className="sticky top-0 z-20 py-3 px-4 mb-6 rounded-2xl bg-card border-2 border-border print:hidden">
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<div className="flex min-w-0 items-center gap-3">
 						<Link href={`${basePath}/${invoiceId}`}>
-							<Button variant="ghost" size="icon" className="rounded-xl h-9 w-9 hover:bg-slate-100 dark:hover:bg-slate-800">
+							<Button variant="ghost" size="icon" className="rounded-xl h-9 w-9 hover:bg-accent">
 								<ArrowRight className="h-4 w-4" />
 							</Button>
 						</Link>
 						<div className="flex min-w-0 items-center gap-1.5 text-sm">
 							{/* مسار التنقل الكامل يظهر من sm فأعلى — على الجوال يكفي السهم + العنوان */}
 							<div className="hidden sm:flex items-center gap-1.5">
-								<Link href={`/app/${organizationSlug}/finance`} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+								<Link href={`/app/${organizationSlug}/finance`} className="text-muted-foreground hover:text-foreground transition-colors">
 									{t("finance.title")}
 								</Link>
-								<ChevronLeft className="h-3.5 w-3.5 text-slate-300 dark:text-slate-600" />
-								<Link href={basePath} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+								<ChevronLeft className="h-3.5 w-3.5 text-muted-foreground" />
+								<Link href={basePath} className="text-muted-foreground hover:text-foreground transition-colors">
 									{t("finance.invoices.title")}
 								</Link>
-								<ChevronLeft className="h-3.5 w-3.5 text-slate-300 dark:text-slate-600" />
-								<Link href={`${basePath}/${invoiceId}`} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+								<ChevronLeft className="h-3.5 w-3.5 text-muted-foreground" />
+								<Link href={`${basePath}/${invoiceId}`} className="text-muted-foreground hover:text-foreground transition-colors">
 									{invoice.invoiceNo}
 								</Link>
-								<ChevronLeft className="h-3.5 w-3.5 text-slate-300 dark:text-slate-600" />
+								<ChevronLeft className="h-3.5 w-3.5 text-muted-foreground" />
 							</div>
-							<span className="truncate text-slate-700 dark:text-slate-200 font-medium">
+							<span className="truncate text-foreground font-medium">
 								{t("finance.invoices.preview")}
 							</span>
 						</div>

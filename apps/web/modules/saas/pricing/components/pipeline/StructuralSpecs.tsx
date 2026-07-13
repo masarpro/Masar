@@ -392,7 +392,7 @@ export function StructuralSpecs({
 			<CardHeader className="pb-3">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
-						<Settings2 className="h-5 w-5 text-amber-600" />
+						<Settings2 className="h-5 w-5 text-chart-1" />
 						<CardTitle className="text-base">{t("pricing.pipeline.structuralSpecs.title")}</CardTitle>
 					</div>
 					<Button
@@ -556,7 +556,7 @@ export function StructuralSpecs({
 				{/* ═══ القسم ج: مواصفات البلوك ═══ */}
 				<div className="border rounded-lg p-4 space-y-4">
 					<div className="flex items-center gap-2">
-						<Package className="h-4 w-4 text-orange-600" />
+						<Package className="h-4 w-4 text-chart-1" />
 						<h3 className="font-medium text-sm">{t("pricing.pipeline.structuralSpecs.blockSpecsTitle")}</h3>
 					</div>
 

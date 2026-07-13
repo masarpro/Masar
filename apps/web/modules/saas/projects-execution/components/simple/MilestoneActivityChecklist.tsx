@@ -138,12 +138,12 @@ export function MilestoneActivityChecklist({
 	const activities = data?.activities ?? [];
 
 	const statusBadgeClass: Record<string, string> = {
-		NOT_STARTED: "bg-slate-100 text-slate-600",
+		NOT_STARTED: "bg-muted text-muted-foreground",
 		IN_PROGRESS: "bg-chart-4/15 text-chart-4",
-		COMPLETED: "bg-green-100 text-green-600",
-		DELAYED: "bg-red-100 text-red-600",
-		ON_HOLD: "bg-yellow-100 text-yellow-600",
-		CANCELLED: "bg-gray-100 text-gray-400",
+		COMPLETED: "bg-success/15 text-success",
+		DELAYED: "bg-destructive/15 text-destructive",
+		ON_HOLD: "bg-chart-1/15 text-chart-1",
+		CANCELLED: "bg-muted text-muted-foreground",
 	};
 
 	if (isLoading) {
@@ -222,7 +222,7 @@ export function MilestoneActivityChecklist({
 								type="button"
 								size="icon"
 								variant="ghost"
-								className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+								className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
 								onClick={() => setDeleteActivityId(activity.id)}
 								title={t("execution.activity.delete")}
 							>
@@ -289,7 +289,7 @@ export function MilestoneActivityChecklist({
 							{t("common.cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							onClick={() =>
 								deleteActivityId && deleteMutation.mutate(deleteActivityId)
 							}

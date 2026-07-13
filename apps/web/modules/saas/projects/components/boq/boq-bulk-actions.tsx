@@ -28,7 +28,7 @@ export function BOQBulkActions({
 				<Button
 					variant="outline"
 					size="sm"
-					className="rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400"
+					className="rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
 					onClick={onDeleteSelected}
 				>
 					<Trash2 className="h-4 w-4 me-1.5" />

@@ -60,9 +60,9 @@ export function HollowCoreSlabFields({
 			/>
 
 			{/* إعدادات الهولوكور */}
-			<div className="border rounded-lg p-4 bg-green-50/30">
+			<div className="border rounded-lg p-4 bg-success/10">
 				<h5 className="font-medium mb-3 flex items-center gap-2">
-					<LayoutGrid className="h-4 w-4 text-green-600" />
+					<LayoutGrid className="h-4 w-4 text-success" />
 					إعدادات سقف الهولوكور
 				</h5>
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -137,11 +137,11 @@ export function HollowCoreSlabFields({
 							</SelectContent>
 						</Select>
 					</div>
-					<div className="bg-green-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
+					<div className="bg-success/15 rounded-lg p-3 flex flex-col justify-center items-center">
 						<span className="text-xs text-muted-foreground">
 							عدد الألواح
 						</span>
-						<span className="font-bold text-lg text-green-700">
+						<span className="font-bold text-lg text-success">
 							{Math.ceil(formData.width / formData.panelWidth)}{" "}
 							لوح
 						</span>
@@ -161,8 +161,8 @@ export function HollowCoreSlabFields({
 
 					{/* تفاصيل تكلفة الألواح */}
 					{calculations.panelsCostBreakdown && (
-						<div className="bg-green-100/50 rounded p-3 space-y-1">
-							<div className="flex items-center gap-2 text-green-700 font-medium">
+						<div className="bg-success/15 rounded p-3 space-y-1">
+							<div className="flex items-center gap-2 text-success font-medium">
 								<LayoutGrid className="h-4 w-4" />
 								تفاصيل تكلفة الألواح
 							</div>
@@ -177,8 +177,8 @@ export function HollowCoreSlabFields({
 					{/* البلوكات - للهوردي */}
 					{calculations.blocksCount &&
 						calculations.blocksCount > 0 && (
-							<div className="bg-orange-100/50 rounded p-3">
-								<div className="flex items-center gap-2 text-orange-700">
+							<div className="bg-chart-1/15 rounded p-3">
+								<div className="flex items-center gap-2 text-chart-1">
 									<LayoutGrid className="h-4 w-4" />
 									<span className="font-medium">
 										عدد البلوكات:{" "}

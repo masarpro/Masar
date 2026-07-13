@@ -229,8 +229,8 @@ export function OrganizationDetail({
 										<span>{t("admin.organizations.members")}</span>
 										<span>{membersCount} / {org.maxUsers}</span>
 									</div>
-									<div className="h-2 rounded-full bg-muted overflow-hidden">
-										<div className="h-full rounded-full bg-primary transition-all" style={{ width: `${membersPercent}%` }} />
+									<div className="h-2 rounded-[4px] bg-muted overflow-hidden">
+										<div className="h-full rounded-[4px] bg-chart-1 transition-all" style={{ width: `${membersPercent}%` }} />
 									</div>
 								</div>
 								<div>
@@ -238,8 +238,8 @@ export function OrganizationDetail({
 										<span>{t("admin.organizations.projects")}</span>
 										<span>{projectsCount} / {org.maxProjects}</span>
 									</div>
-									<div className="h-2 rounded-full bg-muted overflow-hidden">
-										<div className="h-full rounded-full bg-primary transition-all" style={{ width: `${projectsPercent}%` }} />
+									<div className="h-2 rounded-[4px] bg-muted overflow-hidden">
+										<div className="h-full rounded-[4px] bg-chart-1 transition-all" style={{ width: `${projectsPercent}%` }} />
 									</div>
 								</div>
 							</div>

@@ -70,8 +70,8 @@ export function CompletionStep({
 
 	return (
 		<div className="flex flex-col items-center text-center">
-			<div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-				<CheckCircle className="h-10 w-10 text-green-600" />
+			<div className="flex h-20 w-20 items-center justify-center rounded-full bg-success/15">
+				<CheckCircle className="h-10 w-10 text-success" />
 			</div>
 
 			<h2 className="mt-6 text-3xl font-bold">
@@ -91,7 +91,7 @@ export function CompletionStep({
 							<SkipForward className="h-5 w-5 shrink-0 text-muted-foreground" />
 						) : (
 							<CheckCircle
-								className={`h-5 w-5 shrink-0 ${item.done ? "text-green-500" : "text-muted-foreground"}`}
+								className={`h-5 w-5 shrink-0 ${item.done ? "text-success" : "text-muted-foreground"}`}
 							/>
 						)}
 						<span className="flex-1 text-start text-sm font-medium">

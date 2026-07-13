@@ -35,11 +35,11 @@ function getDaysLeft(
 }
 
 const STATUS_BADGE: Record<string, string> = {
-	PLANNED: "bg-slate-100 text-slate-700 border-slate-300",
+	PLANNED: "bg-muted text-muted-foreground border-border",
 	IN_PROGRESS: "bg-chart-4/15 text-chart-4 border-chart-4",
 	COMPLETED: "bg-success/15 text-success border-success",
 	DELAYED: "bg-destructive/15 text-destructive border-destructive",
-	CANCELLED: "bg-gray-100 text-gray-500 border-gray-300",
+	CANCELLED: "bg-muted text-muted-foreground border-border",
 };
 
 export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
@@ -161,7 +161,7 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 			<div
 				id="execution-table-print-area"
 				data-pdf-body
-				className="max-w-[800px] mx-auto bg-white shadow-sm border border-slate-200 p-6 print:shadow-none print:border-0 print:max-w-none print:p-0"
+				className="max-w-[800px] mx-auto bg-white shadow-sm border border-border p-6 print:shadow-none print:border-0 print:max-w-none print:p-0"
 			>
 				<ExecutionPrintHeader
 					projectId={projectId}
@@ -169,11 +169,11 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 				/>
 
 				{!dataReady ? (
-					<div className="p-12 text-center text-slate-500 text-sm">
+					<div className="p-12 text-center text-muted-foreground text-sm">
 						{t("common.loading")}
 					</div>
 				) : sorted.length === 0 ? (
-					<div className="p-12 text-center text-slate-500 text-sm">
+					<div className="p-12 text-center text-muted-foreground text-sm">
 						{t("timeline.emptyTitle")}
 					</div>
 				) : (
@@ -182,26 +182,26 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 						className="w-full text-xs border-collapse"
 					>
 						<thead>
-							<tr className="bg-slate-100">
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-10">
+							<tr className="bg-muted">
+								<th className="border border-border px-2 py-2 text-start font-bold w-10">
 									#
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold">
+								<th className="border border-border px-2 py-2 text-start font-bold">
 									{t("execution.table.name")}
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-20">
+								<th className="border border-border px-2 py-2 text-start font-bold w-20">
 									{t("execution.table.status")}
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-16">
+								<th className="border border-border px-2 py-2 text-start font-bold w-16">
 									{t("execution.table.progress")}
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-24">
+								<th className="border border-border px-2 py-2 text-start font-bold w-24">
 									{t("execution.table.plannedStart")}
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-24">
+								<th className="border border-border px-2 py-2 text-start font-bold w-24">
 									{t("execution.table.plannedEnd")}
 								</th>
-								<th className="border border-slate-300 px-2 py-2 text-start font-bold w-16">
+								<th className="border border-border px-2 py-2 text-start font-bold w-16">
 									{t("execution.table.daysLeft")}
 								</th>
 							</tr>
@@ -213,14 +213,14 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 									Math.min(100, Number(m.progress) || 0),
 								);
 								return (
-									<tr key={m.id} className="hover:bg-slate-50">
-										<td className="border border-slate-300 px-2 py-1.5 text-slate-500 text-center">
+									<tr key={m.id} className="hover:bg-muted/50">
+										<td className="border border-border px-2 py-1.5 text-muted-foreground text-center">
 											{i + 1}
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5 font-medium">
+										<td className="border border-border px-2 py-1.5 font-medium">
 											{m.title}
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5">
+										<td className="border border-border px-2 py-1.5">
 											<span
 												className={cn(
 													"inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold",
@@ -230,9 +230,9 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 												{statusLabel(m.status)}
 											</span>
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5">
+										<td className="border border-border px-2 py-1.5">
 											<div className="flex items-center gap-2">
-												<div className="flex-1 h-2 bg-slate-200 rounded overflow-hidden">
+												<div className="flex-1 h-2 bg-muted rounded overflow-hidden">
 													<div
 														className="h-full bg-chart-4"
 														style={{ width: `${progress}%` }}
@@ -243,13 +243,13 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 												</span>
 											</div>
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5 text-slate-700">
+										<td className="border border-border px-2 py-1.5 text-muted-foreground">
 											{formatDateShort(m.plannedStart)}
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5 text-slate-700">
+										<td className="border border-border px-2 py-1.5 text-muted-foreground">
 											{formatDateShort(m.plannedEnd)}
 										</td>
-										<td className="border border-slate-300 px-2 py-1.5 text-center text-slate-700">
+										<td className="border border-border px-2 py-1.5 text-center text-muted-foreground">
 											{getDaysLeft(m.plannedEnd, m.status)}
 										</td>
 									</tr>

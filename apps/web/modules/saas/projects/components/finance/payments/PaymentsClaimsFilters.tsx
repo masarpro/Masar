@@ -78,7 +78,7 @@ export function PaymentsClaimsFilters({
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 				{/* Search */}
 				<div className="relative flex-1">
-					<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						value={searchInput}
 						onChange={(e: any) => setSearchInput(e.target.value)}
@@ -88,7 +88,7 @@ export function PaymentsClaimsFilters({
 				</div>
 
 				{/* Type segmented control */}
-				<div className="flex rounded-xl border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+				<div className="flex rounded-xl border-2 bg-muted p-0.5">
 					{(
 						[
 							{ value: "all", label: t("paymentsHub.allTypes") },
@@ -108,8 +108,8 @@ export function PaymentsClaimsFilters({
 							onClick={() => updateFilter("type", opt.value)}
 							className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 								filters.type === opt.value
-									? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-									: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+									? "bg-card text-card-foreground"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 						>
 							{opt.label}
@@ -165,7 +165,7 @@ export function PaymentsClaimsFilters({
 
 				{/* Date Range */}
 				<div className="flex items-center gap-1.5">
-					<span className="text-xs text-slate-500">
+					<span className="text-xs text-muted-foreground">
 						{t("paymentsHub.from")}
 					</span>
 					<Input
@@ -176,7 +176,7 @@ export function PaymentsClaimsFilters({
 						}
 						className="h-8 w-32 rounded-lg text-xs"
 					/>
-					<span className="text-xs text-slate-500">
+					<span className="text-xs text-muted-foreground">
 						{t("paymentsHub.to")}
 					</span>
 					<Input
@@ -215,7 +215,7 @@ export function PaymentsClaimsFilters({
 						variant="ghost"
 						size="sm"
 						onClick={clearFilters}
-						className="h-8 rounded-lg px-2 text-xs text-slate-500"
+						className="h-8 rounded-lg px-2 text-xs text-muted-foreground"
 					>
 						<X className="me-1 h-3 w-3" />
 						{t("common.clear")}

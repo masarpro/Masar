@@ -19,13 +19,13 @@ import { QuantityRowExpanded } from "./QuantityRowExpanded";
 /** Map group color names to Tailwind color classes */
 const GROUP_COLOR_CLASSES: Record<string, { bg: string; border: string; badge: string }> = {
 	blue: { bg: "bg-chart-4/15 dark:bg-chart-4/20", border: "border-chart-4", badge: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4" },
-	green: { bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-500", badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" },
-	purple: { bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-500", badge: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
-	orange: { bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-500", badge: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" },
-	pink: { bg: "bg-pink-50 dark:bg-pink-950/30", border: "border-pink-500", badge: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300" },
-	teal: { bg: "bg-teal-50 dark:bg-teal-950/30", border: "border-teal-500", badge: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300" },
-	red: { bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-500", badge: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
-	yellow: { bg: "bg-yellow-50 dark:bg-yellow-950/30", border: "border-yellow-500", badge: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300" },
+	green: { bg: "bg-success/15", border: "border-success", badge: "bg-success/15 text-success" },
+	purple: { bg: "bg-chart-4/15", border: "border-chart-4", badge: "bg-chart-4/15 text-chart-4" },
+	orange: { bg: "bg-chart-1/15", border: "border-chart-1", badge: "bg-chart-1/15 text-chart-1" },
+	pink: { bg: "bg-chart-2/15", border: "border-chart-2", badge: "bg-chart-2/15 text-chart-2" },
+	teal: { bg: "bg-chart-3/15", border: "border-chart-3", badge: "bg-chart-3/15 text-chart-3" },
+	red: { bg: "bg-destructive/15", border: "border-destructive", badge: "bg-destructive/15 text-destructive" },
+	yellow: { bg: "bg-chart-1/15", border: "border-chart-1", badge: "bg-chart-1/15 text-chart-1" },
 	gray: { bg: "bg-muted/40", border: "border-muted-foreground/50", badge: "bg-muted text-muted-foreground" },
 };
 
@@ -197,7 +197,7 @@ export function QuantitiesTable({
 						<div key={group.groupKey}>
 							<button
 								type="button"
-								className={`w-full flex items-center gap-2.5 px-4 py-2.5 border-b text-base font-semibold transition-all duration-200 hover:brightness-95 border-r-4 ${colors.bg} ${colors.border}`}
+								className={`w-full flex items-center gap-2.5 px-4 py-2.5 border-b text-base font-semibold transition-all duration-200 hover:brightness-95 border-s-4 ${colors.bg} ${colors.border}`}
 								onClick={() => toggleGroup(group.groupKey)}
 							>
 								<ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`} />
@@ -254,7 +254,7 @@ export function QuantitiesTable({
 						{/* Group header */}
 						<button
 							type="button"
-							className={`w-full flex items-center gap-2.5 px-4 py-2.5 border-b text-base font-semibold transition-all duration-200 hover:brightness-95 border-r-4 ${colors.bg} ${colors.border}`}
+							className={`w-full flex items-center gap-2.5 px-4 py-2.5 border-b text-base font-semibold transition-all duration-200 hover:brightness-95 border-s-4 ${colors.bg} ${colors.border}`}
 							onClick={() => toggleGroup(group.groupKey)}
 						>
 							<ChevronDown
@@ -317,7 +317,7 @@ export function QuantitiesTable({
 													{item.name}
 												</span>
 												{item.isStale && (
-													<HelpCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+													<HelpCircle className="h-3.5 w-3.5 text-chart-1 shrink-0" />
 												)}
 											</div>
 
@@ -370,11 +370,11 @@ export function QuantitiesTable({
 }
 
 const SOURCE_BADGE_STYLES: Record<string, string> = {
-	auto_building: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-	auto_linked: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	auto_derived: "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300",
-	manual: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-	estimated: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
+	auto_building: "bg-success/15 text-success",
+	auto_linked: "bg-chart-4/15 text-chart-4",
+	auto_derived: "bg-chart-4/15 text-chart-4",
+	manual: "bg-muted text-muted-foreground",
+	estimated: "bg-chart-1/15 text-chart-1",
 };
 
 const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {

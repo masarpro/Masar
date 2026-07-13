@@ -70,7 +70,7 @@ export function GanttContainer({
 
 	return (
 		<div className="relative">
-			<div className="flex border border-border/30 rounded-xl overflow-hidden backdrop-blur-xl bg-white/70 dark:bg-slate-900/70">
+			<div className="flex border border-border rounded-xl overflow-hidden bg-card">
 				{/* Sidebar */}
 				<GanttSidebar
 					milestones={milestones}

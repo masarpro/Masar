@@ -43,13 +43,13 @@ export function DeadlinesCard({
 	}
 
 	return (
-		<div className="backdrop-blur-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl shadow-lg shadow-black/5 p-5 h-full">
+		<div className="bg-card border-2 border-chart-1/30 rounded-2xl p-5 h-full">
 			<div className="flex items-center gap-2 mb-4">
-				<Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-				<h3 className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+				<Clock className="h-5 w-5 text-chart-1" />
+				<h3 className="text-sm font-semibold text-chart-1">
 					{t("finance.dashboard.alerts.upcomingDeadlines")}
 				</h3>
-				<span className="ms-auto text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
+				<span className="ms-auto text-xs font-medium text-chart-1 bg-chart-1/15 px-2 py-0.5 rounded-full">
 					{upcomingDeadlines.length}
 				</span>
 			</div>
@@ -66,21 +66,21 @@ export function DeadlinesCard({
 						<Link
 							key={`invoice-${invoice.id}`}
 							href={path}
-							className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-colors border border-amber-100/50 dark:border-amber-900/30"
+							className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors border"
 						>
 							<div>
-								<p className="font-medium text-sm text-slate-900 dark:text-slate-100">
+								<p className="font-medium text-sm text-card-foreground">
 									{invoice.invoiceNo}
 								</p>
-								<p className="text-xs text-slate-600 dark:text-slate-400">
+								<p className="text-xs text-muted-foreground">
 									{invoice.client?.name ?? "-"}
 								</p>
 							</div>
 							<div className="text-end">
-								<p className="font-semibold text-sm text-amber-600 dark:text-amber-400">
+								<p className="font-semibold text-sm text-chart-1">
 									{daysUntil} {t("common.days")}
 								</p>
-								<p className="text-xs text-slate-500">
+								<p className="text-xs text-muted-foreground">
 									{t("finance.dashboard.types.invoice")}
 								</p>
 							</div>

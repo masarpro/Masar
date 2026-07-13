@@ -89,12 +89,12 @@ export function OpeningsManager({
 										{TYPE_LABEL[o.openingType] ?? o.openingType}
 									</span>
 									{o.isExterior && (
-										<span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+										<span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] text-success">
 											خارجية
 										</span>
 									)}
 									{!o.deductFromInteriorFinishes && (
-										<span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+										<span className="rounded-full bg-chart-1/15 px-2 py-0.5 text-[10px] text-chart-1">
 											بلا خصم داخلي
 										</span>
 									)}

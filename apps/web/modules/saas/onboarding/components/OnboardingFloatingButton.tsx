@@ -16,7 +16,7 @@ export function OnboardingFloatingButton() {
 		<div className="fixed bottom-20 end-6 z-[60] md:bottom-6">
 			{/* Reminder bubble */}
 			{showReminder && (
-				<div className="absolute -top-12 end-0 whitespace-nowrap rounded-lg bg-card px-3 py-2 text-sm font-medium shadow-lg border border-border/50 animate-in fade-in-0 slide-in-from-bottom-2">
+				<div className="absolute -top-12 end-0 whitespace-nowrap rounded-lg bg-card px-3 py-2 text-sm font-medium shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] border border-border/50 animate-in fade-in-0 slide-in-from-bottom-2">
 					{t("onboarding.modal.reminder")}
 					<div className="absolute -bottom-1 end-5 h-2 w-2 rotate-45 bg-card border-b border-r border-border/50" />
 				</div>
@@ -28,7 +28,7 @@ export function OnboardingFloatingButton() {
 				onClick={openModal}
 				aria-label={t("onboarding.modal.setupOrg")}
 				className={cn(
-					"flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-chart-4 to-chart-4 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
+					"flex h-14 w-14 items-center justify-center rounded-full bg-chart-4 text-white shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105 active:scale-95",
 					showReminder && "animate-bounce",
 				)}
 			>

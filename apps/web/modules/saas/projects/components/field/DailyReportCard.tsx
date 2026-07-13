@@ -20,18 +20,18 @@ function getWeatherIcon(weather: string) {
 	switch (weather) {
 		case "SUNNY":
 		case "HOT":
-			return <Sun className="h-4 w-4 text-amber-500" />;
+			return <Sun className="h-4 w-4 text-chart-1" />;
 		case "CLOUDY":
-			return <Cloud className="h-4 w-4 text-slate-500" />;
+			return <Cloud className="h-4 w-4 text-muted-foreground" />;
 		case "RAINY":
 			return <CloudRain className="h-4 w-4 text-chart-4" />;
 		case "WINDY":
 		case "DUSTY":
-			return <Wind className="h-4 w-4 text-slate-500" />;
+			return <Wind className="h-4 w-4 text-muted-foreground" />;
 		case "COLD":
 			return <Thermometer className="h-4 w-4 text-chart-4" />;
 		default:
-			return <Sun className="h-4 w-4 text-amber-500" />;
+			return <Sun className="h-4 w-4 text-chart-1" />;
 	}
 }
 
@@ -47,7 +47,7 @@ export function DailyReportCard({ report }: DailyReportCardProps) {
 	const createdBy = report.createdBy as { name: string; image?: string };
 
 	return (
-		<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+		<div className="rounded-2xl border-2 bg-card p-5">
 			{/* Header */}
 			<div className="mb-4 flex items-start justify-between">
 				<div>
@@ -58,36 +58,36 @@ export function DailyReportCard({ report }: DailyReportCardProps) {
 						>
 							{t("projects.field.dailyReport")}
 						</Badge>
-						<div className="flex items-center gap-1 text-sm text-slate-500">
+						<div className="flex items-center gap-1 text-sm text-muted-foreground">
 							{getWeatherIcon(weather)}
 							<span>{t(`projects.field.weather.${weather}`)}</span>
 						</div>
 					</div>
-					<h3 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="mt-2 text-lg font-semibold text-card-foreground">
 						{formatDate(reportDate)}
 					</h3>
 				</div>
-				<div className="text-start text-sm text-slate-500">
+				<div className="text-start text-sm text-muted-foreground">
 					<span>{createdBy?.name}</span>
 				</div>
 			</div>
 
 			{/* Stats */}
 			<div className="mb-4 grid grid-cols-2 gap-3">
-				<div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
-					<p className="text-xs text-slate-500">
+				<div className="rounded-xl bg-muted p-3">
+					<p className="text-xs text-muted-foreground">
 						{t("projects.field.manpower")}
 					</p>
-					<p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+					<p className="text-lg font-semibold text-card-foreground">
 						{manpower} {t("projects.field.workers")}
 					</p>
 				</div>
 				{equipment && (
-					<div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
-						<p className="text-xs text-slate-500">
+					<div className="rounded-xl bg-muted p-3">
+						<p className="text-xs text-muted-foreground">
 							{t("projects.field.equipment")}
 						</p>
-						<p className="text-sm text-slate-700 dark:text-slate-300">
+						<p className="text-sm text-foreground">
 							{equipment}
 						</p>
 					</div>
@@ -96,19 +96,19 @@ export function DailyReportCard({ report }: DailyReportCardProps) {
 
 			{/* Work Done */}
 			<div className="mb-4">
-				<h4 className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+				<h4 className="mb-2 text-sm font-medium text-foreground">
 					{t("projects.field.workDone")}
 				</h4>
-				<p className="text-sm text-slate-600 dark:text-slate-400">{workDone}</p>
+				<p className="text-sm text-muted-foreground">{workDone}</p>
 			</div>
 
 			{/* Blockers */}
 			{blockers && (
-				<div className="rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
-					<h4 className="mb-1 text-sm font-medium text-amber-700 dark:text-amber-400">
+				<div className="rounded-xl border border-chart-1/30 bg-chart-1/10 p-3">
+					<h4 className="mb-1 text-sm font-medium text-chart-1">
 						{t("projects.field.blockers")}
 					</h4>
-					<p className="text-sm text-amber-600 dark:text-amber-300">
+					<p className="text-sm text-foreground">
 						{blockers}
 					</p>
 				</div>

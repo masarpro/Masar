@@ -114,8 +114,8 @@ export function ClientDetail({
 	if (!client) {
 		return (
 			<div className="text-center py-20">
-				<User className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-				<p className="text-slate-500 dark:text-slate-400">
+				<User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+				<p className="text-muted-foreground">
 					{t("finance.clients.notFound")}
 				</p>
 			</div>
@@ -139,7 +139,7 @@ export function ClientDetail({
 								)}
 							</div>
 							<div>
-								<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+								<h1 className="text-2xl font-semibold text-card-foreground">
 									{client.name}
 								</h1>
 								<div className="flex items-center gap-2 mt-1">
@@ -162,12 +162,12 @@ export function ClientDetail({
 											: t("finance.clients.types.individual")}
 									</Badge>
 									{client.isActive ? (
-										<Badge className="rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+										<Badge className="rounded-lg bg-success/15 text-success">
 											<CheckCircle className="h-3 w-3 me-1" />
 											{t("finance.clients.active")}
 										</Badge>
 									) : (
-										<Badge className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+										<Badge className="rounded-lg bg-muted text-muted-foreground">
 											<XCircle className="h-3 w-3 me-1" />
 											{t("finance.clients.inactive")}
 										</Badge>
@@ -238,7 +238,7 @@ export function ClientDetail({
 										</AlertDialogCancel>
 										<AlertDialogAction
 											onClick={() => deleteMutation.mutate()}
-											className="rounded-xl bg-red-600 hover:bg-red-700"
+											className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 											disabled={deleteMutation.isPending}
 										>
 											{deleteMutation.isPending
@@ -265,19 +265,19 @@ export function ClientDetail({
 					<CardContent className="space-y-3">
 						{client.phone && (
 							<div className="flex items-center gap-3">
-								<Phone className="h-4 w-4 text-slate-400" />
+								<Phone className="h-4 w-4 text-muted-foreground" />
 								<span dir="ltr">{client.phone}</span>
 							</div>
 						)}
 						{client.mobile && (
 							<div className="flex items-center gap-3">
-								<Smartphone className="h-4 w-4 text-slate-400" />
+								<Smartphone className="h-4 w-4 text-muted-foreground" />
 								<span dir="ltr">{client.mobile}</span>
 							</div>
 						)}
 						{client.email && (
 							<div className="flex items-center gap-3">
-								<Mail className="h-4 w-4 text-slate-400" />
+								<Mail className="h-4 w-4 text-muted-foreground" />
 								<a
 									href={`mailto:${client.email}`}
 									className="text-primary hover:underline"
@@ -288,7 +288,7 @@ export function ClientDetail({
 							</div>
 						)}
 						{!client.phone && !client.mobile && !client.email && (
-							<p className="text-slate-400">
+							<p className="text-muted-foreground">
 								{t("finance.clients.noContactInfo")}
 							</p>
 						)}
@@ -323,7 +323,7 @@ export function ClientDetail({
 								)}
 							</>
 						) : (
-							<p className="text-slate-400">
+							<p className="text-muted-foreground">
 								{t("finance.clients.noAddress")}
 							</p>
 						)}
@@ -332,7 +332,7 @@ export function ClientDetail({
 						{secondaryAddress &&
 							(secondaryAddress.streetAddress1 || secondaryAddress.city) && (
 								<div className="mt-4 pt-4 border-t">
-									<h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">
+									<h4 className="font-medium text-muted-foreground mb-2">
 										{t("finance.clients.secondaryAddress")}
 									</h4>
 									{secondaryAddress.streetAddress1 && (
@@ -375,7 +375,7 @@ export function ClientDetail({
 					<CardContent className="space-y-3">
 						{client.taxNumber && (
 							<div>
-								<span className="text-sm text-slate-500">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.clients.taxNumber")}
 								</span>
 								<p className="font-medium" dir="ltr">
@@ -385,7 +385,7 @@ export function ClientDetail({
 						)}
 						{client.crNumber && (
 							<div>
-								<span className="text-sm text-slate-500">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.clients.crNumber")}
 								</span>
 								<p className="font-medium" dir="ltr">
@@ -394,7 +394,7 @@ export function ClientDetail({
 							</div>
 						)}
 						{!client.taxNumber && !client.crNumber && (
-							<p className="text-slate-400">
+							<p className="text-muted-foreground">
 								{t("finance.clients.noTaxInfo")}
 							</p>
 						)}
@@ -412,13 +412,13 @@ export function ClientDetail({
 					<CardContent className="space-y-3">
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<span className="text-sm text-slate-500">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.clients.currency")}
 								</span>
 								<p className="font-medium">{client.currency}</p>
 							</div>
 							<div>
-								<span className="text-sm text-slate-500">
+								<span className="text-sm text-muted-foreground">
 									{t("finance.clients.displayLanguage")}
 								</span>
 								<p className="font-medium">
@@ -427,23 +427,23 @@ export function ClientDetail({
 							</div>
 						</div>
 						<div className="pt-2 border-t">
-							<span className="text-sm text-slate-500">
+							<span className="text-sm text-muted-foreground">
 								{t("finance.clients.statistics")}
 							</span>
 							<div className="grid grid-cols-2 gap-4 mt-2">
-								<div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+								<div className="text-center p-3 bg-muted rounded-xl">
 									<p className="text-2xl font-semibold text-primary">
 										{client._count?.quotations || 0}
 									</p>
-									<p className="text-sm text-slate-500">
+									<p className="text-sm text-muted-foreground">
 										{t("finance.clients.quotationsCount")}
 									</p>
 								</div>
-								<div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+								<div className="text-center p-3 bg-muted rounded-xl">
 									<p className="text-2xl font-semibold text-primary">
 										{client._count?.invoices || 0}
 									</p>
-									<p className="text-sm text-slate-500">
+									<p className="text-sm text-muted-foreground">
 										{t("finance.clients.invoicesCount")}
 									</p>
 								</div>
@@ -472,36 +472,36 @@ export function ClientDetail({
 							{client.contacts.map((contact: any) => (
 								<div
 									key={contact.id}
-									className="p-4 border rounded-xl bg-slate-50/50 dark:bg-slate-800/50"
+									className="p-4 border rounded-xl bg-muted/50"
 								>
 									<div className="flex items-start justify-between mb-2">
 										<div>
 											<h4 className="font-medium">{contact.name}</h4>
 											{contact.position && (
-												<p className="text-sm text-slate-500">
+												<p className="text-sm text-muted-foreground">
 													{contact.position}
 												</p>
 											)}
 										</div>
 										{contact.isPrimary && (
-											<Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+											<Star className="h-4 w-4 text-chart-1 fill-chart-1" />
 										)}
 									</div>
 									<div className="space-y-1">
 										{contact.phone && (
-											<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+											<div className="flex items-center gap-2 text-sm text-muted-foreground">
 												<Phone className="h-3 w-3" />
 												<span dir="ltr">{contact.phone}</span>
 											</div>
 										)}
 										{contact.mobile && (
-											<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+											<div className="flex items-center gap-2 text-sm text-muted-foreground">
 												<Smartphone className="h-3 w-3" />
 												<span dir="ltr">{contact.mobile}</span>
 											</div>
 										)}
 										{contact.email && (
-											<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+											<div className="flex items-center gap-2 text-sm text-muted-foreground">
 												<Mail className="h-3 w-3" />
 												<span dir="ltr">{contact.email}</span>
 											</div>
@@ -511,8 +511,8 @@ export function ClientDetail({
 							))}
 						</div>
 					) : (
-						<div className="text-center py-8 text-slate-500">
-							<Users2 className="h-12 w-12 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+						<div className="text-center py-8 text-muted-foreground">
+							<Users2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
 							<p>{t("finance.clients.contacts.noContacts")}</p>
 						</div>
 					)}
@@ -529,7 +529,7 @@ export function ClientDetail({
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
+						<p className="whitespace-pre-wrap text-muted-foreground">
 							{client.notes}
 						</p>
 					</CardContent>
@@ -539,7 +539,7 @@ export function ClientDetail({
 			{/* معلومات إضافية */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
-					<div className="flex flex-wrap gap-4 text-sm text-slate-500">
+					<div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
 						<div className="flex items-center gap-2">
 							<Calendar className="h-4 w-4" />
 							{t("finance.clients.createdAt")}:{" "}

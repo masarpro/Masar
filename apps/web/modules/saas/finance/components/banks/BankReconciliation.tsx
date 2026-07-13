@@ -134,7 +134,7 @@ export function BankReconciliation({
 					</Button>
 					<div>
 						<h2 className="text-lg font-bold">{t("finance.accounting.reconciliation.title")}</h2>
-						{bankData && <p className="text-sm text-slate-500">{bankData.name}</p>}
+						{bankData && <p className="text-sm text-muted-foreground">{bankData.name}</p>}
 					</div>
 				</div>
 				<Button
@@ -181,20 +181,20 @@ export function BankReconciliation({
 				<Card className="rounded-2xl">
 					<CardContent className="p-4 space-y-2">
 						<div className="flex justify-between text-sm">
-							<span className="text-slate-500">{t("finance.accounting.reconciliation.bookBalance")}</span>
+							<span className="text-muted-foreground">{t("finance.accounting.reconciliation.bookBalance")}</span>
 							<span className="font-medium">{formatAccounting(calculations.bookBalance)}</span>
 						</div>
 						<div className="flex justify-between text-sm">
-							<span className="text-slate-500">{t("finance.accounting.reconciliation.statementBalance")}</span>
+							<span className="text-muted-foreground">{t("finance.accounting.reconciliation.statementBalance")}</span>
 							<span className="font-medium">{formatAccounting(Number(statementBalance) || 0)}</span>
 						</div>
 						<div className="flex justify-between text-sm">
-							<span className="text-slate-500">{t("finance.accounting.reconciliation.matched")}</span>
-							<span className="font-medium text-green-600">{matchedIds.size}</span>
+							<span className="text-muted-foreground">{t("finance.accounting.reconciliation.matched")}</span>
+							<span className="font-medium text-success">{matchedIds.size}</span>
 						</div>
 						<div className="flex justify-between text-sm border-t pt-2 mt-2">
 							<span className="font-medium">{t("finance.accounting.difference")}</span>
-							<span className={`font-bold ${Math.abs(calculations.difference) < 0.01 ? "text-green-600" : "text-red-600"}`}>
+							<span className={`font-bold ${Math.abs(calculations.difference) < 0.01 ? "text-success" : "text-destructive"}`}>
 								{formatAccounting(calculations.difference)}
 								{Math.abs(calculations.difference) < 0.01 && <CheckCircle className="h-4 w-4 inline ms-1" />}
 							</span>
@@ -210,7 +210,7 @@ export function BankReconciliation({
 				</CardHeader>
 				<CardContent className="p-0">
 					{(!lines || lines.length === 0) ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.ledger.noMovements")}
 						</div>
 					) : (
@@ -229,7 +229,7 @@ export function BankReconciliation({
 							</TableHeader>
 							<TableBody>
 								{lines.map((line: any) => (
-									<TableRow key={line.id} className={matchedIds.has(line.id) ? "bg-green-50/50 dark:bg-green-900/10" : ""}>
+									<TableRow key={line.id} className={matchedIds.has(line.id) ? "bg-success/10" : ""}>
 										<TableCell>
 											<input
 												type="checkbox"
@@ -238,7 +238,7 @@ export function BankReconciliation({
 												className="rounded"
 											/>
 										</TableCell>
-										<TableCell className="text-sm text-slate-500">
+										<TableCell className="text-sm text-muted-foreground">
 											{new Date(line.date).toLocaleDateString("en-SA")}
 										</TableCell>
 										<TableCell>
@@ -280,7 +280,7 @@ export function BankReconciliation({
 										<TableCell className="text-sm">{new Date(rec.reconciliationDate).toLocaleDateString("en-SA")}</TableCell>
 										<TableCell className="text-end">{formatAccounting(rec.statementBalance)}</TableCell>
 										<TableCell className="text-end">{formatAccounting(rec.bookBalance)}</TableCell>
-										<TableCell className={`text-end ${Math.abs(rec.difference) < 0.01 ? "text-green-600" : "text-red-600"}`}>
+										<TableCell className={`text-end ${Math.abs(rec.difference) < 0.01 ? "text-success" : "text-destructive"}`}>
 											{formatAccounting(rec.difference)}
 										</TableCell>
 										<TableCell>

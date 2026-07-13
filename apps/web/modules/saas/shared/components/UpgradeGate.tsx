@@ -44,8 +44,8 @@ export function UpgradeGate({
 					{children}
 				</div>
 				<div className="absolute inset-0 flex items-center justify-center">
-					<div className="flex size-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
-						<LockIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
+					<div className="flex size-6 items-center justify-center rounded-full bg-chart-1/15">
+						<LockIcon className="size-3.5 text-chart-1" />
 					</div>
 				</div>
 			</div>

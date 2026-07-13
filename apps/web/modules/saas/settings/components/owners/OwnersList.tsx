@@ -63,15 +63,15 @@ export function OwnersList({
 
 	// Determine progress bar color
 	const getProgressColor = () => {
-		if (totalPercent === 100) return "bg-green-500";
-		if (totalPercent > 100) return "bg-red-500";
-		return "bg-amber-500";
+		if (totalPercent === 100) return "bg-success";
+		if (totalPercent > 100) return "bg-destructive";
+		return "bg-chart-1";
 	};
 
 	const getProgressBgColor = () => {
-		if (totalPercent === 100) return "bg-green-100 dark:bg-green-900/20";
-		if (totalPercent > 100) return "bg-red-100 dark:bg-red-900/20";
-		return "bg-amber-100 dark:bg-amber-900/20";
+		if (totalPercent === 100) return "bg-success/15";
+		if (totalPercent > 100) return "bg-destructive/15";
+		return "bg-chart-1/15";
 	};
 
 	if (isLoading) {
@@ -137,22 +137,22 @@ export function OwnersList({
 						<div className="flex items-center gap-2 text-sm">
 							{totalPercent === 100 ? (
 								<>
-									<CheckCircle2 className="h-4 w-4 text-green-600" />
-									<span className="text-green-700 dark:text-green-400">
+									<CheckCircle2 className="h-4 w-4 text-success" />
+									<span className="text-success">
 										{t("ownershipComplete")}
 									</span>
 								</>
 							) : totalPercent > 100 ? (
 								<>
-									<AlertTriangle className="h-4 w-4 text-red-600" />
-									<span className="text-red-700 dark:text-red-400">
+									<AlertTriangle className="h-4 w-4 text-destructive" />
+									<span className="text-destructive">
 										{t("ownershipExceeded")}
 									</span>
 								</>
 							) : (
 								<>
-									<AlertTriangle className="h-4 w-4 text-amber-600" />
-									<span className="text-amber-700 dark:text-amber-400">
+									<AlertTriangle className="h-4 w-4 text-chart-1" />
+									<span className="text-chart-1">
 										{t("ownershipWarning")} —{" "}
 										{t("remaining")}: {remaining.toFixed(2)}
 										%
@@ -244,8 +244,8 @@ export function OwnersList({
 												}
 												className={
 													owner.isActive
-														? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-														: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+														? "bg-success/15 text-success"
+														: "bg-muted text-muted-foreground"
 												}
 											>
 												{owner.isActive

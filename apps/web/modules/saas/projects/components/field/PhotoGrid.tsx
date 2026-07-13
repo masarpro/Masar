@@ -14,15 +14,15 @@ function getCategoryColor(category: string) {
 		case "PROGRESS":
 			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
 		case "ISSUE":
-			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+			return "bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive";
 		case "EQUIPMENT":
 			return "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4";
 		case "MATERIAL":
-			return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+			return "bg-chart-1/15 text-chart-1 dark:bg-chart-1/20 dark:text-chart-1";
 		case "SAFETY":
-			return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+			return "bg-chart-2/15 text-chart-2 dark:bg-chart-2/20 dark:text-chart-2";
 		default:
-			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+			return "bg-muted text-muted-foreground";
 	}
 }
 
@@ -56,12 +56,12 @@ function PhotoGridItem({
 					onError={() => setImgError(true)}
 				/>
 			) : (
-				<div className="flex size-full items-center justify-center bg-slate-200 dark:bg-slate-700">
-					<ImageIcon className="h-8 w-8 text-slate-400" />
+				<div className="flex size-full items-center justify-center bg-muted">
+					<ImageIcon className="h-8 w-8 text-muted-foreground" />
 				</div>
 			)}
 			<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-			<div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">
+			<div className="absolute inset-x-0 bottom-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">
 				{caption && (
 					<p className="truncate text-sm text-white">{caption}</p>
 				)}

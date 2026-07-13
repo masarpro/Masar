@@ -964,7 +964,7 @@ export function QuotationForm({
 							/>
 
 							{clientName && (
-								<div className="rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 border border-primary/15 px-4 py-3 space-y-1.5">
+								<div className="rounded-xl bg-primary/5 border border-primary/15 px-4 py-3 space-y-1.5">
 									<div className="flex items-center justify-between">
 										<span className="font-medium text-sm">{clientName}</span>
 										{clientTaxNumber && (
@@ -1025,7 +1025,7 @@ export function QuotationForm({
 						</div>
 						<div className="p-5 space-y-3.5">
 							{/* Quotation Number (read-only) */}
-							<div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/50">
+							<div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-muted border border-border">
 								<span className="text-xs text-muted-foreground font-medium">{t("pricing.quotations.columns.number")}</span>
 								<span className="text-sm font-bold font-mono text-foreground tracking-wide">
 									{mode === "edit" && existingQuotation ? existingQuotation.quotationNo : `QT-${new Date().getFullYear()}-XXXX`}
@@ -1076,10 +1076,10 @@ export function QuotationForm({
 							</div>
 
 							{/* Project Link */}
-							<div className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${showProjectLink ? "bg-chart-4/15 dark:bg-chart-4/20 border-chart-4 dark:border-chart-4/40" : "bg-slate-50/50 dark:bg-slate-800/30 border-dashed border-slate-300 dark:border-slate-700"}`}>
+							<div className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${showProjectLink ? "bg-chart-4/15 border-chart-4" : "bg-muted/50 border-dashed border-border"}`}>
 								<div className="flex items-center gap-2">
 									<FolderOpen className={`h-4 w-4 ${showProjectLink ? "text-chart-4" : "text-muted-foreground"}`} />
-									<span className={`text-sm font-medium ${showProjectLink ? "text-chart-4 dark:text-chart-4" : "text-muted-foreground"}`}>{t("pricing.quotations.project")}</span>
+									<span className={`text-sm font-medium ${showProjectLink ? "text-chart-4" : "text-muted-foreground"}`}>{t("pricing.quotations.project")}</span>
 								</div>
 								<Switch checked={showProjectLink} onCheckedChange={(checked: any) => { setShowProjectLink(checked); if (!checked) setProjectId(undefined); }} disabled={!isEditable} />
 							</div>
@@ -1100,7 +1100,7 @@ export function QuotationForm({
 							{/* Currency + VAT badges */}
 							<div className="flex items-center gap-2 pt-1">
 								<Badge variant="secondary" className="text-xs font-medium">{currency}</Badge>
-								<div className="px-2.5 py-1 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4/40 text-xs font-bold text-chart-4 dark:text-chart-4">
+								<div className="px-2.5 py-1 rounded-lg bg-chart-4/15 border border-chart-4 text-xs font-bold text-chart-4">
 									{t("pricing.quotations.vatPercent")} {vatPercent}%
 								</div>
 							</div>
@@ -1112,7 +1112,7 @@ export function QuotationForm({
 				<Collapsible defaultOpen={!!introduction}>
 					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
-							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors">
 								<span className="flex items-center gap-2.5">
 									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 										<BookOpen className="h-[15px] w-[15px] text-chart-4" />
@@ -1130,7 +1130,7 @@ export function QuotationForm({
 									placeholder={t("pricing.quotations.introductionPlaceholder")}
 									rows={4}
 									disabled={!isEditable}
-									className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background resize-none"
+									className="rounded-xl border-border bg-muted/50 focus:bg-background resize-none"
 									maxLength={5000}
 								/>
 							</div>
@@ -1142,7 +1142,7 @@ export function QuotationForm({
 				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "BEFORE_TABLE")}>
 					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
-							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors">
 								<span className="flex items-center gap-2.5">
 									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 										<ListChecks className="h-[15px] w-[15px] text-chart-4" />
@@ -1197,7 +1197,7 @@ export function QuotationForm({
 					<div className="overflow-x-auto">
 						<table className="w-full text-sm">
 							<thead>
-								<tr className="border-b bg-slate-50/80 dark:bg-slate-800/30">
+								<tr className="border-b-2">
 									{isColumnVisible("index") && <th className="p-3 text-center w-12 text-[11.5px] font-semibold text-muted-foreground tracking-wide">#</th>}
 									{isColumnVisible("description") && <th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground min-w-[180px] tracking-wide">{columnLabels.description}</th>}
 									{isColumnVisible("unit") && <th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground w-24 tracking-wide">{columnLabels.unit}</th>}
@@ -1209,7 +1209,7 @@ export function QuotationForm({
 							</thead>
 							<tbody>
 								{items.map((item, index) => (
-									<tr key={item.id} className="border-b border-slate-50 dark:border-slate-800/30 last:border-0 hover:bg-primary/[0.02] transition-colors">
+									<tr key={item.id} className="border-b-2 last:border-0 hover:bg-muted/30 transition-colors">
 										{isColumnVisible("index") && (
 											<td className="p-2 text-center">
 												<div className="flex flex-col items-center gap-0.5">
@@ -1218,7 +1218,7 @@ export function QuotationForm({
 															<ChevronUp className="h-3 w-3 text-muted-foreground" />
 														</button>
 													)}
-													<span className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center text-xs font-bold">{index + 1}</span>
+													<span className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{index + 1}</span>
 													{isEditable && (
 														<button type="button" onClick={() => moveItemDown(index)} disabled={index === items.length - 1} className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
 															<ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -1252,7 +1252,7 @@ export function QuotationForm({
 													maxLength={2000}
 													enterKeyHint="enter"
 													disabled={!isEditable}
-													className="w-full min-h-[36px] max-h-[300px] px-3 py-2 rounded-[10px] text-sm border border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08] focus:outline-none overflow-y-auto resize-y whitespace-pre-wrap break-words transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+													className="w-full min-h-[36px] max-h-[300px] px-3 py-2 rounded-[10px] text-sm border border-transparent bg-transparent hover:bg-muted focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08] focus:outline-none overflow-y-auto resize-y whitespace-pre-wrap break-words transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 												/>
 											</td>
 										)}
@@ -1267,17 +1267,17 @@ export function QuotationForm({
 										)}
 										{isColumnVisible("unitPrice") && (
 											<td className="p-2">
-												<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => updateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+												<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => updateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-muted focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 											</td>
 										)}
 										{isColumnVisible("quantity") && (
 											<td className="p-2">
-												<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => updateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+												<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => updateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-muted focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 											</td>
 										)}
 										{isColumnVisible("total") && (
 											<td className="p-2 text-center">
-												<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4/30 text-chart-4 dark:text-chart-4" : "text-muted-foreground"}`}>
+												<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 border border-chart-4 text-chart-4" : "text-muted-foreground"}`}>
 													{formatCurrency(item.quantity * item.unitPrice)}
 												</div>
 											</td>
@@ -1300,7 +1300,7 @@ export function QuotationForm({
 							<button
 								type="button"
 								onClick={addItem}
-								className="w-full py-3.5 rounded-xl border-2 border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.02] to-primary/[0.06] hover:from-primary/[0.04] hover:to-primary/[0.10] hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+								className="w-full py-3.5 rounded-xl border-2 border-dashed border-primary/25 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
 							>
 								<Plus className="h-[18px] w-[18px]" />
 								{t("finance.items.add")}
@@ -1313,7 +1313,7 @@ export function QuotationForm({
 				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "AFTER_TABLE")}>
 					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
-							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors">
 								<span className="flex items-center gap-2.5">
 									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 										<ListChecks className="h-[15px] w-[15px] text-chart-4" />
@@ -1340,7 +1340,7 @@ export function QuotationForm({
 				<Collapsible defaultOpen={!!termsAndConditions}>
 					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
-							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors">
 								<span className="flex items-center gap-2.5">
 									<div className="w-[30px] h-[30px] rounded-xl bg-success/15 flex items-center justify-center">
 										<ScrollText className="h-[15px] w-[15px] text-success" />
@@ -1358,7 +1358,7 @@ export function QuotationForm({
 									placeholder={t("pricing.quotations.termsAndConditionsPlaceholder")}
 									rows={4}
 									disabled={!isEditable}
-									className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background resize-none"
+									className="rounded-xl border-border bg-muted/50 focus:bg-background resize-none"
 									maxLength={5000}
 								/>
 							</div>
@@ -1394,16 +1394,16 @@ export function QuotationForm({
 							</div>
 							<div className="p-5">
 								<TabsContent value="notes" className="mt-0">
-									<Textarea value={notes} onChange={(e: any) => setNotes(e.target.value)} placeholder={t("pricing.quotations.notesPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={notes} onChange={(e: any) => setNotes(e.target.value)} placeholder={t("pricing.quotations.notesPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-border bg-muted/50 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="paymentTerms" className="mt-0">
-									<Textarea value={paymentTerms} onChange={(e: any) => setPaymentTerms(e.target.value)} placeholder={t("pricing.quotations.paymentTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={paymentTerms} onChange={(e: any) => setPaymentTerms(e.target.value)} placeholder={t("pricing.quotations.paymentTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-border bg-muted/50 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="deliveryTerms" className="mt-0">
-									<Textarea value={deliveryTerms} onChange={(e: any) => setDeliveryTerms(e.target.value)} placeholder={t("pricing.quotations.deliveryTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={deliveryTerms} onChange={(e: any) => setDeliveryTerms(e.target.value)} placeholder={t("pricing.quotations.deliveryTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-border bg-muted/50 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="warrantyTerms" className="mt-0">
-									<Textarea value={warrantyTerms} onChange={(e: any) => setWarrantyTerms(e.target.value)} placeholder={t("pricing.quotations.warrantyTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={warrantyTerms} onChange={(e: any) => setWarrantyTerms(e.target.value)} placeholder={t("pricing.quotations.warrantyTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-border bg-muted/50 focus:bg-background" />
 								</TabsContent>
 							</div>
 						</Tabs>
@@ -1427,7 +1427,7 @@ export function QuotationForm({
 								totalAmount={totals.totalAmount}
 							/>
 							{/* Gradient Total Bar */}
-							<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-primary-glow">
+							<div className="mt-4 p-4 rounded-xl bg-primary flex items-center justify-between">
 								<div>
 									<div className="text-[11px] text-primary-foreground/70 font-medium tracking-wide">{t("finance.summary.total")}</div>
 								</div>
@@ -1441,7 +1441,7 @@ export function QuotationForm({
 				</div>
 
 				{/* ─── Mobile Bottom Bar ───────────────────────────────── */}
-				<div className="fixed bottom-0 inset-x-0 z-50 sm:hidden backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-t shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+				<div className="fixed bottom-0 inset-x-0 z-50 sm:hidden bg-card border-t-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 					<div className="flex items-center justify-between gap-3">
 						<div className="min-w-0">
 							<p className="text-[11px] text-muted-foreground">{t("finance.summary.total")}</p>
@@ -1496,8 +1496,8 @@ export function QuotationForm({
 							</div>
 						</div>
 					</DialogHeader>
-					<div className="bg-slate-100 dark:bg-slate-900 p-4 min-h-[60vh]">
-						<div className="bg-white dark:bg-card rounded-xl shadow-lg overflow-hidden">
+					<div className="bg-muted p-4 min-h-[60vh]">
+						<div className="bg-card rounded-xl border-2 overflow-hidden">
 							<TemplateRenderer
 								data={previewData}
 								template={previewTemplate}

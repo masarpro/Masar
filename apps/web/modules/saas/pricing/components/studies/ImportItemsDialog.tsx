@@ -323,10 +323,10 @@ export function ImportItemsDialog({
 
 				{step === 2 && mode === "manual" && (
 					<div className="space-y-3 py-2">
-						<div className="overflow-x-auto rounded-lg border">
+						<div className="overflow-x-auto rounded-lg border-2">
 							<table className="w-full text-sm">
 								<thead>
-									<tr className="border-b bg-muted/50">
+									<tr className="border-b-2">
 										<th className="px-2 py-2 text-start font-medium">
 											{t("description")}
 										</th>
@@ -344,7 +344,7 @@ export function ImportItemsDialog({
 								</thead>
 								<tbody>
 									{items.map((row, idx) => (
-										<tr key={idx} className="border-b">
+										<tr key={idx} className="border-b-2">
 											<td className="px-2 py-1.5">
 												<Input
 													value={row.description}
@@ -453,10 +453,10 @@ export function ImportItemsDialog({
 							</Badge>
 						</div>
 
-						<div className="max-h-[300px] overflow-y-auto rounded-lg border">
+						<div className="max-h-[300px] overflow-y-auto rounded-lg border-2">
 							<table className="w-full text-sm">
 								<thead className="sticky top-0 bg-background">
-									<tr className="border-b bg-muted/50">
+									<tr className="border-b-2">
 										<th className="px-2 py-2 text-start font-medium w-10">
 											#
 										</th>
@@ -478,7 +478,7 @@ export function ImportItemsDialog({
 									{finalItems.map((item, idx) => (
 										<tr
 											key={idx}
-											className="border-b"
+											className="border-b-2"
 										>
 											<td className="px-2 py-2 text-muted-foreground">
 												{idx + 1}

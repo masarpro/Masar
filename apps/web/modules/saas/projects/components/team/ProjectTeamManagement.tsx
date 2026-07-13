@@ -63,11 +63,11 @@ const roleIcons: Record<ProjectRole, typeof UserCircle> = {
 };
 
 const roleColors: Record<ProjectRole, string> = {
-	MANAGER: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+	MANAGER: "bg-chart-4/15 text-chart-4",
 	ENGINEER: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	SUPERVISOR: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-	ACCOUNTANT: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-	VIEWER: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
+	SUPERVISOR: "bg-chart-1/15 text-chart-1",
+	ACCOUNTANT: "bg-success/15 text-success",
+	VIEWER: "bg-muted text-muted-foreground",
 };
 
 export function ProjectTeamManagement({
@@ -188,10 +188,10 @@ export function ProjectTeamManagement({
 			{/* Header */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="text-xl font-semibold text-foreground">
 						{t("projects.team.title")}
 					</h2>
-					<p className="text-sm text-slate-500 mt-1">
+					<p className="text-sm text-muted-foreground mt-1">
 						{t("projects.team.description")}
 					</p>
 				</div>
@@ -202,15 +202,15 @@ export function ProjectTeamManagement({
 			</div>
 
 			{/* Team Members List */}
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card">
 				{isLoading ? <ListTableSkeleton /> : !teamData?.members.length ? (
-					<div className="flex flex-col items-center justify-center py-12 text-slate-500">
-						<Users className="h-12 w-12 mb-3 text-slate-300" />
+					<div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+						<Users className="h-12 w-12 mb-3 text-muted-foreground/40" />
 						<p className="font-medium">{t("projects.team.noMembers")}</p>
 						<p className="text-sm mt-1">{t("projects.team.addFirstMember")}</p>
 					</div>
 				) : (
-					<div className="divide-y divide-slate-100 dark:divide-slate-800">
+					<div className="divide-y-2 divide-border">
 						{teamData.members.map((member: any) => {
 							const RoleIcon = roleIcons[member.role as ProjectRole];
 							return (
@@ -235,7 +235,7 @@ export function ProjectTeamManagement({
 										</div>
 										<div>
 											<div className="flex items-center gap-2">
-												<span className="font-medium text-slate-900 dark:text-slate-100">
+												<span className="font-medium text-foreground">
 													{member.user.name}
 												</span>
 												<Badge className={`border-0 ${roleColors[member.role as ProjectRole]}`}>
@@ -243,7 +243,7 @@ export function ProjectTeamManagement({
 													{t(`projects.team.roles.${member.role}`)}
 												</Badge>
 											</div>
-											<div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+											<div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
 												<span>{member.user.email}</span>
 												<span>•</span>
 												<span>
@@ -269,7 +269,7 @@ export function ProjectTeamManagement({
 											variant="ghost"
 											size="sm"
 											onClick={() => setRemoveTarget(member.user.id)}
-											className="rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50"
+											className="rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
 										>
 											<Trash2 className="h-4 w-4" />
 										</Button>
@@ -324,7 +324,7 @@ export function ProjectTeamManagement({
 									))}
 								</SelectContent>
 							</Select>
-							<p className="text-xs text-slate-500">
+							<p className="text-xs text-muted-foreground">
 								{t(`projects.team.roleDescriptions.${selectedRole}`)}
 							</p>
 						</div>
@@ -371,7 +371,7 @@ export function ProjectTeamManagement({
 									))}
 								</SelectContent>
 							</Select>
-							<p className="text-xs text-slate-500">
+							<p className="text-xs text-muted-foreground">
 								{t(`projects.team.roleDescriptions.${newRole}`)}
 							</p>
 						</div>
@@ -407,7 +407,7 @@ export function ProjectTeamManagement({
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={() => removeTarget && handleRemoveMember(removeTarget)}
-							className="bg-red-600 hover:bg-red-700"
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{t("projects.team.removeMember")}
 						</AlertDialogAction>

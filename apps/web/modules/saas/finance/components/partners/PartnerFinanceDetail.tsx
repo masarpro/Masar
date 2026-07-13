@@ -103,7 +103,7 @@ export function PartnerFinanceDetail({
 						<div>
 							<h1 className="text-2xl font-semibold">{owner.name}</h1>
 							{owner.nameEn && (
-								<p className="text-sm text-slate-500">{owner.nameEn}</p>
+								<p className="text-sm text-muted-foreground">{owner.nameEn}</p>
 							)}
 							<div className="mt-2 flex items-center gap-2">
 								<Badge variant="outline" className="rounded-lg">
@@ -114,7 +114,7 @@ export function PartnerFinanceDetail({
 									%
 								</Badge>
 								{!owner.isActive && (
-									<Badge className="rounded-lg bg-slate-100 text-slate-700 border-0">
+									<Badge className="rounded-lg bg-muted text-muted-foreground border-0">
 										{t("common.inactive")}
 									</Badge>
 								)}
@@ -138,24 +138,24 @@ export function PartnerFinanceDetail({
 					hint={`${summary.contributionsCount} ${t("finance.partners.detail.contributionsCount")}`}
 				/>
 				<SummaryCard
-					icon={<Banknote className="h-5 w-5 text-red-600" />}
-					bg="bg-red-100 dark:bg-red-900/50"
+					icon={<Banknote className="h-5 w-5 text-destructive" />}
+					bg="bg-destructive/15"
 					label={t("finance.partners.totalDrawings")}
 					value={summary.totalDrawings}
 					hint={`${summary.drawingsCount} ${t("finance.partners.detail.drawingsCount")}`}
 				/>
 				{canViewProfits && summary.shareOfProfit !== null && (
 					<SummaryCard
-						icon={<TrendingUp className="h-5 w-5 text-emerald-600" />}
-						bg="bg-emerald-100 dark:bg-emerald-900/50"
+						icon={<TrendingUp className="h-5 w-5 text-success" />}
+						bg="bg-success/15"
 						label={t("finance.partners.shareOfProfit")}
 						value={summary.shareOfProfit}
 					/>
 				)}
 				{canViewNetBalance && summary.netBalance !== null && (
 					<SummaryCard
-						icon={<BarChart3 className="h-5 w-5 text-indigo-600" />}
-						bg="bg-indigo-100 dark:bg-indigo-900/50"
+						icon={<BarChart3 className="h-5 w-5 text-chart-4" />}
+						bg="bg-chart-4/15"
 						label={t("finance.partners.netBalance")}
 						value={summary.netBalance}
 						emphasizeSign
@@ -183,7 +183,7 @@ export function PartnerFinanceDetail({
 					<Card className="rounded-2xl">
 						<CardContent className="p-0">
 							{drawings.length === 0 ? (
-								<div className="p-8 text-center text-slate-500">
+								<div className="p-8 text-center text-muted-foreground">
 									{t("finance.partners.detail.noDrawings")}
 								</div>
 							) : (
@@ -216,7 +216,7 @@ export function PartnerFinanceDetail({
 													</Link>
 												</TableCell>
 												<TableCell>
-													<div className="flex items-center gap-2 text-slate-600">
+													<div className="flex items-center gap-2 text-muted-foreground">
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(d.date))}
 													</div>
@@ -229,8 +229,8 @@ export function PartnerFinanceDetail({
 													<Badge
 														className={
 															d.status === "APPROVED"
-																? "rounded-lg bg-emerald-100 text-emerald-700 border-0"
-																: "rounded-lg bg-slate-100 text-slate-600 border-0"
+																? "rounded-lg bg-success/15 text-success border-0"
+																: "rounded-lg bg-muted text-muted-foreground border-0"
 														}
 													>
 														{t(
@@ -238,7 +238,7 @@ export function PartnerFinanceDetail({
 														)}
 													</Badge>
 												</TableCell>
-												<TableCell className="text-end font-semibold text-red-600">
+												<TableCell className="text-end font-semibold text-destructive">
 													<Currency amount={d.amount} />
 												</TableCell>
 											</TableRow>
@@ -254,7 +254,7 @@ export function PartnerFinanceDetail({
 					<Card className="rounded-2xl">
 						<CardContent className="p-0">
 							{contributions.length === 0 ? (
-								<div className="p-8 text-center text-slate-500">
+								<div className="p-8 text-center text-muted-foreground">
 									{t("finance.partners.detail.noContributions")}
 								</div>
 							) : (
@@ -285,7 +285,7 @@ export function PartnerFinanceDetail({
 													{c.contributionNo}
 												</TableCell>
 												<TableCell>
-													<div className="flex items-center gap-2 text-slate-600">
+													<div className="flex items-center gap-2 text-muted-foreground">
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(c.date))}
 													</div>
@@ -303,7 +303,7 @@ export function PartnerFinanceDetail({
 												<TableCell>
 													{c.bankAccount?.name ?? "-"}
 												</TableCell>
-												<TableCell className="text-end font-semibold text-emerald-600">
+												<TableCell className="text-end font-semibold text-success">
 													<Currency amount={c.amount} />
 												</TableCell>
 											</TableRow>
@@ -340,7 +340,7 @@ export function PartnerFinanceDetail({
 												<TableCell className="text-end">
 													{row.count}
 												</TableCell>
-												<TableCell className="text-end font-semibold text-red-600">
+												<TableCell className="text-end font-semibold text-destructive">
 													<Currency amount={row.total} />
 												</TableCell>
 											</TableRow>
@@ -377,22 +377,22 @@ function SummaryCard({
 				<div className="flex items-center gap-3">
 					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
 					<div>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{label}
 						</p>
 						<p
 							className={`text-xl font-semibold ${
 								emphasizeSign
 									? value >= 0
-										? "text-emerald-600"
-										: "text-red-600"
+										? "text-success"
+										: "text-destructive"
 									: ""
 							}`}
 						>
 							<Currency amount={value} />
 						</p>
 						{hint && (
-							<p className="text-xs text-slate-400 mt-0.5">{hint}</p>
+							<p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
 						)}
 					</div>
 				</div>

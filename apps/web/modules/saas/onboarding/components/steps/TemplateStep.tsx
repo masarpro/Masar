@@ -136,7 +136,7 @@ export function TemplateStep({
 									className={cn(
 										"relative flex flex-col items-center gap-3 rounded-xl border-2 p-6 text-center transition-all",
 										isSelected
-											? "border-primary bg-primary/5 shadow-md"
+											? "border-primary bg-primary/5"
 											: "border-muted hover:border-primary/30",
 									)}
 								>

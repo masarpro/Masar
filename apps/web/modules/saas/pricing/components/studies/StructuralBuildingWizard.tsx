@@ -358,9 +358,9 @@ export function StructuralBuildingWizard({
 				{enabledFloors.length > 0 && (
 					<div>
 						<Label className="text-base font-semibold mb-3 block">{t("selectedFloorsDetails")}</Label>
-						<div className="border rounded-lg overflow-hidden overflow-x-auto">
+						<div className="border-2 rounded-lg overflow-hidden overflow-x-auto">
 							<table className="w-full text-sm">
-								<thead className="bg-muted/50">
+								<thead className="border-b-2">
 									<tr>
 										<th className="text-start p-2 font-medium">{t("floor")}</th>
 										{heightInputMode === "levels" ? (
@@ -447,7 +447,7 @@ export function StructuralBuildingWizard({
 									))}
 									{/* Parapet row in levels mode */}
 									{heightInputMode === "levels" && heightProps.hasParapet && (
-										<tr className="border-t bg-amber-50/30 dark:bg-amber-950/10">
+										<tr className="border-t bg-chart-1/10">
 											<td className="p-2">
 												<span className="flex items-center gap-2">
 													<span>🧱</span>
@@ -491,7 +491,7 @@ export function StructuralBuildingWizard({
 
 				{/* ── Parapet toggle (manual mode) ── */}
 				{heightInputMode === "manual" && (
-					<div className="flex items-center gap-3 bg-amber-50/30 dark:bg-amber-950/10 border border-amber-200/50 rounded-lg p-3">
+					<div className="flex items-center gap-3 bg-chart-1/10 border border-chart-1/30 rounded-lg p-3">
 						<Switch
 							checked={heightProps.hasParapet}
 							onCheckedChange={(checked: any) =>
@@ -529,7 +529,7 @@ export function StructuralBuildingWizard({
 						</Button>
 					</CollapsibleTrigger>
 					<CollapsibleContent className="mt-3">
-						<div className="border rounded-lg p-4 space-y-4 bg-muted/20">
+						<div className="border-2 rounded-lg p-4 space-y-4 bg-muted/20">
 							{/* Foundation zone */}
 							<div>
 								<h5 className="text-sm font-semibold mb-3">{t("foundationZone")}</h5>
@@ -731,9 +731,9 @@ export function StructuralBuildingWizard({
 
 				{/* ── Derivation preview ── */}
 				{derivation && (
-					<div className="bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 rounded-lg p-4 space-y-2">
+					<div className="bg-success/10 border border-success/30 rounded-lg p-4 space-y-2">
 						<h5 className="text-sm font-semibold flex items-center gap-2">
-							<Ruler className="h-4 w-4 text-green-600" />
+							<Ruler className="h-4 w-4 text-success" />
 							{t("heightsSummary")}
 						</h5>
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">

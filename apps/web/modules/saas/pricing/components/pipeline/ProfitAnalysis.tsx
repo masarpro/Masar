@@ -79,9 +79,9 @@ export function ProfitAnalysis({
 			<CardHeader className="pb-3">
 				<CardTitle className="text-base flex items-center gap-2">
 					{isPositive ? (
-						<TrendingUp className="h-4 w-4 text-emerald-600" />
+						<TrendingUp className="h-4 w-4 text-success" />
 					) : (
-						<TrendingDown className="h-4 w-4 text-red-600" />
+						<TrendingDown className="h-4 w-4 text-destructive" />
 					)}
 					{t("pricing.pipeline.profitAnalysisTitle")}
 				</CardTitle>
@@ -160,14 +160,14 @@ export function ProfitAnalysis({
 							<div
 								className={cn(
 									"h-full transition-all duration-300",
-									isPositive ? "bg-emerald-500" : "bg-red-500",
+									isPositive ? "bg-success" : "bg-destructive",
 								)}
 								style={{ width: `${profitPct}%` }}
 							/>
 						</div>
 						<div className="flex items-center justify-between text-xs">
 							<span className="text-chart-4 tabular-nums" dir="ltr">{formatPercent(costPct)}%</span>
-							<span className={cn("tabular-nums", isPositive ? "text-emerald-600" : "text-red-600")} dir="ltr">
+							<span className={cn("tabular-nums", isPositive ? "text-success" : "text-destructive")} dir="ltr">
 								{formatPercent(profitPct)}%
 							</span>
 						</div>
@@ -180,7 +180,7 @@ export function ProfitAnalysis({
 						<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.profitLabel")}</p>
 						<p className={cn(
 							"text-sm font-bold tabular-nums",
-							isPositive ? "text-emerald-600" : "text-red-600",
+							isPositive ? "text-success" : "text-destructive",
 						)} dir="ltr">
 							{formatAmount(profitAmount)} ر.س
 						</p>
@@ -189,7 +189,7 @@ export function ProfitAnalysis({
 						<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.profitPercentLabel")}</p>
 						<p className={cn(
 							"text-sm font-bold tabular-nums",
-							isPositive ? "text-emerald-600" : "text-red-600",
+							isPositive ? "text-success" : "text-destructive",
 						)} dir="ltr">
 							{formatPercent(profitPercent)}%
 						</p>

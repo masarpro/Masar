@@ -20,12 +20,12 @@ export function EmptyPaymentsState({
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 
 	return (
-		<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-16 dark:border-slate-700 dark:bg-slate-900/30">
-			<Banknote className="mb-4 h-12 w-12 text-slate-300 dark:text-slate-600" />
-			<p className="mb-2 text-base font-medium text-slate-600 dark:text-slate-400">
+		<div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed py-16">
+			<Banknote className="mb-4 h-12 w-12 text-muted-foreground" />
+			<p className="mb-2 text-base font-medium text-foreground">
 				{t("projectPayments.emptyTitle")}
 			</p>
-			<p className="mb-6 max-w-sm text-center text-sm text-slate-500">
+			<p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">
 				{t("projectPayments.emptyDescription")}
 			</p>
 			{showContractLink && (

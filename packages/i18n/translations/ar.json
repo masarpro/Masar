@@ -1850,6 +1850,23 @@
     "quantities": "حصر الكميات",
     "settings": "الإعدادات",
     "viewAll": "عرض الكل",
+    "fieldActivity": {
+      "title": "النشاط الميداني",
+      "siteUpdates": "آخر تحديثات المواقع",
+      "updatedToday": "{count} مشروع تم تحديثه اليوم",
+      "noneToday": "لا توجد تحديثات اليوم",
+      "stale": "مشروع «{name}» لم يُحدّث منذ {days} يوم",
+      "allFresh": "كل المواقع النشطة مُحدّثة",
+      "newMedia": "{photos} صورة و{reports} تقرير يومي جديد",
+      "newMediaPhotosOnly": "{photos} صورة جديدة",
+      "newMediaReportsOnly": "{reports} تقرير يومي جديد",
+      "noNewMedia": "لا صور أو تقارير جديدة هذا الأسبوع",
+      "openIssues": "المشاكل المفتوحة",
+      "openIssuesCount": "{count} مشكلة مفتوحة",
+      "noOpenIssues": "لا توجد مشاكل مفتوحة",
+      "highPriority": "{count} عالية الأولوية",
+      "avgResolution": "متوسط مدة الحل: {days} يوم"
+    },
     "kpi": {
       "bankBalance": "رصيد البنك",
       "cashBalance": "الصندوق",

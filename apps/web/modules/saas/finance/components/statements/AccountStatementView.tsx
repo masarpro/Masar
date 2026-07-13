@@ -95,7 +95,7 @@ export function AccountStatementView({
 				<Card className="print:shadow-none print:border">
 					<CardContent className="pt-4">
 						<div className="text-sm text-muted-foreground">{t("accountStatement.openingBalance")}</div>
-						<div className={`mt-1 text-xl font-bold ${openingBalance < 0 ? "text-red-600" : ""}`}>
+						<div className={`mt-1 text-xl font-bold ${openingBalance < 0 ? "text-destructive" : ""}`}>
 							<Currency amount={openingBalance} />
 						</div>
 					</CardContent>
@@ -115,7 +115,7 @@ export function AccountStatementView({
 				<Card className="print:shadow-none print:border">
 					<CardContent className="pt-4">
 						<div className="text-sm text-muted-foreground">{t("accountStatement.closingBalance")}</div>
-						<div className={`mt-1 text-xl font-bold ${closingBalance < 0 ? "text-red-600" : "text-green-600"}`}>
+						<div className={`mt-1 text-xl font-bold ${closingBalance < 0 ? "text-destructive" : "text-success"}`}>
 							<Currency amount={closingBalance} />
 						</div>
 					</CardContent>
@@ -140,7 +140,7 @@ export function AccountStatementView({
 						{/* Opening balance row */}
 						<TableRow className="bg-muted/50">
 							<TableCell colSpan={6} className="font-medium">{t("accountStatement.openingBalance")}</TableCell>
-							<TableCell className={`text-end font-medium ${openingBalance < 0 ? "text-red-600" : ""}`}>
+							<TableCell className={`text-end font-medium ${openingBalance < 0 ? "text-destructive" : ""}`}>
 								<Currency amount={openingBalance} />
 							</TableCell>
 						</TableRow>
@@ -162,7 +162,7 @@ export function AccountStatementView({
 									<TableCell className="max-w-[200px] truncate">{entry.description}</TableCell>
 									<TableCell className="text-end">{entry.debit > 0 ? <Currency amount={entry.debit} /> : "-"}</TableCell>
 									<TableCell className="text-end">{entry.credit > 0 ? <Currency amount={entry.credit} /> : "-"}</TableCell>
-									<TableCell className={`text-end font-medium ${entry.runningBalance < 0 ? "text-red-600" : ""}`}>
+									<TableCell className={`text-end font-medium ${entry.runningBalance < 0 ? "text-destructive" : ""}`}>
 										<Currency amount={entry.runningBalance} />
 									</TableCell>
 								</TableRow>
@@ -174,7 +174,7 @@ export function AccountStatementView({
 							<TableCell colSpan={4}>{t("accountStatement.closingBalance")}</TableCell>
 							<TableCell className="text-end"><Currency amount={totalDebit} /></TableCell>
 							<TableCell className="text-end"><Currency amount={totalCredit} /></TableCell>
-							<TableCell className={`text-end ${closingBalance < 0 ? "text-red-600" : "text-green-600"}`}>
+							<TableCell className={`text-end ${closingBalance < 0 ? "text-destructive" : "text-success"}`}>
 								<Currency amount={closingBalance} />
 							</TableCell>
 						</TableRow>

@@ -146,7 +146,7 @@ export function CreateStudyDialog({
 		>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("projectQuantities.createDialog.title")}
 					</DialogTitle>
@@ -161,7 +161,7 @@ export function CreateStudyDialog({
 								name="name"
 								render={({ field }: any) => (
 									<FormItem>
-										<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+										<FormLabel className="text-xs font-medium text-muted-foreground">
 											{t("projectQuantities.createDialog.name")} *
 										</FormLabel>
 										<FormControl>
@@ -183,7 +183,7 @@ export function CreateStudyDialog({
 									name="projectType"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.projectType")} *
 											</FormLabel>
 											<Select
@@ -219,7 +219,7 @@ export function CreateStudyDialog({
 									name="finishingLevel"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.finishingLevel")}
 											</FormLabel>
 											<Select
@@ -258,7 +258,7 @@ export function CreateStudyDialog({
 									name="landArea"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.landArea")}
 											</FormLabel>
 											<FormControl>
@@ -282,7 +282,7 @@ export function CreateStudyDialog({
 									name="buildingArea"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.buildingArea")}
 											</FormLabel>
 											<FormControl>
@@ -306,7 +306,7 @@ export function CreateStudyDialog({
 									name="numberOfFloors"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.numberOfFloors")}
 											</FormLabel>
 											<FormControl>
@@ -333,7 +333,7 @@ export function CreateStudyDialog({
 									name="overheadPercent"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.overheadPercent")}
 											</FormLabel>
 											<FormControl>
@@ -358,7 +358,7 @@ export function CreateStudyDialog({
 									name="profitPercent"
 									render={({ field }: any) => (
 										<FormItem>
-											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
+											<FormLabel className="text-xs font-medium text-muted-foreground">
 												{t("projectQuantities.createDialog.profitPercent")}
 											</FormLabel>
 											<FormControl>
@@ -384,14 +384,14 @@ export function CreateStudyDialog({
 								control={form.control}
 								name="vatIncluded"
 								render={({ field }: any) => (
-									<FormItem className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3">
+									<FormItem className="flex items-center gap-3 rounded-xl border-2 bg-muted px-4 py-3">
 										<FormControl>
 											<Checkbox
 												checked={field.value}
 												onCheckedChange={field.onChange}
 											/>
 										</FormControl>
-										<FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer !mt-0">
+										<FormLabel className="text-sm font-medium text-foreground cursor-pointer !mt-0">
 											{t("projectQuantities.createDialog.vatIncluded")}
 										</FormLabel>
 									</FormItem>
@@ -400,7 +400,7 @@ export function CreateStudyDialog({
 						</div>
 
 						{/* Footer Actions */}
-						<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+						<div className="bg-muted border-t-2 px-5 py-3 flex gap-3">
 							<Button
 								type="button"
 								variant="outline"

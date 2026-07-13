@@ -25,9 +25,9 @@ export function WizardShell({
 	const progressValue = ((currentStep + 1) / totalSteps) * 100;
 
 	return (
-		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
+		<div className="flex min-h-screen flex-col bg-background">
 			{/* Header */}
-			<header className="flex items-center justify-between border-b bg-background/80 px-6 py-4 backdrop-blur-sm">
+			<header className="flex items-center justify-between border-b bg-background px-6 py-4">
 				<Logo />
 				<div className="flex items-center gap-3">
 					<span className="text-muted-foreground text-sm">{stepLabel}</span>
@@ -46,7 +46,7 @@ export function WizardShell({
 
 			{/* Footer navigation */}
 			{onPrevious && (
-				<footer className="border-t bg-background/80 px-6 py-4 backdrop-blur-sm">
+				<footer className="border-t bg-background px-6 py-4">
 					<div className="mx-auto flex max-w-2xl justify-start">
 						<Button variant="ghost" onClick={onPrevious}>
 							<ChevronRight className="me-1 h-4 w-4 rotate-180" />

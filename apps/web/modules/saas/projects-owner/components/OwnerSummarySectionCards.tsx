@@ -192,7 +192,7 @@ export function OwnerSummarySectionCards({
 			>
 				{photos.count > 0 ? (
 					<div className="space-y-2.5">
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("ownerPortal.summary.photosCount", { count: photos.count })}
 						</p>
 						<div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
@@ -201,7 +201,7 @@ export function OwnerSummarySectionCards({
 								return (
 									<div
 										key={photo.id}
-										className="relative aspect-square overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800"
+										className="relative aspect-square overflow-hidden rounded-lg bg-muted"
 									>
 										{src && (
 											<Image
@@ -224,7 +224,7 @@ export function OwnerSummarySectionCards({
 						</div>
 					</div>
 				) : (
-					<p className="text-sm text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("ownerPortal.photos.emptyHint")}
 					</p>
 				)}
@@ -234,28 +234,28 @@ export function OwnerSummarySectionCards({
 			<SectionCard
 				href={`${basePath}/changes`}
 				icon={
-					<FileDiff className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<FileDiff className="h-5 w-5 text-chart-1" />
 				}
-				iconClass="bg-amber-100 dark:bg-amber-900/40"
+				iconClass="bg-chart-1/15"
 				title={t("ownerPortal.tabs.changeOrders")}
 			>
 				{changeOrders.count > 0 ? (
 					<div className="space-y-1">
-						<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+						<p className="text-2xl font-bold text-card-foreground">
 							{changeOrders.count}
 						</p>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("ownerPortal.summary.approvedCount")}
 						</p>
 						{changeOrders.totalCostImpact !== 0 && (
-							<p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+							<p className="text-xs font-medium text-chart-1">
 								{changeOrders.totalCostImpact > 0 ? "+" : ""}
 								{formatSARArabic(changeOrders.totalCostImpact)}
 							</p>
 						)}
 					</div>
 				) : (
-					<p className="text-sm text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("ownerPortal.summary.noChangeOrders")}
 					</p>
 				)}
@@ -273,10 +273,10 @@ export function OwnerSummarySectionCards({
 			>
 				{chat.lastMessage ? (
 					<div className="space-y-1">
-						<p className="line-clamp-2 text-sm text-slate-700 dark:text-slate-300">
+						<p className="line-clamp-2 text-sm text-card-foreground">
 							{chat.lastMessage.content}
 						</p>
-						<p className="text-xs text-slate-400">
+						<p className="text-xs text-muted-foreground">
 							{chat.lastMessage.isOwner
 								? t("ownerPortal.chat.owner")
 								: (chat.lastMessage.senderName ?? "")}
@@ -285,7 +285,7 @@ export function OwnerSummarySectionCards({
 						</p>
 					</div>
 				) : (
-					<p className="text-sm text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("ownerPortal.chat.startConversation")}
 					</p>
 				)}

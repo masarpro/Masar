@@ -174,7 +174,7 @@ export function ColumnsSection({
 							hasItems
 								? "border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20"
 								: "border-border"
-						} ${floor.isRepeated && hasItems ? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10" : ""}`}
+						} ${floor.isRepeated && hasItems ? "border-chart-4/30 bg-chart-4/10" : ""}`}
 					>
 						{/* رأس الدور */}
 						<button
@@ -193,7 +193,7 @@ export function ColumnsSection({
 								{floor.isRepeated && repeatedCount > 1 && (
 									<Badge
 										variant="default"
-										className="bg-purple-600 text-xs"
+										className="bg-chart-4 text-xs"
 									>
 										{t("pricing.studies.structural.sections.columns.floorsCount", { count: repeatedCount })}
 									</Badge>
@@ -201,7 +201,7 @@ export function ColumnsSection({
 								{floor.id === "ground" && neckEnabled && (
 									<Badge
 										variant="secondary"
-										className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+										className="text-xs bg-chart-1/15 text-chart-1"
 									>
 										{t("pricing.studies.structural.sections.columns.plusNecks")}
 									</Badge>
@@ -225,7 +225,7 @@ export function ColumnsSection({
 									{displaySteel > 0 && (
 										<span>
 											{t("pricing.studies.structural.sections.common.steel")}:{" "}
-											<span className="font-semibold text-orange-600">
+											<span className="font-semibold text-chart-1">
 												{formatNumber(displaySteel)} كجم
 											</span>
 										</span>
@@ -287,14 +287,14 @@ export function ColumnsSection({
 											floorItems.length > 0 && (
 												<Button
 													variant="outline"
-													className="w-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border-2 border-dashed border-amber-400/40 hover:bg-amber-500/20 hover:border-amber-400/60 transition-all"
+													className="w-full bg-chart-1/10 text-chart-1 border-2 border-dashed border-chart-1/40 hover:bg-chart-1/20 hover:border-chart-1/60 transition-all"
 													onClick={() => setNeckEnabledOverride(true)}
 												>
 													<Plus className="h-5 w-5 me-2" />
 													<span className="font-semibold">
 														{t("pricing.studies.structural.sections.columns.addNeckColumns")}
 													</span>
-													<span className="text-xs ms-2 text-amber-600/70 dark:text-amber-500/70">
+													<span className="text-xs ms-2 text-chart-1/70">
 														{t("pricing.studies.structural.sections.columns.neckHint")}
 													</span>
 												</Button>
@@ -305,14 +305,14 @@ export function ColumnsSection({
 									/* ═══ الدور المتكرر: خاص ═══ */
 									<div className="space-y-4">
 										{/* عدد الأدوار المتكررة — قراءة فقط (من معالج التهيئة) */}
-										<div className="flex items-center gap-3 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 rounded-lg p-3">
-											<Layers className="h-5 w-5 text-purple-600" />
+										<div className="flex items-center gap-3 bg-chart-4/10 border border-chart-4/30 rounded-lg p-3">
+											<Layers className="h-5 w-5 text-chart-4" />
 											<Label className="font-medium text-sm">
 												{t("pricing.studies.structural.sections.columns.repeatedFloorsCount")}:
 											</Label>
 											<Badge
 												variant="default"
-												className="bg-purple-600 text-sm font-bold"
+												className="bg-chart-4 text-sm font-bold"
 											>
 												× {repeatedCount}
 											</Badge>
@@ -322,9 +322,9 @@ export function ColumnsSection({
 										</div>
 
 										{/* قالب الأعمدة */}
-										<div className="border border-purple-200/30 rounded-lg p-3">
+										<div className="border border-chart-4/30 rounded-lg p-3">
 											<div className="flex items-center gap-2 mb-3">
-												<Copy className="h-4 w-4 text-purple-600" />
+												<Copy className="h-4 w-4 text-chart-4" />
 												<h5 className="font-medium text-sm">
 													{t("pricing.studies.structural.sections.columns.columnsTemplate")}
 												</h5>
@@ -364,7 +364,7 @@ export function ColumnsSection({
 										{floorItems.length > 0 && (
 											<div className="space-y-2">
 												<div className="flex items-center gap-2">
-													<Building2 className="h-4 w-4 text-purple-600" />
+													<Building2 className="h-4 w-4 text-chart-4" />
 													<h5 className="font-medium text-sm">
 														{t("pricing.studies.structural.sections.columns.repeatedDetail")}
 													</h5>
@@ -426,7 +426,7 @@ export function ColumnsSection({
 																		</span>
 																		<span>
 																			{t("pricing.studies.structural.sections.common.steel")}:{" "}
-																			<span className="font-semibold text-orange-600">
+																			<span className="font-semibold text-chart-1">
 																				{formatNumber(perFloorSteel)} كجم
 																			</span>
 																		</span>
@@ -510,7 +510,7 @@ export function ColumnsSection({
 																			<span className="font-bold text-chart-4">
 																				{formatNumber(perFloorConcrete)} م³ {t("pricing.studies.structural.sections.common.concrete")}
 																			</span>
-																			<span className="font-bold text-orange-600">
+																			<span className="font-bold text-chart-1">
 																				{formatNumber(perFloorSteel)} كجم {t("pricing.studies.structural.sections.common.steel")}
 																			</span>
 																		</div>
@@ -522,10 +522,10 @@ export function ColumnsSection({
 												)}
 
 												{/* ملخص جميع الأدوار المتكررة */}
-												<div className="bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 rounded-lg p-3">
+												<div className="bg-chart-4/10 border border-chart-4/30 rounded-lg p-3">
 													<div className="flex items-center justify-between">
 														<span className="font-semibold text-sm flex items-center gap-2">
-															<Layers className="h-4 w-4 text-purple-600" />
+															<Layers className="h-4 w-4 text-chart-4" />
 															{t("pricing.studies.structural.sections.columns.repeatedTotal", { count: repeatedCount })}
 														</span>
 														<div className="flex gap-4 text-sm">
@@ -537,7 +537,7 @@ export function ColumnsSection({
 															</span>
 															<span>
 																{t("pricing.studies.structural.sections.common.steel")}:{" "}
-																<span className="font-bold text-orange-600">
+																<span className="font-bold text-chart-1">
 																	{formatNumber(repeatedSteel)} كجم
 																</span>
 															</span>

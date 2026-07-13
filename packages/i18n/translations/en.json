@@ -1850,6 +1850,23 @@
     "quantities": "Quantities",
     "settings": "Settings",
     "viewAll": "View All",
+    "fieldActivity": {
+      "title": "Field Activity",
+      "siteUpdates": "Latest Site Updates",
+      "updatedToday": "{count} project(s) updated today",
+      "noneToday": "No updates today",
+      "stale": "Project \"{name}\" not updated for {days} day(s)",
+      "allFresh": "All active sites are up to date",
+      "newMedia": "{photos} new photos and {reports} daily reports",
+      "newMediaPhotosOnly": "{photos} new photos",
+      "newMediaReportsOnly": "{reports} new daily reports",
+      "noNewMedia": "No new photos or reports this week",
+      "openIssues": "Open Issues",
+      "openIssuesCount": "{count} open issue(s)",
+      "noOpenIssues": "No open issues",
+      "highPriority": "{count} high priority",
+      "avgResolution": "Avg. resolution: {days} day(s)"
+    },
     "kpi": {
       "bankBalance": "Bank Balance",
       "cashBalance": "Cash Balance",

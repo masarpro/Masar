@@ -220,8 +220,8 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 						label: t("finance.banks.totalCashBalance"),
 						value: <Currency amount={summaryData?.totalCashBalance ?? 0} />,
 						icon: Wallet,
-						iconClassName: "text-green-600 dark:text-green-400",
-						iconBgClassName: "bg-green-100 dark:bg-green-900/50",
+						iconClassName: "text-success",
+						iconBgClassName: "bg-success/15",
 					},
 					{
 						label: t("finance.banks.totalBalance"),
@@ -242,10 +242,10 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 								<Building className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.banks.totalBankBalance")}
 								</p>
-								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+								<p className="text-xl font-semibold text-card-foreground">
 									<Currency amount={summaryData?.totalBankBalance ?? 0} />
 								</p>
 							</div>
@@ -255,14 +255,14 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-xl">
-								<Wallet className="h-5 w-5 text-green-600 dark:text-green-400" />
+							<div className="p-2 bg-success/15 rounded-xl">
+								<Wallet className="h-5 w-5 text-success" />
 							</div>
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.banks.totalCashBalance")}
 								</p>
-								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+								<p className="text-xl font-semibold text-card-foreground">
 									<Currency amount={summaryData?.totalCashBalance ?? 0} />
 								</p>
 							</div>
@@ -276,10 +276,10 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 								<Banknote className="h-5 w-5 text-primary" />
 							</div>
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.banks.totalBalance")}
 								</p>
-								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+								<p className="text-xl font-semibold text-card-foreground">
 									<Currency amount={summaryData?.totalBalance ?? 0} />
 								</p>
 							</div>
@@ -294,7 +294,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
 					<div className="flex items-center gap-2 sm:hidden">
 						<div className="relative min-w-0 flex-1">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.banks.searchPlaceholder")}
 								value={searchQuery}
@@ -335,7 +335,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 					{/* الديسكتوب كما هو */}
 					<div className="hidden flex-col sm:flex sm:flex-row gap-4">
 						<div className="flex-1 relative">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.banks.searchPlaceholder")}
 								value={searchQuery}
@@ -380,8 +380,8 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 				<CardContent className="p-0">
 					{isLoading ? <ListTableSkeleton /> : accounts.length === 0 ? (
 						<div className="text-center py-20">
-							<Building className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-							<p className="text-slate-500 dark:text-slate-400">
+							<Building className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+							<p className="text-muted-foreground">
 								{searchQuery
 									? t("finance.banks.noSearchResults")
 									: t("finance.banks.noAccounts")}
@@ -403,7 +403,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 								{accounts.map((account: any) => (
 									<TableRow
 										key={account.id}
-										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+										className="cursor-pointer hover:bg-muted/50"
 										onClick={() =>
 											router.push(
 												`/app/${organizationSlug}/finance/banks/${account.id}`,
@@ -415,19 +415,19 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 												<div className={`p-1.5 rounded-lg ${
 													account.accountType === "BANK"
 														? "bg-chart-4/15 dark:bg-chart-4/20"
-														: "bg-green-100 dark:bg-green-900/50"
+														: "bg-success/15"
 												}`}>
 													{account.accountType === "BANK" ? (
 														<Building className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 													) : (
-														<Wallet className="h-4 w-4 text-green-600 dark:text-green-400" />
+														<Wallet className="h-4 w-4 text-success" />
 													)}
 												</div>
 												<div>
-													<div className="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-2">
+													<div className="font-medium text-card-foreground flex items-center gap-2">
 														{account.name}
 														{account.isDefault && (
-															<Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
+															<Star className="h-3.5 w-3.5 text-chart-1 fill-chart-1" />
 														)}
 													</div>
 												</div>
@@ -444,20 +444,20 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 											</Badge>
 										</TableCell>
 										<TableCell>
-											{account.bankName || <span className="text-slate-400">-</span>}
+											{account.bankName || <span className="text-muted-foreground">-</span>}
 										</TableCell>
 										<TableCell>
 											{account.accountNumber ? (
 												<span className="font-mono text-sm">{account.accountNumber}</span>
 											) : (
-												<span className="text-slate-400">-</span>
+												<span className="text-muted-foreground">-</span>
 											)}
 										</TableCell>
 										<TableCell className="text-end">
 											<span className={`font-semibold ${
 												Number(account.balance) >= 0
-													? "text-green-600 dark:text-green-400"
-													: "text-red-600 dark:text-red-400"
+													? "text-success"
+													: "text-destructive"
 											}`}>
 												<Currency amount={Number(account.balance)} />
 											</span>
@@ -501,7 +501,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 													<DropdownMenuSeparator />
 													<DropdownMenuItem
 														onClick={() => setDeleteAccountId(account.id)}
-														className="text-red-600"
+														className="text-destructive"
 													>
 														<Trash2 className="h-4 w-4 me-2" />
 														{t("common.delete")}
@@ -669,7 +669,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 						<AlertDialogAction
 							onClick={() => deleteAccountId && deleteMutation.mutate(deleteAccountId)}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending
 								? t("common.deleting")

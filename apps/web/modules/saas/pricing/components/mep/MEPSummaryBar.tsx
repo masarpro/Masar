@@ -26,7 +26,7 @@ export const MEPSummaryBar = memo(function MEPSummaryBar({
 	const t = useTranslations("pricing.studies.mep");
 
 	return (
-		<div className="rounded-xl border bg-card shadow-sm p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+		<div className="rounded-xl border-2 bg-card p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
 			<Stat
 				icon={<Settings className="h-4 w-4" />}
 				label={t("summary.totalItems")}

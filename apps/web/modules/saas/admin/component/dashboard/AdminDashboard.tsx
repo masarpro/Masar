@@ -101,7 +101,7 @@ export function AdminDashboard() {
 			</div>
 
 			{(stats?.pastDueOrgs ?? 0) > 0 && (
-				<div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-amber-700 dark:text-amber-400">
+				<div className="flex items-center gap-2 rounded-lg border border-chart-1/20 bg-chart-1/10 p-4 text-chart-1">
 					<AlertTriangleIcon className="size-5" />
 					<span>
 						{t("admin.dashboard.pastDueWarning", {

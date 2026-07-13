@@ -107,7 +107,7 @@ export function CostingTable({
 						{/* Section header */}
 						<div className={cn(
 							"flex items-center justify-between px-4 py-3 bg-muted/50 border-r-4",
-							SECTION_COLORS[section] || "border-r-gray-400",
+							SECTION_COLORS[section] || "border-r-muted-foreground",
 						)}>
 							<h3 className="font-semibold text-sm">
 								{SECTION_LABELS[section] || section}

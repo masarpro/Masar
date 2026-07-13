@@ -482,7 +482,7 @@ export function FloorDetailsStep({
 									<span
 										className={
 											Math.abs(areaDiff) > 1
-												? "text-amber-600"
+												? "text-chart-1"
 												: ""
 										}
 									>

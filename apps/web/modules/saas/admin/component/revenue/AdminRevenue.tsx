@@ -79,8 +79,8 @@ export function AdminRevenue() {
 						/>
 						<Bar
 							dataKey="amount"
-							fill="var(--primary)"
-							radius={[4, 4, 0, 0]}
+							fill="var(--chart-1)"
+							radius={[10, 10, 10, 10]}
 						/>
 					</BarChart>
 				</ResponsiveContainer>

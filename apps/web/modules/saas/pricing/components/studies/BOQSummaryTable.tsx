@@ -994,8 +994,8 @@ function GrandTotalCards({
 			value: totals.concrete > 0 ? formatNumber(totals.concrete) : "—",
 			unit: "م³",
 			color: "text-chart-4",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			borderColor: "border-chart-4 dark:border-chart-4",
+			bgColor: "bg-chart-4/15",
+			borderColor: "border-2",
 		},
 		{
 			title: t("structural.totalSteel"),
@@ -1007,8 +1007,8 @@ function GrandTotalCards({
 					? `(${formatNumber(totals.rebar)} كجم)`
 					: undefined,
 			color: "text-chart-1",
-			bgColor: "bg-orange-50 dark:bg-orange-950/30",
-			borderColor: "border-orange-200 dark:border-orange-800",
+			bgColor: "bg-chart-1/15",
+			borderColor: "border-2",
 		},
 		{
 			title: t("boq.totalBlocks"),
@@ -1016,8 +1016,8 @@ function GrandTotalCards({
 			value: totals.blocks > 0 ? formatNumber(totals.blocks) : "—",
 			unit: t("structural.otherStructural.results.blockUnit"),
 			color: "text-success",
-			bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-			borderColor: "border-emerald-200 dark:border-emerald-800",
+			bgColor: "bg-success/15",
+			borderColor: "border-2",
 		},
 		{
 			title: t("boq.totalFormwork"),
@@ -1025,8 +1025,8 @@ function GrandTotalCards({
 			value: totals.formwork > 0 ? formatNumber(totals.formwork) : "—",
 			unit: "م²",
 			color: "text-chart-1",
-			bgColor: "bg-amber-50 dark:bg-amber-950/30",
-			borderColor: "border-amber-200 dark:border-amber-800",
+			bgColor: "bg-chart-1/15",
+			borderColor: "border-2",
 		},
 	];
 
@@ -1243,7 +1243,7 @@ function CuttingWorkshopTab({
 					<Card key={diameter}>
 						<div className="px-4 py-2 bg-muted/30 border-b flex items-center justify-between">
 							<div className="flex items-center gap-2">
-								<Badge className="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+								<Badge className="bg-chart-1/15 text-chart-1">
 									Ø{diameter} مم
 								</Badge>
 								<span className="text-xs text-muted-foreground">

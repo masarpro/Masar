@@ -136,11 +136,11 @@ export function RetentionCard({
 				</div>
 
 				{retentionAmount > 0 && (
-					<div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-950/30">
-						<p className="text-sm text-amber-600 dark:text-amber-400">
+					<div className="rounded-lg bg-chart-1/15 p-3">
+						<p className="text-sm text-chart-1">
 							{t("projects.contract.retention.amount")}
 						</p>
-						<p className="text-lg font-semibold text-amber-700 dark:text-amber-300">
+						<p className="text-lg font-semibold text-chart-1">
 							{formatSAR(retentionAmount)}
 						</p>
 					</div>

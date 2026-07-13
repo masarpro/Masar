@@ -143,7 +143,7 @@ export function SlabsSection({
 								: "border-border"
 						} ${
 							floor.isRepeated && hasItems
-								? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10"
+								? "border-chart-4/30 bg-chart-4/10"
 								: ""
 						}`}
 					>
@@ -170,7 +170,7 @@ export function SlabsSection({
 								{floor.isRepeated && floor.repeatCount > 1 && (
 									<Badge
 										variant="default"
-										className="bg-purple-600 text-xs"
+										className="bg-chart-4 text-xs"
 									>
 										{floor.repeatCount} أدوار
 									</Badge>
@@ -194,7 +194,7 @@ export function SlabsSection({
 									{displaySteel > 0 && (
 										<span>
 											حديد:{" "}
-											<span className="font-semibold text-orange-600">
+											<span className="font-semibold text-chart-1">
 												{formatNumber(displaySteel)} كجم
 											</span>
 										</span>

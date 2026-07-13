@@ -369,66 +369,66 @@ export const ContractFormSections = forwardRef<
 
 			{/* ═══ Fixed Summary Strip ════════════════════════ */}
 			{contractValue > 0 && (
-				<div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95">
+				<div className="fixed inset-x-0 bottom-0 z-40 border-t-2 bg-card">
 					<div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-4 py-3">
-						<Calculator className="me-2 h-4 w-4 shrink-0 text-slate-400" />
-						<span className="shrink-0 text-xs font-medium text-slate-500">
+						<Calculator className="me-2 h-4 w-4 shrink-0 text-muted-foreground" />
+						<span className="shrink-0 text-xs font-medium text-muted-foreground">
 							{t("projects.createProject.summaryStrip")}:
 						</span>
 
-						<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
-							<span className="font-mono text-xs font-semibold text-chart-4 dark:text-chart-4">
+						<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1">
+							<span className="font-mono text-xs font-semibold text-chart-4">
 								{formatNumber(contractValue)}
 							</span>
 						</div>
 
 						{formData.includesVat && (
 							<>
-								<span className="text-xs text-slate-400">
+								<span className="text-xs text-muted-foreground">
 									+
 								</span>
-								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
-									<span className="text-[10px] text-slate-400">
+								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1">
+									<span className="text-[10px] text-muted-foreground">
 										VAT{" "}
 									</span>
-									<span className="font-mono text-xs font-semibold text-chart-4 dark:text-chart-4">
+									<span className="font-mono text-xs font-semibold text-chart-4">
 										{formatNumber(vatAmount)}
 									</span>
 								</div>
-								<span className="text-xs text-slate-400">
+								<span className="text-xs text-muted-foreground">
 									=
 								</span>
-								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1 dark:bg-chart-4/20">
-									<span className="font-mono text-xs font-bold text-chart-4 dark:text-chart-4">
+								<div className="shrink-0 rounded-md bg-chart-4/15 px-2.5 py-1">
+									<span className="font-mono text-xs font-bold text-chart-4">
 										{formatNumber(totalWithVat)}
 									</span>
 								</div>
 							</>
 						)}
 
-						<div className="mx-1 h-4 w-px shrink-0 bg-slate-200 dark:bg-slate-700" />
+						<div className="mx-1 h-4 w-px shrink-0 bg-border" />
 
 						{retentionAmount > 0 && (
-							<div className="shrink-0 rounded-md bg-amber-50 px-2.5 py-1 dark:bg-amber-950/30">
-								<span className="text-[10px] text-slate-400">
+							<div className="shrink-0 rounded-md bg-chart-1/15 px-2.5 py-1">
+								<span className="text-[10px] text-muted-foreground">
 									{t(
 										"projects.createProject.retentionInfo",
 									)}{" "}
 								</span>
-								<span className="font-mono text-xs font-semibold text-amber-700 dark:text-amber-300">
+								<span className="font-mono text-xs font-semibold text-chart-1">
 									{formatNumber(retentionAmount)}
 								</span>
 							</div>
 						)}
 
 						{performanceBondAmount > 0 && (
-							<div className="shrink-0 rounded-md bg-amber-50 px-2.5 py-1 dark:bg-amber-950/30">
-								<span className="text-[10px] text-slate-400">
+							<div className="shrink-0 rounded-md bg-chart-1/15 px-2.5 py-1">
+								<span className="text-[10px] text-muted-foreground">
 									{t(
 										"projects.createProject.performanceBond",
 									)}{" "}
 								</span>
-								<span className="font-mono text-xs font-semibold text-amber-700 dark:text-amber-300">
+								<span className="font-mono text-xs font-semibold text-chart-1">
 									{formatNumber(performanceBondAmount)}
 								</span>
 							</div>

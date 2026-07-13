@@ -117,7 +117,7 @@ export function ClientInfoSection({
 				<div className="grid gap-4 sm:grid-cols-2">
 					<div>
 						<Label className="flex items-center gap-2">
-							<Phone className="h-4 w-4 text-slate-400" />
+							<Phone className="h-4 w-4 text-muted-foreground" />
 							{t("finance.clients.phone")}
 						</Label>
 						<Input
@@ -135,7 +135,7 @@ export function ClientInfoSection({
 					</div>
 					<div>
 						<Label className="flex items-center gap-2">
-							<Smartphone className="h-4 w-4 text-slate-400" />
+							<Smartphone className="h-4 w-4 text-muted-foreground" />
 							{t("finance.clients.mobile")}
 						</Label>
 						<Input
@@ -156,7 +156,7 @@ export function ClientInfoSection({
 				{/* البريد الإلكتروني */}
 				<div>
 					<Label className="flex items-center gap-2">
-						<Mail className="h-4 w-4 text-slate-400" />
+						<Mail className="h-4 w-4 text-muted-foreground" />
 						{t("finance.clients.email")}
 					</Label>
 					<Input

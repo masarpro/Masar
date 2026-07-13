@@ -24,64 +24,54 @@ export function ContractSummaryBar({
 			title: t("projects.contract.summary.originalValue"),
 			value: originalValue,
 			icon: Banknote,
-			bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-			iconBg: "bg-indigo-100 dark:bg-indigo-900/50",
-			iconColor: "text-indigo-600 dark:text-indigo-400",
-			textColor: "text-indigo-700 dark:text-indigo-300",
-			labelColor: "text-indigo-600 dark:text-indigo-400",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 		{
 			title: t("projects.contract.summary.changeOrders"),
 			value: approvedCOImpact,
 			icon: FileDiff,
-			bgColor:
-				approvedCOImpact >= 0
-					? "bg-green-50 dark:bg-green-950/30"
-					: "bg-red-50 dark:bg-red-950/30",
 			iconBg:
 				approvedCOImpact >= 0
-					? "bg-green-100 dark:bg-green-900/50"
-					: "bg-red-100 dark:bg-red-900/50",
+					? "bg-success/15"
+					: "bg-destructive/15",
 			iconColor:
 				approvedCOImpact >= 0
-					? "text-green-600 dark:text-green-400"
-					: "text-red-600 dark:text-red-400",
+					? "text-success"
+					: "text-destructive",
 			textColor:
 				approvedCOImpact >= 0
-					? "text-green-700 dark:text-green-300"
-					: "text-red-700 dark:text-red-300",
-			labelColor:
-				approvedCOImpact >= 0
-					? "text-green-600 dark:text-green-400"
-					: "text-red-600 dark:text-red-400",
+					? "text-success"
+					: "text-destructive",
+			labelColor: "text-muted-foreground",
 			prefix: approvedCOImpact > 0 ? "+" : "",
 		},
 		{
 			title: t("projects.contract.summary.adjustedValue"),
 			value: adjustedValue,
 			icon: TrendingUp,
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconColor: "text-chart-4 dark:text-chart-4",
-			textColor: "text-chart-4 dark:text-chart-4",
-			labelColor: "text-chart-4 dark:text-chart-4",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 		{
 			title: t("projects.contract.summary.retentionHeld"),
 			value: retentionAmount,
 			icon: Shield,
-			bgColor: "bg-amber-50 dark:bg-amber-950/30",
-			iconBg: "bg-amber-100 dark:bg-amber-900/50",
-			iconColor: "text-amber-600 dark:text-amber-400",
-			textColor: "text-amber-700 dark:text-amber-300",
-			labelColor: "text-amber-600 dark:text-amber-400",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 	];
 
 	return (
 		<div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-4">
 			{cards.map((card) => (
-				<div key={card.title} className={`rounded-2xl ${card.bgColor} p-5`}>
+				<div key={card.title} className="rounded-2xl border-2 bg-card p-5">
 					<div className="flex items-center gap-3">
 						<div className={`rounded-xl ${card.iconBg} p-2.5`}>
 							<card.icon className={`h-5 w-5 ${card.iconColor}`} />

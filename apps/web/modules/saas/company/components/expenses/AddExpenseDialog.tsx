@@ -101,7 +101,7 @@ export function AddExpenseDialog({
 						{/* Row 1: Name, Category, Amount */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.name")} *
 								</Label>
 								<Input
@@ -112,7 +112,7 @@ export function AddExpenseDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.category")} *
 								</Label>
 								<Select
@@ -132,7 +132,7 @@ export function AddExpenseDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.amount")} *
 								</Label>
 								<Input
@@ -151,7 +151,7 @@ export function AddExpenseDialog({
 						{/* Row 2: Recurrence, Vendor, Contract Number */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.recurrence")} *
 								</Label>
 								<Select
@@ -171,7 +171,7 @@ export function AddExpenseDialog({
 								</Select>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.vendor")}
 								</Label>
 								<Input
@@ -181,7 +181,7 @@ export function AddExpenseDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.contractNumber")}
 								</Label>
 								<Input
@@ -195,7 +195,7 @@ export function AddExpenseDialog({
 						{/* Row 3: Start Date, End Date, Reminder Days */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.startDate")} *
 								</Label>
 								<Input
@@ -207,7 +207,7 @@ export function AddExpenseDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.endDate")}
 								</Label>
 								<Input
@@ -218,7 +218,7 @@ export function AddExpenseDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.reminderDays")}
 								</Label>
 								<Input
@@ -234,7 +234,7 @@ export function AddExpenseDialog({
 						{/* Row 4: Description, Notes */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.expenses.description")}
 								</Label>
 								<Input
@@ -244,7 +244,7 @@ export function AddExpenseDialog({
 								/>
 							</div>
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground">
 									{t("company.common.notes")}
 								</Label>
 								<Input
@@ -257,7 +257,7 @@ export function AddExpenseDialog({
 					</div>
 
 					{/* Footer Actions */}
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3">
+					<div className="bg-muted/50 border-t-2 px-5 py-3 flex gap-3">
 						<Button
 							type="button"
 							variant="outline"

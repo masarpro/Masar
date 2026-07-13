@@ -196,14 +196,14 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	}
 
 	return (
-		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 			<div className="space-y-5 max-w-6xl mx-auto">
 
 				{/* ─── Header ─────────────────────────────────────────── */}
-				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+				<div className="sticky top-0 z-20 py-3 px-4 rounded-2xl bg-card border-2 border-border">
 					<div className="flex flex-wrap items-center justify-between gap-3 max-w-6xl mx-auto">
 						<div className="flex items-center gap-3 min-w-0">
-							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm" aria-label={t("common.back")}>
+							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border" aria-label={t("common.back")}>
 								<Link href={`/app/${organizationSlug}/finance`}>
 									<ArrowRight className="h-4 w-4 rtl:rotate-180" />
 								</Link>
@@ -223,13 +223,13 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									<FileText className="h-3.5 w-3.5 me-1.5" />
 									{t("drafts.button")}
 									{draftCount > 0 && (
-										<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+										<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-chart-1 text-primary text-[10px] font-bold">
 											{draftCount}
 										</span>
 									)}
 								</Link>
 							</Button>
-							<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
+							<Button asChild size="sm" className="h-8 rounded-lg text-xs px-5">
 								<Link href={`${basePath}/new`}>
 									<Plus className="h-3.5 w-3.5 me-1.5" />
 									{t("finance.invoices.create")}
@@ -240,10 +240,10 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				</div>
 
 				{/* ─── Search + Filter (زر فلترة واحد للجوال والكمبيوتر) ── */}
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-4 py-3 sm:px-5 sm:py-3.5">
+				<div className="bg-card rounded-2xl border-2 border-border px-4 py-3 sm:px-5 sm:py-3.5">
 					<div className="flex items-center gap-2">
 						<div className="relative min-w-0 flex-1">
-							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.invoices.searchPlaceholder")}
 								value={searchTerm}
@@ -251,7 +251,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									setSearchTerm(e.target.value);
 									setCurrentPage(1);
 								}}
-								className="pe-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
+								className="pe-10 rounded-lg h-9 border-input bg-card"
 							/>
 						</div>
 						<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
@@ -277,18 +277,18 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				{/* ─── Invoices Table ──────────────────────────────────── */}
 				{invoices.length > 0 ? (
 					<>
-						<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-							<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-								<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-800/20 flex items-center justify-center">
-									<FileText className="h-[15px] w-[15px] text-amber-500" />
+						<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+							<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+								<div className="flex size-8 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+									<FileText className="h-[15px] w-[15px]" />
 								</div>
-								<span className="text-sm font-semibold text-foreground">{t("finance.invoices.title")}</span>
+								<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.title")}</span>
 								<span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">{totalCount}</span>
 							</div>
 							<div className="overflow-x-auto">
 								<table className="w-full text-sm">
 									<thead>
-										<tr className="border-b bg-slate-50/80 dark:bg-slate-800/30">
+										<tr className="border-b-2 border-border">
 											<th className="p-3 w-10">
 												<Checkbox
 													checked={invoices.length > 0 && selectedIds.size === invoices.length}
@@ -322,8 +322,8 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 											return (
 												<tr
 													key={invoice.id}
-													className={`border-b border-slate-50 dark:border-slate-800/30 last:border-0 hover:bg-primary/[0.02] transition-colors ${
-														overdue ? "bg-red-50/50 dark:bg-red-950/20" : ""
+													className={`border-b border-border last:border-0 hover:bg-primary/[0.02] transition-colors ${
+														overdue ? "bg-destructive/5" : ""
 													}`}
 												>
 													<td className="p-3" onClick={(e) => e.stopPropagation()}>
@@ -340,7 +340,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 														>
 															{invoice.invoiceNo}
 															{invoice.invoiceType === "CREDIT_NOTE" && (
-																<span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400">
+																<span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-destructive/15 text-destructive">
 																	{t("finance.invoices.types.credit_note")}
 																</span>
 															)}
@@ -355,13 +355,13 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 														</div>
 													</td>
 													<td className="p-3 text-muted-foreground hidden md:table-cell">{formatDate(invoice.issueDate)}</td>
-													<td className={`p-3 hidden lg:table-cell ${overdue ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+													<td className={`p-3 hidden lg:table-cell ${overdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
 														{formatDate(invoice.dueDate)}
 													</td>
 													<td className="p-3 font-semibold">
 														<Currency amount={invoice.totalAmount} />
 													</td>
-													<td className="p-3 text-green-600 font-medium hidden md:table-cell">
+													<td className="p-3 text-success font-medium hidden md:table-cell">
 														<Currency amount={invoice.paidAmount} />
 													</td>
 													<td className="p-3">
@@ -453,7 +453,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 																{/* Delete — only DRAFT */}
 																{isDraft && (
 																	<DropdownMenuItem
-																		className="text-red-600"
+																		className="text-destructive"
 																		onClick={() => setDeleteInvoiceId(invoice.id)}
 																	>
 																		<Trash2 className="h-4 w-4 me-2" />
@@ -569,7 +569,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 						title={t("finance.invoices.empty")}
 						description={t("finance.invoices.emptyDescription")}
 					>
-						<Button asChild className="rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
+						<Button asChild className="rounded-lg h-9 px-5">
 							<Link href={`${basePath}/new`}>
 								<Plus className="ms-2 h-4 w-4" />
 								{t("finance.invoices.create")}
@@ -591,7 +591,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 						<AlertDialogAction
 							onClick={() => deleteInvoiceId && deleteMutation.mutate(deleteInvoiceId)}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
 						</AlertDialogAction>
@@ -647,25 +647,25 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 
 function ZatcaStatusIcon({ status }: { status?: string | null }) {
 	if (!status || status === "NOT_APPLICABLE") {
-		return <span className="text-slate-300 dark:text-slate-600">—</span>;
+		return <span className="text-muted-foreground">—</span>;
 	}
 	if (status === "CLEARED" || status === "REPORTED") {
 		return (
-			<span title={status === "CLEARED" ? "Cleared" : "Reported"} className="text-green-500">
+			<span title={status === "CLEARED" ? "Cleared" : "Reported"} className="text-success">
 				<FileCheck className="h-4 w-4 inline-block" />
 			</span>
 		);
 	}
 	if (status === "REJECTED") {
 		return (
-			<span title="Rejected" className="text-red-500">
+			<span title="Rejected" className="text-destructive">
 				<XCircle className="h-4 w-4 inline-block" />
 			</span>
 		);
 	}
 	if (status === "FAILED") {
 		return (
-			<span title="Failed" className="text-amber-500">
+			<span title="Failed" className="text-chart-1">
 				<XCircle className="h-4 w-4 inline-block" />
 			</span>
 		);

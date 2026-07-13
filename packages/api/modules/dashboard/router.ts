@@ -15,6 +15,7 @@ import {
 	getLeadsPipeline,
 	getPendingSubcontractClaimsCount,
 	getInvoiceTotals,
+	getFieldActivitySummary,
 } from "@repo/database";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -203,6 +204,7 @@ const getAll = protectedProcedure
 			leadsPipeline,
 			pendingSubcontractClaims,
 			invoiceTotals,
+			fieldActivity,
 		] = await Promise.all([
 			getDashboardStats(input.organizationId),
 			getRecentActivities(input.organizationId, input.activitiesLimit),
@@ -214,6 +216,7 @@ const getAll = protectedProcedure
 			getLeadsPipeline(input.organizationId),
 			getPendingSubcontractClaimsCount(input.organizationId),
 			getInvoiceTotals(input.organizationId),
+			getFieldActivitySummary(input.organizationId),
 		]);
 
 		// Computed fields
@@ -235,6 +238,7 @@ const getAll = protectedProcedure
 			leadsPipeline,
 			pendingSubcontractClaims,
 			invoiceTotals,
+			fieldActivity,
 			netProfit,
 			profitMargin,
 		};

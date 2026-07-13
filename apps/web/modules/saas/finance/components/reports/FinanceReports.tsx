@@ -144,15 +144,15 @@ export function FinanceReports({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.reports.totalRevenue")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-card-foreground mt-1">
 									<Currency amount={totalRevenue} />
 								</p>
 							</div>
-							<div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
-								<DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
+							<div className="p-3 bg-success/15 rounded-xl">
+								<DollarSign className="h-6 w-6 text-success" />
 							</div>
 						</div>
 					</CardContent>
@@ -162,13 +162,13 @@ export function FinanceReports({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.reports.conversionRate")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-card-foreground mt-1">
 									{conversionRate?.conversionRate?.toFixed(1) ?? "0"}%
 								</p>
-								<p className="text-xs text-slate-400 mt-1">
+								<p className="text-xs text-muted-foreground mt-1">
 									{conversionRate?.converted ?? 0} / {conversionRate?.total ?? 0}
 								</p>
 							</div>
@@ -183,15 +183,15 @@ export function FinanceReports({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.reports.totalQuotations")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-card-foreground mt-1">
 									{quotationStats?.reduce((sum: any, s: any) => sum + s.count, 0) ?? 0}
 								</p>
 							</div>
-							<div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-								<FileSignature className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+							<div className="p-3 bg-chart-4/15 rounded-xl">
+								<FileSignature className="h-6 w-6 text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
@@ -201,15 +201,15 @@ export function FinanceReports({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("finance.reports.totalInvoices")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-card-foreground mt-1">
 									{invoiceStats?.reduce((sum: any, s: any) => sum + s.count, 0) ?? 0}
 								</p>
 							</div>
-							<div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-								<Receipt className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+							<div className="p-3 bg-chart-1/15 rounded-xl">
+								<Receipt className="h-6 w-6 text-chart-1" />
 							</div>
 						</div>
 					</CardContent>
@@ -219,17 +219,17 @@ export function FinanceReports({
 			{/* Detailed Reports */}
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				<Link href={`/app/${organizationSlug}/finance/reports/cash-flow`}>
-					<Card className="rounded-2xl hover:shadow-md transition-shadow cursor-pointer">
+					<Card className="rounded-2xl hover:border-primary/40 transition-colors cursor-pointer">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
 								<div className="p-3 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
 									<ArrowUpDown className="h-6 w-6 text-chart-4 dark:text-chart-4" />
 								</div>
 								<div>
-									<p className="font-medium text-slate-900 dark:text-slate-100">
+									<p className="font-medium text-card-foreground">
 										{t("finance.reports.cashFlow.title")}
 									</p>
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+									<p className="text-sm text-muted-foreground">
 										{t("finance.reports.cashFlow.subtitle")}
 									</p>
 								</div>
@@ -241,7 +241,7 @@ export function FinanceReports({
 
 			{/* Reports Tabs */}
 			<Tabs defaultValue="revenue" className="space-y-6">
-				<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+				<TabsList className="rounded-xl bg-muted p-1">
 					<TabsTrigger value="revenue" className="rounded-lg">
 						<TrendingUp className="h-4 w-4 me-2" />
 						{t("finance.reports.revenueByPeriod")}
@@ -273,7 +273,7 @@ export function FinanceReports({
 							{isLoadingRevenue ? (
 								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByPeriod || revenueByPeriod.length === 0 ? (
-								<div className="text-center py-10 text-slate-500">
+								<div className="text-center py-10 text-muted-foreground">
 									{t("finance.reports.noData")}
 								</div>
 							) : (
@@ -282,17 +282,17 @@ export function FinanceReports({
 									<div className="space-y-3">
 										{revenueByPeriod.map((item: any) => (
 											<div key={item.month} className="flex items-center gap-4">
-												<div className="w-20 text-sm text-slate-500 dark:text-slate-400">
+												<div className="w-20 text-sm text-muted-foreground">
 													{item.month}
 												</div>
-												<div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-8 overflow-hidden">
+												<div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
 													<div
 														className="bg-primary h-full rounded-full flex items-center justify-end pe-3"
 														style={{
 															width: `${Math.max((Number(item.revenue) / maxRevenue) * 100, 5)}%`,
 														}}
 													>
-														<span className="text-xs font-medium text-white">
+														<span className="text-xs font-medium text-primary-foreground">
 															<Currency amount={Number(item.revenue)} />
 														</span>
 													</div>
@@ -319,7 +319,7 @@ export function FinanceReports({
 							{isLoadingProject ? (
 								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByProject || revenueByProject.length === 0 ? (
-								<div className="text-center py-10 text-slate-500">
+								<div className="text-center py-10 text-muted-foreground">
 									{t("finance.reports.noData")}
 								</div>
 							) : (
@@ -344,7 +344,7 @@ export function FinanceReports({
 												<TableCell className="text-center">
 													<Currency amount={Number(item.totalPaid)} />
 												</TableCell>
-												<TableCell className="text-end font-medium text-green-600 dark:text-green-400">
+												<TableCell className="text-end font-medium text-success">
 													<Currency amount={Number(item.totalInvoiced)} />
 												</TableCell>
 											</TableRow>
@@ -369,7 +369,7 @@ export function FinanceReports({
 							{isLoadingClient ? (
 								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByClient || revenueByClient.length === 0 ? (
-								<div className="text-center py-10 text-slate-500">
+								<div className="text-center py-10 text-muted-foreground">
 									{t("finance.reports.noData")}
 								</div>
 							) : (
@@ -389,7 +389,7 @@ export function FinanceReports({
 									<TableBody>
 										{revenueByClient.map((item: any, index: any) => (
 											<TableRow key={item.client?.id || index}>
-												<TableCell className="text-slate-400">
+												<TableCell className="text-muted-foreground">
 													{index + 1}
 												</TableCell>
 												<TableCell className="font-medium">
@@ -398,7 +398,7 @@ export function FinanceReports({
 												<TableCell className="text-center">
 													{item.invoiceCount}
 												</TableCell>
-												<TableCell className="text-end font-medium text-green-600 dark:text-green-400">
+												<TableCell className="text-end font-medium text-success">
 													<Currency amount={Number(item.totalPaid)} />
 												</TableCell>
 											</TableRow>
@@ -425,7 +425,7 @@ export function FinanceReports({
 								{isLoadingQuotationStats ? (
 									<Skeleton className="h-64 w-full rounded-lg" />
 								) : !quotationStats || quotationStats.length === 0 ? (
-									<div className="text-center py-10 text-slate-500">
+									<div className="text-center py-10 text-muted-foreground">
 										{t("finance.reports.noData")}
 									</div>
 								) : (
@@ -433,19 +433,19 @@ export function FinanceReports({
 										{quotationStats.map((stat: any) => (
 											<div
 												key={stat.status}
-												className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl"
+												className="flex items-center justify-between p-3 bg-muted/50 rounded-xl"
 											>
 												<div className="flex items-center gap-3">
 													<StatusIndicator status={stat.status} type="quotation" />
-													<span className="text-slate-700 dark:text-slate-300">
+													<span className="text-foreground">
 														{t(`finance.quotations.status.${stat.status.toLowerCase()}`)}
 													</span>
 												</div>
 												<div className="flex items-center gap-4">
-													<span className="text-sm text-slate-500">
+													<span className="text-sm text-muted-foreground">
 														<Currency amount={Number(stat.totalValue ?? 0)} />
 													</span>
-													<span className="font-bold text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-lg">
+													<span className="font-bold text-foreground bg-muted px-2 py-0.5 rounded-lg">
 														{stat.count}
 													</span>
 												</div>
@@ -468,7 +468,7 @@ export function FinanceReports({
 								{isLoadingInvoiceStats ? (
 									<Skeleton className="h-64 w-full rounded-lg" />
 								) : !invoiceStats || invoiceStats.length === 0 ? (
-									<div className="text-center py-10 text-slate-500">
+									<div className="text-center py-10 text-muted-foreground">
 										{t("finance.reports.noData")}
 									</div>
 								) : (
@@ -476,19 +476,19 @@ export function FinanceReports({
 										{invoiceStats.map((stat: any) => (
 											<div
 												key={stat.status}
-												className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl"
+												className="flex items-center justify-between p-3 bg-muted/50 rounded-xl"
 											>
 												<div className="flex items-center gap-3">
 													<StatusIndicator status={stat.status} type="invoice" />
-													<span className="text-slate-700 dark:text-slate-300">
+													<span className="text-foreground">
 														{t(`finance.invoices.status.${stat.status.toLowerCase()}`)}
 													</span>
 												</div>
 												<div className="flex items-center gap-4">
-													<span className="text-sm text-slate-500">
+													<span className="text-sm text-muted-foreground">
 														<Currency amount={Number(stat.totalValue ?? 0)} />
 													</span>
-													<span className="font-bold text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-lg">
+													<span className="font-bold text-foreground bg-muted px-2 py-0.5 rounded-lg">
 														{stat.count}
 													</span>
 												</div>
@@ -515,19 +515,19 @@ function StatusIndicator({
 }) {
 	const colors: Record<string, string> = {
 		// Quotation statuses
-		DRAFT: "bg-slate-400",
+		DRAFT: "bg-muted-foreground",
 		SENT: "bg-chart-4",
-		VIEWED: "bg-purple-500",
-		ACCEPTED: "bg-green-500",
-		REJECTED: "bg-red-500",
-		EXPIRED: "bg-amber-500",
+		VIEWED: "bg-chart-4",
+		ACCEPTED: "bg-success",
+		REJECTED: "bg-destructive",
+		EXPIRED: "bg-chart-1",
 		CONVERTED: "bg-chart-4",
 		// Invoice statuses
-		PARTIALLY_PAID: "bg-amber-500",
-		PAID: "bg-green-500",
-		OVERDUE: "bg-red-500",
-		CANCELLED: "bg-slate-400",
+		PARTIALLY_PAID: "bg-chart-1",
+		PAID: "bg-success",
+		OVERDUE: "bg-destructive",
+		CANCELLED: "bg-muted-foreground",
 	};
 
-	return <div className={`w-3 h-3 rounded-full ${colors[status] || "bg-slate-400"}`} />;
+	return <div className={`w-3 h-3 rounded-full ${colors[status] || "bg-muted-foreground"}`} />;
 }

@@ -55,7 +55,7 @@ function formatFileSize(bytes: number | null | undefined): string {
 
 function getFileIcon(mimeType?: string | null) {
 	if (mimeType?.startsWith("image/")) {
-		return <Image className="h-4 w-4 text-pink-500" />;
+		return <Image className="h-4 w-4 text-chart-2" />;
 	}
 	return <File className="h-4 w-4 text-chart-4" />;
 }
@@ -89,10 +89,10 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 	return (
 		<div className="space-y-4">
 			{/* Upload Zone */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
-					<div className="h-[30px] w-[30px] rounded-lg bg-green-50 dark:bg-green-950/30 flex items-center justify-center">
-						<Upload className="h-4 w-4 text-green-600 dark:text-green-400" />
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
+					<div className="h-[30px] w-[30px] rounded-lg bg-success/15 flex items-center justify-center">
+						<Upload className="h-4 w-4 text-success" />
 					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.uploadFile")}
@@ -108,10 +108,10 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 			</div>
 
 			{/* File List */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
-					<div className="h-[30px] w-[30px] rounded-lg bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center">
-						<FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
+					<div className="h-[30px] w-[30px] rounded-lg bg-chart-4/15 flex items-center justify-center">
+						<FolderOpen className="h-4 w-4 text-chart-4" />
 					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.files")} ({files.length})
@@ -123,10 +123,10 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 							{t("pricing.leads.detail.noFiles")}
 						</p>
 					) : (
-						<div className="overflow-hidden rounded-xl border border-border">
+						<div className="overflow-hidden rounded-xl border-2">
 							<Table>
 								<TableHeader>
-									<TableRow className="bg-slate-50/80 dark:bg-slate-800/50">
+									<TableRow>
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileName")}</TableHead>
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileCategory")}</TableHead>
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileSize")}</TableHead>

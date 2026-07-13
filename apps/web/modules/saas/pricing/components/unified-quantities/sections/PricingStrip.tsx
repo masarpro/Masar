@@ -123,15 +123,15 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 				<div className="hidden flex-col items-center justify-center gap-1 self-center sm:flex">
 					<ArrowLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
 					{pricing.markupMethod === "percentage" ? (
-						<span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-700 tabular-nums dark:bg-violet-950/40 dark:text-violet-300">
+						<span className="rounded-full bg-chart-4/15 px-2 py-0.5 text-[10px] font-medium text-chart-4 tabular-nums">
 							+{pricing.markupPercent.toFixed(1)}%
 						</span>
 					) : pricing.markupMethod === "fixed_amount" ? (
-						<span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-700 tabular-nums dark:bg-violet-950/40 dark:text-violet-300">
+						<span className="rounded-full bg-chart-4/15 px-2 py-0.5 text-[10px] font-medium text-chart-4 tabular-nums">
 							+{fmt2(pricing.markupFixedAmount)}ر
 						</span>
 					) : (
-						<span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
+						<span className="rounded-full bg-chart-4/15 px-2 py-0.5 text-[10px] font-medium text-chart-4">
 							يدوي
 						</span>
 					)}
@@ -224,21 +224,21 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 				<div
 					className={`rounded-lg border p-3 ${
 						isProfit
-							? "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/20"
-							: "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20"
+							? "border-success/40 bg-success/10"
+							: "border-destructive/40 bg-destructive/10"
 					}`}
 				>
 					<div className="flex items-center gap-1.5">
 						{isProfit ? (
-							<TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+							<TrendingUp className="h-3.5 w-3.5 text-success" />
 						) : (
-							<TrendingDown className="h-3.5 w-3.5 text-red-600" />
+							<TrendingDown className="h-3.5 w-3.5 text-destructive" />
 						)}
 						<p
 							className={`text-[10px] uppercase tracking-wide ${
 								isProfit
-									? "text-emerald-700 dark:text-emerald-300"
-									: "text-red-700 dark:text-red-300"
+									? "text-success"
+									: "text-destructive"
 							}`}
 						>
 							{isProfit ? "صافي الربح" : "خسارة"}
@@ -247,8 +247,8 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 					<p
 						className={`mt-1 text-base font-bold tabular-nums ${
 							isProfit
-								? "text-emerald-700 dark:text-emerald-300"
-								: "text-red-700 dark:text-red-300"
+								? "text-success"
+								: "text-destructive"
 						}`}
 					>
 						{isProfit ? "+" : ""}
@@ -292,7 +292,7 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 
 			{/* Manual price hint */}
 			{pricing.markupMethod === "manual_price" && (
-				<div className="flex items-start gap-2 rounded-md border bg-violet-50/40 px-3 py-2 text-xs text-violet-800 dark:bg-violet-950/20 dark:text-violet-200">
+				<div className="flex items-start gap-2 rounded-md border bg-chart-4/10 px-3 py-2 text-xs text-chart-4">
 					<Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
 					<p>
 						السعر يدوي ويتجاوز الحساب التلقائي. لإعادة الربط بالتكلفة،
@@ -302,7 +302,7 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 			)}
 
 			{!isProfit && pricing.sellTotalAmount > 0 && (
-				<div className="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
+				<div className="rounded-lg bg-destructive/15 p-2.5 text-xs text-destructive">
 					⚠️ السعر الحالي أقل من التكلفة — تحقق من الأرقام أو ارفع السعر.
 				</div>
 			)}

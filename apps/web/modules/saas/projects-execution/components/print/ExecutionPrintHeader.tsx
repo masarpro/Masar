@@ -57,7 +57,7 @@ export function ExecutionPrintHeader({
 	const logoUrl = resolveImageSrc(activeOrganization?.logo);
 
 	return (
-		<header className="border-b-2 border-slate-800 pb-3 mb-4 print:pb-2 print:mb-3">
+		<header className="border-b-2 border-foreground pb-3 mb-4 print:pb-2 print:mb-3">
 			{/* الصف العلوي: الشعار + اسم المقاول + عنوان التقرير */}
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex items-center gap-3">
@@ -70,25 +70,25 @@ export function ExecutionPrintHeader({
 							crossOrigin="anonymous"
 						/>
 					) : (
-						<div className="h-14 w-14 rounded bg-slate-100 flex items-center justify-center text-slate-400 text-xs">
+						<div className="h-14 w-14 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">
 							{contractorName?.[0] ?? ""}
 						</div>
 					)}
 					<div>
-						<div className="text-lg font-bold text-slate-900">
+						<div className="text-lg font-bold text-foreground">
 							{contractorName}
 						</div>
-						<div className="text-xs text-slate-600">
+						<div className="text-xs text-muted-foreground">
 							{t("execution.print.contractor")}
 						</div>
 					</div>
 				</div>
 
 				<div className="text-end">
-					<div className="text-xl font-bold text-slate-900">
+					<div className="text-xl font-bold text-foreground">
 						{reportTitle}
 					</div>
-					<div className="text-xs text-slate-500 mt-1">
+					<div className="text-xs text-muted-foreground mt-1">
 						{t("execution.print.generatedOn")}:{" "}
 						{formatDateShort(new Date())}
 					</div>
@@ -125,10 +125,10 @@ export function ExecutionPrintHeader({
 function HeaderCell({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex flex-col">
-			<span className="text-slate-500 text-[10px] uppercase tracking-wide">
+			<span className="text-muted-foreground text-[10px] uppercase tracking-wide">
 				{label}
 			</span>
-			<span className="text-slate-900 font-semibold mt-0.5 truncate">
+			<span className="text-foreground font-semibold mt-0.5 truncate">
 				{value}
 			</span>
 		</div>

@@ -24,7 +24,7 @@ export function CatalogItemCard({ entry, onSelect, showDomainBadge }: Props) {
 	return (
 		<Card
 			onClick={onSelect}
-			className="group cursor-pointer p-3 transition-all hover:border-primary hover:shadow-md"
+			className="group cursor-pointer p-3 transition-all hover:border-primary"
 			role="button"
 			tabIndex={0}
 			onKeyDown={(e) => {
@@ -59,7 +59,7 @@ export function CatalogItemCard({ entry, onSelect, showDomainBadge }: Props) {
 						{entry.unit} · هدر {Number(entry.defaultWastagePercent)}%
 					</p>
 					{totalPrice > 0 && (
-						<p className="mt-1 text-xs tabular-nums text-emerald-600 dark:text-emerald-400">
+						<p className="mt-1 text-xs tabular-nums text-success">
 							{totalPrice.toFixed(2)} ر.س / {entry.unit}
 						</p>
 					)}

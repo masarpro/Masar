@@ -96,13 +96,13 @@ export function BOQByPhaseView({
 
 	if (!hasPhases && !hasUnassigned) {
 		return (
-			<Card className="rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center">
+			<Card className="rounded-2xl border-2 p-10 text-center">
 				<div className="flex justify-center mb-4">
-					<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-						<Inbox className="h-7 w-7 text-slate-400" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+						<Inbox className="h-7 w-7 text-muted-foreground" />
 					</div>
 				</div>
-				<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+				<p className="text-sm font-medium text-muted-foreground">
 					{t("phaseView.noPhases")}
 				</p>
 			</Card>
@@ -175,7 +175,7 @@ export function BOQByPhaseView({
 							{t("actions.cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							onClick={handleDelete}
 						>
 							{t("actions.deleteSelected")}
@@ -211,27 +211,27 @@ function PhaseCard({
 	return (
 		<AccordionItem
 			value={m.id}
-			className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden"
+			className="rounded-2xl border-2 bg-card overflow-hidden"
 		>
 			<AccordionTrigger className="px-4 py-3 hover:no-underline">
 				<div className="flex flex-1 items-center justify-between gap-3">
 					<div className="flex items-center gap-2 min-w-0">
 						{isUnassigned ? (
-							<Inbox className="h-4 w-4 text-slate-400 shrink-0" />
+							<Inbox className="h-4 w-4 text-muted-foreground shrink-0" />
 						) : (
 							<Flag className="h-4 w-4 text-chart-4 shrink-0" />
 						)}
-						<span className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+						<span className="text-sm font-semibold text-card-foreground truncate">
 							{m.title}
 						</span>
 					</div>
 					<div className="flex items-center gap-2 flex-wrap text-xs">
-						<span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-slate-700 dark:text-slate-300">
+						<span className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">
 							<Layers className="inline h-3 w-3 me-1" />
 							{t("phaseView.itemsCount", { count })}
 						</span>
 						{total > 0 && (
-							<span className="rounded-lg bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
+							<span className="rounded-lg bg-success/15 px-2 py-0.5 text-success">
 								{formatSAR(total)}
 							</span>
 						)}
@@ -268,14 +268,14 @@ function PhaseCard({
 					</div>
 
 					{count === 0 ? (
-						<div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-6 text-center text-sm text-slate-500">
+						<div className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-muted-foreground">
 							{t("phaseView.emptyPhase")}
 						</div>
 					) : (
-						<div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+						<div className="overflow-x-auto rounded-xl border-2">
 							<table className="w-full text-sm">
-								<thead className="bg-slate-50 dark:bg-slate-900/50">
-									<tr className="text-xs text-slate-500">
+								<thead>
+									<tr className="text-xs text-muted-foreground">
 										<th className="text-start py-2 px-3 font-medium">
 											{t("table.code")}
 										</th>
@@ -297,26 +297,26 @@ function PhaseCard({
 										<th className="py-2 px-3"></th>
 									</tr>
 								</thead>
-								<tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+								<tbody className="divide-y divide-border">
 									{phase.items.map((item: any) => (
 										<tr
 											key={item.id}
-											className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
+											className="hover:bg-muted/50"
 										>
-											<td className="py-2 px-3 text-xs text-slate-500">
+											<td className="py-2 px-3 text-xs text-muted-foreground">
 												{item.code ?? "—"}
 											</td>
 											<td className="py-2 px-3">
-												<div className="font-medium text-slate-900 dark:text-slate-100">
+												<div className="font-medium text-card-foreground">
 													{item.description}
 												</div>
 												{item.category && (
-													<div className="text-xs text-slate-500 mt-0.5">
+													<div className="text-xs text-muted-foreground mt-0.5">
 														{item.category}
 													</div>
 												)}
 											</td>
-											<td className="py-2 px-3 text-xs text-slate-600">
+											<td className="py-2 px-3 text-xs text-muted-foreground">
 												{item.unit}
 											</td>
 											<td className="py-2 px-3 text-end font-mono text-xs">
@@ -325,7 +325,7 @@ function PhaseCard({
 											<td className="py-2 px-3 text-end font-mono text-xs">
 												{item.unitPrice != null
 													? formatNumber(item.unitPrice)
-													: <span className="text-amber-600">{t("table.noPrice")}</span>}
+													: <span className="text-chart-1">{t("table.noPrice")}</span>}
 											</td>
 											<td className="py-2 px-3 text-end font-mono text-xs font-semibold">
 												{item.totalPrice != null
@@ -348,7 +348,7 @@ function PhaseCard({
 													<Button
 														size="sm"
 														variant="ghost"
-														className="h-7 w-7 p-0 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+														className="h-7 w-7 p-0 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
 														onClick={(e) => {
 															e.stopPropagation();
 															onDeleteItem(item.id);

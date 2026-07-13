@@ -72,7 +72,7 @@ export function ClientStatementReport({
 						onChange={(e: any) => setDateFrom(e.target.value)}
 						className="rounded-xl w-40"
 					/>
-					<span className="text-slate-400">—</span>
+					<span className="text-muted-foreground">—</span>
 					<Input
 						type="date"
 						value={dateTo}
@@ -96,7 +96,7 @@ export function ClientStatementReport({
 						{client.taxNumber && <p className="text-sm">{t("finance.clients.taxNumber")}: {client.taxNumber}</p>}
 					</div>
 				)}
-				<p className="text-sm text-slate-500 mt-2">{dateFrom} — {dateTo}</p>
+				<p className="text-sm text-muted-foreground mt-2">{dateFrom} — {dateTo}</p>
 			</div>
 
 			{/* Client Info Card */}
@@ -106,10 +106,10 @@ export function ClientStatementReport({
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-semibold">{client.name}</p>
-								{client.businessName && <p className="text-sm text-slate-500">{client.businessName}</p>}
+								{client.businessName && <p className="text-sm text-muted-foreground">{client.businessName}</p>}
 							</div>
 							{client.taxNumber && (
-								<p className="text-sm text-slate-500">{t("finance.clients.taxNumber")}: {client.taxNumber}</p>
+								<p className="text-sm text-muted-foreground">{t("finance.clients.taxNumber")}: {client.taxNumber}</p>
 							)}
 						</div>
 					</CardContent>
@@ -120,7 +120,7 @@ export function ClientStatementReport({
 			<Card className="rounded-2xl print:rounded-none print:shadow-none print:border">
 				<CardContent className="p-0">
 					{(data?.lines.length ?? 0) === 0 ? (
-						<div className="text-center py-12 text-slate-500">
+						<div className="text-center py-12 text-muted-foreground">
 							{t("finance.accounting.statement.noTransactions")}
 						</div>
 					) : (
@@ -137,7 +137,7 @@ export function ClientStatementReport({
 							</TableHeader>
 							<TableBody>
 								{/* Opening Balance */}
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium">
+								<TableRow className="bg-muted font-medium">
 									<TableCell colSpan={3}>{t("finance.accounting.statement.openingBalance")}</TableCell>
 									<TableCell className="text-end">—</TableCell>
 									<TableCell className="text-end">—</TableCell>
@@ -148,7 +148,7 @@ export function ClientStatementReport({
 
 								{data?.lines.map((line: any, idx: any) => (
 									<TableRow key={idx}>
-										<TableCell className="text-sm text-slate-500">
+										<TableCell className="text-sm text-muted-foreground">
 											{new Date(line.date).toLocaleDateString("en-SA")}
 										</TableCell>
 										<TableCell className="text-sm font-mono">{line.referenceNo}</TableCell>
@@ -166,7 +166,7 @@ export function ClientStatementReport({
 								))}
 
 								{/* Closing Balance */}
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-medium border-t-2">
+								<TableRow className="bg-muted font-medium border-t-2">
 									<TableCell colSpan={3}>
 										{t("finance.accounting.statement.balanceDue")}
 									</TableCell>

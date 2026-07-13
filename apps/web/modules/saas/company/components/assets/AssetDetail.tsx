@@ -106,10 +106,10 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 
 	const getStatusStyle = (status: string) => {
 		const styles: Record<string, string> = {
-			AVAILABLE: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			IN_USE: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-			MAINTENANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-			RETIRED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+			AVAILABLE: "bg-chart-4/15 text-chart-4",
+			IN_USE: "bg-chart-4/15 text-chart-4",
+			MAINTENANCE: "bg-chart-1/15 text-chart-1",
+			RETIRED: "bg-muted text-muted-foreground",
 		};
 		return styles[status] ?? styles.RETIRED;
 	};
@@ -119,14 +119,14 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{asset.name}</h2>
+					<h2 className="text-xl font-bold text-card-foreground">{asset.name}</h2>
 					<div className="flex items-center gap-2 mt-1">
 						{asset.assetNo && (
-							<Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-0 text-[10px] px-2 py-0.5">
+							<Badge className="bg-chart-4/15 text-chart-4 border-0 text-[10px] px-2 py-0.5">
 								{asset.assetNo}
 							</Badge>
 						)}
-						<Badge className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 border-0 text-[10px] px-2 py-0.5">
+						<Badge className="bg-chart-4/15 text-chart-4 border-0 text-[10px] px-2 py-0.5">
 							{t(`company.assets.categories.${asset.category}`)}
 						</Badge>
 						<Badge className={`border-0 text-[10px] px-2 py-0.5 ${getStatusStyle(asset.status)}`}>
@@ -137,7 +137,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 				<div className="flex gap-2">
 					<Button
 						variant="outline"
-						className="rounded-xl border-white/20 dark:border-slate-700/30"
+						className="rounded-lg"
 						onClick={() => router.push(`/app/${organizationSlug}/company/assets/${assetId}/edit`)}
 					>
 						<Pencil className="ms-2 h-4 w-4" />
@@ -146,7 +146,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 					{asset.status !== "RETIRED" && (
 						<Button
 							variant="outline"
-							className="rounded-xl border-red-200/50 dark:border-red-800/30 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+							className="rounded-lg border-destructive/30 text-destructive hover:bg-destructive/10"
 							onClick={() => {
 								if (confirm(t("company.assets.confirmRetire"))) retireMutation.mutate();
 							}}
@@ -159,43 +159,43 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 			</div>
 
 			{/* Info */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<Package className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Package className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.assets.basicInfo")}
 					</h3>
 				</div>
 				<div className="p-5">
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.type")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`company.assets.types.${asset.type}`)}</p>
+							<p className="text-xs text-muted-foreground">{t("company.assets.type")}</p>
+							<p className="font-medium text-card-foreground">{t(`company.assets.types.${asset.type}`)}</p>
 						</div>
 						{asset.brand && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.brand")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{asset.brand}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.brand")}</p>
+								<p className="font-medium text-card-foreground">{asset.brand}</p>
 							</div>
 						)}
 						{asset.model && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.model")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{asset.model}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.model")}</p>
+								<p className="font-medium text-card-foreground">{asset.model}</p>
 							</div>
 						)}
 						{asset.serialNumber && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.serialNumber")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{asset.serialNumber}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.serialNumber")}</p>
+								<p className="font-medium text-card-foreground">{asset.serialNumber}</p>
 							</div>
 						)}
 						{asset.year && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.year")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{asset.year}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.year")}</p>
+								<p className="font-medium text-card-foreground">{asset.year}</p>
 							</div>
 						)}
 					</div>
@@ -203,45 +203,45 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 			</div>
 
 			{/* Financial */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Banknote className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.assets.financialInfo")}
 					</h3>
 				</div>
 				<div className="p-5">
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.purchasePrice")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.purchasePrice))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.assets.purchasePrice")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(asset.purchasePrice))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.monthlyRent")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.monthlyRent))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.assets.monthlyRent")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(asset.monthlyRent))}</p>
 						</div>
 						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.currentValue")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.currentValue))}</p>
+							<p className="text-xs text-muted-foreground">{t("company.assets.currentValue")}</p>
+							<p className="font-medium text-card-foreground">{formatCurrency(Number(asset.currentValue))}</p>
 						</div>
 						{asset.purchaseDate && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.purchaseDate")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{new Date(asset.purchaseDate).toLocaleDateString("ar-SA")}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.purchaseDate")}</p>
+								<p className="font-medium text-card-foreground">{new Date(asset.purchaseDate).toLocaleDateString("ar-SA")}</p>
 							</div>
 						)}
 						{asset.warrantyExpiry && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.warrantyExpiry")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{new Date(asset.warrantyExpiry).toLocaleDateString("ar-SA")}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.warrantyExpiry")}</p>
+								<p className="font-medium text-card-foreground">{new Date(asset.warrantyExpiry).toLocaleDateString("ar-SA")}</p>
 							</div>
 						)}
 						{asset.insuranceExpiry && (
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.insuranceExpiry")}</p>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{new Date(asset.insuranceExpiry).toLocaleDateString("ar-SA")}</p>
+								<p className="text-xs text-muted-foreground">{t("company.assets.insuranceExpiry")}</p>
+								<p className="font-medium text-card-foreground">{new Date(asset.insuranceExpiry).toLocaleDateString("ar-SA")}</p>
 							</div>
 						)}
 					</div>
@@ -249,29 +249,29 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 			</div>
 
 			{/* Assignment */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-						<Briefcase className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+			<div className="bg-card border-2 rounded-2xl overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b-2">
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Briefcase className="h-5 w-5" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("company.assets.projectAssignment")}
 					</h3>
 				</div>
 				<div className="p-5">
 					{asset.currentProject ? (
-						<div className="flex items-center justify-between rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/20 p-4">
+						<div className="flex items-center justify-between rounded-xl border-2 bg-muted/50 p-4">
 							<div>
-								<p className="font-medium text-slate-900 dark:text-slate-100">{asset.currentProject.name}</p>
+								<p className="font-medium text-card-foreground">{asset.currentProject.name}</p>
 								{asset.assignedAt && (
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+									<p className="text-sm text-muted-foreground">
 										{t("company.assets.assignedSince")} {new Date(asset.assignedAt).toLocaleDateString("ar-SA")}
 									</p>
 								)}
 							</div>
 							<Button
 								variant="outline"
-								className="rounded-xl border-white/20 dark:border-slate-700/30"
+								className="rounded-lg"
 								onClick={() => returnMutation.mutate()}
 								disabled={returnMutation.isPending}
 							>
@@ -282,10 +282,10 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 					) : asset.status !== "RETIRED" ? (
 						<div>
 							{showAssignForm ? (
-								<div className="flex items-end gap-3 rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/20 p-3">
+								<div className="flex items-end gap-3 rounded-xl border-2 bg-muted/50 p-3">
 									<div className="flex-1">
 										<Select value={assignProjectId} onValueChange={setAssignProjectId}>
-											<SelectTrigger className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70">
+											<SelectTrigger className="rounded-lg border border-input bg-card">
 												<SelectValue placeholder={t("company.employees.selectProject")} />
 											</SelectTrigger>
 											<SelectContent className="rounded-xl">
@@ -296,7 +296,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 										</Select>
 									</div>
 									<Button
-										className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+										className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
 										onClick={() => assignMutation.mutate()}
 										disabled={!assignProjectId || assignMutation.isPending}
 									>
@@ -306,7 +306,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 							) : (
 								<Button
 									variant="outline"
-									className="rounded-xl border-white/20 dark:border-slate-700/30"
+									className="rounded-lg"
 									onClick={() => setShowAssignForm(true)}
 								>
 									<MapPin className="ms-2 h-4 w-4" />
@@ -315,7 +315,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 							)}
 						</div>
 					) : (
-						<p className="text-center text-sm text-slate-500 dark:text-slate-400 py-4">
+						<p className="text-center text-sm text-muted-foreground py-4">
 							{t("company.assets.retiredCannotAssign")}
 						</p>
 					)}

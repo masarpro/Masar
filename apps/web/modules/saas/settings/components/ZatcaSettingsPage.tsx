@@ -69,12 +69,12 @@ interface ZatcaStatusData {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-	DISABLED: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-	ONBOARDING: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	COMPLIANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-	ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-	EXPIRED: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-	REVOKED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+	DISABLED: "bg-muted text-muted-foreground",
+	ONBOARDING: "bg-chart-4/15 text-chart-4",
+	COMPLIANCE: "bg-chart-1/15 text-chart-1",
+	ACTIVE: "bg-success/15 text-success",
+	EXPIRED: "bg-chart-1/15 text-chart-1",
+	REVOKED: "bg-destructive/15 text-destructive",
 };
 
 export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSettingsPageProps) {
@@ -170,17 +170,17 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 				<div className={`relative rounded-2xl border-2 p-5 transition-colors ${
 					phase === "1"
 						? "border-primary bg-primary/5"
-						: "border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80"
+						: "border-border bg-card"
 				}`}>
 					<div className="flex items-start gap-3">
-						<div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-							<QrCode className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+						<div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+							<QrCode className="h-5 w-5 text-muted-foreground" />
 						</div>
 						<div className="flex-1">
 							<div className="flex items-center gap-2">
 								<h3 className="font-semibold text-foreground">{t("phase1.title")}</h3>
 								{phase === "1" && (
-									<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+									<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success/15 text-success">
 										<CheckCircle2 className="h-3 w-3" />
 										{t("phase1.active")}
 									</span>
@@ -195,7 +195,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 				<div className={`relative rounded-2xl border-2 p-5 transition-colors ${
 					phase === "2"
 						? "border-primary bg-primary/5"
-						: "border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80"
+						: "border-border bg-card"
 				}`}>
 					<div className="flex items-start gap-3">
 						<div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -205,7 +205,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 							<div className="flex items-center gap-2">
 								<h3 className="font-semibold text-foreground">{t("phase2.title")}</h3>
 								{phase === "2" && (
-									<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+									<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success/15 text-success">
 										<CheckCircle2 className="h-3 w-3" />
 										{t("phase2.active")}
 									</span>
@@ -230,15 +230,15 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 
 			{/* Devices Table */}
 			{devices.length > 0 && (
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-sm overflow-hidden">
-					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+				<div className="bg-card rounded-2xl border-2 overflow-hidden">
+					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-border">
 						<Shield className="h-4 w-4 text-primary" />
 						<span className="text-sm font-semibold text-foreground">{t("device.title")}</span>
 					</div>
 					<div className="overflow-x-auto">
 						<table className="w-full">
 							<thead>
-								<tr className="border-b border-slate-100 dark:border-slate-800/40">
+								<tr className="border-b border-border">
 									<th className="p-3 text-start text-xs font-semibold text-muted-foreground">{t("device.name")}</th>
 									<th className="p-3 text-start text-xs font-semibold text-muted-foreground">{t("device.type")}</th>
 									<th className="p-3 text-start text-xs font-semibold text-muted-foreground">{t("device.counter")}</th>
@@ -249,7 +249,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 							<tbody>
 								{devices.map((device) => (
 									<Fragment key={device.id}>
-										<tr className="border-b border-slate-50 dark:border-slate-800/30 last:border-0">
+										<tr className="border-b border-border last:border-0">
 											<td className="p-3 font-medium text-sm">{device.deviceName}</td>
 											<td className="p-3 text-sm text-muted-foreground">
 												{device.invoiceType === "STANDARD" ? t("device.standard") : t("device.simplified")}
@@ -265,7 +265,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+														className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
 														onClick={() => setRevokeDeviceId(device.id)}
 													>
 														<Trash2 className="h-4 w-4" />
@@ -274,9 +274,9 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 											</td>
 										</tr>
 										{device.lastError && device.status !== "ACTIVE" && (
-											<tr className="border-b border-slate-50 dark:border-slate-800/30">
+											<tr className="border-b border-border">
 												<td colSpan={5} className="px-3 pb-3">
-													<div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-800 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200">
+													<div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
 														<AlertCircle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
 														<span className="font-mono break-all">{device.lastError}</span>
 													</div>
@@ -293,17 +293,17 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 
 			{/* Stats */}
 			{stats && stats.total > 0 && (
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-sm overflow-hidden">
-					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+				<div className="bg-card rounded-2xl border-2 overflow-hidden">
+					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-border">
 						<FileCheck className="h-4 w-4 text-primary" />
 						<span className="text-sm font-semibold text-foreground">{t("stats.title")}</span>
 					</div>
 					<div className="grid grid-cols-2 sm:grid-cols-5 gap-4 p-5">
-						<StatCard label={t("stats.total")} value={stats.total} icon={<FileCheck className="h-4 w-4" />} color="text-slate-600" />
-						<StatCard label={t("stats.cleared")} value={stats.cleared} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
+						<StatCard label={t("stats.total")} value={stats.total} icon={<FileCheck className="h-4 w-4" />} color="text-muted-foreground" />
+						<StatCard label={t("stats.cleared")} value={stats.cleared} icon={<CheckCircle2 className="h-4 w-4" />} color="text-success" />
 						<StatCard label={t("stats.reported")} value={stats.reported} icon={<CheckCircle2 className="h-4 w-4" />} color="text-chart-4" />
-						<StatCard label={t("stats.rejected")} value={stats.rejected} icon={<XCircle className="h-4 w-4" />} color="text-red-600" />
-						<StatCard label={t("stats.pending")} value={stats.pending} icon={<Clock className="h-4 w-4" />} color="text-amber-600" />
+						<StatCard label={t("stats.rejected")} value={stats.rejected} icon={<XCircle className="h-4 w-4" />} color="text-destructive" />
+						<StatCard label={t("stats.pending")} value={stats.pending} icon={<Clock className="h-4 w-4" />} color="text-chart-1" />
 					</div>
 				</div>
 			)}
@@ -320,10 +320,10 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 					<div
 						className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
 							isSandbox
-								? "border-red-200 bg-red-50 text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200"
+								? "border-destructive/30 bg-destructive/10 text-destructive"
 								: environment === "production"
-									? "border-green-200 bg-green-50 text-green-900 dark:border-green-900/40 dark:bg-green-950/30 dark:text-green-200"
-									: "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200"
+									? "border-success/30 bg-success/10 text-success"
+									: "border-chart-1/30 bg-chart-1/10 text-chart-1"
 						}`}
 					>
 						<AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -434,7 +434,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 			<Dialog open={!!revokeDeviceId} onOpenChange={() => setRevokeDeviceId(null)}>
 				<DialogContent className="sm:max-w-md">
 					<DialogHeader>
-						<DialogTitle className="flex items-center gap-2 text-red-600">
+						<DialogTitle className="flex items-center gap-2 text-destructive">
 							<AlertCircle className="h-5 w-5" />
 							{t("device.revoke")}
 						</DialogTitle>
@@ -462,7 +462,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 
 function StatCard({ label, value, icon, color }: { label: string; value: number; icon: React.ReactNode; color: string }) {
 	return (
-		<div className="text-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+		<div className="text-center p-3 rounded-xl bg-muted/50">
 			<div className={`flex items-center justify-center mb-1 ${color}`}>{icon}</div>
 			<div className="text-2xl font-bold text-foreground">{value}</div>
 			<div className="text-xs text-muted-foreground">{label}</div>

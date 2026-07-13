@@ -99,17 +99,17 @@ export function DailyReportForm({
 					variant="ghost"
 					size="icon"
 					asChild
-					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+					className="shrink-0 rounded-xl hover:bg-accent"
 				>
 					<Link href={`${basePath}/execution`}>
 						<ChevronLeft className="h-5 w-5" />
 					</Link>
 				</Button>
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="text-2xl font-semibold text-foreground">
 						{t("projects.field.newReport")}
 					</h1>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("projects.field.newReportSubtitle")}
 					</p>
 				</div>
@@ -117,7 +117,7 @@ export function DailyReportForm({
 
 			{/* Form */}
 			<form onSubmit={handleSubmit} className="space-y-6">
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+				<div className="rounded-2xl border-2 bg-card p-6">
 					<div className="grid gap-6 sm:grid-cols-2">
 						{/* Report Date */}
 						<div className="space-y-2">

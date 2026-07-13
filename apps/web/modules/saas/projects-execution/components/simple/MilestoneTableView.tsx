@@ -88,17 +88,17 @@ export function MilestoneTableView({
 	});
 
 	const statusBadge: Record<string, { className: string; label: string }> = {
-		PLANNED: { className: "bg-slate-100 text-slate-700", label: t("timeline.status.planned") },
+		PLANNED: { className: "bg-muted text-muted-foreground", label: t("timeline.status.planned") },
 		IN_PROGRESS: { className: "bg-chart-4/15 text-chart-4", label: t("timeline.status.inProgress") },
-		COMPLETED: { className: "bg-green-100 text-green-700", label: t("timeline.status.completed") },
-		DELAYED: { className: "bg-red-100 text-red-700", label: t("timeline.status.delayed") },
-		CANCELLED: { className: "bg-gray-100 text-gray-500", label: t("execution.milestone.cancelled") },
+		COMPLETED: { className: "bg-success/15 text-success", label: t("timeline.status.completed") },
+		DELAYED: { className: "bg-destructive/15 text-destructive", label: t("timeline.status.delayed") },
+		CANCELLED: { className: "bg-muted text-muted-foreground", label: t("execution.milestone.cancelled") },
 	};
 
 	const healthBadge: Record<string, { className: string; label: string }> = {
-		ON_TRACK: { className: "bg-green-100 text-green-700", label: t("timeline.health.onTrack") },
-		AT_RISK: { className: "bg-yellow-100 text-yellow-700", label: t("timeline.health.atRisk") },
-		DELAYED: { className: "bg-red-100 text-red-700", label: t("timeline.health.delayed") },
+		ON_TRACK: { className: "bg-success/15 text-success", label: t("timeline.health.onTrack") },
+		AT_RISK: { className: "bg-chart-1/15 text-chart-1", label: t("timeline.health.atRisk") },
+		DELAYED: { className: "bg-destructive/15 text-destructive", label: t("timeline.health.delayed") },
 	};
 
 	const SortableHead = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (

@@ -160,12 +160,12 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 				{/* Basic Info */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<Receipt className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+				<div className="bg-card border-2 rounded-2xl overflow-hidden">
+					<div className="flex items-center gap-3 p-5 border-b-2">
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Receipt className="h-5 w-5 text-chart-4" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.expenses.basicInfo")}
 						</h3>
 					</div>
@@ -251,12 +251,12 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 				</div>
 
 				{/* Description & Notes */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50">
-							<FileText className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+				<div className="bg-card border-2 rounded-2xl overflow-hidden">
+					<div className="flex items-center gap-3 p-5 border-b-2">
+						<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+							<FileText className="h-5 w-5 text-muted-foreground" />
 						</div>
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						<h3 className="text-sm font-semibold text-card-foreground">
 							{t("company.expenses.description")}
 						</h3>
 					</div>
@@ -282,7 +282,7 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 					<Button
 						type="submit"
 						disabled={isPending}
-						className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
 					>
 						{isPending
 							? t("company.common.saving")

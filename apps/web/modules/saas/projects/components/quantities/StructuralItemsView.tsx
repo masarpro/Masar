@@ -155,7 +155,7 @@ export function StructuralItemsView({
 	if (allItems.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<p className="text-sm text-slate-500 dark:text-slate-400">
+				<p className="text-sm text-muted-foreground">
 					{t("projectQuantities.empty.noStructuralItems")}
 				</p>
 			</div>
@@ -164,7 +164,7 @@ export function StructuralItemsView({
 
 	return (
 		<div className="space-y-6">
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card">
 				<div className="overflow-x-auto">
 					<Table>
 						<TableHeader>
@@ -186,25 +186,25 @@ export function StructuralItemsView({
 						<TableBody>
 							{allItems.map((item) => (
 								<TableRow key={item.id}>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{studyMap.get(item.costStudyId) ?? "-"}
 									</TableCell>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{item.category}
 									</TableCell>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{item.subCategory ?? "-"}
 									</TableCell>
-									<TableCell className="font-medium text-slate-900 dark:text-slate-100">
+									<TableCell className="font-medium text-card-foreground">
 										{item.name}
 									</TableCell>
-									<TableCell className="text-end text-slate-600 dark:text-slate-400">
+									<TableCell className="text-end text-muted-foreground">
 										{item.quantity.toLocaleString("en-US")}
 									</TableCell>
-									<TableCell className="text-slate-600 dark:text-slate-400">
+									<TableCell className="text-muted-foreground">
 										{item.unit}
 									</TableCell>
-									<TableCell className="text-end font-medium text-slate-900 dark:text-slate-100">
+									<TableCell className="text-end font-medium text-card-foreground">
 										{formatNumber(item.totalCost, 2)}
 									</TableCell>
 									<TableCell>
@@ -237,14 +237,14 @@ export function StructuralItemsView({
 							))}
 
 							{/* Total row */}
-							<TableRow className="bg-slate-50 font-semibold dark:bg-slate-800/50">
+							<TableRow className="bg-muted font-semibold">
 								<TableCell
 									colSpan={6}
-									className="text-slate-900 dark:text-slate-100"
+									className="text-card-foreground"
 								>
 									{t("projectQuantities.table.grandTotal")}
 								</TableCell>
-								<TableCell className="text-end text-slate-900 dark:text-slate-100">
+								<TableCell className="text-end text-card-foreground">
 									{formatNumber(grandTotal, 2)}
 								</TableCell>
 								<TableCell />

@@ -100,10 +100,10 @@ export function ProjectStatementView({
 						<Card className="print:shadow-none print:border">
 							<CardContent className="pt-4">
 								<div className="flex items-center gap-2 text-sm text-muted-foreground">
-									<TrendingUp className="h-4 w-4 text-green-600" />
+									<TrendingUp className="h-4 w-4 text-success" />
 									{t("accountStatement.projectSummary.revenue")}
 								</div>
-								<div className="mt-1 text-2xl font-bold text-green-600">
+								<div className="mt-1 text-2xl font-bold text-success">
 									<Currency amount={data.revenue.total} />
 								</div>
 							</CardContent>
@@ -111,10 +111,10 @@ export function ProjectStatementView({
 						<Card className="print:shadow-none print:border">
 							<CardContent className="pt-4">
 								<div className="flex items-center gap-2 text-sm text-muted-foreground">
-									<TrendingDown className="h-4 w-4 text-red-600" />
+									<TrendingDown className="h-4 w-4 text-destructive" />
 									{t("accountStatement.projectSummary.costs")}
 								</div>
-								<div className="mt-1 text-2xl font-bold text-red-600">
+								<div className="mt-1 text-2xl font-bold text-destructive">
 									<Currency amount={data.costs.total} />
 								</div>
 							</CardContent>
@@ -122,7 +122,7 @@ export function ProjectStatementView({
 						<Card className="print:shadow-none print:border">
 							<CardContent className="pt-4">
 								<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.grossProfit")}</div>
-								<div className={`mt-1 text-2xl font-bold ${data.profitability.grossProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+								<div className={`mt-1 text-2xl font-bold ${data.profitability.grossProfit >= 0 ? "text-success" : "text-destructive"}`}>
 									<Currency amount={data.profitability.grossProfit} />
 								</div>
 							</CardContent>
@@ -130,7 +130,7 @@ export function ProjectStatementView({
 						<Card className="print:shadow-none print:border">
 							<CardContent className="pt-4">
 								<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.profitMargin")}</div>
-								<div className={`mt-1 text-2xl font-bold ${data.profitability.profitMargin >= 0 ? "text-green-600" : "text-red-600"}`}>
+								<div className={`mt-1 text-2xl font-bold ${data.profitability.profitMargin >= 0 ? "text-success" : "text-destructive"}`}>
 									{data.profitability.profitMargin}%
 								</div>
 							</CardContent>
@@ -202,15 +202,15 @@ export function ProjectStatementView({
 							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 								<div>
 									<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.cashIn")}</div>
-									<div className="mt-1 text-xl font-bold text-green-600"><Currency amount={data.cashFlow.totalIn} /></div>
+									<div className="mt-1 text-xl font-bold text-success"><Currency amount={data.cashFlow.totalIn} /></div>
 								</div>
 								<div>
 									<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.cashOut")}</div>
-									<div className="mt-1 text-xl font-bold text-red-600"><Currency amount={data.cashFlow.totalOut} /></div>
+									<div className="mt-1 text-xl font-bold text-destructive"><Currency amount={data.cashFlow.totalOut} /></div>
 								</div>
 								<div>
 									<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.netCash")}</div>
-									<div className={`mt-1 text-xl font-bold ${data.cashFlow.netCash >= 0 ? "text-green-600" : "text-red-600"}`}>
+									<div className={`mt-1 text-xl font-bold ${data.cashFlow.netCash >= 0 ? "text-success" : "text-destructive"}`}>
 										<Currency amount={data.cashFlow.netCash} />
 									</div>
 								</div>

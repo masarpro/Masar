@@ -47,8 +47,8 @@ export function SpecificationsPageContentV2({
 	if (!skipQuantitiesCheck && !isQuantitiesApproved) {
 		return (
 			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
-				<div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 mb-4">
-					<Lock className="h-10 w-10 text-amber-500" />
+				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
+					<Lock className="h-10 w-10 text-chart-1" />
 				</div>
 				<h3 className="text-lg font-semibold mb-2">مرحلة المواصفات مقفلة</h3>
 				<p className="text-muted-foreground mb-4 max-w-md">

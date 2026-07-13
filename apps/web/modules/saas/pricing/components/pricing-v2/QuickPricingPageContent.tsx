@@ -247,10 +247,10 @@ export function QuickPricingPageContent({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* ═══ Title bar ═══ */}
-			<div className="rounded-2xl bg-gradient-to-bl from-amber-500/15 via-amber-500/5 to-background border border-amber-500/20 p-6">
+			<div className="rounded-2xl bg-card border-2 border-border p-6">
 				<div className="flex items-center gap-3 mb-2">
-					<div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/40">
-						<Zap className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<div className="flex size-9 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+						<Zap className="h-5 w-5" />
 					</div>
 					<div>
 						<h2 className="text-xl font-bold">{t("quick.title")}</h2>
@@ -467,7 +467,7 @@ export function QuickPricingPageContent({
 							<span className="text-muted-foreground">
 								{t("quick.profitMarginWithPct", { pct: profitMarginNum })}
 							</span>
-							<span className="font-medium text-emerald-600" dir="ltr">
+							<span className="font-medium text-success" dir="ltr">
 								+{formatNum(profitAmount)} ر.س
 							</span>
 						</div>

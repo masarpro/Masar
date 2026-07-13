@@ -108,7 +108,7 @@ export function StudyHeaderCard({
 				: null;
 
 	return (
-		<Card className="bg-gradient-to-l from-primary/10 via-primary/5 to-background border-primary/20">
+		<Card className="bg-card border-2">
 			<CardContent className="p-5">
 				<div className="flex flex-col gap-4">
 					{/* Row 1: Back button + Study name + Status */}

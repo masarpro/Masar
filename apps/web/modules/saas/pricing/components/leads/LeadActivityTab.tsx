@@ -26,8 +26,8 @@ export function LeadActivityTab({ leadId, organizationId, activities }: LeadActi
 	return (
 		<div className="space-y-4">
 			{/* Comment Box */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
 					<div className="h-[30px] w-[30px] rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
 						<MessageSquare className="h-4 w-4 text-chart-4 dark:text-chart-4" />
 					</div>
@@ -41,10 +41,10 @@ export function LeadActivityTab({ leadId, organizationId, activities }: LeadActi
 			</div>
 
 			{/* Activity Feed */}
-			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
-					<div className="h-[30px] w-[30px] rounded-lg bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center">
-						<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+			<div className="rounded-2xl border-2 bg-card">
+				<div className="flex items-center gap-2 border-b-2 px-5 py-3.5">
+					<div className="h-[30px] w-[30px] rounded-lg bg-chart-1/15 flex items-center justify-center">
+						<Clock className="h-4 w-4 text-chart-1" />
 					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.activityLog")}

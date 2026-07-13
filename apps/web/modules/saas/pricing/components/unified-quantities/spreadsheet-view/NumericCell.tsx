@@ -57,7 +57,7 @@ export function NumericCell({
 				className={`h-8 px-2 text-end font-mono text-xs tabular-nums ${
 					suffix ? "pe-7" : ""
 				} ${
-					error ? "border-red-400 focus-visible:ring-red-400" : ""
+					error ? "border-destructive focus-visible:ring-destructive" : ""
 				}`}
 				title={error ? "فشل الحفظ — تحقّق من القيمة" : undefined}
 			/>

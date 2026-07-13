@@ -155,7 +155,7 @@ export function CopyTermsFromExecutionDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("projectPayments.copyExecution.title")}
 					</DialogTitle>
@@ -164,10 +164,10 @@ export function CopyTermsFromExecutionDialog({
 				{/* No contract → guide the user to create one first */}
 				{!hasContract ? (
 					<div className="p-5">
-						<div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-							<Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+						<div className="flex items-start gap-3 rounded-xl border-2 border-chart-1/20 bg-chart-1/10 p-4">
+							<Info className="mt-0.5 h-5 w-5 shrink-0 text-chart-1" />
 							<div className="space-y-2">
-								<p className="text-sm text-amber-700 dark:text-amber-300">
+								<p className="text-sm text-chart-1">
 									{t("projectPayments.copyExecution.noContract")}
 								</p>
 								{organizationSlug && (
@@ -191,10 +191,10 @@ export function CopyTermsFromExecutionDialog({
 					<>
 						<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 							{/* Tax-inclusive toggle */}
-							<div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
+							<div className="flex items-center justify-between rounded-xl border-2 bg-muted px-4 py-3">
 								<label
 									htmlFor="tax-inclusive"
-									className="text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer"
+									className="text-sm font-medium text-foreground cursor-pointer"
 								>
 									{t("projectPayments.copyExecution.taxInclusive")}
 								</label>
@@ -212,7 +212,7 @@ export function CopyTermsFromExecutionDialog({
 										{[1, 2, 3].map((i) => (
 											<div
 												key={i}
-												className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3"
+												className="rounded-xl border-2 p-4 space-y-3"
 											>
 												<Skeleton className="h-5 w-48" />
 												<Skeleton className="h-9 w-full" />
@@ -221,10 +221,10 @@ export function CopyTermsFromExecutionDialog({
 									</>
 								) : milestones.length === 0 ? (
 									<div className="flex flex-col items-center justify-center py-12 text-center">
-										<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-											<ClipboardList className="h-7 w-7 text-slate-400" />
+										<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+											<ClipboardList className="h-7 w-7 text-muted-foreground" />
 										</div>
-										<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+										<p className="text-sm font-medium text-foreground">
 											{t("projectPayments.copyExecution.noMilestones")}
 										</p>
 									</div>
@@ -236,10 +236,10 @@ export function CopyTermsFromExecutionDialog({
 										return (
 											<div
 												key={milestone.id}
-												className={`rounded-xl border bg-white dark:bg-slate-900 p-4 transition-colors ${
+												className={`rounded-xl border-2 bg-card p-4 transition-colors ${
 													isSelected
-														? "border-chart-4 dark:border-chart-4"
-														: "border-slate-200 dark:border-slate-700"
+														? "border-chart-4"
+														: "border-border"
 												}`}
 											>
 												<div className="flex items-start gap-3">

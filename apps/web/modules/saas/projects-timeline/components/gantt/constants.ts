@@ -28,33 +28,33 @@ export const PADDING_DAYS = 7;
 
 export const STATUS_COLORS: Record<MilestoneStatus, { bg: string; border: string; text: string }> = {
 	PLANNED: {
-		bg: "rgba(148, 163, 184, 0.3)",
-		border: "rgb(148, 163, 184)",
-		text: "rgb(100, 116, 139)",
+		bg: "color-mix(in srgb, var(--muted-foreground) 30%, transparent)",
+		border: "var(--muted-foreground)",
+		text: "var(--muted-foreground)",
 	},
 	IN_PROGRESS: {
-		bg: "rgba(20, 184, 166, 0.3)",
-		border: "rgb(20, 184, 166)",
-		text: "rgb(13, 148, 136)",
+		bg: "color-mix(in srgb, var(--chart-4) 30%, transparent)",
+		border: "var(--chart-4)",
+		text: "var(--chart-4)",
 	},
 	COMPLETED: {
-		bg: "rgba(34, 197, 94, 0.3)",
-		border: "rgb(34, 197, 94)",
-		text: "rgb(22, 163, 74)",
+		bg: "color-mix(in srgb, var(--success) 30%, transparent)",
+		border: "var(--success)",
+		text: "var(--success)",
 	},
 	DELAYED: {
-		bg: "rgba(239, 68, 68, 0.3)",
-		border: "rgb(239, 68, 68)",
-		text: "rgb(220, 38, 38)",
+		bg: "color-mix(in srgb, var(--destructive) 30%, transparent)",
+		border: "var(--destructive)",
+		text: "var(--destructive)",
 	},
 };
 
 export const HEALTH_COLORS: Record<HealthStatus, string> = {
-	ON_TRACK: "rgb(34, 197, 94)",
-	AT_RISK: "rgb(245, 158, 11)",
-	DELAYED: "rgb(239, 68, 68)",
+	ON_TRACK: "var(--success)",
+	AT_RISK: "var(--chart-1)",
+	DELAYED: "var(--destructive)",
 };
 
-export const TODAY_LINE_COLOR = "rgb(239, 68, 68)";
-export const GRID_LINE_COLOR = "rgba(148, 163, 184, 0.15)";
-export const WEEKEND_BG_COLOR = "rgba(148, 163, 184, 0.06)";
+export const TODAY_LINE_COLOR = "var(--destructive)";
+export const GRID_LINE_COLOR = "var(--border)";
+export const WEEKEND_BG_COLOR = "color-mix(in srgb, var(--muted-foreground) 6%, transparent)";

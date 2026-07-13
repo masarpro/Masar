@@ -123,7 +123,7 @@ export function GanttPrintLayout({ projectId }: GanttPrintLayoutProps) {
 			<div
 				id="execution-gantt-print-area"
 				data-pdf-body
-				className="max-w-[1600px] mx-auto bg-white shadow-sm border border-slate-200 p-4 print:shadow-none print:border-0 print:max-w-none print:p-0"
+				className="max-w-[1600px] mx-auto bg-white shadow-sm border border-border p-4 print:shadow-none print:border-0 print:max-w-none print:p-0"
 			>
 				<ExecutionPrintHeader
 					projectId={projectId}
@@ -131,7 +131,7 @@ export function GanttPrintLayout({ projectId }: GanttPrintLayoutProps) {
 				/>
 
 				{!dataReady ? (
-					<div className="p-12 text-center text-slate-500 text-sm">
+					<div className="p-12 text-center text-muted-foreground text-sm">
 						{t("common.loading")}
 					</div>
 				) : (

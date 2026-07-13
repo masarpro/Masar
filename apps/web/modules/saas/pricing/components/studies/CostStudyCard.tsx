@@ -178,7 +178,7 @@ export function CostStudyCard({
 
 	return (
 		<>
-			<div className="group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm">
+			<div className="group relative rounded-2xl bg-card border-2 overflow-hidden transition-all duration-200 hover:border-primary/30">
 				{/* Top accent line */}
 				<div className={`h-1 w-full ${accentColor}`} />
 
@@ -190,12 +190,12 @@ export function CostStudyCard({
 								href={`${basePath}/${study.id}`}
 								className="group/link inline-block"
 							>
-								<h3 className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300 transition-colors">
+								<h3 className="font-semibold text-card-foreground line-clamp-1 group-hover/link:text-primary transition-colors">
 									{study.name || t("pricing.studies.unnamed")}
 								</h3>
 							</Link>
 							{study.customerName && (
-								<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+								<p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
 									{study.customerName}
 								</p>
 							)}
@@ -215,9 +215,9 @@ export function CostStudyCard({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+									className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground rounded-lg"
 								>
-									<MoreVertical className="h-4 w-4 text-slate-500" />
+									<MoreVertical className="h-4 w-4 text-muted-foreground" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="rounded-xl w-40">
@@ -233,7 +233,7 @@ export function CostStudyCard({
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
-									className="text-red-600 dark:text-red-400 rounded-lg focus:text-red-600 dark:focus:text-red-400"
+									className="text-destructive rounded-lg focus:text-destructive"
 									onClick={() => setShowDeleteDialog(true)}
 								>
 									<Trash2 className="me-2 h-4 w-4" />
@@ -251,7 +251,7 @@ export function CostStudyCard({
 						{workScopes.map((scope) => (
 							<span
 								key={scope}
-								className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400"
+								className="inline-flex items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
 							>
 								<span>{SCOPE_ICONS[scope] ?? ""}</span>
 								{t(`pricing.studies.create.scopes.${scope}`)}
@@ -262,7 +262,7 @@ export function CostStudyCard({
 					{/* Stage progress */}
 					{hasStageFields && totalStages > 0 && (
 						<div className="mt-3">
-							<div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+							<div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
 								<span>
 									{t("pricing.studies.stagesProgress", {
 										approved: approvedStages,
@@ -270,9 +270,9 @@ export function CostStudyCard({
 									})}
 								</span>
 							</div>
-							<div className="h-1 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+							<div className="h-2 w-full rounded-[4px] bg-muted overflow-hidden">
 								<div
-									className="h-full rounded-full bg-primary transition-all"
+									className="h-full rounded-[4px] bg-chart-1 transition-all"
 									style={{
 										width: `${totalStages > 0 ? (approvedStages / totalStages) * 100 : 0}%`,
 									}}
@@ -285,13 +285,13 @@ export function CostStudyCard({
 				{/* Per-section item counts */}
 				{totalItems > 0 && (
 					<div className="px-4 pb-3">
-						<div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-3 text-xs text-muted-foreground">
 							<div className="flex items-center gap-1" title={t("pricing.studies.structural.title")}>
-								<Hammer className="h-3 w-3 text-orange-500" />
+								<Hammer className="h-3 w-3 text-chart-1" />
 								<span>{study._count.structuralItems}</span>
 							</div>
 							<div className="flex items-center gap-1" title={t("pricing.studies.finishing.title")}>
-								<PaintBucket className="h-3 w-3 text-violet-500" />
+								<PaintBucket className="h-3 w-3 text-chart-4" />
 								<span>{study._count.finishingItems}</span>
 							</div>
 							<div className="flex items-center gap-1" title={t("pricing.studies.mep.title")}>
@@ -303,9 +303,9 @@ export function CostStudyCard({
 				)}
 
 				{/* Card Footer */}
-				<div className="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+				<div className="px-4 pb-4 pt-3 border-t-2 border-border">
 					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-2 text-xs text-muted-foreground">
 							<div className="flex items-center gap-1">
 								<Boxes className="h-3.5 w-3.5" />
 								<span>{totalItems}</span>
@@ -316,7 +316,7 @@ export function CostStudyCard({
 								<span>{formatDateShort(study.createdAt)}</span>
 							</div>
 						</div>
-						<span className="text-base font-semibold text-slate-900 dark:text-slate-100">
+						<span className="text-base font-semibold text-card-foreground">
 							{formatSAR(study.totalCost)}
 						</span>
 					</div>
@@ -335,7 +335,7 @@ export function CostStudyCard({
 						<AlertDialogCancel className="rounded-xl">{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={handleDelete}
-							className="rounded-xl bg-red-600 text-white hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{t("common.delete")}
 						</AlertDialogAction>

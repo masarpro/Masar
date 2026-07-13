@@ -147,7 +147,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 									className={cn(
 										"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
 										viewMode === "byItem"
-											? "bg-background shadow-sm text-foreground"
+											? "bg-background text-foreground"
 											: "text-muted-foreground hover:text-foreground",
 									)}
 								>
@@ -160,7 +160,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 									className={cn(
 										"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
 										viewMode === "byMaterial"
-											? "bg-background shadow-sm text-foreground"
+											? "bg-background text-foreground"
 											: "text-muted-foreground hover:text-foreground",
 									)}
 								>

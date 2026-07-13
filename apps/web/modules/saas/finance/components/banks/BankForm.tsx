@@ -230,7 +230,7 @@ export function BankForm({
 								className="rounded-xl mt-1 max-w-xs"
 								dir="ltr"
 							/>
-							<p className="text-sm text-slate-500 mt-1">
+							<p className="text-sm text-muted-foreground mt-1">
 								{t("finance.banks.openingBalanceHint")}
 							</p>
 						</div>

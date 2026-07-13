@@ -373,8 +373,8 @@ export function PricingPageContentV2({
 				className="flex flex-col items-center justify-center py-16 text-center"
 				dir="rtl"
 			>
-				<div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 mb-4">
-					<Lock className="h-10 w-10 text-amber-500" />
+				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
+					<Lock className="h-10 w-10 text-chart-1" />
 				</div>
 				<h3 className="text-lg font-semibold mb-2">{t("locked.title")}</h3>
 				<p className="text-muted-foreground mb-4 max-w-md">
@@ -479,7 +479,7 @@ export function PricingPageContentV2({
 							className={cn(
 								"flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm transition-all text-start",
 								method === opt.key
-									? "border-primary bg-primary/5 shadow-sm"
+									? "border-primary bg-primary/5"
 									: "border-border hover:border-muted-foreground/30",
 							)}
 						>
@@ -692,7 +692,7 @@ export function PricingPageContentV2({
 								<span
 									className={cn(
 										"font-bold text-lg",
-										manualMarkupPct >= 0 ? "text-emerald-600" : "text-red-600",
+										manualMarkupPct >= 0 ? "text-success" : "text-destructive",
 									)}
 									dir="ltr"
 								>
@@ -718,7 +718,7 @@ export function PricingPageContentV2({
 								<span
 									className={cn(
 										"font-medium",
-										manualProfit >= 0 ? "text-emerald-600" : "text-red-600",
+										manualProfit >= 0 ? "text-success" : "text-destructive",
 									)}
 									dir="ltr"
 								>
@@ -763,7 +763,7 @@ export function PricingPageContentV2({
 					</div>
 
 					{buildingArea <= 0 && (
-						<div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-700 dark:text-amber-400">
+						<div className="rounded-lg bg-chart-1/10 border border-chart-1/30 p-3 text-sm text-chart-1">
 							{t("perSqm.noAreaWarning")}
 						</div>
 					)}
@@ -815,8 +815,8 @@ export function PricingPageContentV2({
 											className={cn(
 												"font-bold",
 												sqmMarkupPct >= 0
-													? "text-emerald-600"
-													: "text-red-600",
+													? "text-success"
+													: "text-destructive",
 											)}
 											dir="ltr"
 										>
@@ -831,8 +831,8 @@ export function PricingPageContentV2({
 											className={cn(
 												"font-medium",
 												sqmPriceNum - costPerSqm >= 0
-													? "text-emerald-600"
-													: "text-red-600",
+													? "text-success"
+													: "text-destructive",
 											)}
 											dir="ltr"
 										>
@@ -980,7 +980,7 @@ export function PricingPageContentV2({
 												key={item.id}
 												className={cn(
 													"border-b last:border-0 hover:bg-muted/20",
-													item.hasOverride && "bg-amber-50/50 dark:bg-amber-950/10",
+													item.hasOverride && "bg-chart-1/10",
 												)}
 											>
 												<td className="px-4 py-2.5 text-muted-foreground text-xs">
@@ -1010,7 +1010,7 @@ export function PricingPageContentV2({
 														className={cn(
 															"h-7 w-24 mx-auto text-center rounded-lg text-xs",
 															item.hasOverride &&
-																"border-amber-400 dark:border-amber-600",
+																"border-chart-1",
 														)}
 														dir="ltr"
 														placeholder={formatNum(item.calculatedPrice)}

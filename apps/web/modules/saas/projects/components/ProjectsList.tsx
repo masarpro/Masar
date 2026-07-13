@@ -59,12 +59,12 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 }
 
 const coverGradients = [
-	"from-chart-4 to-indigo-500",
-	"from-chart-4 to-chart-4",
-	"from-amber-400 to-orange-500",
-	"from-violet-400 to-purple-500",
-	"from-rose-400 to-pink-500",
-	"from-chart-4 to-chart-4",
+	"from-chart-4 to-chart-3",
+	"from-chart-3 to-chart-4",
+	"from-chart-1 to-chart-2",
+	"from-chart-4 to-chart-5",
+	"from-chart-2 to-chart-1",
+	"from-chart-5 to-chart-3",
 ];
 
 export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
@@ -115,8 +115,8 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						label: t("projects.stats.active"),
 						value: stats.active,
 						icon: Clock,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 						hint:
 							stats.total > 0
 								? `${Math.round((stats.active / stats.total) * 100)}%`
@@ -126,90 +126,90 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						label: t("projects.stats.completed"),
 						value: stats.completed,
 						icon: CheckCircle2,
-						iconClassName: "text-chart-4 dark:text-chart-4",
-						iconBgClassName: "bg-chart-4/15 dark:bg-chart-4/20",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
 					},
 					{
 						label: t("projects.stats.totalValue"),
 						value: formatSAR(stats.totalValue),
 						icon: Banknote,
-						iconClassName: "text-indigo-600 dark:text-indigo-400",
-						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
-						valueClassName: "text-indigo-700 dark:text-indigo-300",
+						iconClassName: "text-chart-4",
+						iconBgClassName: "bg-chart-4/15",
+						valueClassName: "text-chart-4",
 					},
 				]}
 			/>
 
-			{/* Statistics Cards - Glass Morphism (الديسكتوب كما هو) */}
+			{/* Statistics Cards (الديسكتوب كما هو) */}
 			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
 				{/* Total Projects */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50">
-							<FolderKanban className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+							<FolderKanban className="h-5 w-5" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("projects.stats.total")}
 					</p>
-					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-2xl font-bold text-card-foreground">
 						{stats.total}
 					</p>
 				</div>
 
 				{/* Active Projects */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<Clock className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Clock className="h-5 w-5" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-chart-4 dark:text-chart-4">
+							<div className="flex items-center gap-0.5 text-xs text-chart-4">
 								<TrendingUp className="h-3 w-3" />
 								<span>{Math.round((stats.active / stats.total) * 100)}%</span>
 							</div>
 						)}
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("projects.stats.active")}
 					</p>
-					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+					<p className="text-2xl font-bold text-chart-4">
 						{stats.active}
 					</p>
 				</div>
 
 				{/* Completed Projects */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-							<CheckCircle2 className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<CheckCircle2 className="h-5 w-5" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-chart-4 dark:text-chart-4">
+							<div className="flex items-center gap-0.5 text-xs text-chart-4">
 								<CheckCircle2 className="h-3 w-3" />
 								<span>{Math.round((stats.completed / stats.total) * 100)}%</span>
 							</div>
 						)}
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("projects.stats.completed")}
 					</p>
-					<p className="text-2xl font-bold text-chart-4 dark:text-chart-4">
+					<p className="text-2xl font-bold text-chart-4">
 						{stats.completed}
 					</p>
 				</div>
 
 				{/* Total Value */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+				<div className="rounded-2xl border-2 bg-card p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-							<Banknote className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<Banknote className="h-5 w-5" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("projects.stats.totalValue")}
 					</p>
-					<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
+					<p className="text-xl font-bold text-chart-4">
 						{formatSAR(stats.totalValue)}
 					</p>
 				</div>
@@ -218,12 +218,12 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
 			<div className="flex items-center gap-2 sm:hidden">
 				<div className="relative min-w-0 flex-1">
-					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
 						placeholder={t("projects.searchPlaceholder")}
 						value={searchTerm}
 						onChange={(e: any) => setSearchTerm(e.target.value)}
-						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+						className="rounded-lg border-input bg-card pe-10"
 					/>
 				</div>
 				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
@@ -253,7 +253,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						asChild
 						size="icon"
 						aria-label={t("projects.newProject")}
-						className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="h-10 w-10 shrink-0 rounded-xl"
 					>
 						<Link href={`${basePath}/new`}>
 							<Plus className="h-5 w-5" />
@@ -266,16 +266,16 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder={t("projects.searchPlaceholder")}
 							value={searchTerm}
 							onChange={(e: any) => setSearchTerm(e.target.value)}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl ps-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-lg border-input bg-card ps-10"
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-[160px] rounded-lg border-input bg-card">
 							<SelectValue placeholder={t("projects.allStatuses")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -298,7 +298,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				<UpgradeGate feature="projects.create">
 					<Button
 						asChild
-						className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="rounded-xl"
 					>
 						<Link href={`${basePath}/new`}>
 							<Plus className="me-2 h-4 w-4" />
@@ -308,7 +308,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				</UpgradeGate>
 			</div>
 
-			{/* Grid of Projects - Glass Morphism Cards */}
+			{/* Grid of Projects */}
 			{projects.length > 0 ? (
 				<div className="grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{projects.map((project: any, index: any) => {
@@ -330,7 +330,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 									animationDelay: `${Math.min(index, 6) * 40}ms`,
 								}}
 							>
-								<div className={`group relative h-full backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${project.status === "ARCHIVED" ? "opacity-60" : ""}`}>
+								<div className={`group relative h-full border-2 bg-card rounded-2xl overflow-hidden transition-colors duration-300 hover:border-primary/30 ${project.status === "ARCHIVED" ? "opacity-60" : ""}`}>
 									{/* Cover Image / Gradient — شريط قصير على الجوال */}
 									<div className="relative h-28 overflow-hidden sm:h-auto sm:aspect-[16/9]">
 										<ProjectCover
@@ -341,7 +341,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 										{/* Overlay gradient */}
 										<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 										{/* Project name on overlay */}
-										<div className="absolute bottom-0 left-0 right-0 p-3">
+										<div className="absolute bottom-0 inset-x-0 p-3">
 											<div className="flex items-start justify-between gap-2">
 												<h3 className="font-semibold text-white text-sm leading-tight line-clamp-2">
 													{project.name || t("projects.unnamed")}
@@ -356,13 +356,13 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 										{/* Client & Location */}
 										<div className="space-y-1.5">
 											{project.clientName && (
-												<div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+												<div className="flex items-center gap-2 text-xs text-muted-foreground">
 													<User className="h-3.5 w-3.5 shrink-0" />
 													<span className="truncate">{project.clientName}</span>
 												</div>
 											)}
 											{project.location && (
-												<div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+												<div className="flex items-center gap-2 text-xs text-muted-foreground">
 													<MapPin className="h-3.5 w-3.5 shrink-0" />
 													<span className="truncate">{project.location}</span>
 												</div>
@@ -372,10 +372,10 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 										{/* Progress */}
 										<div>
 											<div className="mb-1 flex items-center justify-between text-xs">
-												<span className="text-slate-500 dark:text-slate-400">
+												<span className="text-muted-foreground">
 													{t("projects.overview.progress")}
 												</span>
-												<span className="font-semibold text-chart-4 dark:text-chart-4">
+												<span className="font-semibold text-chart-4">
 													{Math.round(Number(project.progress))}%
 												</span>
 											</div>
@@ -383,18 +383,18 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 										</div>
 
 										{/* Footer: Contract Value + Team */}
-										<div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
+										<div className="flex items-center justify-between border-t-2 pt-3">
 											{project.contractValue ? (
 												<div className="flex items-center gap-1.5">
-													<Banknote className="h-3.5 w-3.5 text-slate-400" />
-													<span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+													<Banknote className="h-3.5 w-3.5 text-muted-foreground" />
+													<span className="text-xs font-semibold text-card-foreground">
 														{formatSAR(project.contractValue)}
 													</span>
 												</div>
 											) : (
 												<span />
 											)}
-											<div className="flex items-center gap-1 text-xs text-slate-400">
+											<div className="flex items-center gap-1 text-xs text-muted-foreground">
 												<Users className="h-3.5 w-3.5" />
 												<span>{(project as any).memberCount ?? 0}</span>
 											</div>
@@ -413,7 +413,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				>
 					<Button
 						asChild
-						className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="rounded-xl"
 					>
 						<Link href={`${basePath}/new`}>
 							<Plus className="me-2 h-4 w-4" />

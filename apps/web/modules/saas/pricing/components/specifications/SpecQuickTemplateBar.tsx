@@ -25,9 +25,9 @@ const TEMPLATES = [
 		value: "economic" as const,
 		label: "اقتصادي",
 		icon: Wallet,
-		color: "text-emerald-600",
-		bg: "bg-emerald-50 dark:bg-emerald-950/30",
-		border: "border-emerald-200 dark:border-emerald-800",
+		color: "text-success",
+		bg: "bg-success/15",
+		border: "border-success/30",
 	},
 	{
 		value: "medium" as const,
@@ -41,9 +41,9 @@ const TEMPLATES = [
 		value: "luxury" as const,
 		label: "فاخر",
 		icon: Crown,
-		color: "text-amber-600",
-		bg: "bg-amber-50 dark:bg-amber-950/30",
-		border: "border-amber-200 dark:border-amber-800",
+		color: "text-chart-1",
+		bg: "bg-chart-1/15",
+		border: "border-chart-1/30",
 	},
 ];
 

@@ -23,9 +23,9 @@ export function CostSection({ item }: Props) {
 	const unitLabel = item.unit?.trim() || "وحدة";
 
 	return (
-		<Card className="border-emerald-200 bg-emerald-50/40 p-4 dark:border-emerald-900 dark:bg-emerald-950/20">
+		<Card className="border-2 border-success/30 bg-card p-4">
 			<div className="space-y-3">
-				<h4 className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+				<h4 className="text-sm font-semibold text-success">
 					💰 التكلفة
 				</h4>
 
@@ -64,7 +64,7 @@ export function CostSection({ item }: Props) {
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">إجمالي التكلفة</p>
-							<p className="font-bold tabular-nums text-emerald-700 dark:text-emerald-300">
+							<p className="font-bold tabular-nums text-success">
 								{fmt(totalCost)} ر.س
 							</p>
 						</div>

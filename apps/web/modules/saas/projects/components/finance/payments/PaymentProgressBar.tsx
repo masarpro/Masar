@@ -18,20 +18,20 @@ export function PaymentProgressBar({
 	const t = useTranslations();
 
 	return (
-		<div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/50">
+		<div className="rounded-2xl border-2 bg-card p-4">
 			<div className="mb-2 flex items-center justify-between text-sm">
-				<span className="text-slate-600 dark:text-slate-400">
+				<span className="text-muted-foreground">
 					{t("projectPayments.collectionProgress")}
 				</span>
-				<span className="font-mono font-semibold text-chart-4 dark:text-chart-4">
+				<span className="font-mono font-semibold text-chart-4">
 					{collectionPercent}%
 				</span>
 			</div>
 			<Progress
 				value={collectionPercent}
-				className="h-2.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-chart-4"
+				className="h-2.5 bg-muted [&>div]:bg-chart-4"
 			/>
-			<div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+			<div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
 				<span>
 					{t("projectPayments.totalPaid")}: {formatSAR(totalCollected)}
 				</span>

@@ -96,11 +96,11 @@ export function EditExpenseRunItemDialog({
 				<Form {...form}>
 					<form onSubmit={handleSubmit} className="space-y-4">
 						{/* Original Amount (read-only reference) */}
-						<div className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-3">
-							<p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+						<div className="rounded-lg border-2 bg-muted/50 p-3">
+							<p className="text-xs text-muted-foreground mb-1">
 								{t("company.expenseRuns.originalAmount")}
 							</p>
-							<p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+							<p className="text-sm font-semibold text-card-foreground">
 								{formatCurrency(Number(item.originalAmount ?? 0))}
 							</p>
 						</div>

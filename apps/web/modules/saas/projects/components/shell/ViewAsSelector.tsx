@@ -30,11 +30,11 @@ const roleIcons: Record<ProjectRole, typeof UserCircle> = {
 };
 
 const roleColors: Record<ProjectRole, string> = {
-	MANAGER: "text-purple-600 dark:text-purple-400",
+	MANAGER: "text-chart-4",
 	ENGINEER: "text-chart-4 dark:text-chart-4",
-	SUPERVISOR: "text-orange-600 dark:text-orange-400",
-	ACCOUNTANT: "text-green-600 dark:text-green-400",
-	VIEWER: "text-slate-600 dark:text-slate-400",
+	SUPERVISOR: "text-chart-1",
+	ACCOUNTANT: "text-success",
+	VIEWER: "text-muted-foreground",
 };
 
 const roles: ProjectRole[] = [
@@ -61,8 +61,8 @@ export function ViewAsSelector() {
 						size="sm"
 						className={`rounded-lg gap-1.5 text-xs ${
 							isViewAsActive
-								? "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
-								: "border-slate-200 dark:border-slate-700"
+								? "border-chart-1 bg-chart-1/15 text-chart-1"
+								: "border-border"
 						}`}
 					>
 						<ScanEye className="h-3.5 w-3.5" />
@@ -86,7 +86,7 @@ export function ViewAsSelector() {
 								/>
 								<span>{t(`projects.team.roles.${role}`)}</span>
 								{role === "MANAGER" && (
-									<span className="ms-auto text-[10px] text-slate-400">
+									<span className="ms-auto text-[10px] text-muted-foreground">
 										{t("projects.viewAs.default")}
 									</span>
 								)}
@@ -98,7 +98,7 @@ export function ViewAsSelector() {
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								onClick={() => setViewAs(null)}
-								className="gap-2 text-amber-600"
+								className="gap-2 text-chart-1"
 							>
 								<X className="h-4 w-4" />
 								{t("projects.viewAs.exit")}
@@ -110,7 +110,7 @@ export function ViewAsSelector() {
 
 			{/* Preview mode indicator banner */}
 			{isViewAsActive && (
-				<div className="flex items-center gap-1.5 rounded-lg bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+				<div className="flex items-center gap-1.5 rounded-lg bg-chart-1/15 px-2.5 py-1 text-xs font-medium text-chart-1">
 					<Eye className="h-3 w-3" />
 					{t("projects.viewAs.previewMode")}
 				</div>

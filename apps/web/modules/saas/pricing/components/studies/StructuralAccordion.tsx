@@ -219,12 +219,12 @@ export function StructuralAccordion({
 						key={section.id}
 						value={section.id}
 						className={cn(
-							"border rounded-lg px-4 transition-all duration-200",
+							"border-2 rounded-lg px-4 transition-all duration-200",
 							isSaved &&
-								"border-green-500/50 bg-green-50/30 dark:bg-green-950/20",
+								"border-success/50 bg-success/10",
 							hasItems &&
 								!isSaved &&
-								"border-chart-4/50 bg-chart-4/15 dark:bg-chart-4/20",
+								"border-chart-4/50 bg-chart-4/15",
 							!hasItems && !isSaved && "border-border",
 						)}
 					>
@@ -270,7 +270,7 @@ export function StructuralAccordion({
 											{sectionSteel > 0 && (
 												<span className="flex items-center gap-1">
 													حديد:{" "}
-													<span className="font-semibold text-orange-600">
+													<span className="font-semibold text-chart-1">
 														{formatNumber(
 															sectionSteel,
 														)}{" "}
@@ -284,7 +284,7 @@ export function StructuralAccordion({
 									{isSaved ? (
 										<Badge
 											variant="default"
-											className="bg-green-600"
+											className="bg-success"
 										>
 											<Check className="h-3 w-3 me-1" />
 											{t(

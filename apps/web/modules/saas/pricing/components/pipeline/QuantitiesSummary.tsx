@@ -42,22 +42,22 @@ export function QuantitiesSummary({
 			label: t("pricing.pipeline.summaryFinishing"),
 			count: (data as any)?.finishing ?? 0,
 			icon: PaintBucket,
-			color: "text-amber-600",
-			bg: "bg-amber-50 dark:bg-amber-950/30",
+			color: "text-chart-1",
+			bg: "bg-chart-1/15",
 		},
 		{
 			label: t("pricing.pipeline.summaryMep"),
 			count: (data as any)?.mep ?? 0,
 			icon: Wrench,
-			color: "text-emerald-600",
-			bg: "bg-emerald-50 dark:bg-emerald-950/30",
+			color: "text-success",
+			bg: "bg-success/15",
 		},
 		{
 			label: t("pricing.pipeline.summaryManual"),
 			count: (data as any)?.manual ?? 0,
 			icon: FileEdit,
-			color: "text-purple-600",
-			bg: "bg-purple-50 dark:bg-purple-950/30",
+			color: "text-chart-4",
+			bg: "bg-chart-4/15",
 		},
 	];
 

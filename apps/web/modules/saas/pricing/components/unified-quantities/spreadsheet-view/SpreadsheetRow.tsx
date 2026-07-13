@@ -106,8 +106,8 @@ function SpreadsheetRowImpl({
 				<span
 					className={`inline-flex items-center gap-0.5 font-semibold ${
 						isProfit
-							? "text-emerald-700 dark:text-emerald-400"
-							: "text-red-700 dark:text-red-400"
+							? "text-success"
+							: "text-destructive"
 					}`}
 				>
 					{isProfit ? (

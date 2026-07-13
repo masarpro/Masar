@@ -32,7 +32,7 @@ export function PricingStatsCards({
 			/>
 			<GlassStatCard
 				colorScheme="amber"
-				icon={<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
+				icon={<Clock className="h-4 w-4 text-chart-1 dark:text-chart-1" />}
 				title={t("pricing.dashboard.stats.expiringQuotations")}
 				value={expiringQuotations}
 				subtitle={t("pricing.dashboard.stats.expiringQuotationsSubtitle")}

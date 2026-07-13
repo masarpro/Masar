@@ -60,7 +60,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 			<ReportPrintHeader reportTitle={t("finance.accounting.incomeStatement.title")} dateRange={`${dateFrom.toLocaleDateString("en-SA")} — ${dateTo.toLocaleDateString("en-SA")}`} />
 			{/* Period Selector */}
 			<div className="flex flex-wrap items-center gap-3 print:hidden">
-				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+				<div className="flex gap-1 bg-muted rounded-xl p-1">
 					{([
 						{ key: "month" as const, label: t("finance.accounting.income.month") },
 						{ key: "quarter" as const, label: t("finance.accounting.income.quarter") },
@@ -71,7 +71,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 						</Button>
 					))}
 				</div>
-				<label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+				<label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
 					<input type="checkbox" checked={includeComparison} onChange={(e) => setIncludeComparison(e.target.checked)} className="rounded" />
 					{t("finance.accounting.incomeStatement.compareWithPrevious")}
 				</label>
@@ -139,10 +139,10 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 
 function KPICard({ label, value, color, icon: Icon, subtitle }: { label: string; value: number; color: string; icon: any; subtitle?: string }) {
 	const colorMap: Record<string, { text: string; bg: string }> = {
-		green: { text: "text-green-600 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/30" },
-		red: { text: "text-red-600 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/30" },
-		blue: { text: "text-chart-4 dark:text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20" },
-		amber: { text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/30" },
+		green: { text: "text-success", bg: "bg-success/15" },
+		red: { text: "text-destructive", bg: "bg-destructive/15" },
+		blue: { text: "text-chart-4", bg: "bg-chart-4/15" },
+		amber: { text: "text-chart-1", bg: "bg-chart-1/15" },
 	};
 	const c = colorMap[color] ?? colorMap.blue;
 	return (
@@ -150,9 +150,9 @@ function KPICard({ label, value, color, icon: Icon, subtitle }: { label: string;
 			<CardContent className="p-4">
 				<div className="flex items-center justify-between">
 					<div>
-						<p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
+						<p className="text-sm text-muted-foreground">{label}</p>
 						<p className={`text-xl font-bold ${c.text} mt-1`}>{formatAccounting(Math.abs(value)) || "0"}</p>
-						{subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+						{subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
 					</div>
 					<div className={`p-2.5 ${c.bg} rounded-xl`}><Icon className={`h-5 w-5 ${c.text}`} /></div>
 				</div>
@@ -163,36 +163,36 @@ function KPICard({ label, value, color, icon: Icon, subtitle }: { label: string;
 
 function SectionHeader({ label, color }: { label: string; color: string }) {
 	const bgMap: Record<string, string> = {
-		green: "bg-green-50 dark:bg-green-950/20",
-		amber: "bg-amber-50 dark:bg-amber-950/20",
-		red: "bg-red-50 dark:bg-red-950/20",
+		green: "bg-success/10",
+		amber: "bg-chart-1/10",
+		red: "bg-destructive/10",
 	};
-	return <div className={`font-bold text-slate-700 dark:text-slate-300 py-2 px-3 rounded-lg ${bgMap[color] ?? ""}`}>{label}</div>;
+	return <div className={`font-bold text-foreground py-2 px-3 rounded-lg ${bgMap[color] ?? ""}`}>{label}</div>;
 }
 
 function StatementLine({ label, amount, indent = 0 }: { label: string; amount: number; indent?: number }) {
 	return (
 		<div className="flex justify-between py-1" style={{ paddingInlineStart: `${indent * 1.5}rem` }}>
-			<span className="text-slate-600 dark:text-slate-400">{label}</span>
-			<span className="text-slate-700 dark:text-slate-300">{formatAccounting(amount)}</span>
+			<span className="text-muted-foreground">{label}</span>
+			<span className="text-foreground">{formatAccounting(amount)}</span>
 		</div>
 	);
 }
 
 function SubtotalLine({ label, amount }: { label: string; amount: number }) {
 	return (
-		<div className="flex justify-between py-1 border-t border-slate-200 dark:border-slate-700 font-semibold">
-			<span className="text-slate-700 dark:text-slate-300">{label}</span>
-			<span className={amount < 0 ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-slate-100"}>{formatAccounting(amount)}</span>
+		<div className="flex justify-between py-1 border-t border-border font-semibold">
+			<span className="text-foreground">{label}</span>
+			<span className={amount < 0 ? "text-destructive" : "text-foreground"}>{formatAccounting(amount)}</span>
 		</div>
 	);
 }
 
 function TotalLine({ label, amount, isGrandTotal }: { label: string; amount: number; isGrandTotal?: boolean }) {
 	return (
-		<div className={`flex justify-between py-2 font-bold ${isGrandTotal ? "border-t-2 border-b-2 border-slate-400 dark:border-slate-500" : "border-t border-slate-300 dark:border-slate-600"}`}>
-			<span className="text-slate-900 dark:text-slate-100">{label}</span>
-			<span className={amount < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>{formatAccounting(amount)}</span>
+		<div className={`flex justify-between py-2 font-bold ${isGrandTotal ? "border-t-2 border-b-2 border-border" : "border-t border-border"}`}>
+			<span className="text-foreground">{label}</span>
+			<span className={amount < 0 ? "text-destructive" : "text-success"}>{formatAccounting(amount)}</span>
 		</div>
 	);
 }
@@ -200,8 +200,8 @@ function TotalLine({ label, amount, isGrandTotal }: { label: string; amount: num
 function PercentLine({ label, value }: { label: string; value: number }) {
 	return (
 		<div className="flex justify-between py-0.5">
-			<span className="text-xs text-slate-400">{label}</span>
-			<span className="text-xs text-slate-400">{formatPercent(value)}</span>
+			<span className="text-xs text-muted-foreground">{label}</span>
+			<span className="text-xs text-muted-foreground">{formatPercent(value)}</span>
 		</div>
 	);
 }

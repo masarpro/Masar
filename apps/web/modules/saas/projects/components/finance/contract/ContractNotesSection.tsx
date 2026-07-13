@@ -43,13 +43,13 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 	const t = useTranslations();
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-amber-200/50 bg-amber-50/50 dark:border-amber-800/30 dark:bg-amber-950/20">
-			<div className="border-b border-amber-200/50 p-5 dark:border-amber-800/30">
+		<div className="overflow-hidden rounded-2xl border-2 bg-card">
+			<div className="border-b-2 p-5">
 				<div className="flex items-center gap-3">
-					<div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-900/50">
-						<Shield className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<div className="rounded-xl bg-chart-1/15 p-2.5">
+						<Shield className="h-5 w-5 text-chart-1" />
 					</div>
-					<h2 className="text-lg font-medium text-amber-900 dark:text-amber-100">
+					<h2 className="text-lg font-medium text-card-foreground">
 						{t("projects.createProject.guaranteesSection")}
 					</h2>
 				</div>
@@ -57,13 +57,13 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 
 			<div className="space-y-5 p-5">
 				{/* Retention */}
-				<div className="rounded-xl border border-amber-200/40 bg-white/60 p-4 dark:border-amber-800/30 dark:bg-slate-900/30">
-					<Label className="mb-3 block text-sm font-medium text-amber-800 dark:text-amber-200">
+				<div className="rounded-xl border-2 bg-card p-4">
+					<Label className="mb-3 block text-sm font-medium text-card-foreground">
 						{t("projects.createProject.retentionInfo")}
 					</Label>
 					<div className="grid gap-4 sm:grid-cols-4">
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.retentionPercent",
 								)}
@@ -82,21 +82,21 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="10"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-6 text-sm"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									%
 								</span>
 							</div>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.retentionAmount",
 								)}
 							</Label>
-							<div className="flex h-9 items-center rounded-lg bg-amber-50 px-3 font-mono text-sm font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
+							<div className="flex h-9 items-center rounded-lg bg-chart-1/15 px-3 font-mono text-sm font-medium text-chart-1">
 								{retentionAmount > 0
 									? formatNumber(retentionAmount)
 									: "\u2014"}
@@ -104,7 +104,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.retentionCap",
 								)}
@@ -122,16 +122,16 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="0.00"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-12 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-12 text-sm"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									{t("common.sar")}
 								</span>
 							</div>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.retentionReleaseDays",
 								)}
@@ -147,20 +147,20 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									)
 								}
 								placeholder="365"
-								className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+								className="h-9 rounded-lg text-sm"
 							/>
 						</div>
 					</div>
 				</div>
 
 				{/* Performance Bond */}
-				<div className="rounded-xl border border-amber-200/40 bg-white/60 p-4 dark:border-amber-800/30 dark:bg-slate-900/30">
-					<Label className="mb-3 block text-sm font-medium text-amber-800 dark:text-amber-200">
+				<div className="rounded-xl border-2 bg-card p-4">
+					<Label className="mb-3 block text-sm font-medium text-card-foreground">
 						{t("projects.createProject.performanceBond")}
 					</Label>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.performanceBondPercent",
 								)}
@@ -179,21 +179,21 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="5"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-6 text-sm"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									%
 								</span>
 							</div>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.performanceBondAmount",
 								)}
 							</Label>
-							<div className="flex h-9 items-center rounded-lg bg-amber-50 px-3 font-mono text-sm font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
+							<div className="flex h-9 items-center rounded-lg bg-chart-1/15 px-3 font-mono text-sm font-medium text-chart-1">
 								{performanceBondAmount > 0
 									? formatNumber(performanceBondAmount)
 									: "\u2014"}
@@ -203,9 +203,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 				</div>
 
 				{/* Insurance */}
-				<div className="rounded-xl border border-amber-200/40 bg-white/60 p-4 dark:border-amber-800/30 dark:bg-slate-900/30">
+				<div className="rounded-xl border-2 bg-card p-4">
 					<div className="flex items-center justify-between">
-						<Label className="text-sm font-medium text-amber-800 dark:text-amber-200">
+						<Label className="text-sm font-medium text-card-foreground">
 							{t(
 								"projects.createProject.insuranceRequired",
 							)}
@@ -231,20 +231,20 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									"projects.createProject.insuranceDetailsPlaceholder",
 								)}
 								rows={2}
-								className="rounded-lg border-amber-200/60 bg-amber-50/30 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+								className="rounded-lg text-sm"
 							/>
 						</div>
 					)}
 				</div>
 
 				{/* Penalties */}
-				<div className="rounded-xl border border-amber-200/40 bg-white/60 p-4 dark:border-amber-800/30 dark:bg-slate-900/30">
-					<Label className="mb-3 block text-sm font-medium text-amber-800 dark:text-amber-200">
+				<div className="rounded-xl border-2 bg-card p-4">
+					<Label className="mb-3 block text-sm font-medium text-card-foreground">
 						{t("projects.createProject.penalties")}
 					</Label>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.penaltyPercent",
 								)}
@@ -263,16 +263,16 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="0.5"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-6 text-sm"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									%
 								</span>
 							</div>
 						</div>
 
 						<div className="space-y-1">
-							<Label className="text-xs text-slate-500">
+							<Label className="text-xs text-muted-foreground">
 								{t(
 									"projects.createProject.penaltyCapPercent",
 								)}
@@ -291,9 +291,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="10"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg pe-6 text-sm"
 								/>
-								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 									%
 								</span>
 							</div>

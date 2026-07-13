@@ -250,7 +250,7 @@ export function ClientsHeaderActions({
 							</div>
 						</div>
 
-						<div className="text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">
+						<div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-xl">
 							{t("finance.clients.quickAddHint")}
 						</div>
 

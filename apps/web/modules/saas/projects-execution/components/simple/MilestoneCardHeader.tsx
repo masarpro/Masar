@@ -141,7 +141,7 @@ export function MilestoneCardHeader({
 					<StatusBadge status={milestone.status} />
 					{daysInfo && (
 						<span
-							className={`text-xs font-medium ${daysInfo.isOverdue ? "text-red-600" : "text-muted-foreground"}`}
+							className={`text-xs font-medium ${daysInfo.isOverdue ? "text-destructive" : "text-muted-foreground"}`}
 						>
 							{daysInfo.text}
 						</span>

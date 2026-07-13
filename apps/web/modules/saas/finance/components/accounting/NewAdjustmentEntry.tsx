@@ -26,12 +26,12 @@ interface Props {
 }
 
 const TEMPLATES = [
-	{ id: "accrued_revenue", icon: TrendingUp, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/20", type: "ACCRUAL" },
-	{ id: "accrued_expense", icon: TrendingDown, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/20", type: "ACCRUAL" },
-	{ id: "depreciation", icon: Timer, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/20", type: "DEPRECIATION" },
-	{ id: "prepaid_expense", icon: CalendarClock, color: "text-chart-4", bg: "bg-chart-4/15 dark:bg-chart-4/20", type: "PREPAYMENT" },
-	{ id: "provision", icon: ShieldCheck, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/20", type: "PROVISION" },
-	{ id: "correction", icon: Eraser, color: "text-slate-600", bg: "bg-slate-50 dark:bg-slate-800", type: "CORRECTION" },
+	{ id: "accrued_revenue", icon: TrendingUp, color: "text-success", bg: "bg-success/15", type: "ACCRUAL" },
+	{ id: "accrued_expense", icon: TrendingDown, color: "text-destructive", bg: "bg-destructive/15", type: "ACCRUAL" },
+	{ id: "depreciation", icon: Timer, color: "text-chart-1", bg: "bg-chart-1/15", type: "DEPRECIATION" },
+	{ id: "prepaid_expense", icon: CalendarClock, color: "text-chart-4", bg: "bg-chart-4/15", type: "PREPAYMENT" },
+	{ id: "provision", icon: ShieldCheck, color: "text-chart-4", bg: "bg-chart-4/15", type: "PROVISION" },
+	{ id: "correction", icon: Eraser, color: "text-muted-foreground", bg: "bg-muted", type: "CORRECTION" },
 ] as const;
 
 
@@ -80,7 +80,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 	if (!selectedTemplate) {
 		return (
 			<div className="space-y-4">
-				<h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+				<h2 className="text-lg font-bold text-foreground">
 					{t("finance.accounting.adjustments.selectTemplate")}
 				</h2>
 				<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -89,30 +89,30 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 						return (
 							<Card
 								key={tpl.id}
-								className="rounded-2xl cursor-pointer hover:shadow-lg transition-shadow group"
+								className="rounded-2xl border-2 shadow-none cursor-pointer hover:border-primary/40 transition-colors group"
 								onClick={() => selectTemplate(tpl.id)}
 							>
 								<CardContent className="p-5">
 									<div className={`p-3 rounded-xl ${tpl.bg} w-fit mb-3 group-hover:scale-110 transition-transform`}>
 										<Icon className={`h-6 w-6 ${tpl.color}`} />
 									</div>
-									<h3 className="font-semibold text-slate-900 dark:text-slate-100">{t(`finance.accounting.adjustments.templates.${tpl.id}.label`)}</h3>
-									<p className="text-xs text-slate-500 mt-1">{t(`finance.accounting.adjustments.templates.${tpl.id}.description`)}</p>
+									<h3 className="font-semibold text-foreground">{t(`finance.accounting.adjustments.templates.${tpl.id}.label`)}</h3>
+									<p className="text-xs text-muted-foreground mt-1">{t(`finance.accounting.adjustments.templates.${tpl.id}.description`)}</p>
 								</CardContent>
 							</Card>
 						);
 					})}
 					{/* Free entry */}
 					<Card
-						className="rounded-2xl cursor-pointer hover:shadow-lg transition-shadow group border-dashed"
+						className="rounded-2xl border-2 border-dashed shadow-none cursor-pointer hover:border-primary/40 transition-colors group"
 						onClick={() => { setSelectedTemplate("free"); setDescription(""); }}
 					>
 						<CardContent className="p-5">
-							<div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 w-fit mb-3 group-hover:scale-110 transition-transform">
-								<FileEdit className="h-6 w-6 text-slate-600" />
+							<div className="p-3 rounded-xl bg-muted w-fit mb-3 group-hover:scale-110 transition-transform">
+								<FileEdit className="h-6 w-6 text-muted-foreground" />
 							</div>
-							<h3 className="font-semibold text-slate-900 dark:text-slate-100">{t("finance.accounting.adjustments.freeEntry")}</h3>
-							<p className="text-xs text-slate-500 mt-1">{t("finance.accounting.adjustments.freeEntry")}</p>
+							<h3 className="font-semibold text-foreground">{t("finance.accounting.adjustments.freeEntry")}</h3>
+							<p className="text-xs text-muted-foreground mt-1">{t("finance.accounting.adjustments.freeEntry")}</p>
 						</CardContent>
 					</Card>
 				</div>
@@ -127,12 +127,12 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 				<ArrowRight className="h-4 w-4 me-1" /> {t("finance.accounting.adjustments.selectTemplate")}
 			</Button>
 
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl border-2 shadow-none">
 				<CardContent className="p-6 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-3">
 						<div>
 							<Label>{t("finance.accounting.adjustments.type")}</Label>
-							<select value={adjustmentType} onChange={(e) => setAdjustmentType(e.target.value)} className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm">
+							<select value={adjustmentType} onChange={(e) => setAdjustmentType(e.target.value)} className="w-full h-9 rounded-xl border border-input bg-transparent px-3 text-sm">
 								<option value="ACCRUAL">{t("finance.accounting.adjustments.accrual")}</option>
 								<option value="PREPAYMENT">{t("finance.accounting.adjustments.prepayment")}</option>
 								<option value="DEPRECIATION">{t("finance.accounting.adjustments.depreciation")}</option>
@@ -184,7 +184,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 
 					<div>
 						<Label>{t("finance.accounting.description")} ({t("finance.accounting.manual")})</Label>
-						<textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 py-2 text-sm" />
+						<textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm" />
 					</div>
 
 					<Button

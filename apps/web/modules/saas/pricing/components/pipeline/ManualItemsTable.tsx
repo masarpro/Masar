@@ -294,7 +294,7 @@ export function ManualItemsTable({
 										<td className="px-3 py-1.5">
 											<div className="flex items-center justify-center gap-1">
 												<Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleUpdate} disabled={updateMutation.isPending}>
-													<Save className="h-3.5 w-3.5 text-emerald-600" />
+													<Save className="h-3.5 w-3.5 text-success" />
 												</Button>
 												<Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditing(null)}>
 													<X className="h-3.5 w-3.5" />
@@ -335,7 +335,7 @@ export function ManualItemsTable({
 
 						{/* New item row */}
 						{showNewRow && (
-							<tr className="border-b bg-emerald-50/50 dark:bg-emerald-950/20">
+							<tr className="border-b bg-success/10">
 								<td className="px-3 py-1.5 text-muted-foreground">—</td>
 								<td className="px-3 py-1.5">
 									<Input
@@ -397,7 +397,7 @@ export function ManualItemsTable({
 											{createMutation.isPending ? (
 												<Loader2 className="h-3.5 w-3.5 animate-spin" />
 											) : (
-												<Save className="h-3.5 w-3.5 text-emerald-600" />
+												<Save className="h-3.5 w-3.5 text-success" />
 											)}
 										</Button>
 										<Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setShowNewRow(false); setNewItem(emptyNewItem); }}>

@@ -74,7 +74,7 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, o
 	return (
 		<div className="space-y-3">
 			{/* Main Header */}
-			<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50" dir="rtl">
+			<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-card border-2" dir="rtl">
 				<div className="flex items-center gap-3 min-w-0">
 					{/* Back Button */}
 					<Button
@@ -146,7 +146,7 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, o
 						<Button
 							variant="outline"
 							size="sm"
-							className="gap-1.5 rounded-xl border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30"
+							className="gap-1.5 rounded-xl border-success/30 text-success hover:bg-success/10"
 							onClick={onConvert}
 						>
 							<FolderKanban className="h-3.5 w-3.5" />
@@ -187,7 +187,7 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, o
 
 			{/* Status Progress Bar */}
 			{lead.status !== "LOST" && (
-				<div className="rounded-xl border border-border/50 p-3">
+				<div className="rounded-xl border-2 p-3">
 					<div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
 						<span>{t("pricing.leads.detail.opportunityPath")}</span>
 						<span>{getStatusProgress(lead.status)}</span>
@@ -196,7 +196,7 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, o
 						<div
 							className={cn(
 								"h-full rounded-full transition-all duration-500",
-								lead.status === "WON" ? "bg-green-500" : "bg-primary",
+								lead.status === "WON" ? "bg-success" : "bg-primary",
 							)}
 							style={{ width: getStatusProgress(lead.status) }}
 						/>

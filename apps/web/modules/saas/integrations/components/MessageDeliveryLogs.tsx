@@ -85,13 +85,13 @@ export function MessageDeliveryLogs({ projectId }: MessageDeliveryLogsProps) {
 	const getStatusIcon = (st: string) => {
 		switch (st) {
 			case "SENT":
-				return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
+				return <CheckCircleIcon className="h-4 w-4 text-success" />;
 			case "FAILED":
-				return <XCircleIcon className="h-4 w-4 text-red-500" />;
+				return <XCircleIcon className="h-4 w-4 text-destructive" />;
 			case "PENDING":
-				return <ClockIcon className="h-4 w-4 text-yellow-500" />;
+				return <ClockIcon className="h-4 w-4 text-chart-1" />;
 			case "SKIPPED":
-				return <AlertCircleIcon className="h-4 w-4 text-gray-500" />;
+				return <AlertCircleIcon className="h-4 w-4 text-muted-foreground" />;
 			default:
 				return null;
 		}

@@ -39,7 +39,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
 				{features.map((feature) => (
 					<div
 						key={feature.label}
-						className="flex flex-col items-center gap-2 rounded-xl border bg-card p-6 shadow-sm"
+						className="flex flex-col items-center gap-2 rounded-xl border-2 bg-card p-6"
 					>
 						<feature.icon className="h-8 w-8 text-primary" />
 						<span className="text-sm font-medium">{feature.label}</span>

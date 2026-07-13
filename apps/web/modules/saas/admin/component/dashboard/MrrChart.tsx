@@ -38,9 +38,9 @@ export function MrrChart({
 					<Line
 						type="monotone"
 						dataKey="amount"
-						stroke="var(--primary)"
+						stroke="var(--chart-1)"
 						strokeWidth={2}
-						dot={{ fill: "var(--primary)" }}
+						dot={{ fill: "var(--chart-1)" }}
 					/>
 				</LineChart>
 			</ResponsiveContainer>

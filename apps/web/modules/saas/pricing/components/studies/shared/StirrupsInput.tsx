@@ -35,10 +35,10 @@ export function StirrupsInput({
 }: StirrupsInputProps) {
 	return (
 		<div
-			className={`rounded-lg p-3 border bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800 ${className || ""}`}
+			className={`rounded-lg p-3 border bg-chart-1/10 border-chart-1/30 ${className || ""}`}
 		>
 			{/* Header */}
-			<div className="font-medium text-sm mb-3 text-amber-700 dark:text-amber-300">
+			<div className="font-medium text-sm mb-3 text-chart-1">
 				{title}
 			</div>
 

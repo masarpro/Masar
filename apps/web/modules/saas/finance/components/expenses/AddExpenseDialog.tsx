@@ -147,14 +147,14 @@ export function AddExpenseDialog({
 					className="flex flex-col overflow-hidden flex-1"
 				>
 					{/* Header */}
-					<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 sm:py-4 shrink-0">
+					<DialogHeader className="bg-card border-b-2 border-border px-3 sm:px-5 py-3 sm:py-4 shrink-0">
 						<DialogTitle className="text-sm sm:text-base font-semibold">
 							{getDialogTitle()}
 						</DialogTitle>
 
 						{/* Tab triggers — hidden in edit mode */}
 						{!isEditMode && (
-							<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1 mt-2 sm:mt-3 grid grid-cols-3 w-full">
+							<TabsList className="rounded-xl bg-muted p-1 mt-2 sm:mt-3 grid grid-cols-3 w-full">
 								<TabsTrigger
 									value="general"
 									className="rounded-lg text-[11px] sm:text-xs px-1 sm:px-3"
@@ -218,7 +218,7 @@ export function AddExpenseDialog({
 					</div>
 
 					{/* Footer */}
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 flex gap-2 sm:gap-3 shrink-0">
+					<div className="bg-muted/50 border-t-2 border-border px-3 sm:px-5 py-3 flex gap-2 sm:gap-3 shrink-0">
 						<Button
 							type="button"
 							variant="outline"

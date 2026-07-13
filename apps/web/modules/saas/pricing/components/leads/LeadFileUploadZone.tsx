@@ -58,7 +58,7 @@ function formatFileSize(bytes: number): string {
 
 function getFileIcon(mimeType: string) {
 	if (mimeType.startsWith("image/")) {
-		return <Image className="h-8 w-8 text-pink-500" />;
+		return <Image className="h-8 w-8 text-chart-2" />;
 	}
 	return <File className="h-8 w-8 text-chart-4" />;
 }
@@ -175,12 +175,12 @@ export function LeadFileUploadZone({
 
 	if (uploadState === "success" && uploadedFile) {
 		return (
-			<div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 dark:border-green-900/50 dark:bg-green-900/10">
+			<div className="rounded-xl border-2 border-success/30 bg-success/10 p-4">
 				<div className="flex items-center gap-3">
 					{getFileIcon(uploadedFile.mimeType)}
 					<div className="min-w-0 flex-1">
 						<p className="truncate text-sm font-medium text-foreground">{uploadedFile.name}</p>
-						<div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+						<div className="flex items-center gap-2 text-xs text-success">
 							<CheckCircle className="h-3.5 w-3.5" />
 							<span>{t("pricing.leads.detail.uploadSuccess")}</span>
 							<span className="text-muted-foreground">•</span>
@@ -197,14 +197,14 @@ export function LeadFileUploadZone({
 
 	if (uploadState === "error") {
 		return (
-			<div className="rounded-xl border-2 border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/10">
+			<div className="rounded-xl border-2 border-destructive/30 bg-destructive/10 p-4">
 				<div className="flex items-center gap-3">
-					<AlertCircle className="h-8 w-8 shrink-0 text-red-500" />
+					<AlertCircle className="h-8 w-8 shrink-0 text-destructive" />
 					<div className="min-w-0 flex-1">
-						<p className="text-sm font-medium text-red-700 dark:text-red-400">{t("pricing.leads.detail.uploadError")}</p>
-						<p className="text-xs text-red-500">{errorMessage}</p>
+						<p className="text-sm font-medium text-destructive">{t("pricing.leads.detail.uploadError")}</p>
+						<p className="text-xs text-destructive">{errorMessage}</p>
 					</div>
-					<Button variant="ghost" size="sm" className="shrink-0 rounded-lg text-red-600" onClick={handleReset}>
+					<Button variant="ghost" size="sm" className="shrink-0 rounded-lg text-destructive" onClick={handleReset}>
 						<RefreshCw className="h-4 w-4 me-1" />
 						{t("pricing.leads.detail.retry")}
 					</Button>

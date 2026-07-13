@@ -295,7 +295,7 @@ export function InvoiceView({
 	if (!invoice) {
 		return (
 			<div className="text-center py-20">
-				<p className="text-slate-500 dark:text-slate-400">
+				<p className="text-muted-foreground">
 					{t("finance.invoices.notFound")}
 				</p>
 			</div>
@@ -305,15 +305,15 @@ export function InvoiceView({
 	// ─── Render ──────────────────────────────────────────────────────────
 
 	return (
-		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 			<div className="space-y-5 max-w-6xl mx-auto">
 
 				{/* ─── Header ─────────────────────────────────────────── */}
-				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50 print:hidden">
+				<div className="sticky top-0 z-20 py-3 px-4 rounded-2xl bg-card border-2 border-border print:hidden">
 					<div className="flex flex-wrap items-center justify-between gap-3 max-w-6xl mx-auto">
 						{/* Start: back + breadcrumb/title */}
 						<div className="flex items-center gap-3 min-w-0">
-							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border">
 								<Link href={`/app/${organizationSlug}/finance/invoices`}>
 									<ArrowRight className="h-4 w-4" />
 								</Link>
@@ -360,13 +360,13 @@ export function InvoiceView({
 						{/* End: Payment status + Issue button */}
 						<div className="flex items-center gap-1.5 shrink-0">
 							{invoice.status === "PAID" && (
-								<div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
+								<div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-success/15 text-success text-xs font-medium">
 									<Check className="h-3 w-3" />
 									{t("finance.invoices.status.paid")}
 								</div>
 							)}
 							{invoice.status === "PARTIALLY_PAID" && (
-								<div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-medium whitespace-nowrap">
+								<div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-chart-1/15 text-chart-1 text-xs font-medium whitespace-nowrap">
 									{t("finance.invoices.remainingAmount")}: <Currency amount={remainingAmount} />
 								</div>
 							)}
@@ -376,7 +376,7 @@ export function InvoiceView({
 								</span>
 							)}
 							{isDraft && (
-								<Button size="sm" onClick={() => setIssueDialogOpen(true)} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
+								<Button size="sm" onClick={() => setIssueDialogOpen(true)} className="h-8 rounded-lg text-xs px-5">
 									<FileCheck className="h-3.5 w-3.5 me-1.5" />
 									{t("finance.invoices.issueInvoice")}
 								</Button>
@@ -386,12 +386,12 @@ export function InvoiceView({
 				</div>
 
 				{/* ─── Action Bar (matches ProjectNavigation style) ── */}
-				<nav className="print:hidden flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg flex-wrap">
+				<nav className="print:hidden flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-card border-2 border-border flex-wrap">
 					{/* Edit — DRAFT only */}
 					{isDraft && (
 						<Link
 							href={`${basePath}/${invoiceId}/edit`}
-							className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+							className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 						>
 							<Edit className="h-4 w-4" />
 							<span className="hidden sm:inline">{t("finance.actions.edit")}</span>
@@ -402,7 +402,7 @@ export function InvoiceView({
 					<button
 						type="button"
 						onClick={() => printDocument()}
-						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+						className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 					>
 						<Printer className="h-4 w-4" />
 						<span className="hidden sm:inline">{t("finance.actions.print")}</span>
@@ -426,7 +426,7 @@ export function InvoiceView({
 								setIsGeneratingPdf(false);
 							}
 						}}
-						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105 disabled:opacity-50"
+						className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
 					>
 						{isGeneratingPdf ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
@@ -444,7 +444,7 @@ export function InvoiceView({
 						<button
 							type="button"
 							onClick={() => setPaymentDialogOpen(true)}
-							className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+							className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 						>
 							<CreditCard className="h-4 w-4" />
 							<span className="hidden sm:inline">{t("finance.invoices.addPayment")}</span>
@@ -456,7 +456,7 @@ export function InvoiceView({
 						<button
 							type="button"
 							onClick={() => router.push(`${basePath}/${invoiceId}/credit-note`)}
-							className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+							className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 						>
 							<FileMinus className="h-4 w-4" />
 							<span className="hidden sm:inline">{t("finance.actions.creditNote")}</span>
@@ -467,7 +467,7 @@ export function InvoiceView({
 					<button
 						type="button"
 						onClick={openNoteDialog}
-						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+						className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 					>
 						<StickyNote className="h-4 w-4" />
 						<span className="hidden sm:inline">{t("finance.actions.addNote")}</span>
@@ -478,7 +478,7 @@ export function InvoiceView({
 						type="button"
 						onClick={() => duplicateMutation.mutate()}
 						disabled={duplicateMutation.isPending}
-						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105 disabled:opacity-50"
+						className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
 					>
 						<Copy className="h-4 w-4" />
 						<span className="hidden sm:inline">{t("finance.actions.duplicate")}</span>
@@ -491,7 +491,7 @@ export function InvoiceView({
 							<button
 								type="button"
 								onClick={() => setDeleteDialogOpen(true)}
-								className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-950/30 hover:scale-105"
+								className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors text-muted-foreground hover:text-destructive hover:bg-destructive/10"
 							>
 								<Trash2 className="h-4 w-4" />
 							</button>
@@ -749,12 +749,12 @@ function DetailsTabContent({
 	return (
 		<div className="space-y-5">
 			{/* ─── Metadata Card ──────────────────────────────────── */}
-			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
-						<FileText className="h-[15px] w-[15px] text-chart-4" />
+			<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+					<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<FileText className="h-[15px] w-[15px]" />
 					</div>
-					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.details.metadata")}</span>
+					<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.details.metadata")}</span>
 				</div>
 				<div className="p-5">
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -762,7 +762,7 @@ function DetailsTabContent({
 						<DetailRow icon={<FileText className="h-4 w-4" />} label={t("finance.invoices.details.invoiceType")} value={t(`finance.invoices.types.${INVOICE_TYPE_KEYS[invoice.invoiceType] || "standard"}`)} />
 
 						<div className="flex items-start gap-3">
-							<div className="mt-1 text-slate-400"><FileCheck className="h-4 w-4" /></div>
+							<div className="mt-1 text-muted-foreground"><FileCheck className="h-4 w-4" /></div>
 							<div>
 								<p className="text-sm text-muted-foreground">{t("finance.invoices.details.status")}</p>
 								<div className="mt-0.5"><StatusBadge status={invoice.status} type="invoice" /></div>
@@ -776,7 +776,7 @@ function DetailsTabContent({
 
 						{invoice.project && (
 							<div className="flex items-start gap-3">
-								<div className="mt-1 text-slate-400"><Link2 className="h-4 w-4" /></div>
+								<div className="mt-1 text-muted-foreground"><Link2 className="h-4 w-4" /></div>
 								<div>
 									<p className="text-sm text-muted-foreground">{t("finance.invoices.details.project")}</p>
 									<Link href={`/app/${organizationSlug}/projects/${invoice.project.slug || invoice.project.id}`} className="text-primary hover:underline font-medium flex items-center gap-1">
@@ -789,7 +789,7 @@ function DetailsTabContent({
 
 						{invoice.quotation && (
 							<div className="flex items-start gap-3">
-								<div className="mt-1 text-slate-400"><Link2 className="h-4 w-4" /></div>
+								<div className="mt-1 text-muted-foreground"><Link2 className="h-4 w-4" /></div>
 								<div>
 									<p className="text-sm text-muted-foreground">{t("finance.invoices.details.quotation")}</p>
 									<Link href={`/app/${organizationSlug}/finance/quotations/${invoice.quotation.id}`} className="text-primary hover:underline font-medium flex items-center gap-1">
@@ -806,7 +806,7 @@ function DetailsTabContent({
 
 						{invoice.zatcaUuid && (
 							<div className="sm:col-span-2 lg:col-span-3 flex items-start gap-3">
-								<div className="mt-1 text-slate-400"><QrCode className="h-4 w-4" /></div>
+								<div className="mt-1 text-muted-foreground"><QrCode className="h-4 w-4" /></div>
 								<div>
 									<p className="text-sm text-muted-foreground">{t("finance.invoices.details.zatcaUuid")}</p>
 									<p className="font-mono text-sm text-foreground break-all">{invoice.zatcaUuid}</p>
@@ -817,18 +817,18 @@ function DetailsTabContent({
 						{/* ZATCA Phase 2 Status */}
 						{invoice.zatcaSubmissionStatus && invoice.zatcaSubmissionStatus !== "NOT_APPLICABLE" && (
 							<div className="sm:col-span-2 lg:col-span-3 flex items-start gap-3">
-								<div className="mt-1 text-slate-400"><FileCheck className="h-4 w-4" /></div>
+								<div className="mt-1 text-muted-foreground"><FileCheck className="h-4 w-4" /></div>
 								<div className="space-y-1.5 flex-1 min-w-0">
 									<p className="text-sm text-muted-foreground">{t("zatca.submission.title")}</p>
 									<div className="flex flex-wrap items-center gap-2">
 										<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
 											invoice.zatcaSubmissionStatus === "CLEARED" || invoice.zatcaSubmissionStatus === "REPORTED"
-												? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+												? "bg-success/15 text-success"
 												: invoice.zatcaSubmissionStatus === "REJECTED"
-													? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+													? "bg-destructive/15 text-destructive"
 													: invoice.zatcaSubmissionStatus === "FAILED"
-														? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-														: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
+														? "bg-chart-1/15 text-chart-1"
+														: "bg-chart-4/15 text-chart-4"
 										}`}>
 											{t(`zatca.submission.${invoice.zatcaSubmissionStatus}`)}
 										</span>
@@ -861,14 +861,14 @@ function DetailsTabContent({
 											const hasErrors = errs.length > 0 || (resp?.errors && resp.errors.length > 0) || resp?.message;
 											if (!hasErrors) return null;
 											return (
-												<div className="mt-2 p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40">
+												<div className="mt-2 p-2.5 rounded-lg bg-destructive/10 border-2 border-destructive/30">
 													<div className="flex items-start gap-2">
-														<AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+														<AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
 														<div className="space-y-1 min-w-0">
-															<p className="text-xs font-semibold text-red-700 dark:text-red-300">
+															<p className="text-xs font-semibold text-destructive">
 																{t("zatca.submission.errorDetails")}
 															</p>
-															<ul className="text-xs text-red-700 dark:text-red-300 space-y-0.5 list-disc ms-4">
+															<ul className="text-xs text-destructive space-y-0.5 list-disc ms-4">
 																{errs.length > 0 ? (
 																	errs.map((e, i) => (
 																		<li key={i} className="break-words">
@@ -898,23 +898,23 @@ function DetailsTabContent({
 			</div>
 
 			{/* ─── Payments List ───────────────────────────────────── */}
-			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/40 dark:to-green-800/20 flex items-center justify-center">
-						<CreditCard className="h-[15px] w-[15px] text-green-500" />
+			<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+					<div className="flex size-8 items-center justify-center rounded-xl bg-success/15 text-success">
+						<CreditCard className="h-[15px] w-[15px]" />
 					</div>
-					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.details.payments")}</span>
+					<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.details.payments")}</span>
 					{invoice.payments && invoice.payments.length > 0 && (
-						<span className="px-2.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold">{invoice.payments.length}</span>
+						<span className="px-2.5 py-0.5 rounded-full bg-success/15 text-success text-[11px] font-bold">{invoice.payments.length}</span>
 					)}
 				</div>
 				<div className="p-5">
 					{invoice.payments && invoice.payments.length > 0 ? (
 						<div className="space-y-2">
 							{invoice.payments.map((payment: any) => (
-								<div key={payment.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+								<div key={payment.id} className="flex items-center justify-between p-3 rounded-xl bg-muted border-2 border-border">
 									<div>
-										<p className="font-medium text-green-600 dark:text-green-400 text-sm"><Currency amount={payment.amount} /></p>
+										<p className="font-medium text-success text-sm"><Currency amount={payment.amount} /></p>
 										<p className="text-xs text-muted-foreground">
 											{formatDate(payment.paymentDate)}
 											{payment.paymentMethod && ` - ${payment.paymentMethod}`}
@@ -938,27 +938,27 @@ function DetailsTabContent({
 			</div>
 
 			{/* ─── Credit Notes List ───────────────────────────────── */}
-			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900/40 dark:to-pink-800/20 flex items-center justify-center">
-						<FileMinus className="h-[15px] w-[15px] text-pink-500" />
+			<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+				<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+					<div className="flex size-8 items-center justify-center rounded-xl bg-destructive/15 text-destructive">
+						<FileMinus className="h-[15px] w-[15px]" />
 					</div>
-					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.details.creditNotes")}</span>
+					<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.details.creditNotes")}</span>
 					{invoice.creditNotes && invoice.creditNotes.length > 0 && (
-						<span className="px-2.5 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 text-[11px] font-bold">{invoice.creditNotes.length}</span>
+						<span className="px-2.5 py-0.5 rounded-full bg-destructive/15 text-destructive text-[11px] font-bold">{invoice.creditNotes.length}</span>
 					)}
 				</div>
 				<div className="p-5">
 					{invoice.creditNotes && invoice.creditNotes.length > 0 ? (
 						<div className="space-y-2">
 							{invoice.creditNotes.map((cn: any) => (
-								<Link key={cn.id} href={`${basePath}/${cn.id}`} className="flex items-center justify-between p-3 rounded-xl bg-pink-50/50 dark:bg-pink-900/10 border border-pink-200/50 dark:border-pink-800/30 hover:bg-pink-100/50 dark:hover:bg-pink-900/20 transition-colors">
+								<Link key={cn.id} href={`${basePath}/${cn.id}`} className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border-2 border-destructive/20 hover:bg-destructive/10 transition-colors">
 									<div>
-										<p className="font-medium text-pink-700 dark:text-pink-400 text-sm">{cn.invoiceNo}</p>
+										<p className="font-medium text-destructive text-sm">{cn.invoiceNo}</p>
 										<p className="text-xs text-muted-foreground">{formatDate(cn.createdAt)}</p>
 									</div>
 									<div className="flex items-center gap-2">
-										<Currency amount={Number(cn.totalAmount)} className="font-medium text-pink-600 dark:text-pink-400 text-sm" />
+										<Currency amount={Number(cn.totalAmount)} className="font-medium text-destructive text-sm" />
 										<StatusBadge status={cn.status} type="invoice" />
 									</div>
 								</Link>
@@ -972,15 +972,15 @@ function DetailsTabContent({
 
 			{/* ─── Related Invoice (if this is a credit note) ──────── */}
 			{invoice.relatedInvoice && (
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-						<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/40 dark:to-slate-700/20 flex items-center justify-center">
-							<Link2 className="h-[15px] w-[15px] text-slate-500" />
+				<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+					<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+						<div className="flex size-8 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+							<Link2 className="h-[15px] w-[15px]" />
 						</div>
-						<span className="text-sm font-semibold text-foreground">{t("finance.invoices.details.relatedInvoice")}</span>
+						<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.details.relatedInvoice")}</span>
 					</div>
 					<div className="p-5">
-						<Link href={`${basePath}/${invoice.relatedInvoice.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors">
+						<Link href={`${basePath}/${invoice.relatedInvoice.id}`} className="flex items-center justify-between p-3 rounded-xl bg-muted border-2 border-border hover:bg-accent transition-colors">
 							<div>
 								<p className="font-medium text-foreground">{invoice.relatedInvoice.invoiceNo}</p>
 								<p className="text-xs text-muted-foreground">{t(`finance.invoices.types.${INVOICE_TYPE_KEYS[invoice.relatedInvoice.invoiceType] || "standard"}`)}</p>
@@ -988,7 +988,7 @@ function DetailsTabContent({
 							<div className="flex items-center gap-2">
 								<Currency amount={Number(invoice.relatedInvoice.totalAmount)} className="font-medium text-sm" />
 								<StatusBadge status={invoice.relatedInvoice.status} type="invoice" />
-								<ExternalLink className="h-4 w-4 text-slate-400" />
+								<ExternalLink className="h-4 w-4 text-muted-foreground" />
 							</div>
 						</Link>
 					</div>
@@ -1026,9 +1026,9 @@ function ActivityTabContent({
 
 	if (logs.length === 0) {
 		return (
-			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden py-12">
+			<div className="bg-card rounded-2xl border-2 border-border overflow-hidden py-12">
 				<div className="text-center">
-					<Clock className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+					<Clock className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
 					<p className="text-muted-foreground">{t("finance.invoices.activity.empty")}</p>
 				</div>
 			</div>
@@ -1036,18 +1036,18 @@ function ActivityTabContent({
 	}
 
 	return (
-		<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-				<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/40 dark:to-violet-800/20 flex items-center justify-center">
-					<Clock className="h-[15px] w-[15px] text-violet-500" />
+		<div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-border">
+				<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+					<Clock className="h-[15px] w-[15px]" />
 				</div>
-				<span className="text-sm font-semibold text-foreground">{t("finance.invoices.activity.title")}</span>
-				<span className="px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-[11px] font-bold">{logs.length}</span>
+				<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.activity.title")}</span>
+				<span className="px-2.5 py-0.5 rounded-full bg-chart-4/15 text-chart-4 text-[11px] font-bold">{logs.length}</span>
 			</div>
 			<div className="p-5">
 				<div className="relative">
 					{/* Timeline line */}
-					<div className="absolute top-0 bottom-0 start-4 w-0.5 bg-slate-200 dark:bg-slate-700" />
+					<div className="absolute top-0 bottom-0 start-4 w-0.5 bg-border" />
 
 					<div className="space-y-6">
 						{logs.map((log: any) => (

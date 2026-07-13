@@ -39,7 +39,7 @@ export function CompactStatGrid({ items, className }: CompactStatGridProps) {
 				<div
 					key={item.label}
 					className={cn(
-						"flex items-center gap-2.5 rounded-xl border border-slate-200/60 bg-white/80 px-3 py-2.5 backdrop-blur-sm dark:border-slate-700/40 dark:bg-slate-900/70",
+						"flex items-center gap-2.5 rounded-xl border-2 border-border bg-card px-3 py-2.5",
 						// عدد فردي: العنصر الأخير يمتد بعرض كامل بدل بطاقة يتيمة مشوهة
 						isOdd && index === items.length - 1 && "col-span-2",
 					)}
@@ -47,24 +47,24 @@ export function CompactStatGrid({ items, className }: CompactStatGridProps) {
 					<div
 						className={cn(
 							"shrink-0 rounded-lg p-1.5",
-							item.iconBgClassName ?? "bg-slate-100 dark:bg-slate-800/60",
+							item.iconBgClassName ?? "bg-muted",
 						)}
 					>
 						<item.icon
 							className={cn(
 								"h-4 w-4",
 								item.iconClassName ??
-									"text-slate-500 dark:text-slate-400",
+									"text-muted-foreground",
 							)}
 						/>
 					</div>
 					<div className="min-w-0 flex-1">
-						<p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">
+						<p className="truncate text-xs font-medium text-muted-foreground">
 							{item.label}
 						</p>
 						<p
 							className={cn(
-								"truncate text-base font-bold tabular-nums text-slate-900 dark:text-slate-100",
+								"truncate text-base font-bold tabular-nums text-foreground",
 								item.valueClassName,
 							)}
 						>
@@ -72,7 +72,7 @@ export function CompactStatGrid({ items, className }: CompactStatGridProps) {
 						</p>
 					</div>
 					{item.hint ? (
-						<div className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">
+						<div className="shrink-0 text-[10px] text-muted-foreground">
 							{item.hint}
 						</div>
 					) : null}
