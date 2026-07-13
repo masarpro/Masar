@@ -81,3 +81,5 @@ export * from "./accounting-health";
 export * from "./client-statements";
 // Account Statements (journal-based)
 export * from "./account-statements";
+// Global Organization Search
+export * from "./search";

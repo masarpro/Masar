@@ -5760,8 +5760,19 @@
     "back": "Back",
     "forward": "Forward",
     "search": "Search",
-    "searchPlaceholder": "Search sections and pages…",
+    "searchPlaceholder": "Search anything: invoice, client, study, quotation…",
     "searchEmpty": "No results found.",
+    "searching": "Searching…",
+    "searchGroups": {
+      "projects": "Projects",
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "clients": "Clients",
+      "studies": "Cost studies",
+      "quotations": "Quotations",
+      "leads": "Leads",
+      "employees": "Employees"
+    },
     "themeLight": "Light",
     "themeDark": "Dark",
     "quickAdd": {

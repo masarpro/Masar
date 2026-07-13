@@ -45,6 +45,7 @@ import { handoverRouter } from "../modules/handover/router";
 import { zatcaRouter } from "../modules/zatca/router";
 import { categoriesRouter } from "../modules/categories/router";
 import { unifiedQuantitiesRouter } from "../modules/unified-quantities/router";
+import { searchRouter } from "../modules/search/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -118,6 +119,8 @@ export const router = publicProcedure.router({
 	categories: categoriesRouter,
 	// Unified Quantities Engine - محرك الكميات والتسعير الموحَّد (تشطيبات + MEP)
 	unifiedQuantities: unifiedQuantitiesRouter,
+	// Global Search - البحث الشامل داخل المنظمة
+	search: searchRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

@@ -5765,8 +5765,19 @@
     "back": "رجوع",
     "forward": "تقدّم",
     "search": "بحث",
-    "searchPlaceholder": "ابحث في الأقسام والصفحات…",
+    "searchPlaceholder": "ابحث عن أي شيء: فاتورة، عميل، دراسة، عرض سعر…",
     "searchEmpty": "لا توجد نتائج.",
+    "searching": "جارٍ البحث…",
+    "searchGroups": {
+      "projects": "المشاريع",
+      "invoices": "الفواتير",
+      "payments": "الدفعات",
+      "clients": "العملاء",
+      "studies": "دراسات التكلفة",
+      "quotations": "عروض الأسعار",
+      "leads": "العملاء المحتملون",
+      "employees": "الموظفون"
+    },
     "themeLight": "فاتح",
     "themeDark": "داكن",
     "quickAdd": {
