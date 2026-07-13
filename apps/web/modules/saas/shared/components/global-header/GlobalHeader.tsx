@@ -7,34 +7,40 @@ import { useSession } from "@saas/auth/hooks/use-session";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { NotificationBell } from "@saas/shared/components/NotificationBell";
 import { UserAvatar } from "@shared/components/UserAvatar";
-import { ColorModeToggle } from "@shared/components/ColorModeToggle";
+import { cn } from "@ui/lib";
 import { Button } from "@ui/components/button";
 import React from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/dropdown-menu";
 import {
-	Building2,
-	Calculator,
-	FolderKanban,
-	Home,
+	ChevronLeft,
+	ChevronRight,
 	LanguagesIcon,
 	LogOutIcon,
 	Menu,
+	MoonIcon,
 	Settings,
-	Wallet,
+	SunIcon,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import { useIsClient } from "usehooks-ts";
 import { useSidebar } from "../sidebar/sidebar-context";
 import { useIsMobile } from "../sidebar/use-is-mobile";
+import { HeaderQuickAdd } from "./HeaderQuickAdd";
+import { HeaderSearch } from "./HeaderSearch";
+
+/** Botly top-bar icon-button treatment (69:1786): 44px, 12px radius, ghost. */
+const iconButtonClass = cn(
+	"flex size-11 items-center justify-center rounded-xl text-foreground transition-colors",
+	"hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+);
 
 export const GlobalHeader = React.memo(function GlobalHeader() {
 	const t = useTranslations();
@@ -48,24 +54,17 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 	const { setMobileOpen } = useSidebar();
 	const isMobile = useIsMobile();
 
-	// Determine current section from pathname
-	let SectionIcon: LucideIcon = Home;
+	// Section label = page title (Botly big bold headline).
 	let sectionLabel = t("app.menu.home");
-
 	if (pathname.includes("/finance")) {
-		SectionIcon = Wallet;
 		sectionLabel = t("app.menu.finance");
 	} else if (pathname.includes("/projects")) {
-		SectionIcon = FolderKanban;
 		sectionLabel = t("app.menu.projects");
 	} else if (pathname.includes("/pricing")) {
-		SectionIcon = Calculator;
 		sectionLabel = t("app.menu.pricing");
 	} else if (pathname.includes("/company")) {
-		SectionIcon = Building2;
 		sectionLabel = t("app.menu.company");
 	} else if (pathname.includes("/settings")) {
-		SectionIcon = Settings;
 		sectionLabel = t("app.menu.organizationSettings");
 	}
 
@@ -84,37 +83,56 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 
 	const onSwitchLocale = () => {
 		const newLocale = locale === "ar" ? "en" : "ar";
-		localeRouter.replace(
-			`${localePathname}?${searchParams.toString()}`,
-			{ locale: newLocale },
-		);
+		localeRouter.replace(`${localePathname}?${searchParams.toString()}`, {
+			locale: newLocale,
+		});
 	};
 
 	return (
-		// Botly Top bar (69:1786): flat, no divider, roomy 64px with 48px icon buttons
-		<header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between bg-background px-4">
-			{/* Start side: mobile hamburger + section icon + section name */}
-			<div className="flex items-center gap-2.5">
+		// Botly Top bar (69:1786): flat, no divider, big bold title + nav chevrons
+		// on the leading side; icon buttons + avatar on the trailing side. Padding
+		// aligns with the content cards below it.
+		<header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 bg-background px-3 xl:h-20 xl:px-8">
+			{/* Leading side: mobile hamburger + page title + back/forward chevrons */}
+			<div className="flex min-w-0 items-center gap-2 xl:gap-6">
 				{isMobile && (
 					<Button
 						variant="ghost"
 						size="icon"
-						className="h-9 w-9 rounded-lg"
+						className="size-10 rounded-xl"
 						onClick={() => setMobileOpen(true)}
 						aria-label="Open menu"
 					>
-						<Menu className="h-5 w-5" />
+						<Menu className="size-5" />
 					</Button>
 				)}
-				<SectionIcon className="h-5 w-5 text-foreground" />
-				<span className="text-base font-semibold text-foreground">
+				<h1 className="truncate text-xl font-bold text-foreground xl:text-3xl">
 					{sectionLabel}
-				</span>
+				</h1>
+				<div className="hidden items-center sm:flex">
+					<button
+						type="button"
+						onClick={() => window.history.back()}
+						className={cn(iconButtonClass, "size-10")}
+						aria-label={t("globalHeader.back")}
+					>
+						<ChevronLeft className="size-5 rtl-flip" />
+					</button>
+					<button
+						type="button"
+						onClick={() => window.history.forward()}
+						className={cn(iconButtonClass, "size-10")}
+						aria-label={t("globalHeader.forward")}
+					>
+						<ChevronRight className="size-5 rtl-flip" />
+					</button>
+				</div>
 			</div>
 
-			{/* End side: color mode + notifications + user avatar (Botly: 48px icon buttons + 40px avatar) */}
-			<div className="flex items-center gap-1.5">
-				<ColorModeToggle />
+			{/* Trailing side: quick-add + search + notifications + avatar */}
+			<div className="flex items-center gap-1 xl:gap-2">
+				<HeaderQuickAdd />
+				<HeaderSearch />
 
 				{activeOrganization?.id && (
 					<NotificationBell
@@ -123,55 +141,128 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 					/>
 				)}
 
-				{/* User avatar + dropdown */}
+				{/* Avatar + Botly profile card dropdown (75:2472) */}
 				<DropdownMenu modal={false}>
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="ms-1.5 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+							className="ms-1 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
 							aria-label="User menu"
 						>
 							<UserAvatar
 								name={user?.name ?? ""}
 								avatarUrl={user?.image}
-								className="h-10 w-10"
+								className="size-11"
 							/>
 						</button>
 					</DropdownMenuTrigger>
 
-					<DropdownMenuContent align="end" className="w-56">
-						<DropdownMenuLabel>
-							{user?.name}
-							<span className="block text-xs font-normal opacity-70">
-								{user?.email}
-							</span>
-						</DropdownMenuLabel>
+					<DropdownMenuContent
+						align="end"
+						sideOffset={12}
+						className="w-72 overflow-hidden rounded-[20px] p-0 shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]"
+					>
+						{/* User block */}
+						<div className="flex items-center gap-4 border-b px-6 py-5">
+							<div className="min-w-0 flex-1">
+								<p className="truncate text-lg font-semibold text-foreground">
+									{user?.name}
+								</p>
+								<p className="truncate text-sm text-muted-foreground">
+									{user?.email}
+								</p>
+							</div>
+							<UserAvatar
+								name={user?.name ?? ""}
+								avatarUrl={user?.image}
+								className="size-14 shrink-0"
+							/>
+						</div>
 
-						<DropdownMenuSeparator />
+						{/* Actions */}
+						<div className="flex flex-col gap-1 px-3 py-2">
+							<DropdownMenuItem
+								asChild
+								className="rounded-xl px-4 py-3 text-base font-semibold text-muted-foreground focus:text-foreground"
+							>
+								<Link href="/app/settings/general">
+									<Settings className="me-3 size-5" />
+									{t("app.userMenu.accountSettings")}
+								</Link>
+							</DropdownMenuItem>
 
-						<DropdownMenuItem asChild>
-							<Link href="/app/settings/general">
-								<Settings className="me-2 h-4 w-4" />
-								{t("app.userMenu.accountSettings")}
-							</Link>
-						</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={onSwitchLocale}
+								className="rounded-xl px-4 py-3 text-base font-semibold text-muted-foreground focus:text-foreground"
+							>
+								<LanguagesIcon className="me-3 size-5" />
+								{locale === "ar"
+									? t("globalHeader.switchToEnglish")
+									: t("globalHeader.switchToArabic")}
+							</DropdownMenuItem>
+						</div>
 
-						<DropdownMenuItem onClick={onSwitchLocale}>
-							<LanguagesIcon className="me-2 h-4 w-4" />
-							{locale === "ar"
-								? t("globalHeader.switchToEnglish")
-								: t("globalHeader.switchToArabic")}
-						</DropdownMenuItem>
+						{/* Segmented Light/Dark toggle */}
+						<div className="border-y px-3 py-4">
+							<ThemeSegmentedToggle />
+						</div>
 
-						<DropdownMenuSeparator />
-
-						<DropdownMenuItem onClick={onLogout}>
-							<LogOutIcon className="me-2 h-4 w-4" />
-							{t("app.userMenu.logout")}
-						</DropdownMenuItem>
+						{/* Log out */}
+						<div className="px-3 py-2">
+							<DropdownMenuItem
+								onClick={onLogout}
+								className="rounded-xl px-4 py-3 text-base font-semibold text-muted-foreground focus:text-foreground"
+							>
+								<LogOutIcon className="me-3 size-5" />
+								{t("app.userMenu.logout")}
+							</DropdownMenuItem>
+						</div>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
 		</header>
 	);
 });
+
+/** Botly two-cell segmented Light/Dark control (75:2438). */
+function ThemeSegmentedToggle() {
+	const t = useTranslations();
+	const { resolvedTheme, setTheme } = useTheme();
+	const isClient = useIsClient();
+	// Before hydration, assume light so the markup is stable (no flash of the
+	// wrong active cell). resolvedTheme fills in on mount.
+	const active = isClient ? resolvedTheme : "light";
+
+	const options = [
+		{ value: "light", label: t("globalHeader.themeLight"), icon: SunIcon },
+		{ value: "dark", label: t("globalHeader.themeDark"), icon: MoonIcon },
+	];
+
+	return (
+		<div className="flex items-center gap-1 rounded-lg border-2 p-1">
+			{options.map((option) => {
+				const isActive = active === option.value;
+				return (
+					<button
+						key={option.value}
+						type="button"
+						onClick={(e) => {
+							// Keep the dropdown open while switching themes.
+							e.preventDefault();
+							setTheme(option.value);
+						}}
+						className={cn(
+							"flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-1.5 text-base font-semibold transition-colors",
+							isActive
+								? "bg-muted text-foreground"
+								: "text-muted-foreground hover:text-foreground",
+						)}
+					>
+						<option.icon className="size-4" />
+						{option.label}
+					</button>
+				);
+			})}
+		</div>
+	);
+}

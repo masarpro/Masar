@@ -109,7 +109,7 @@ export function NotificationBell({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="relative"
+					className="relative size-11 rounded-xl"
 					aria-label={t("notifications.title")}
 				>
 					<BellIcon className="size-5" />

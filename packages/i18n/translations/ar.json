@@ -5761,7 +5761,23 @@
   },
   "globalHeader": {
     "switchToEnglish": "English",
-    "switchToArabic": "العربية"
+    "switchToArabic": "العربية",
+    "back": "رجوع",
+    "forward": "تقدّم",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث في الأقسام والصفحات…",
+    "searchEmpty": "لا توجد نتائج.",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "quickAdd": {
+      "title": "إنشاء جديد",
+      "project": "مشروع جديد",
+      "invoice": "فاتورة جديدة",
+      "payment": "دفعة جديدة",
+      "client": "عميل جديد",
+      "quotation": "عرض سعر جديد",
+      "lead": "عميل محتمل جديد"
+    }
   },
   "hero": {
     "badge": "🇸🇦 مصمّم للسوق السعودي",

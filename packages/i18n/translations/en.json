@@ -5756,7 +5756,23 @@
   },
   "globalHeader": {
     "switchToEnglish": "English",
-    "switchToArabic": "العربية"
+    "switchToArabic": "العربية",
+    "back": "Back",
+    "forward": "Forward",
+    "search": "Search",
+    "searchPlaceholder": "Search sections and pages…",
+    "searchEmpty": "No results found.",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "quickAdd": {
+      "title": "Create new",
+      "project": "New project",
+      "invoice": "New invoice",
+      "payment": "New payment",
+      "client": "New client",
+      "quotation": "New quotation",
+      "lead": "New lead"
+    }
   },
   "hero": {
     "badge": "🇸🇦 Built for the Saudi Market",

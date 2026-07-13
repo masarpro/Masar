@@ -45,33 +45,35 @@ export function ProjectsDonutCard({
 	].filter((s) => s.value > 0);
 
 	return (
-		<div className="flex h-full min-h-0 flex-col gap-3 rounded-3xl border-2 bg-card p-5">
-			<p className="shrink-0 text-base font-semibold text-card-foreground">
+		// Botly Audiences widget (69:3173): 32px card, px-8 py-6, 20px title,
+		// huge percentage figure, 16px legend swatches with 16px semibold labels.
+		<div className="flex h-full min-h-0 flex-col gap-4 rounded-[var(--botly-radius-card)] border-2 bg-card px-8 py-6">
+			<p className="shrink-0 text-xl font-semibold text-card-foreground">
 				{t("dashboard.operational.title")}
 			</p>
-			<div className="flex min-h-0 flex-1 items-center gap-4">
-				<div className="size-20 shrink-0 xl:size-24">
+			<div className="flex min-h-0 flex-1 items-center gap-6">
+				<div className="size-24 shrink-0 xl:size-28">
 					{total > 0 ? (
 						<ProjectsDonutChart data={segments} />
 					) : (
-						<div className="size-20 rounded-full border-[12px] border-muted xl:size-24" />
+						<div className="size-24 rounded-full border-[16px] border-muted xl:size-28" />
 					)}
 				</div>
 				<div className="min-w-0 flex-1">
-					<p className="text-2xl font-bold tabular-nums text-card-foreground xl:text-3xl">
+					<p className="text-5xl font-bold leading-none tabular-nums text-card-foreground xl:text-6xl">
 						{activePct}%
 					</p>
-					<div className="mt-1.5 space-y-1">
+					<div className="mt-3 space-y-2">
 						{segments.map((s) => (
-							<div key={s.name} className="flex items-center gap-2 text-xs">
+							<div key={s.name} className="flex items-center gap-2 text-base">
 								<span
-									className="size-2.5 shrink-0 rounded-[3px]"
+									className="size-4 shrink-0 rounded-[4px]"
 									style={{ backgroundColor: s.color }}
 								/>
-								<span className="truncate text-muted-foreground">
+								<span className="truncate font-semibold text-card-foreground">
 									{s.name}
 								</span>
-								<span className="ms-auto font-semibold tabular-nums text-card-foreground">
+								<span className="ms-auto font-semibold tabular-nums text-muted-foreground">
 									{s.value}
 								</span>
 							</div>

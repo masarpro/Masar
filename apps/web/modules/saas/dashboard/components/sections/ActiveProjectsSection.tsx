@@ -91,15 +91,17 @@ export function ActiveProjectsSection({
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border-2 bg-card p-5">
+		// Botly Earnings table (71:4242): 32px card, px-8 py-6, 20px title,
+		// 14px medium column labels with roomy header/row spacing.
+		<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--botly-radius-card)] border-2 bg-card px-8 py-6">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between">
-				<p className="text-base font-semibold text-card-foreground">
+				<p className="text-xl font-semibold text-card-foreground">
 					{t("dashboard.activeProjects")}
 				</p>
 				<Link
 					href={`/app/${organizationSlug}/projects`}
-					className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+					className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
 				>
 					{t("dashboard.viewAll")}
 					<ChevronLeft className="h-3 w-3 rtl-flip" />
@@ -107,7 +109,7 @@ export function ActiveProjectsSection({
 			</div>
 
 			{/* Column labels (single-line table title row) */}
-			<div className="mt-3 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto] items-center gap-3 border-b-2 pb-2 text-xs font-medium text-muted-foreground sm:grid">
+			<div className="mt-4 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto] items-center gap-3 border-b-2 pb-4 text-sm font-medium text-muted-foreground sm:grid">
 				<span className="truncate">{t("dashboard.activeProjects")}</span>
 				<span className="truncate">{t("projects.overview.progress")}</span>
 				<span className="truncate">{t("dashboard.projectCard.paymentsShort")}</span>
