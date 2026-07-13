@@ -3,15 +3,16 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { PricingBalanceCards } from "./PricingBalanceCards";
+import { Currency } from "@saas/finance/components/shared/Currency";
 import { PricingActionCards } from "./PricingActionCards";
 import { PricingStatsCards } from "./PricingStatsCards";
 import { PricingRecentDocsTable } from "./PricingRecentDocsTable";
 import { PricingDeadlinesCard } from "./PricingDeadlinesCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ModuleHeroCard } from "@saas/shared/components/ModuleHeroCard";
 import { Skeleton } from "@ui/components/skeleton";
-import { PricingHeader } from "./PricingHeader";
 
 const PricingPipelineChart = dynamic(
 	() => import("./PricingPipelineChart").then((m) => ({ default: m.PricingPipelineChart })),
@@ -27,6 +28,7 @@ export function PricingDashboard({
 	organizationId,
 	userName,
 }: PricingDashboardProps) {
+	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
 	const orgSlug = activeOrganization?.slug ?? "";
 
@@ -50,14 +52,28 @@ export function PricingDashboard({
 
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* 0. Blue Header */}
-			<PricingHeader userName={userName} />
-
-			{/* 1. Balance Cards (Studies Value, Active Quotations, Leads Pipeline) */}
-			<PricingBalanceCards
-				studiesValue={studies?.totalValue ?? 0}
-				activeQuotationsValue={quotations?.activeValue ?? 0}
-				leadsOpenValue={leads?.openEstimatedValue ?? 0}
+			{/* 0. Botly module hero — page name + primary action + KPI strip */}
+			<ModuleHeroCard
+				title={t("pricing.title")}
+				subtitle={`${t("pricing.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
+				cta={{
+					label: t("pricing.studies.newStudy"),
+					href: `/app/${orgSlug}/pricing/studies?new=1`,
+				}}
+				stats={[
+					{
+						label: t("pricing.dashboard.overview.studiesValue"),
+						value: <Currency amount={studies?.totalValue ?? 0} />,
+					},
+					{
+						label: t("pricing.dashboard.overview.activeQuotations"),
+						value: <Currency amount={quotations?.activeValue ?? 0} />,
+					},
+					{
+						label: t("pricing.dashboard.overview.leadsPipeline"),
+						value: <Currency amount={leads?.openEstimatedValue ?? 0} />,
+					},
+				]}
 			/>
 
 			{/* 2. Pipeline Chart */}

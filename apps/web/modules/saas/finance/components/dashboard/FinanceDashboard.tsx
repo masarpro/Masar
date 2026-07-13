@@ -3,15 +3,16 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { BalanceCards } from "./BalanceCards";
 import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ModuleHeroCard } from "@saas/shared/components/ModuleHeroCard";
 import { Skeleton } from "@ui/components/skeleton";
-import { FinanceHeader } from "./FinanceHeader";
+import { Currency } from "../shared/Currency";
 
 const CashFlowCard = dynamic(
 	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
@@ -27,6 +28,7 @@ export function FinanceDashboard({
 	organizationId,
 	userName,
 }: FinanceDashboardProps) {
+	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
 	const orgSlug = activeOrganization?.slug ?? "";
 
@@ -55,14 +57,28 @@ export function FinanceDashboard({
 
 	return (
 		<div className="space-y-6">
-			{/* 0. Blue Header */}
-			<FinanceHeader userName={userName} />
-
-			{/* 1. Balance Cards (Cash, Bank, Net Profit) */}
-			<BalanceCards
-				cashBalance={cashBalance}
-				bankBalance={bankBalance}
-				netProfit={netProfit}
+			{/* 0. Botly module hero — page name + primary action + balance strip */}
+			<ModuleHeroCard
+				title={t("finance.title")}
+				subtitle={`${t("finance.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
+				cta={{
+					label: t("finance.pages.accountingDashboard"),
+					href: `/app/${orgSlug}/finance/accounting-dashboard`,
+				}}
+				stats={[
+					{
+						label: t("finance.dashboard.overview.cashBalance"),
+						value: <Currency amount={cashBalance} />,
+					},
+					{
+						label: t("finance.dashboard.overview.bankBalance"),
+						value: <Currency amount={bankBalance} />,
+					},
+					{
+						label: t("finance.dashboard.overview.netProfit"),
+						value: <Currency amount={netProfit} />,
+					},
+				]}
 			/>
 
 			{/* 3. Cash Flow Chart */}

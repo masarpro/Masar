@@ -1,0 +1,84 @@
+"use client";
+
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
+
+interface ModuleHeroCardProps {
+	/** Page name shown as the big headline (e.g. "المالية", "التسعير"). */
+	title: string;
+	/** Optional greeting / context line under the title. */
+	subtitle?: string;
+	/** KPI cells rendered in the glass strip along the bottom. */
+	stats: Array<{ label: string; value: ReactNode }>;
+	/** Primary Botly button in the top-trailing corner. */
+	cta?: { label: string; href: string };
+}
+
+/**
+ * Botly "Unlock pro insights" hero (Figma 45:4531) generalised for module
+ * landing pages (finance, pricing) so they share the home dashboard's signature
+ * big card: gradient rounded-[32px], page name top-leading, primary #1d1d1d
+ * button top-trailing, and a glass KPI strip along the bottom. Unlike the home
+ * `BotlyHero` (fixed-viewport, absolute), this flows normally since these pages
+ * scroll. Light art is kept in dark mode, exactly like Botly's dark dashboard.
+ */
+export function ModuleHeroCard({
+	title,
+	subtitle,
+	stats,
+	cta,
+}: ModuleHeroCardProps) {
+	return (
+		<div
+			className="relative overflow-hidden rounded-[32px] p-3"
+			style={{
+				backgroundImage:
+					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
+			}}
+		>
+			{/* Title + primary action */}
+			<div className="flex items-start gap-3 px-3 pt-3 pb-6 xl:px-6 xl:pt-6 xl:pb-8">
+				<div className="min-w-0 flex-1">
+					<h2 className="truncate text-xl font-bold leading-tight text-[#1d1d1d] xl:text-3xl">
+						{title}
+					</h2>
+					{subtitle && (
+						<p className="mt-1 truncate text-sm font-medium text-[#1d1d1d]/70 xl:text-base">
+							{subtitle}
+						</p>
+					)}
+				</div>
+				{cta && (
+					// Botly Button 45:4490: #1d1d1d, rounded-12, semibold.
+					<Link
+						href={cta.href}
+						className="hidden shrink-0 items-center justify-center gap-2 rounded-[12px] bg-[#1d1d1d] px-4 py-2.5 text-sm font-semibold leading-6 text-white transition-opacity hover:opacity-90 sm:flex"
+					>
+						{cta.label}
+						<ChevronLeft className="size-5 rtl-flip" />
+					</Link>
+				)}
+			</div>
+
+			{/* Glass KPI strip — Figma 45:4463 */}
+			{stats.length > 0 && (
+				<div className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5">
+					{stats.map((s) => (
+						<div
+							key={s.label}
+							className="flex min-w-0 flex-1 flex-col gap-1 xl:gap-1.5"
+						>
+							<p className="truncate text-xs font-semibold leading-tight text-[#1d1d1d] xl:text-[17px] xl:leading-6">
+								{s.label}
+							</p>
+							<p className="truncate text-xl font-bold tabular-nums leading-none tracking-[-0.5px] text-[#1d1d1d] xl:text-4xl xl:leading-[1.1]">
+								{s.value}
+							</p>
+						</div>
+					))}
+				</div>
+			)}
+		</div>
+	);
+}
