@@ -52,13 +52,16 @@ export function PricingPipelineChart({ pipeline }: PricingPipelineChartProps) {
 	];
 
 	return (
-		<div className="bg-card border-2 rounded-3xl p-6">
-			<div className="flex items-center justify-between mb-4">
+		<div className="flex h-full min-h-0 flex-col bg-card border-2 rounded-3xl p-6">
+			<div className="flex shrink-0 items-center justify-between mb-4">
 				<h3 className="text-sm font-semibold text-card-foreground">
 					{t("pricing.dashboard.pipeline.title")}
 				</h3>
 			</div>
-			<ChartContainer config={chartConfig} className="h-40 w-full">
+			<ChartContainer
+				config={chartConfig}
+				className="h-40 w-full lg:h-auto lg:min-h-0 lg:flex-1"
+			>
 				<BarChart
 					accessibilityLayer
 					data={data}
