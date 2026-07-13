@@ -138,7 +138,7 @@ export function EditPaymentDialog({
 				<form onSubmit={handleSubmit} className="space-y-4">
 					{/* Split payment hint */}
 					{isSplit && (
-						<div className="rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-300">
+						<div className="rounded-xl border border-chart-4 bg-chart-4/15 p-3 text-xs text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
 							{t("projectPayments.splitEditHint")}
 						</div>
 					)}

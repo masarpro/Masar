@@ -853,7 +853,7 @@ function ActivationCodeSection() {
 							}}
 							className={`font-mono text-center tracking-wider text-base h-12 ${
 								validationError
-									? "border-red-500 focus-visible:ring-red-500"
+									? "border-destructive focus-visible:ring-destructive"
 									: ""
 							}`}
 							dir="ltr"

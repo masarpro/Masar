@@ -170,18 +170,18 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 	return (
 		<>
 			{/* Payments Table */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
-				<div className="flex flex-col gap-3 border-b border-slate-100 p-5 dark:border-slate-800">
+			<div className="overflow-hidden rounded-2xl border border-border bg-white dark:border-border dark:bg-muted">
+				<div className="flex flex-col gap-3 border-b border-border p-5 dark:border-border">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							<div className="rounded-lg bg-chart-4/15 p-2 dark:bg-chart-4/20">
 								<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 							</div>
 							<div>
-								<h2 className="font-semibold text-slate-800 dark:text-slate-200">
+								<h2 className="font-semibold text-muted-foreground dark:text-muted-foreground">
 									{t("subcontracts.detail.paymentsHistory")}
 								</h2>
-								<p className="text-xs text-slate-500">
+								<p className="text-xs text-muted-foreground">
 									{payments?.length ?? 0} {t("subcontracts.detail.paymentsCount")}
 								</p>
 							</div>
@@ -200,7 +200,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 					{(payments?.length ?? 0) > 0 && (
 						<div className="flex items-center gap-2">
 							<div className="relative max-w-xs flex-1">
-								<Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+								<Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									placeholder={t("subcontracts.detail.searchPayments")}
 									value={paymentSearch}
@@ -216,7 +216,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 										size="sm"
 										className={`h-8 rounded-lg px-2.5 text-[11px] ${
 											paymentSortBy === field
-												? "bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
+												? "bg-muted text-white hover:bg-muted dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted"
 												: ""
 										}`}
 										onClick={() => {
@@ -256,13 +256,13 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 							<TableBody>
 								{filteredPayments.map((payment) => (
 									<TableRow key={payment.id}>
-										<TableCell className="font-mono text-xs text-slate-500">
+										<TableCell className="font-mono text-xs text-muted-foreground">
 											{payment.paymentNo}
 										</TableCell>
 										<TableCell className="text-sm">
 											{format(new Date(payment.date), "dd/MM/yyyy", { locale: ar })}
 										</TableCell>
-										<TableCell className="font-semibold text-red-600 dark:text-red-400">
+										<TableCell className="font-semibold text-destructive dark:text-destructive">
 											{formatCurrency(payment.amount)}
 										</TableCell>
 										<TableCell className="text-xs">
@@ -276,7 +276,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 													{payment.term.label || t(`subcontracts.termTypes.${payment.term.type}`)}
 												</Badge>
 											) : (
-												<span className="text-xs text-slate-400">-</span>
+												<span className="text-xs text-muted-foreground">-</span>
 											)}
 										</TableCell>
 										<TableCell>
@@ -285,13 +285,13 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 													{t("claims.linkedToClaim", { claimNo: String(claimMap.get(payment.claimId) ?? 0) })}
 												</Badge>
 											) : (
-												<span className="text-xs text-slate-400">-</span>
+												<span className="text-xs text-muted-foreground">-</span>
 											)}
 										</TableCell>
-										<TableCell className="text-xs text-slate-500">
+										<TableCell className="text-xs text-muted-foreground">
 											{payment.sourceAccount?.name ?? "-"}
 										</TableCell>
-										<TableCell className="font-mono text-xs text-slate-500" dir="ltr">
+										<TableCell className="font-mono text-xs text-muted-foreground" dir="ltr">
 											{payment.referenceNo ?? "-"}
 										</TableCell>
 									</TableRow>
@@ -300,32 +300,32 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 						</Table>
 
 						{/* Totals row */}
-						<div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/50">
-							<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<div className="flex items-center justify-between border-t border-border bg-muted px-4 py-3 dark:border-border dark:bg-muted">
+							<span className="text-sm font-semibold text-muted-foreground dark:text-muted-foreground">
 								{t("subcontracts.detail.paymentsTotalLabel")}
 							</span>
 							<div className="flex items-center gap-6 text-sm">
 								<span>
-									<span className="text-slate-500">{t("subcontracts.detail.totalPaid")}: </span>
-									<span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(totalPaid)}</span>
+									<span className="text-muted-foreground">{t("subcontracts.detail.totalPaid")}: </span>
+									<span className="font-bold text-destructive dark:text-destructive">{formatCurrency(totalPaid)}</span>
 								</span>
 								<span>
-									<span className="text-slate-500">{t("subcontracts.detail.remaining")}: </span>
-									<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-chart-4"}`}>{formatCurrency(remaining)}</span>
+									<span className="text-muted-foreground">{t("subcontracts.detail.remaining")}: </span>
+									<span className={`font-bold ${isOverBudget ? "text-destructive" : "text-chart-4"}`}>{formatCurrency(remaining)}</span>
 								</span>
 							</div>
 						</div>
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-10 text-center">
-						<div className="mb-3 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+						<div className="mb-3 rounded-2xl bg-muted p-4 dark:bg-muted">
 							{paymentSearch ? (
-								<Search className="h-8 w-8 text-slate-400" />
+								<Search className="h-8 w-8 text-muted-foreground" />
 							) : (
-								<Banknote className="h-8 w-8 text-slate-400" />
+								<Banknote className="h-8 w-8 text-muted-foreground" />
 							)}
 						</div>
-						<p className="text-sm text-slate-500">
+						<p className="text-sm text-muted-foreground">
 							{paymentSearch
 								? t("subcontracts.detail.noSearchResults")
 								: t("subcontracts.detail.noPayments")}

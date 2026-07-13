@@ -11,8 +11,6 @@ import {
 	MapPin,
 	Plus,
 	Receipt,
-	TrendingDown,
-	TrendingUp,
 	Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -108,8 +106,17 @@ export function ActiveProjectsSection({
 				</Link>
 			</div>
 
-			{/* Cards */}
-			<div className="mt-2 min-h-0 flex-1 space-y-1 overflow-y-auto">
+			{/* Column labels (single-line table title row) */}
+			<div className="mt-3 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto] items-center gap-3 border-b-2 pb-2 text-xs font-medium text-muted-foreground sm:grid">
+				<span>{t("dashboard.activeProjects")}</span>
+				<span>{t("projects.overview.progress")}</span>
+				<span>{t("dashboard.projectCard.payments")}</span>
+				<span>{t("dashboard.projectCard.receipts")}</span>
+				<span className="text-end">{t("dashboard.projectCard.photos")}</span>
+			</div>
+
+			{/* Rows — one project per line */}
+			<div className="min-h-0 flex-1 overflow-y-auto">
 				{visibleProjects.map((project) => {
 					const progress = Math.min(
 						Math.round(Number(project.progress ?? 0)),
@@ -117,16 +124,21 @@ export function ActiveProjectsSection({
 					);
 					const milestone = project.currentMilestone ?? null;
 					const photos = (project.photos ?? []).slice(0, 4);
+					const milestoneText = milestone
+						? milestone.days !== null
+							? `${milestone.title} · ${t("dashboard.projectCard.daysOnPhase", { days: milestone.days })}`
+							: milestone.title
+						: t("dashboard.projectCard.noPhase");
 
 					return (
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group block rounded-xl border-b-2 px-1 py-3 transition-colors last:border-0 hover:bg-accent/40"
+							className="group grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-center gap-3 border-b-2 py-2.5 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]"
 						>
-							{/* Top: cover + name/client — recent photos strip on the left */}
-							<div className="flex items-center gap-3">
-								<div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-chart-4/15 xl:h-11 xl:w-11">
+							{/* Project: cover + name + milestone·days subline */}
+							<div className="flex min-w-0 items-center gap-2.5">
+								<div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-chart-4/15">
 									<ProjectThumb
 										src={
 											project.coverPhoto?.url ??
@@ -136,94 +148,55 @@ export function ActiveProjectsSection({
 										alt={project.name || ""}
 									/>
 								</div>
-								<div className="min-w-0 flex-1">
-									<p className="truncate text-base font-semibold text-card-foreground">
+								<div className="min-w-0">
+									<p className="truncate text-sm font-semibold text-card-foreground">
 										{project.name || t("projects.unnamed")}
 									</p>
-									<p className="truncate text-sm font-medium text-muted-foreground">
-										{project.clientName || t("dashboard.noClient")}
+									<p className="flex items-center gap-1 truncate text-[11px] leading-tight text-muted-foreground">
+										<MapPin className="size-3 shrink-0 text-chart-3" />
+										<span className="truncate">{milestoneText}</span>
 									</p>
 								</div>
-								{photos.length > 0 && (
-									<div className="flex shrink-0 items-center gap-1">
-										{photos.map((photo, i) => (
-											<div
-												key={i}
-												className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md bg-muted"
-											>
-												<ProjectThumb src={photo.url} alt="" />
-											</div>
-										))}
-									</div>
-								)}
 							</div>
 
-							{/* Progress bar + trailing figure */}
-							<div className="mt-2.5 flex items-center gap-3">
-								<div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[4px] bg-muted">
+							{/* Progress bar + % */}
+							<div className="flex items-center gap-2">
+								<div className="h-2 min-w-0 flex-1 overflow-hidden rounded-[4px] bg-muted">
 									<div
 										className="h-full rounded-[4px] bg-chart-1"
 										style={{ width: `${progress}%` }}
 									/>
 								</div>
-								<p className="shrink-0 text-base font-semibold tabular-nums text-card-foreground">
+								<span className="shrink-0 text-sm font-semibold tabular-nums text-card-foreground">
 									{progress}
 									<span className="text-muted-foreground">%</span>
-								</p>
+								</span>
 							</div>
 
-							{/* Current milestone + days on phase */}
-							<div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-								<MapPin className="size-3.5 shrink-0 text-chart-3" />
-								{milestone ? (
-									<span className="min-w-0 truncate">
-										<span className="font-medium text-card-foreground">
-											{milestone.title}
-										</span>
-										{milestone.days !== null && (
-											<>
-												{" · "}
-												{t("dashboard.projectCard.daysOnPhase", {
-													days: milestone.days,
-												})}
-											</>
-										)}
-									</span>
+							{/* Payments (out) */}
+							<p className="hidden truncate text-xs font-semibold tabular-nums text-destructive sm:block">
+								<Currency amount={project.expensesTotal ?? 0} />
+							</p>
+
+							{/* Receipts (in) */}
+							<p className="hidden truncate text-xs font-semibold tabular-nums text-success sm:block">
+								<Currency amount={project.paymentsTotal ?? 0} />
+							</p>
+
+							{/* Latest photos — visual-left in RTL */}
+							<div className="hidden shrink-0 items-center justify-end gap-1 sm:flex">
+								{photos.length > 0 ? (
+									photos.map((photo, i) => (
+										<div
+											key={i}
+											className="relative h-6 w-6 shrink-0 overflow-hidden rounded-md bg-muted"
+										>
+											<ProjectThumb src={photo.url} alt="" />
+										</div>
+									))
 								) : (
-									<span className="truncate">
-										{t("dashboard.projectCard.noPhase")}
-									</span>
+									<span className="text-[11px] text-muted-foreground">—</span>
 								)}
-							</div>
-
-							{/* Payments (out) / Receipts (in) */}
-							<div className="mt-2 grid grid-cols-2 gap-2">
-								<div className="flex items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
-									<span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-destructive/15 text-destructive">
-										<TrendingDown className="size-3.5" />
-									</span>
-									<div className="min-w-0">
-										<p className="truncate text-[11px] leading-tight text-muted-foreground">
-											{t("dashboard.projectCard.payments")}
-										</p>
-										<p className="truncate text-xs font-semibold tabular-nums text-card-foreground">
-											<Currency amount={project.expensesTotal ?? 0} />
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
-									<span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-success/15 text-success">
-										<TrendingUp className="size-3.5" />
-									</span>
-									<div className="min-w-0">
-										<p className="truncate text-[11px] leading-tight text-muted-foreground">
-											{t("dashboard.projectCard.receipts")}
-										</p>
-										<p className="truncate text-xs font-semibold tabular-nums text-card-foreground">
-											<Currency amount={project.paymentsTotal ?? 0} />
-										</p>
-									</div>
-								</div>
 							</div>
 						</Link>
 					);

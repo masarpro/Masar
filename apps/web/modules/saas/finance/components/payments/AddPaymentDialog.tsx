@@ -210,7 +210,7 @@ export function AddPaymentDialog({
 				onInteractOutside={(e) => e.preventDefault()}
 			>
 				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 sm:py-4 shrink-0">
+				<DialogHeader className="bg-white dark:bg-muted border-b border-border dark:border-border px-3 sm:px-5 py-3 sm:py-4 shrink-0">
 					<DialogTitle className="text-sm sm:text-base font-semibold">
 						{t("finance.payments.new")}
 					</DialogTitle>
@@ -221,7 +221,7 @@ export function AddPaymentDialog({
 					{/* Row 1: Amount, Date */}
 					<div className="grid grid-cols-2 gap-2 sm:gap-3">
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 								{t("finance.payments.amount")} *
 							</Label>
 							<Input
@@ -242,7 +242,7 @@ export function AddPaymentDialog({
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 								{t("finance.payments.date")} *
 							</Label>
 							<Input
@@ -262,7 +262,7 @@ export function AddPaymentDialog({
 
 					{/* Client */}
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 							<User className="h-3 w-3 inline me-1" />
 							{t("finance.payments.selectClient")}
 						</Label>
@@ -301,7 +301,7 @@ export function AddPaymentDialog({
 
 					{!formData.clientId && (
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 								{t("finance.payments.clientName")} *
 							</Label>
 							<Input
@@ -323,7 +323,7 @@ export function AddPaymentDialog({
 					{/* Project — required */}
 					{!defaultProjectId && (
 						<div className="space-y-1">
-							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+							<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 								<FolderOpen className="h-3 w-3 inline me-1" />
 								{t("finance.payments.selectProject")} *
 							</Label>
@@ -359,7 +359,7 @@ export function AddPaymentDialog({
 
 					{/* Destination account */}
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 							<Building className="h-3 w-3 inline me-1" />
 							{t("finance.payments.selectAccount")} *
 						</Label>
@@ -389,10 +389,10 @@ export function AddPaymentDialog({
 											{account.accountType === "BANK" ? (
 												<Building className="h-3.5 w-3.5 text-chart-4" />
 											) : (
-												<Wallet className="h-3.5 w-3.5 text-green-500" />
+												<Wallet className="h-3.5 w-3.5 text-success" />
 											)}
 											<span>{account.name}</span>
-											<span className="text-slate-400 text-xs">
+											<span className="text-muted-foreground text-xs">
 												(
 												<Currency
 													amount={Number(
@@ -410,21 +410,21 @@ export function AddPaymentDialog({
 
 					{/* Selected account info — payment increases balance */}
 					{selectedAccount && (
-						<div className="rounded-xl border border-green-200/60 bg-green-50/40 dark:border-green-800/30 dark:bg-green-950/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+						<div className="rounded-xl border border-success bg-success/15 dark:border-success dark:bg-success/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 							<div className="flex items-center gap-2.5 min-w-0">
-								<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 shrink-0">
+								<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/15 dark:bg-success/20 shrink-0">
 									{selectedAccount.accountType === "BANK" ? (
 										<Building className="h-3.5 w-3.5 text-chart-4" />
 									) : (
-										<Wallet className="h-3.5 w-3.5 text-green-600" />
+										<Wallet className="h-3.5 w-3.5 text-success" />
 									)}
 								</div>
 								<div className="min-w-0">
-									<p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+									<p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground truncate">
 										{selectedAccount.name}
 									</p>
 									{selectedAccount.bankName && (
-										<p className="text-[11px] text-slate-500 truncate">
+										<p className="text-[11px] text-muted-foreground truncate">
 											{selectedAccount.bankName}
 										</p>
 									)}
@@ -438,8 +438,8 @@ export function AddPaymentDialog({
 								</span>
 								{numericAmount > 0 && (
 									<>
-										<ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-										<span className="text-green-600 font-semibold">
+										<ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+										<span className="text-success font-semibold">
 											<Currency
 												amount={
 													Number(
@@ -456,7 +456,7 @@ export function AddPaymentDialog({
 
 					{/* Description */}
 					<div className="space-y-1">
-						<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 							{t("finance.payments.description")}
 						</Label>
 						<Input
@@ -482,7 +482,7 @@ export function AddPaymentDialog({
 						<CollapsibleTrigger asChild>
 							<button
 								type="button"
-								className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors w-full"
+								className="flex items-center gap-2 text-sm font-medium text-muted-foreground dark:text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors w-full"
 							>
 								<ChevronDown
 									className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`}
@@ -494,7 +494,7 @@ export function AddPaymentDialog({
 							{/* Payment method, reference */}
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 								<div className="space-y-1">
-									<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+									<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 										{t("finance.payments.paymentMethod")}
 									</Label>
 									<Select
@@ -524,7 +524,7 @@ export function AddPaymentDialog({
 									</Select>
 								</div>
 								<div className="space-y-1">
-									<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+									<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 										{t("finance.payments.referenceNo")}
 									</Label>
 									<Input
@@ -547,7 +547,7 @@ export function AddPaymentDialog({
 							{/* Invoice link */}
 							<div className="grid grid-cols-1 gap-2 sm:gap-3">
 								<div className="space-y-1">
-									<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+									<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 										{t("finance.payments.selectInvoice")}
 									</Label>
 									<Select
@@ -595,7 +595,7 @@ export function AddPaymentDialog({
 
 							{/* Notes */}
 							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<Label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
 									{t("finance.payments.additionalNotes")}
 								</Label>
 								<Textarea
@@ -618,7 +618,7 @@ export function AddPaymentDialog({
 				</div>
 
 				{/* Footer */}
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 flex gap-2 sm:gap-3 shrink-0">
+				<div className="bg-muted dark:bg-muted border-t border-border dark:border-border px-3 sm:px-5 py-3 flex gap-2 sm:gap-3 shrink-0">
 					<Button
 						type="button"
 						variant="outline"

@@ -115,7 +115,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 
 				{/* Over budget warning in form */}
 				{payAmount && (Number.parseFloat(payAmount) || 0) > remaining && remaining > 0 && (
-					<div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800/50 dark:bg-red-950/20 dark:text-red-400">
+					<div className="flex items-center gap-2 rounded-lg border border-destructive bg-destructive/15 px-3 py-2 text-xs text-destructive dark:border-destructive dark:bg-destructive/20 dark:text-destructive">
 						<AlertTriangle className="h-3.5 w-3.5 shrink-0" />
 						{t("subcontracts.detail.alerts.paymentExceedsRemaining")}
 					</div>
@@ -137,7 +137,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 								dir="ltr"
 								required
 							/>
-							<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
+							<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
 								{t("common.sar")}
 							</span>
 						</div>
@@ -288,12 +288,12 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 
 				{/* Selected account balance info */}
 				{selectedPayAccount && (
-					<div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs dark:border-slate-700 dark:bg-slate-800">
-						<span className="text-slate-500">
+					<div className="flex items-center justify-between rounded-lg border border-border bg-white px-4 py-2 text-xs dark:border-border dark:bg-muted">
+						<span className="text-muted-foreground">
 							{selectedPayAccount.name}: {formatCurrency(Number(selectedPayAccount.balance))}
 						</span>
 						{payAmount && (
-							<span className="text-slate-500">
+							<span className="text-muted-foreground">
 								&larr; {formatCurrency(Number(selectedPayAccount.balance) - (Number.parseFloat(payAmount) || 0))}
 							</span>
 						)}

@@ -93,19 +93,19 @@ export function PaymentsTable({
 
 	if (payments.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-10 dark:border-slate-700 dark:bg-slate-900/30">
-				<Banknote className="mb-3 h-10 w-10 text-slate-300 dark:text-slate-600" />
-				<p className="text-sm text-slate-500">{t("projectPayments.noPayments")}</p>
+			<div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-10">
+				<Banknote className="mb-3 h-10 w-10 text-muted-foreground" />
+				<p className="text-sm text-muted-foreground">{t("projectPayments.noPayments")}</p>
 			</div>
 		);
 	}
 
 	return (
 		<>
-			<div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-slate-700/50">
+			<div className="overflow-x-auto rounded-xl border-2">
 				<Table>
 					<TableHeader>
-						<TableRow className="bg-slate-50/80 dark:bg-slate-800/50">
+						<TableRow className="hover:bg-transparent">
 							<TableHead className="text-start">{t("projectPayments.paymentNo")}</TableHead>
 							<TableHead className="text-start">{t("projectPayments.date")}</TableHead>
 							<TableHead className="text-start">{t("projectPayments.amount")}</TableHead>
@@ -132,13 +132,13 @@ export function PaymentsTable({
 											day: "numeric",
 										})}
 									</TableCell>
-									<TableCell className="font-semibold text-chart-4 dark:text-chart-4">
+									<TableCell className="font-semibold text-chart-4">
 										<div className="flex flex-col gap-1">
 											<span>{formatSARPrecise(payment.amount)}</span>
 											{payment.splitGroupTotal != null && (
 												<Badge
 													variant="secondary"
-													className="w-fit gap-1 text-[10px] font-normal bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+													className="w-fit gap-1 text-[10px] font-normal bg-chart-4/15 text-chart-4"
 												>
 													{t("projectPayments.splitPart", {
 														total: formatSARPrecise(payment.splitGroupTotal),
@@ -153,11 +153,11 @@ export function PaymentsTable({
 										</Badge>
 									</TableCell>
 									{showTermColumn && (
-										<TableCell className="text-sm text-slate-600 dark:text-slate-400">
+										<TableCell className="text-sm text-muted-foreground">
 											{payment.contractTerm?.label ?? "-"}
 										</TableCell>
 									)}
-									<TableCell className="max-w-[200px] truncate text-sm text-slate-500">
+									<TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
 										{payment.description ?? payment.note ?? "-"}
 									</TableCell>
 									<TableCell>
@@ -173,7 +173,7 @@ export function PaymentsTable({
 													{t("common.edit")}
 												</DropdownMenuItem>
 												<DropdownMenuItem
-													className="text-red-600 dark:text-red-400"
+													className="text-destructive dark:text-destructive"
 													onClick={() => setDeletePaymentId(payment.id)}
 												>
 													<Trash2 className="me-2 h-4 w-4" />
@@ -215,7 +215,7 @@ export function PaymentsTable({
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
-							className="bg-red-600 hover:bg-red-700"
+							className="bg-destructive hover:bg-destructive"
 							onClick={() => {
 								if (deletePaymentId) {
 									deleteMutation.mutate({

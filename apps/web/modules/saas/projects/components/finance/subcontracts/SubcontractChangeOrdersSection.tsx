@@ -37,20 +37,20 @@ export const SubcontractChangeOrdersSection = React.memo(function SubcontractCha
 	const t = useTranslations();
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-amber-200/50 bg-white dark:border-amber-800/30 dark:bg-slate-900/50">
-			<div className="flex items-center justify-between border-b border-amber-100 p-5 dark:border-amber-800/30">
+		<div className="overflow-hidden rounded-2xl border border-chart-1 bg-white dark:border-chart-1 dark:bg-muted">
+			<div className="flex items-center justify-between border-b border-chart-1 p-5 dark:border-chart-1">
 				<div className="flex items-center gap-3">
-					<div className="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-						<FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+						<FileText className="h-5 w-5 text-chart-1 dark:text-chart-1" />
 					</div>
-					<h2 className="font-semibold text-amber-700 dark:text-amber-300">
+					<h2 className="font-semibold text-chart-1 dark:text-chart-1">
 						{t("subcontracts.detail.changeOrdersSection")}
 					</h2>
 				</div>
 				<Button
 					variant="outline"
 					size="sm"
-					className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400"
+					className="rounded-xl border-chart-1 text-chart-1 hover:bg-chart-1/20 dark:border-chart-1 dark:text-chart-1"
 					onClick={onAdd}
 				>
 					<Plus className="me-1 h-4 w-4" />
@@ -59,7 +59,7 @@ export const SubcontractChangeOrdersSection = React.memo(function SubcontractCha
 			</div>
 			<div className="p-4">
 				{!changeOrders || changeOrders.length === 0 ? (
-					<p className="py-6 text-center text-sm text-slate-500">
+					<p className="py-6 text-center text-sm text-muted-foreground">
 						{t("subcontracts.detail.noChangeOrders")}
 					</p>
 				) : (
@@ -69,21 +69,21 @@ export const SubcontractChangeOrdersSection = React.memo(function SubcontractCha
 							return (
 								<div
 									key={co.id}
-									className="flex items-center justify-between rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50"
+									className="flex items-center justify-between rounded-xl bg-muted p-3 dark:bg-muted"
 								>
 									<div className="flex-1">
 										<div className="flex items-center gap-2">
-											<span className="text-xs font-medium text-slate-500">#{co.orderNo}</span>
+											<span className="text-xs font-medium text-muted-foreground">#{co.orderNo}</span>
 											<Badge className={`border-0 text-[10px] ${coStyle.bg} ${coStyle.text}`}>
 												{t(`subcontracts.detail.coStatus.${co.status}`)}
 											</Badge>
 										</div>
-										<p className="mt-0.5 text-sm text-slate-700 dark:text-slate-300">
+										<p className="mt-0.5 text-sm text-muted-foreground dark:text-muted-foreground">
 											{co.description}
 										</p>
 									</div>
 									<div className="flex items-center gap-2">
-										<span className={`font-semibold ${co.amount >= 0 ? "text-chart-4" : "text-red-600"}`}>
+										<span className={`font-semibold ${co.amount >= 0 ? "text-chart-4" : "text-destructive"}`}>
 											{co.amount >= 0 ? "+" : ""}
 											{formatCurrency(co.amount)}
 										</span>
@@ -93,7 +93,7 @@ export const SubcontractChangeOrdersSection = React.memo(function SubcontractCha
 										<Button
 											variant="ghost"
 											size="icon"
-											className="h-7 w-7 text-red-500 hover:text-red-600"
+											className="h-7 w-7 text-destructive hover:text-destructive"
 											onClick={() => onDelete(co.id)}
 										>
 											<Trash2 className="h-3 w-3" />

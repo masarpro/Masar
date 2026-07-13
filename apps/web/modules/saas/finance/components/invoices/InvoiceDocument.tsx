@@ -107,7 +107,7 @@ function PaymentsTable({
 	const t = useTranslations();
 
 	return (
-		<div className="mt-4 border-t border-slate-200 pt-4">
+		<div className="mt-4 border-t border-border pt-4">
 			<h4
 				className="mb-2 text-sm font-bold flex items-center gap-2"
 				style={{ color: primaryColor }}
@@ -121,16 +121,16 @@ function PaymentsTable({
 						className="border-b"
 						style={{ borderColor: `${primaryColor}30` }}
 					>
-						<th className="py-2 text-start text-xs font-medium text-slate-500">
+						<th className="py-2 text-start text-xs font-medium text-muted-foreground">
 							{t("finance.invoices.paymentDate")}
 						</th>
-						<th className="py-2 text-start text-xs font-medium text-slate-500">
+						<th className="py-2 text-start text-xs font-medium text-muted-foreground">
 							{t("finance.invoices.paymentMethod")}
 						</th>
-						<th className="py-2 text-start text-xs font-medium text-slate-500">
+						<th className="py-2 text-start text-xs font-medium text-muted-foreground">
 							{t("finance.invoices.referenceNo")}
 						</th>
-						<th className="py-2 text-end text-xs font-medium text-slate-500">
+						<th className="py-2 text-end text-xs font-medium text-muted-foreground">
 							{t("finance.invoices.amount")}
 						</th>
 					</tr>
@@ -139,18 +139,18 @@ function PaymentsTable({
 					{payments.map((payment: any) => (
 						<tr
 							key={payment.id}
-							className="border-b border-slate-100"
+							className="border-b border-border"
 						>
-							<td className="py-2 text-slate-700">
+							<td className="py-2 text-muted-foreground">
 								{formatDate(payment.paymentDate)}
 							</td>
-							<td className="py-2 text-slate-700">
+							<td className="py-2 text-muted-foreground">
 								{payment.paymentMethod || "-"}
 							</td>
-							<td className="py-2 text-slate-700">
+							<td className="py-2 text-muted-foreground">
 								{payment.referenceNo || "-"}
 							</td>
-							<td className="py-2 text-end font-medium text-green-600">
+							<td className="py-2 text-end font-medium text-success">
 								<Currency amount={Number(payment.amount)} />
 							</td>
 						</tr>
@@ -225,7 +225,7 @@ export function InvoiceDocument({
 			{/* Draft watermark */}
 			{showWatermark && invoice.status === "DRAFT" && (
 				<div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10">
-					<span className="text-8xl font-bold text-slate-200/50 rotate-[-30deg] select-none">
+					<span className="text-8xl font-bold text-muted-foreground rotate-[-30deg] select-none">
 						{t("finance.invoices.status.draft")}
 					</span>
 				</div>

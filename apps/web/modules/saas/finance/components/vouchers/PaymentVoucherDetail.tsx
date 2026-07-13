@@ -95,7 +95,7 @@ export function PaymentVoucherDetail({
 			<div className="hidden print:block print:space-y-4">
 				<div className="text-center border-b-2 border-black pb-3 mb-4">
 					<h1 className="text-2xl font-bold">{t("print.paymentVoucher")}</h1>
-					<p className="text-sm text-gray-500">PAYMENT VOUCHER</p>
+					<p className="text-sm text-muted-foreground">PAYMENT VOUCHER</p>
 				</div>
 				<div className="flex justify-between text-sm mb-4">
 					<div><span className="font-medium">{t("finance.paymentVouchers.voucherNo")}:</span> <span className="font-mono">{voucher.voucherNo}</span></div>
@@ -103,31 +103,31 @@ export function PaymentVoucherDetail({
 				</div>
 				<table className="w-full border-collapse text-sm">
 					<tbody>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">{t("finance.paymentVouchers.payeeName")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted w-1/4 border-e border-border">{t("finance.paymentVouchers.payeeName")}</td>
 							<td className="p-2">{voucher.payeeName}</td>
 						</tr>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.payeeType")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.paymentVouchers.payeeType")}</td>
 							<td className="p-2">{t(`finance.paymentVouchers.payeeTypes.${voucher.payeeType}`)}</td>
 						</tr>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.amount")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.paymentVouchers.amount")}</td>
 							<td className="p-2 font-bold text-lg">{new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(voucher.amount))}</td>
 						</tr>
 						{voucher.amountInWords && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.amountInWords")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.paymentVouchers.amountInWords")}</td>
 								<td className="p-2 font-medium">{voucher.amountInWords} {t("print.only")}</td>
 							</tr>
 						)}
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.paymentMethod")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.paymentVouchers.paymentMethod")}</td>
 							<td className="p-2">{t(`finance.payments.methods.${voucher.paymentMethod}`)}</td>
 						</tr>
 						{voucher.description && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.description")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.paymentVouchers.description")}</td>
 								<td className="p-2">{voucher.description}</td>
 							</tr>
 						)}
@@ -245,7 +245,7 @@ export function PaymentVoucherDetail({
 								</>
 							)}
 							{voucher.rejectionReason && (
-								<InfoRow label={t("finance.paymentVouchers.rejectReason")} value={<span className="text-red-600">{voucher.rejectionReason}</span>} />
+								<InfoRow label={t("finance.paymentVouchers.rejectReason")} value={<span className="text-destructive">{voucher.rejectionReason}</span>} />
 							)}
 						</CardContent>
 					</Card>
@@ -276,8 +276,8 @@ export function PaymentVoucherDetail({
 					<span>{t("finance.paymentVouchers.printCount")}: {voucher.printCount}</span>
 					{voucher.status === "CANCELLED" && (
 						<>
-							<span className="text-red-600">{t("finance.paymentVouchers.cancelledAt")}: {voucher.cancelledAt ? formatDate(voucher.cancelledAt) : ""}</span>
-							<span className="text-red-600">{t("finance.paymentVouchers.cancelReason")}: {voucher.cancelReason}</span>
+							<span className="text-destructive">{t("finance.paymentVouchers.cancelledAt")}: {voucher.cancelledAt ? formatDate(voucher.cancelledAt) : ""}</span>
+							<span className="text-destructive">{t("finance.paymentVouchers.cancelReason")}: {voucher.cancelReason}</span>
 						</>
 					)}
 				</CardContent>

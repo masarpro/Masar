@@ -159,12 +159,12 @@ export function SubcontractPaymentForm({
 		<form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
 			{/* Term Selection (if terms exist) */}
 			{termsProgress && termsProgress.terms.length > 0 && (
-				<div className="overflow-hidden rounded-2xl border border-violet-200/50 bg-white dark:border-violet-800/30 dark:bg-slate-900/50">
-					<div className="flex items-center gap-3 border-b border-violet-200/50 p-5 dark:border-violet-800/30">
-						<div className="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/50">
-							<Banknote className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+				<div className="overflow-hidden rounded-2xl border border-chart-4 bg-white dark:border-chart-4 dark:bg-muted">
+					<div className="flex items-center gap-3 border-b border-chart-4 p-5 dark:border-chart-4">
+						<div className="rounded-lg bg-chart-4/15 p-2 dark:bg-chart-4/20">
+							<Banknote className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
-						<h2 className="font-semibold text-violet-700 dark:text-violet-300">
+						<h2 className="font-semibold text-chart-4 dark:text-chart-4">
 							{t("subcontracts.payment.selectTerm")}
 						</h2>
 					</div>
@@ -234,12 +234,12 @@ export function SubcontractPaymentForm({
 										</p>
 									</div>
 									<div>
-										<p className="text-amber-500">
+										<p className="text-chart-1">
 											{t(
 												"subcontracts.payment.remainingAmount",
 											)}
 										</p>
-										<p className="font-semibold text-amber-700 dark:text-amber-300">
+										<p className="font-semibold text-chart-1 dark:text-chart-1">
 											{formatSARPrecise(
 												selectedTerm.remainingAmount,
 											)}
@@ -253,12 +253,12 @@ export function SubcontractPaymentForm({
 			)}
 
 			{/* Amount & Date */}
-			<div className="overflow-hidden rounded-2xl border border-orange-200/50 bg-white dark:border-orange-800/30 dark:bg-slate-900/50">
-				<div className="flex items-center gap-3 border-b border-orange-200/50 p-5 dark:border-orange-800/30">
-					<div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/50">
-						<Wallet className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+			<div className="overflow-hidden rounded-2xl border border-chart-1 bg-white dark:border-chart-1 dark:bg-muted">
+				<div className="flex items-center gap-3 border-b border-chart-1 p-5 dark:border-chart-1">
+					<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+						<Wallet className="h-5 w-5 text-chart-1 dark:text-chart-1" />
 					</div>
-					<h2 className="font-semibold text-orange-700 dark:text-orange-300">
+					<h2 className="font-semibold text-chart-1 dark:text-chart-1">
 						{t("subcontracts.payment.amountAndDate")}
 					</h2>
 				</div>
@@ -278,7 +278,7 @@ export function SubcontractPaymentForm({
 									dir="ltr"
 									required
 								/>
-								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
 									{t("common.sar")}
 								</span>
 							</div>
@@ -298,14 +298,14 @@ export function SubcontractPaymentForm({
 			</div>
 
 			{/* Source Account */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
-				<div className="flex items-center gap-3 border-b border-slate-200/50 p-5 dark:border-slate-700/30">
-					<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-						<Building className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+			<div className="overflow-hidden rounded-2xl border border-border bg-white dark:border-border dark:bg-muted">
+				<div className="flex items-center gap-3 border-b border-border p-5 dark:border-border">
+					<div className="rounded-lg bg-muted p-2 dark:bg-muted">
+						<Building className="h-5 w-5 text-muted-foreground dark:text-muted-foreground" />
 					</div>
 					<h2 className="font-semibold">
 						{t("subcontracts.payment.sourceAccount")}
-						<span className="text-red-500"> *</span>
+						<span className="text-destructive"> *</span>
 					</h2>
 				</div>
 				<div className="space-y-4 p-5">
@@ -338,36 +338,36 @@ export function SubcontractPaymentForm({
 
 					{/* Selected account info */}
 					{selectedAccount && (
-						<div className="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
+						<div className="rounded-xl border border-chart-1 bg-chart-1/20 p-4 dark:border-chart-1 dark:bg-chart-1/25">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-3">
-									<div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/50">
-										<Building className="h-4 w-4 text-orange-600" />
+									<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+										<Building className="h-4 w-4 text-chart-1" />
 									</div>
 									<div>
 										<p className="text-sm font-medium">
 											{selectedAccount.name}
 										</p>
 										{selectedAccount.bankName && (
-											<p className="text-xs text-slate-500">
+											<p className="text-xs text-muted-foreground">
 												{selectedAccount.bankName}
 											</p>
 										)}
 									</div>
 								</div>
 								<div className="text-end">
-									<p className="text-xs text-slate-500">
+									<p className="text-xs text-muted-foreground">
 										{t("subcontracts.payment.currentBalance")}
 									</p>
-									<p className="font-semibold text-orange-700 dark:text-orange-300">
+									<p className="font-semibold text-chart-1 dark:text-chart-1">
 										{formatSARPrecise(
 											Number(selectedAccount.balance),
 										)}
 									</p>
 									{numericAmount > 0 && (
 										<div className="mt-1 flex items-center justify-end gap-1 text-xs">
-											<ArrowRight className="h-3 w-3 text-slate-400" />
-											<span className="text-red-500">
+											<ArrowRight className="h-3 w-3 text-muted-foreground" />
+											<span className="text-destructive">
 												{formatSARPrecise(
 													Number(
 														selectedAccount.balance,
@@ -384,7 +384,7 @@ export function SubcontractPaymentForm({
 			</div>
 
 			{/* Payment Method & Reference */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
+			<div className="overflow-hidden rounded-2xl border border-border bg-white dark:border-border dark:bg-muted">
 				<div className="space-y-5 p-5">
 					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 						<div className="space-y-2">

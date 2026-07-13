@@ -262,13 +262,13 @@ export function PaymentForm({
 					)}
 
 					{selectedClient && (
-						<div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+						<div className="p-4 bg-muted dark:bg-muted rounded-xl">
 							<div className="flex items-center gap-2">
 								<User className="h-5 w-5 text-primary" />
 								<div>
 									<p className="font-medium">{selectedClient.name}</p>
 									{selectedClient.email && (
-										<p className="text-sm text-slate-500">{selectedClient.email}</p>
+										<p className="text-sm text-muted-foreground">{selectedClient.email}</p>
 									)}
 								</div>
 							</div>
@@ -304,10 +304,10 @@ export function PaymentForm({
 											{account.accountType === "BANK" ? (
 												<Building className="h-4 w-4 text-chart-4" />
 											) : (
-												<Wallet className="h-4 w-4 text-green-500" />
+												<Wallet className="h-4 w-4 text-success" />
 											)}
 											<span>{account.name}</span>
-											<span className="text-slate-400">
+											<span className="text-muted-foreground">
 												(<Currency amount={Number(account.balance)} />)
 											</span>
 										</div>
@@ -318,28 +318,28 @@ export function PaymentForm({
 					</div>
 
 					{selectedAccount && (
-						<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+						<div className="p-4 bg-success/15 dark:bg-success/20 rounded-xl border border-success dark:border-success">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
 									{selectedAccount.accountType === "BANK" ? (
 										<Building className="h-5 w-5 text-chart-4" />
 									) : (
-										<Wallet className="h-5 w-5 text-green-500" />
+										<Wallet className="h-5 w-5 text-success" />
 									)}
 									<div>
 										<p className="font-medium">{selectedAccount.name}</p>
 										{selectedAccount.bankName && (
-											<p className="text-sm text-slate-500">{selectedAccount.bankName}</p>
+											<p className="text-sm text-muted-foreground">{selectedAccount.bankName}</p>
 										)}
 									</div>
 								</div>
 								<div className="text-end">
-									<p className="text-sm text-slate-500">{t("finance.banks.currentBalance")}</p>
-									<p className="font-semibold text-green-600">
+									<p className="text-sm text-muted-foreground">{t("finance.banks.currentBalance")}</p>
+									<p className="font-semibold text-success">
 										<Currency amount={Number(selectedAccount.balance)} />
 									</p>
 									{formData.amount && (
-										<p className="text-xs text-slate-500">
+										<p className="text-xs text-muted-foreground">
 											{t("finance.payments.afterPayment")}:{" "}
 											<Currency amount={Number(selectedAccount.balance) + parseFloat(formData.amount || "0")} />
 										</p>
@@ -443,7 +443,7 @@ export function PaymentForm({
 								</Select>
 							</div>
 						</div>
-						<p className="text-sm text-slate-500">
+						<p className="text-sm text-muted-foreground">
 							{t("finance.payments.projectLinkHint")}
 						</p>
 					</CardContent>

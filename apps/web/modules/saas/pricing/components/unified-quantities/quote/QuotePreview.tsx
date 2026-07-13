@@ -76,17 +76,17 @@ export function QuotePreview({
 			<div
 				id="quote-print-area"
 				dir="rtl"
-				className="rounded-md border bg-white p-6 text-sm text-slate-900 shadow-sm dark:bg-white dark:text-slate-900 print:rounded-none print:border-0 print:shadow-none"
+				className="rounded-md border bg-white p-6 text-sm text-muted-foreground shadow-sm dark:bg-white dark:text-muted-foreground print:rounded-none print:border-0 print:shadow-none"
 			>
 				<div data-pdf-body>
 					<header className="mb-6 flex items-start justify-between border-b pb-4">
 						<div>
 							<h1 className="text-2xl font-bold">عرض سعر</h1>
-							<p className="mt-1 text-xs text-slate-600">
+							<p className="mt-1 text-xs text-muted-foreground">
 								{data.quoteNumber || "—"}
 							</p>
 						</div>
-						<div className="text-end text-xs text-slate-600">
+						<div className="text-end text-xs text-muted-foreground">
 							<p>
 								تاريخ الإصدار:{" "}
 								<span className="tabular-nums">
@@ -104,7 +104,7 @@ export function QuotePreview({
 
 					<section className="mb-5 grid grid-cols-2 gap-6">
 						<div>
-							<h3 className="mb-2 text-xs font-semibold uppercase text-slate-500">
+							<h3 className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
 								العميل
 							</h3>
 							<p className="font-semibold">{data.clientName || "—"}</p>
@@ -115,7 +115,7 @@ export function QuotePreview({
 							{data.clientEmail && <p>{data.clientEmail}</p>}
 						</div>
 						<div>
-							<h3 className="mb-2 text-xs font-semibold uppercase text-slate-500">
+							<h3 className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
 								المشروع
 							</h3>
 							<p className="font-semibold">{data.projectName || "—"}</p>
@@ -125,7 +125,7 @@ export function QuotePreview({
 
 					<section className="mb-5">
 						<table className="w-full border-collapse text-xs">
-							<thead className="border-y bg-slate-100 text-slate-700">
+							<thead className="border-y bg-muted text-muted-foreground">
 								<tr>
 									<th className="px-2 py-2 text-start">#</th>
 									<th className="px-2 py-2 text-start">البند</th>
@@ -141,7 +141,7 @@ export function QuotePreview({
 										key={item.id}
 										className="quote-row border-b align-top"
 									>
-										<td className="px-2 py-2 tabular-nums text-slate-500">
+										<td className="px-2 py-2 tabular-nums text-muted-foreground">
 											{idx + 1}
 										</td>
 										<td className="px-2 py-2">
@@ -149,7 +149,7 @@ export function QuotePreview({
 												{item.displayName}
 											</div>
 											{item.specMaterialName && (
-												<div className="text-[11px] text-slate-500">
+												<div className="text-[11px] text-muted-foreground">
 													{item.specMaterialName}
 													{item.specMaterialBrand
 														? ` — ${item.specMaterialBrand}`
@@ -175,12 +175,12 @@ export function QuotePreview({
 
 					<section className="mb-6 ms-auto w-full max-w-md space-y-1 text-sm">
 						<div className="flex items-center justify-between">
-							<span className="text-slate-600">الإجمالي قبل الضريبة</span>
+							<span className="text-muted-foreground">الإجمالي قبل الضريبة</span>
 							<span className="tabular-nums">{fmt(subtotal)} ر.س</span>
 						</div>
 						{data.includeVAT && (
 							<div className="flex items-center justify-between">
-								<span className="text-slate-600">VAT 15%</span>
+								<span className="text-muted-foreground">VAT 15%</span>
 								<span className="tabular-nums">{fmt(vatAmount)} ر.س</span>
 							</div>
 						)}
@@ -188,7 +188,7 @@ export function QuotePreview({
 							<span>الإجمالي النهائي</span>
 							<span className="tabular-nums">{fmt(total)} ر.س</span>
 						</div>
-						<p className="mt-1 text-[10px] text-slate-500">
+						<p className="mt-1 text-[10px] text-muted-foreground">
 							التكلفة المرجعية:{" "}
 							<span className="tabular-nums">{fmt(totalGrossCost)}</span> ر.س
 						</p>
@@ -198,7 +198,7 @@ export function QuotePreview({
 						{data.paymentTerms && (
 							<div>
 								<h4 className="font-semibold">شروط الدفع</h4>
-								<p className="whitespace-pre-line text-slate-700">
+								<p className="whitespace-pre-line text-muted-foreground">
 									{data.paymentTerms}
 								</p>
 							</div>
@@ -206,7 +206,7 @@ export function QuotePreview({
 						{data.executionDuration && (
 							<div>
 								<h4 className="font-semibold">مدة التنفيذ</h4>
-								<p className="whitespace-pre-line text-slate-700">
+								<p className="whitespace-pre-line text-muted-foreground">
 									{data.executionDuration}
 								</p>
 							</div>
@@ -214,7 +214,7 @@ export function QuotePreview({
 						{data.warranty && (
 							<div>
 								<h4 className="font-semibold">الضمان</h4>
-								<p className="whitespace-pre-line text-slate-700">
+								<p className="whitespace-pre-line text-muted-foreground">
 									{data.warranty}
 								</p>
 							</div>
@@ -222,7 +222,7 @@ export function QuotePreview({
 						{data.notes && (
 							<div>
 								<h4 className="font-semibold">ملاحظات</h4>
-								<p className="whitespace-pre-line text-slate-700">
+								<p className="whitespace-pre-line text-muted-foreground">
 									{data.notes}
 								</p>
 							</div>
@@ -231,17 +231,17 @@ export function QuotePreview({
 
 					<section className="mt-10 grid grid-cols-2 gap-6 text-xs">
 						<div>
-							<p className="border-t pt-2 text-slate-700">توقيع المقاول</p>
+							<p className="border-t pt-2 text-muted-foreground">توقيع المقاول</p>
 						</div>
 						<div>
-							<p className="border-t pt-2 text-slate-700">توقيع العميل</p>
+							<p className="border-t pt-2 text-muted-foreground">توقيع العميل</p>
 						</div>
 					</section>
 				</div>
 
 				<footer
 					data-pdf-footer
-					className="mt-8 border-t pt-3 text-center text-[10px] text-slate-500"
+					className="mt-8 border-t pt-3 text-center text-[10px] text-muted-foreground"
 				>
 					<p>
 						هذا العرض ساري لمدة 30 يوماً من تاريخ الإصدار. الأسعار قابلة

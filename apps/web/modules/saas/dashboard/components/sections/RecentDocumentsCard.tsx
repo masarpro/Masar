@@ -91,8 +91,8 @@ export function RecentDocumentsCard({
 			createdAt: (s as any).createdAt,
 			href: `${basePath}/pricing/studies/${s.id}`,
 			icon: Calculator,
-			iconColor: "text-violet-600 dark:text-violet-400",
-			bgColor: "bg-violet-50 dark:bg-violet-950/20",
+			iconColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		});
 	}
 
@@ -101,7 +101,7 @@ export function RecentDocumentsCard({
 
 	if (visibleDocs.length === 0) {
 		return (
-			<div className="rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-border/50 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-3.5 text-center">
+			<div className="rounded-2xl bg-muted dark:bg-muted border border-border/50 flex flex-col items-center justify-center p-3.5 text-center">
 				<FileText className="h-8 w-8 text-muted-foreground/40 mb-2" />
 				<p className="text-sm font-medium text-muted-foreground">
 					{t("recentDocs.empty")}
@@ -111,7 +111,7 @@ export function RecentDocumentsCard({
 	}
 
 	return (
-		<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4/30 dark:border-chart-4/20 shadow-lg shadow-black/5 flex flex-col p-3.5">
+		<div className="rounded-2xl bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4/30 dark:border-chart-4/20 flex flex-col p-3.5">
 			<h3 className="text-sm font-bold text-foreground mb-2">
 				{t("recentDocs.title")}
 			</h3>
@@ -126,7 +126,7 @@ export function RecentDocumentsCard({
 						<Link
 							key={doc.id}
 							href={doc.href}
-							className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800/40 transition-colors"
+							className="flex items-center gap-3 p-2 rounded-lg hover:bg-card dark:hover:bg-muted transition-colors"
 						>
 							<div className={`p-1.5 rounded-lg ${doc.bgColor} shrink-0`}>
 								<Icon className={`h-3.5 w-3.5 ${doc.iconColor}`} />

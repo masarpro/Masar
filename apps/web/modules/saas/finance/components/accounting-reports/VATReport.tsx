@@ -69,7 +69,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 			<ReportPrintHeader reportTitle={t("finance.accountingReports.vatReport")} dateRange={`Q${selectedQuarter} ${selectedYear}`} />
 			{/* Period Selector */}
 			<div className="flex flex-wrap items-center gap-3 print:hidden">
-				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+				<div className="flex gap-1 bg-muted dark:bg-muted rounded-xl p-1">
 					{[1, 2, 3, 4].map((q) => (
 						<Button
 							key={q}
@@ -82,7 +82,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 						</Button>
 					))}
 				</div>
-				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+				<div className="flex gap-1 bg-muted dark:bg-muted rounded-xl p-1">
 					{years.map((y) => (
 						<Button
 							key={y}
@@ -102,7 +102,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 			</div>
 
 			{/* Tabs */}
-			<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit print:hidden">
+			<div className="flex gap-1 bg-muted dark:bg-muted rounded-xl p-1 w-fit print:hidden">
 				{([
 					{ key: "summary" as const, label: t("finance.accountingReports.vat.statement") },
 					{ key: "invoices" as const, label: t("finance.accountingReports.vat.invoiceDetails") },
@@ -122,10 +122,10 @@ export function VATReport({ organizationId }: VATReportProps) {
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 											{t("finance.accountingReports.vat.outputVat")}
 										</p>
-										<p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
+										<p className="text-2xl font-bold text-success dark:text-success mt-1">
 											<Currency
 												amount={
 													data.outputVAT.total
@@ -134,8 +134,8 @@ export function VATReport({ organizationId }: VATReportProps) {
 											/>
 										</p>
 									</div>
-									<div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
-										<ArrowUpCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+									<div className="p-3 bg-success/15 dark:bg-success/20 rounded-xl">
+										<ArrowUpCircle className="h-6 w-6 text-success dark:text-success" />
 									</div>
 								</div>
 							</CardContent>
@@ -145,10 +145,10 @@ export function VATReport({ organizationId }: VATReportProps) {
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 											{t("finance.accountingReports.vat.inputVat")}
 										</p>
-										<p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+										<p className="text-2xl font-bold text-destructive dark:text-destructive mt-1">
 											<Currency
 												amount={
 													data.inputVAT.total
@@ -157,8 +157,8 @@ export function VATReport({ organizationId }: VATReportProps) {
 											/>
 										</p>
 									</div>
-									<div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
-										<ArrowDownCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+									<div className="p-3 bg-destructive/15 dark:bg-destructive/20 rounded-xl">
+										<ArrowDownCircle className="h-6 w-6 text-destructive dark:text-destructive" />
 									</div>
 								</div>
 							</CardContent>
@@ -168,19 +168,19 @@ export function VATReport({ organizationId }: VATReportProps) {
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 											{t("finance.accountingReports.vat.netVat")}
 										</p>
 										<p
 											className={`text-2xl font-bold mt-1 ${
 												data.isPayable
-													? "text-red-600 dark:text-red-400"
+													? "text-destructive dark:text-destructive"
 													: "text-chart-4 dark:text-chart-4"
 											}`}
 										>
 											<Currency amount={Math.abs(data.netVAT)} />
 										</p>
-										<p className="text-xs text-slate-400 mt-1">
+										<p className="text-xs text-muted-foreground mt-1">
 											{data.isPayable
 												? t("finance.accountingReports.vat.payable")
 												: t("finance.accountingReports.vat.refundable")}
@@ -189,14 +189,14 @@ export function VATReport({ organizationId }: VATReportProps) {
 									<div
 										className={`p-3 rounded-xl ${
 											data.isPayable
-												? "bg-red-100 dark:bg-red-900/30"
+												? "bg-destructive/15 dark:bg-destructive/20"
 												: "bg-chart-4/15 dark:bg-chart-4/20"
 										}`}
 									>
 										<Minus
 											className={`h-6 w-6 ${
 												data.isPayable
-													? "text-red-600 dark:text-red-400"
+													? "text-destructive dark:text-destructive"
 													: "text-chart-4 dark:text-chart-4"
 											}`}
 										/>
@@ -219,7 +219,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 							<div className="space-y-6">
 								{/* Output VAT Section */}
 								<div>
-									<h3 className="font-semibold text-slate-700 dark:text-slate-300 mb-3">
+									<h3 className="font-semibold text-muted-foreground dark:text-muted-foreground mb-3">
 										{t("finance.accountingReports.vat.outputVat")}
 									</h3>
 									<Table>
@@ -265,7 +265,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 												vat={data.outputVAT.creditNotes.vatAmount}
 												isNegative
 											/>
-											<TableRow className="border-t-2 font-bold bg-green-50 dark:bg-green-950/20">
+											<TableRow className="border-t-2 font-bold bg-success/15 dark:bg-success/20">
 												<TableCell>
 													{t("finance.accountingReports.vat.totalOutput")}
 												</TableCell>
@@ -278,7 +278,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 														}
 													/>
 												</TableCell>
-												<TableCell className="text-end text-green-600 dark:text-green-400">
+												<TableCell className="text-end text-success dark:text-success">
 													<Currency
 														amount={
 															data.outputVAT.total
@@ -293,7 +293,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 
 								{/* Input VAT Section */}
 								<div>
-									<h3 className="font-semibold text-slate-700 dark:text-slate-300 mb-3">
+									<h3 className="font-semibold text-muted-foreground dark:text-muted-foreground mb-3">
 										{t("finance.accountingReports.vat.inputVat")}
 									</h3>
 									<Table>
@@ -326,7 +326,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 												taxable={data.inputVAT.subcontractors.taxableAmount}
 												vat={data.inputVAT.subcontractors.vatAmount}
 											/>
-											<TableRow className="border-t-2 font-bold bg-red-50 dark:bg-red-950/20">
+											<TableRow className="border-t-2 font-bold bg-destructive/15 dark:bg-destructive/20">
 												<TableCell>
 													{t("finance.accountingReports.vat.totalInput")}
 												</TableCell>
@@ -339,7 +339,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 														}
 													/>
 												</TableCell>
-												<TableCell className="text-end text-red-600 dark:text-red-400">
+												<TableCell className="text-end text-destructive dark:text-destructive">
 													<Currency
 														amount={
 															data.inputVAT.total
@@ -356,18 +356,18 @@ export function VATReport({ organizationId }: VATReportProps) {
 								<div
 									className={`p-4 rounded-xl border-2 ${
 										data.isPayable
-											? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20"
+											? "border-destructive dark:border-destructive bg-destructive/15 dark:bg-destructive/20"
 											: "border-chart-4 dark:border-chart-4 bg-chart-4/15 dark:bg-chart-4/20"
 									}`}
 								>
 									<div className="flex items-center justify-between">
-										<span className="text-lg font-bold text-slate-900 dark:text-slate-100">
+										<span className="text-lg font-bold text-muted-foreground dark:text-muted-foreground">
 											{t("finance.accountingReports.vat.netVat")}
 										</span>
 										<span
 											className={`text-2xl font-bold ${
 												data.isPayable
-													? "text-red-600 dark:text-red-400"
+													? "text-destructive dark:text-destructive"
 													: "text-chart-4 dark:text-chart-4"
 											}`}
 										>
@@ -375,7 +375,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 											{t("finance.accountingReports.sar")}
 										</span>
 									</div>
-									<p className="text-sm text-slate-500 mt-1">
+									<p className="text-sm text-muted-foreground mt-1">
 										{data.isPayable
 											? t("finance.accountingReports.vat.payableNote")
 											: t("finance.accountingReports.vat.refundableNote")}
@@ -474,24 +474,24 @@ function VATRow({
 	if (count === 0) {
 		return (
 			<TableRow>
-				<TableCell className="text-slate-500">{label}</TableCell>
-				<TableCell className="text-center text-slate-300">0</TableCell>
-				<TableCell className="text-end text-slate-300">-</TableCell>
-				<TableCell className="text-end text-slate-300">-</TableCell>
+				<TableCell className="text-muted-foreground">{label}</TableCell>
+				<TableCell className="text-center text-muted-foreground">0</TableCell>
+				<TableCell className="text-end text-muted-foreground">-</TableCell>
+				<TableCell className="text-end text-muted-foreground">-</TableCell>
 			</TableRow>
 		);
 	}
 
 	return (
 		<TableRow>
-			<TableCell className={isNegative ? "text-red-500" : ""}>{label}</TableCell>
+			<TableCell className={isNegative ? "text-destructive" : ""}>{label}</TableCell>
 			<TableCell className="text-center">{count}</TableCell>
-			<TableCell className={`text-end ${isNegative ? "text-red-500" : ""}`}>
+			<TableCell className={`text-end ${isNegative ? "text-destructive" : ""}`}>
 				{isNegative && taxable !== 0 ? "(" : ""}
 				<Currency amount={Math.abs(taxable)} />
 				{isNegative && taxable !== 0 ? ")" : ""}
 			</TableCell>
-			<TableCell className={`text-end ${isNegative ? "text-red-500" : ""}`}>
+			<TableCell className={`text-end ${isNegative ? "text-destructive" : ""}`}>
 				{isNegative && vat !== 0 ? "(" : ""}
 				<Currency amount={Math.abs(vat)} />
 				{isNegative && vat !== 0 ? ")" : ""}

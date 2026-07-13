@@ -131,7 +131,7 @@ export function IncomeStatementReport({
 		<div className="space-y-6">
 			{/* Period Selector */}
 			<div className="flex flex-wrap items-end gap-3">
-				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+				<div className="flex gap-1 bg-muted dark:bg-muted rounded-xl p-1">
 					{(
 						[
 							{ key: "month", label: t("finance.accountingReports.income.month") },
@@ -216,7 +216,7 @@ export function IncomeStatementReport({
 						<CardContent>
 							<div className="text-sm space-y-1">
 								{/* Revenue Section */}
-								<div className="font-bold text-slate-700 dark:text-slate-300 pb-2 border-b">
+								<div className="font-bold text-muted-foreground dark:text-muted-foreground pb-2 border-b">
 									{t("finance.accountingReports.income.revenue")}
 								</div>
 								<StatementLine
@@ -245,7 +245,7 @@ export function IncomeStatementReport({
 								/>
 
 								{/* Expenses Section */}
-								<div className="font-bold text-slate-700 dark:text-slate-300 pb-2 pt-4 border-b">
+								<div className="font-bold text-muted-foreground dark:text-muted-foreground pb-2 pt-4 border-b">
 									{t("finance.accountingReports.income.expenses")}
 								</div>
 								{data.expenses.byCategory.map((cat: any) => (
@@ -293,7 +293,7 @@ export function IncomeStatementReport({
 										isTotal
 									/>
 								</div>
-								<div className="flex justify-between pt-1 text-xs text-slate-400">
+								<div className="flex justify-between pt-1 text-xs text-muted-foreground">
 									<span>
 										{t("finance.accountingReports.income.profitMargin")}
 									</span>
@@ -351,7 +351,7 @@ export function IncomeStatementReport({
 															className="space-y-1"
 														>
 															<div className="flex items-center justify-between text-sm">
-																<span className="text-slate-600 dark:text-slate-400 truncate max-w-[200px]">
+																<span className="text-muted-foreground dark:text-muted-foreground truncate max-w-[200px]">
 																	{
 																		proj.projectName
 																	}
@@ -364,7 +364,7 @@ export function IncomeStatementReport({
 																	/>
 																</span>
 															</div>
-															<div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+															<div className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden">
 																<div
 																	className="h-full bg-primary rounded-full"
 																	style={{
@@ -404,13 +404,13 @@ function KPICard({
 }) {
 	const colorClasses = {
 		green: {
-			text: "text-green-600 dark:text-green-400",
-			bg: "bg-green-100 dark:bg-green-900/30",
+			text: "text-success dark:text-success",
+			bg: "bg-success/15 dark:bg-success/20",
 			icon: TrendingUp,
 		},
 		red: {
-			text: "text-red-600 dark:text-red-400",
-			bg: "bg-red-100 dark:bg-red-900/30",
+			text: "text-destructive dark:text-destructive",
+			bg: "bg-destructive/15 dark:bg-destructive/20",
 			icon: TrendingDown,
 		},
 		blue: {
@@ -433,7 +433,7 @@ function KPICard({
 			<CardContent className="p-4">
 				<div className="flex items-center justify-between">
 					<div>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 							{label}
 						</p>
 						<p className={`text-2xl font-bold ${c.text} mt-1`}>
@@ -445,8 +445,8 @@ function KPICard({
 							<div
 								className={`flex items-center gap-1 mt-1 text-xs ${
 									isPositiveChange
-										? "text-green-500"
-										: "text-red-500"
+										? "text-success"
+										: "text-destructive"
 								}`}
 							>
 								{isPositiveChange ? (
@@ -458,7 +458,7 @@ function KPICard({
 							</div>
 						)}
 						{subtitle && (
-							<p className="text-xs text-slate-400 mt-1">
+							<p className="text-xs text-muted-foreground mt-1">
 								{subtitle}
 							</p>
 						)}
@@ -498,9 +498,9 @@ function StatementLine({
 		<div
 			className={`flex items-center justify-between py-1 ${
 				isBold ? "font-bold" : ""
-			} ${isSubtotal ? "border-t border-slate-200 dark:border-slate-700" : ""} ${
+			} ${isSubtotal ? "border-t border-border dark:border-border" : ""} ${
 				isTotal
-					? "border-t-2 border-b-2 border-slate-400 dark:border-slate-500 py-2"
+					? "border-t-2 border-b-2 border-border dark:border-border py-2"
 					: ""
 			}`}
 			style={{ paddingInlineStart: `${indent * 1.5}rem` }}
@@ -508,17 +508,17 @@ function StatementLine({
 			<span
 				className={
 					isBold
-						? "text-slate-900 dark:text-slate-100"
-						: "text-slate-600 dark:text-slate-400"
+						? "text-muted-foreground dark:text-muted-foreground"
+						: "text-muted-foreground dark:text-muted-foreground"
 				}
 			>
 				{label}
 			</span>
 			<span
-				className={`${isNegative || amount < 0 ? "text-red-500" : ""} ${
+				className={`${isNegative || amount < 0 ? "text-destructive" : ""} ${
 					isBold
-						? "text-slate-900 dark:text-slate-100"
-						: "text-slate-600 dark:text-slate-400"
+						? "text-muted-foreground dark:text-muted-foreground"
+						: "text-muted-foreground dark:text-muted-foreground"
 				}`}
 			>
 				{formatted}

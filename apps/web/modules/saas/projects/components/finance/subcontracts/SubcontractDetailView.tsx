@@ -451,9 +451,9 @@ export function SubcontractDetailView({
 
 			{/* Notes */}
 			{contract.notes && (
-				<div className="rounded-2xl border border-slate-200/50 bg-white p-5 dark:border-slate-700/30 dark:bg-slate-900/50">
-					<p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">{t("subcontracts.form.notes")}</p>
-					<p className="text-sm text-slate-700 dark:text-slate-300">{contract.notes}</p>
+				<div className="rounded-2xl border border-border bg-white p-5 dark:border-border dark:bg-muted">
+					<p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("subcontracts.form.notes")}</p>
+					<p className="text-sm text-muted-foreground dark:text-muted-foreground">{contract.notes}</p>
 				</div>
 			)}
 
@@ -534,7 +534,7 @@ export function SubcontractDetailView({
 							</div>
 						</div>
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-							<div className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+							<div className="flex items-center gap-3 rounded-xl border border-border p-3 dark:border-border">
 								<Switch checked={editIncludesVat} onCheckedChange={setEditIncludesVat} />
 								<Label>{t("subcontracts.form.includesVat")}</Label>
 							</div>
@@ -595,7 +595,7 @@ export function SubcontractDetailView({
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
-							className="bg-red-600 hover:bg-red-700"
+							className="bg-destructive hover:bg-destructive"
 							onClick={() => deleteMutation.mutate({ organizationId, projectId, contractId: subcontractId })}
 						>
 							{t("common.delete")}

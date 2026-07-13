@@ -78,7 +78,7 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 					</Link>
 					<div>
 						<div className="flex min-w-0 items-center gap-2">
-							<h1 className="truncate text-xl font-bold text-slate-800 dark:text-slate-200">
+							<h1 className="truncate text-xl font-bold text-muted-foreground dark:text-muted-foreground">
 								{contract.name}
 							</h1>
 							<Badge className={`border-0 text-xs ${statusStyle.bg} ${statusStyle.text}`}>
@@ -86,7 +86,7 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 							</Badge>
 						</div>
 						{contract.contractNo && (
-							<p className="text-sm text-slate-500">{contract.contractNo}</p>
+							<p className="text-sm text-muted-foreground">{contract.contractNo}</p>
 						)}
 					</div>
 				</div>
@@ -103,7 +103,7 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 					<Button
 						variant="outline"
 						size="sm"
-						className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400"
+						className="rounded-xl border-destructive text-destructive hover:bg-destructive/15 hover:text-destructive dark:border-destructive dark:text-destructive"
 						onClick={onDelete}
 					>
 						<Trash2 className="h-4 w-4" />
@@ -113,39 +113,39 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 
 			{/* Alerts */}
 			{isOverBudget && (
-				<div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800/50 dark:bg-red-950/20">
-					<AlertTriangle className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+				<div className="flex items-center gap-3 rounded-xl border border-destructive bg-destructive/15 p-4 dark:border-destructive dark:bg-destructive/20">
+					<AlertTriangle className="h-5 w-5 shrink-0 text-destructive dark:text-destructive" />
 					<div>
-						<p className="text-sm font-semibold text-red-700 dark:text-red-300">
+						<p className="text-sm font-semibold text-destructive dark:text-destructive">
 							{t("subcontracts.detail.alerts.overBudget")}
 						</p>
-						<p className="text-xs text-red-600 dark:text-red-400">
+						<p className="text-xs text-destructive dark:text-destructive">
 							{t("subcontracts.detail.alerts.overBudgetDesc", { amount: formatCurrency(totalPaid - adjustedValue) })}
 						</p>
 					</div>
 				</div>
 			)}
 			{isEndDatePast && (
-				<div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-950/20">
-					<Clock className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+				<div className="flex items-center gap-3 rounded-xl border border-chart-1 bg-chart-1/20 p-4 dark:border-chart-1 dark:bg-chart-1/25">
+					<Clock className="h-5 w-5 shrink-0 text-chart-1 dark:text-chart-1" />
 					<div>
-						<p className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+						<p className="text-sm font-semibold text-chart-1 dark:text-chart-1">
 							{t("subcontracts.detail.alerts.overdue")}
 						</p>
-						<p className="text-xs text-amber-600 dark:text-amber-400">
+						<p className="text-xs text-chart-1 dark:text-chart-1">
 							{t("subcontracts.detail.alerts.overdueDesc", { date: format(new Date(contract.endDate!), "dd/MM/yyyy", { locale: ar }) })}
 						</p>
 					</div>
 				</div>
 			)}
 			{isNearingDeadline && !isEndDatePast && (
-				<div className="flex items-center gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800/50 dark:bg-yellow-950/20">
-					<Clock className="h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
+				<div className="flex items-center gap-3 rounded-xl border border-chart-1 bg-chart-1/20 p-4 dark:border-chart-1 dark:bg-chart-1/25">
+					<Clock className="h-5 w-5 shrink-0 text-chart-1 dark:text-chart-1" />
 					<div>
-						<p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+						<p className="text-sm font-semibold text-chart-1 dark:text-chart-1">
 							{t("subcontracts.detail.alerts.nearingDeadline")}
 						</p>
-						<p className="text-xs text-yellow-600 dark:text-yellow-400">
+						<p className="text-xs text-chart-1 dark:text-chart-1">
 							{t("subcontracts.detail.alerts.nearingDeadlineDesc", { days: daysUntilEnd! })}
 						</p>
 					</div>
@@ -153,23 +153,23 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 			)}
 
 			{/* Contractor Info */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
-				<div className="border-b border-slate-100 p-5 dark:border-slate-800">
+			<div className="overflow-hidden rounded-2xl border border-border bg-white dark:border-border dark:bg-muted">
+				<div className="border-b border-border p-5 dark:border-border">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex items-start gap-3">
-							<div className="shrink-0 rounded-xl bg-orange-100 p-2.5 dark:bg-orange-900/30">
-								<Hammer className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+							<div className="shrink-0 rounded-xl bg-chart-1/20 p-2.5 dark:bg-chart-1/25">
+								<Hammer className="h-5 w-5 text-chart-1 dark:text-chart-1" />
 							</div>
 							<div>
-								<h3 className="font-semibold text-slate-800 dark:text-slate-200">
+								<h3 className="font-semibold text-muted-foreground dark:text-muted-foreground">
 									{contract.companyName || contract.name}
 								</h3>
-								<p className="text-xs text-slate-500">
+								<p className="text-xs text-muted-foreground">
 									{contract.contractorType === "COMPANY" ? t("subcontracts.form.company") : t("subcontracts.form.individual")}
 									{contract.crNumber && ` • ${t("subcontracts.form.crNumber")}: ${contract.crNumber}`}
 									{contract.taxNumber && ` • ${t("subcontracts.form.taxNumber")}: ${contract.taxNumber}`}
 								</p>
-								<div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+								<div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
 									{contract.phone && (
 										<span className="flex items-center gap-1" dir="ltr">
 											<Phone className="h-3 w-3" /> {contract.phone}
@@ -187,16 +187,16 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 						{/* Dates */}
 						<div className="flex items-center gap-4 text-xs">
 							{contract.startDate && (
-								<div className="flex items-center gap-1.5 text-slate-500">
+								<div className="flex items-center gap-1.5 text-muted-foreground">
 									<Calendar className="h-3.5 w-3.5" />
 									<span>{format(new Date(contract.startDate), "dd/MM/yyyy", { locale: ar })}</span>
 								</div>
 							)}
 							{contract.startDate && contract.endDate && (
-								<span className="text-slate-300 dark:text-slate-600">&larr;</span>
+								<span className="text-muted-foreground dark:text-muted-foreground">&larr;</span>
 							)}
 							{contract.endDate && (
-								<div className={`flex items-center gap-1.5 ${isEndDatePast ? "font-semibold text-red-500" : "text-slate-500"}`}>
+								<div className={`flex items-center gap-1.5 ${isEndDatePast ? "font-semibold text-destructive" : "text-muted-foreground"}`}>
 									<Calendar className="h-3.5 w-3.5" />
 									<span>{format(new Date(contract.endDate), "dd/MM/yyyy", { locale: ar })}</span>
 								</div>

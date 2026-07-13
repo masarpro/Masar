@@ -83,13 +83,13 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 			</div>
 
 			{periodsList.length === 0 ? (
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-12 text-center text-muted-foreground">
 						{t("finance.accounting.periods.noPeriods")}
 					</CardContent>
 				</Card>
 			) : (
-				<Card className="rounded-2xl">
+				<Card className="rounded-2xl border-2 shadow-none">
 					<CardContent className="p-0">
 						<Table>
 							<TableHeader>

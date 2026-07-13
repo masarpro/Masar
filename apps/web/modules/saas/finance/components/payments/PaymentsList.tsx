@@ -1105,7 +1105,7 @@ export function PaymentsList({
 								deleteMutation.mutate(deletePaymentId)
 							}
 							disabled={deleteMutation.isPending}
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive hover:bg-destructive/90"
 						>
 							{deleteMutation.isPending
 								? t("common.deleting")

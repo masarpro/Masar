@@ -14,7 +14,7 @@ export function CreateDocumentForm({
 	const t = useTranslations();
 
 	return (
-		<div className="text-center py-10 text-slate-500">
+		<div className="text-center py-10 text-muted-foreground">
 			{t("finance.documents.createComingSoon")}
 		</div>
 	);

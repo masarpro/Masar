@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 const glassCard =
-	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
+	"bg-card border-2 rounded-2xl";
 
 interface OverdueInvoice {
 	id: string;
@@ -60,9 +60,9 @@ export function AlertsSection({
 	if (!hasAlerts) {
 		return (
 			<div
-				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-2.5 text-center flex-1"
+				className="rounded-2xl bg-success/15 dark:bg-success/20 border border-success dark:border-success flex flex-col items-center justify-center p-2.5 text-center flex-1"
 			>
-				<CheckCircle2 className="h-7 w-7 text-emerald-500 mb-1" />
+				<CheckCircle2 className="h-7 w-7 text-success mb-1" />
 				<p className="text-sm font-semibold text-foreground">
 					{t("dashboard.welcome.allGood")}
 				</p>
@@ -84,24 +84,24 @@ export function AlertsSection({
 			count: overdueInvoices.length,
 			amount: sumOverdueInvoices,
 			icon: FileWarning,
-			color: "text-red-600 dark:text-red-400",
-			bgColor: "bg-red-50 dark:bg-red-950/20",
+			color: "text-destructive dark:text-destructive",
+			bgColor: "bg-destructive/15 dark:bg-destructive/20",
 			href: `/app/${organizationSlug}/finance/invoices?status=OVERDUE`,
 		},
 		overdueMilestones.length > 0 && {
 			title: t("dashboard.alerts.overdueMilestones"),
 			count: overdueMilestones.length,
 			icon: AlertTriangle,
-			color: "text-amber-600 dark:text-amber-400",
-			bgColor: "bg-amber-50 dark:bg-amber-950/20",
+			color: "text-chart-1 dark:text-chart-1",
+			bgColor: "bg-chart-1/20 dark:bg-chart-1/25",
 			href: `/app/${organizationSlug}/projects`,
 		},
 		pendingSubcontractClaims > 0 && {
 			title: t("dashboard.alerts.pendingClaims"),
 			count: pendingSubcontractClaims,
 			icon: Flag,
-			color: "text-orange-600 dark:text-orange-400",
-			bgColor: "bg-orange-50 dark:bg-orange-950/20",
+			color: "text-chart-1 dark:text-chart-1",
+			bgColor: "bg-chart-1/20 dark:bg-chart-1/25",
 			href: `/app/${organizationSlug}/projects`,
 		},
 		upcomingPayments.length > 0 && {
@@ -125,7 +125,7 @@ export function AlertsSection({
 	const visibleAlerts = alerts.slice(0, 2);
 
 	return (
-		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-2.5 flex-1">
+		<div className="rounded-2xl bg-chart-1/20 dark:bg-chart-1/25 border border-chart-1 dark:border-chart-1 flex flex-col p-2.5 flex-1">
 			<h3 className="text-xs font-bold text-foreground mb-1.5">
 				{t("dashboard.alerts.needsAttention")}
 			</h3>

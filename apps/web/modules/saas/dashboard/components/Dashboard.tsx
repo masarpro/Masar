@@ -141,7 +141,9 @@ export function Dashboard({
 							)}
 						</div>
 
-						<QuickActionsGrid organizationSlug={organizationSlug} />
+						<div className="min-h-0 xl:flex-[3]">
+							<QuickActionsGrid organizationSlug={organizationSlug} />
+						</div>
 
 						{showProjects && (
 							<div className="min-h-0 xl:flex-[5]">

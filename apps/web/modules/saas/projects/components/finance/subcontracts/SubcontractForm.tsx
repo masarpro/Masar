@@ -215,12 +215,12 @@ export function SubcontractForm({
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6 pb-24">
 			{/* Section 1: Contractor Info */}
-			<div className="overflow-hidden rounded-2xl border border-orange-200/50 bg-white dark:border-orange-800/30 dark:bg-slate-900/50">
-				<div className="flex items-center gap-3 border-b border-orange-200/50 p-5 dark:border-orange-800/30">
-					<div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/50">
-						<User className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+			<div className="overflow-hidden rounded-2xl border border-chart-1 bg-white dark:border-chart-1 dark:bg-muted">
+				<div className="flex items-center gap-3 border-b border-chart-1 p-5 dark:border-chart-1">
+					<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+						<User className="h-5 w-5 text-chart-1 dark:text-chart-1" />
 					</div>
-					<h2 className="font-semibold text-orange-700 dark:text-orange-300">
+					<h2 className="font-semibold text-chart-1 dark:text-chart-1">
 						{t("subcontracts.form.contractorInfo")}
 					</h2>
 				</div>
@@ -320,12 +320,12 @@ export function SubcontractForm({
 			</div>
 
 			{/* Section 2: Contract Details */}
-			<div className="overflow-hidden rounded-2xl border border-amber-200/50 bg-white dark:border-amber-800/30 dark:bg-slate-900/50">
-				<div className="flex items-center gap-3 border-b border-amber-200/50 p-5 dark:border-amber-800/30">
-					<div className="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/50">
-						<FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+			<div className="overflow-hidden rounded-2xl border border-chart-1 bg-white dark:border-chart-1 dark:bg-muted">
+				<div className="flex items-center gap-3 border-b border-chart-1 p-5 dark:border-chart-1">
+					<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+						<FileText className="h-5 w-5 text-chart-1 dark:text-chart-1" />
 					</div>
-					<h2 className="font-semibold text-amber-700 dark:text-amber-300">
+					<h2 className="font-semibold text-chart-1 dark:text-chart-1">
 						{t("subcontracts.form.contractDetails")}
 					</h2>
 				</div>
@@ -346,7 +346,7 @@ export function SubcontractForm({
 									dir="ltr"
 									required
 								/>
-								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
 									{t("common.sar")}
 								</span>
 							</div>
@@ -414,7 +414,7 @@ export function SubcontractForm({
 
 					{/* VAT & Retention */}
 					<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-						<div className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+						<div className="flex items-center gap-3 rounded-xl border border-border p-3 dark:border-border">
 							<Switch
 								checked={includesVat}
 								onCheckedChange={setIncludesVat}
@@ -483,13 +483,13 @@ export function SubcontractForm({
 			</div>
 
 			{/* Section 3: Payment Terms */}
-			<div className="overflow-hidden rounded-2xl border border-violet-200/50 bg-white dark:border-violet-800/30 dark:bg-slate-900/50">
-				<div className="flex items-center justify-between border-b border-violet-200/50 p-5 dark:border-violet-800/30">
+			<div className="overflow-hidden rounded-2xl border border-chart-4 bg-white dark:border-chart-4 dark:bg-muted">
+				<div className="flex items-center justify-between border-b border-chart-4 p-5 dark:border-chart-4">
 					<div className="flex items-center gap-3">
-						<div className="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/50">
-							<Building className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+						<div className="rounded-lg bg-chart-4/15 p-2 dark:bg-chart-4/20">
+							<Building className="h-5 w-5 text-chart-4 dark:text-chart-4" />
 						</div>
-						<h2 className="font-semibold text-violet-700 dark:text-violet-300">
+						<h2 className="font-semibold text-chart-4 dark:text-chart-4">
 							{t("subcontracts.form.paymentTerms")}
 						</h2>
 					</div>
@@ -506,7 +506,7 @@ export function SubcontractForm({
 				</div>
 				<div className="p-5">
 					{paymentTerms.length === 0 ? (
-						<p className="text-center text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-center text-sm text-muted-foreground dark:text-muted-foreground">
 							{t("subcontracts.form.noTerms")}
 						</p>
 					) : (
@@ -514,7 +514,7 @@ export function SubcontractForm({
 							{paymentTerms.map((term, index) => (
 								<div
 									key={index}
-									className="flex items-end gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50"
+									className="flex items-end gap-3 rounded-xl bg-muted p-3 dark:bg-muted"
 								>
 									<div className="flex-1 space-y-2">
 										<Label className="text-xs">
@@ -576,7 +576,7 @@ export function SubcontractForm({
 											dir="ltr"
 										/>
 									</div>
-									<div className="min-w-[80px] text-end text-sm font-medium text-slate-600 dark:text-slate-400">
+									<div className="min-w-[80px] text-end text-sm font-medium text-muted-foreground dark:text-muted-foreground">
 										{formatSAR(
 											(totalWithVat *
 												(Number.parseFloat(term.percent) || 0)) /
@@ -587,7 +587,7 @@ export function SubcontractForm({
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="h-9 w-9 shrink-0 text-red-500 hover:bg-red-50 hover:text-red-600"
+										className="h-9 w-9 shrink-0 text-destructive hover:bg-destructive/15 hover:text-destructive"
 										onClick={() => removeTerm(index)}
 									>
 										<Trash2 className="h-4 w-4" />
@@ -595,11 +595,11 @@ export function SubcontractForm({
 								</div>
 							))}
 							{/* Terms total */}
-							<div className="flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
-								<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+							<div className="flex items-center justify-between border-t border-border pt-3 dark:border-border">
+								<span className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
 									{t("subcontracts.form.termsTotal")}
 								</span>
-								<span className="font-semibold text-violet-600 dark:text-violet-400">
+								<span className="font-semibold text-chart-4 dark:text-chart-4">
 									{formatSAR(termsTotal)}
 								</span>
 							</div>
@@ -609,7 +609,7 @@ export function SubcontractForm({
 			</div>
 
 			{/* Section 4: Scope & Notes */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
+			<div className="overflow-hidden rounded-2xl border border-border bg-white dark:border-border dark:bg-muted">
 				<div className="space-y-5 p-5">
 					<div className="space-y-2">
 						<Label>{t("subcontracts.form.scopeOfWork")}</Label>
@@ -635,22 +635,22 @@ export function SubcontractForm({
 			</div>
 
 			{/* Sticky Summary & Save Bar */}
-			<div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/80">
+			<div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card dark:border-border dark:bg-muted">
 				<div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
 					<div className="flex items-center gap-4 text-sm">
-						<span className="text-slate-500">
+						<span className="text-muted-foreground">
 							{t("subcontracts.form.total")}:
 						</span>
-						<span className="font-bold text-orange-600">
+						<span className="font-bold text-chart-1">
 							{formatSAR(totalWithVat)}
 						</span>
 						{retentionAmount > 0 && (
 							<>
-								<ArrowRight className="h-4 w-4 text-slate-400" />
-								<span className="text-slate-500">
+								<ArrowRight className="h-4 w-4 text-muted-foreground" />
+								<span className="text-muted-foreground">
 									{t("subcontracts.form.retention")}:
 								</span>
-								<span className="font-medium text-amber-600">
+								<span className="font-medium text-chart-1">
 									{formatSAR(retentionAmount)}
 								</span>
 							</>

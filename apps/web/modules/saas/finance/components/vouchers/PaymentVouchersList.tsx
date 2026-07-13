@@ -93,16 +93,16 @@ export function PaymentVouchersList({
 						</CardContent>
 					</Card>
 					{summaryData.pendingApproval.count > 0 && (
-						<Card className="border-amber-200 bg-amber-50">
+						<Card className="border-chart-1 bg-chart-1/20">
 							<CardContent className="pt-3 sm:pt-4">
-								<div className="flex items-center gap-2 text-xs sm:text-sm text-amber-700">
+								<div className="flex items-center gap-2 text-xs sm:text-sm text-chart-1">
 									<Clock className="h-4 w-4" />
 									{t("finance.paymentVouchers.summary.pendingApproval")}
 								</div>
-								<div className="mt-1 text-base sm:text-2xl font-bold text-amber-700">
+								<div className="mt-1 text-base sm:text-2xl font-bold text-chart-1">
 									{summaryData.pendingApproval.count}
 								</div>
-								<div className="text-xs text-amber-600">
+								<div className="text-xs text-chart-1">
 									<Currency amount={summaryData.pendingApproval.total} />
 								</div>
 							</CardContent>

@@ -21,7 +21,7 @@ const TIPS = [
 	{ key: "approvalWorkflow", href: "/projects", gradient: "from-green-500/10 to-lime-500/10" },
 	{ key: "cashFlow", href: "/finance/reports", gradient: "from-chart-4/10 to-chart-4/10" },
 	{ key: "changeOrders", href: "/projects", gradient: "from-amber-500/10 to-yellow-500/10" },
-	{ key: "buildingConfig", href: "/pricing/studies", gradient: "from-slate-500/10 to-gray-500/10" },
+	{ key: "buildingConfig", href: "/pricing/studies", gradient: "from-muted to-muted" },
 	{ key: "mepEngine", href: "/pricing/studies", gradient: "from-yellow-500/10 to-amber-500/10" },
 	{ key: "finishingCalc", href: "/pricing/studies", gradient: "from-pink-500/10 to-rose-500/10" },
 	{ key: "profitability", href: "/projects", gradient: "from-emerald-500/10 to-green-500/10" },
@@ -30,7 +30,7 @@ const TIPS = [
 	{ key: "assetTracking", href: "/company/assets", gradient: "from-orange-500/10 to-red-500/10" },
 	{ key: "bankTransfers", href: "/finance/banks", gradient: "from-teal-500/10 to-emerald-500/10" },
 	{ key: "multiLanguage", href: "/settings/general", gradient: "from-purple-500/10 to-indigo-500/10" },
-	{ key: "darkMode", href: "/settings/general", gradient: "from-gray-500/10 to-slate-500/10" },
+	{ key: "darkMode", href: "/settings/general", gradient: "from-muted to-muted" },
 	{ key: "rolePermissions", href: "/settings/roles", gradient: "from-red-500/10 to-rose-500/10" },
 	{ key: "claimsWorkflow", href: "/projects", gradient: "from-chart-4/10 to-chart-4/10" },
 	{ key: "boqSummary", href: "/pricing/studies", gradient: "from-lime-500/10 to-green-500/10" },
@@ -63,7 +63,7 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 
 	return (
 		<div
-			className="relative overflow-hidden rounded-2xl border border-chart-4/40 dark:border-chart-4/20 backdrop-blur-xl bg-gradient-to-br from-chart-4/15 via-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:via-chart-4/20 dark:to-chart-4/20 shadow-lg shadow-chart-4/5 p-2.5 flex flex-col flex-1"
+			className="relative overflow-hidden rounded-2xl border border-chart-4/40 dark:border-chart-4/20 bg-gradient-to-br from-chart-4/15 via-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:via-chart-4/20 dark:to-chart-4/20 shadow-lg shadow-chart-4/5 p-2.5 flex flex-col flex-1"
 		>
 			{/* Header */}
 			<div className="flex items-center gap-1.5 mb-1 relative z-10">

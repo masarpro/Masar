@@ -600,7 +600,7 @@ export function InvoiceView({
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel className="rounded-xl">{t("common.cancel")}</AlertDialogCancel>
-						<AlertDialogAction onClick={() => deletePaymentId && deletePaymentMutation.mutate(deletePaymentId)} disabled={deletePaymentMutation.isPending} className="rounded-xl bg-red-600 hover:bg-red-700">
+						<AlertDialogAction onClick={() => deletePaymentId && deletePaymentMutation.mutate(deletePaymentId)} disabled={deletePaymentMutation.isPending} className="rounded-xl bg-destructive hover:bg-destructive">
 							{deletePaymentMutation.isPending ? t("common.deleting") : t("common.delete")}
 						</AlertDialogAction>
 					</AlertDialogFooter>
@@ -616,7 +616,7 @@ export function InvoiceView({
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel className="rounded-xl">{t("common.cancel")}</AlertDialogCancel>
-						<AlertDialogAction onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending} className="rounded-xl bg-red-600 hover:bg-red-700">
+						<AlertDialogAction onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending} className="rounded-xl bg-destructive hover:bg-destructive">
 							{deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
 						</AlertDialogAction>
 					</AlertDialogFooter>
@@ -664,7 +664,7 @@ function InvoiceTabContent({
 	return (
 		<div
 			id="invoice-print-area"
-			className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto relative overflow-hidden print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white"
+			className="bg-card dark:bg-muted rounded-2xl border border-white/80 dark:border-border shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto relative overflow-hidden print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white"
 		>
 			{/* على الجوال: تصغير صفحة A4 لتطابق عرض الشاشة بدل قصّها */}
 			<ScaleToFit contentWidth={794}>
@@ -1117,7 +1117,7 @@ function DetailRow({
 
 	return (
 		<div className="flex items-start gap-3">
-			<div className="mt-1 text-slate-400">{icon}</div>
+			<div className="mt-1 text-muted-foreground">{icon}</div>
 			<div>
 				<p className="text-sm text-muted-foreground">{label}</p>
 				<p className="font-medium text-foreground">{value}</p>

@@ -32,32 +32,32 @@ const BASIC_REPORTS: ReportItem[] = [
 	{
 		id: "aged-receivables",
 		icon: AlertTriangle,
-		color: "text-red-600 dark:text-red-400",
-		bgColor: "bg-red-100 dark:bg-red-900/30",
+		color: "text-destructive",
+		bgColor: "bg-destructive/15",
 		labelKey: "finance.accountingReports.agedReceivables",
 		descKey: "finance.accountingReports.agedReceivablesDesc",
 	},
 	{
 		id: "aged-payables",
 		icon: Clock,
-		color: "text-amber-600 dark:text-amber-400",
-		bgColor: "bg-amber-100 dark:bg-amber-900/30",
+		color: "text-chart-1",
+		bgColor: "bg-chart-1/15",
 		labelKey: "finance.accountingReports.agedPayables",
 		descKey: "finance.accountingReports.agedPayablesDesc",
 	},
 	{
 		id: "vat-report",
 		icon: FileText,
-		color: "text-green-600 dark:text-green-400",
-		bgColor: "bg-green-100 dark:bg-green-900/30",
+		color: "text-success",
+		bgColor: "bg-success/15",
 		labelKey: "finance.accountingReports.vatReport",
 		descKey: "finance.accountingReports.vatReportDesc",
 	},
 	{
 		id: "cost-center",
 		icon: Target,
-		color: "text-orange-600 dark:text-orange-400",
-		bgColor: "bg-orange-100 dark:bg-orange-900/30",
+		color: "text-chart-1 dark:text-chart-1",
+		bgColor: "bg-chart-1/20 dark:bg-chart-1/25",
 		labelKey: "finance.accountingReports.costCenter",
 		descKey: "finance.accountingReports.costCenterDesc",
 	},
@@ -78,16 +78,16 @@ const ACCOUNTING_REPORTS: ReportItem[] = [
 	{
 		id: "trial-balance",
 		icon: Scale,
-		color: "text-indigo-600 dark:text-indigo-400",
-		bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
+		color: "text-chart-4 dark:text-chart-4",
+		bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		labelKey: "finance.accounting.trialBalance.title",
 		descKey: "finance.accounting.trialBalance.noEntries",
 	},
 	{
 		id: "balance-sheet",
 		icon: BookOpen,
-		color: "text-violet-600 dark:text-violet-400",
-		bgColor: "bg-violet-100 dark:bg-violet-900/30",
+		color: "text-chart-4 dark:text-chart-4",
+		bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
 		labelKey: "finance.accounting.balanceSheet.title",
 		descKey: "finance.accounting.balanceSheet.balanced",
 	},
@@ -97,8 +97,8 @@ const TOOLS: ReportItem[] = [
 	{
 		id: "health",
 		icon: HeartPulse,
-		color: "text-emerald-600 dark:text-emerald-400",
-		bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+		color: "text-success dark:text-success",
+		bgColor: "bg-success/15 dark:bg-success/20",
 		labelKey: "finance.accountingReports.healthCheck",
 		descKey: "finance.accountingReports.healthCheckDesc",
 	},
@@ -115,10 +115,10 @@ function ReportCard({ report, basePath, t }: { report: ReportItem; basePath: str
 							<Icon className={`h-6 w-6 ${report.color}`} />
 						</div>
 						<div className="flex-1 min-w-0">
-							<h3 className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">
+							<h3 className="font-semibold text-muted-foreground dark:text-muted-foreground group-hover:text-primary transition-colors">
 								{t(report.labelKey)}
 							</h3>
-							<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+							<p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
 								{t(report.descKey)}
 							</p>
 						</div>
@@ -145,17 +145,17 @@ export function AccountingReportsLanding({
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<h1 className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground">
 					{t("finance.accountingReports.title")}
 				</h1>
-				<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+				<p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
 					{t("finance.accountingReports.subtitle")}
 				</p>
 			</div>
 
 			{sections.map((section) => (
 				<div key={section.title} className="space-y-3">
-					<h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+					<h2 className="text-lg font-semibold text-muted-foreground dark:text-muted-foreground">
 						{section.title}
 					</h2>
 					<div className="grid gap-4 sm:grid-cols-2">

@@ -53,7 +53,7 @@ export function PaymentVoucher({
 	if (!expense) {
 		return (
 			<div className="text-center py-20">
-				<p className="text-slate-500">{t("common.notFound")}</p>
+				<p className="text-muted-foreground">{t("common.notFound")}</p>
 			</div>
 		);
 	}
@@ -83,8 +83,8 @@ export function PaymentVoucher({
 				<Card className="rounded-2xl print:rounded-none print:shadow-none print:border-2 print:border-black max-w-[210mm] mx-auto">
 					<CardContent className="p-8">
 						{/* Header */}
-						<div className="text-center border-b-2 border-dashed border-slate-300 pb-6 mb-6">
-							<h1 className="text-2xl font-bold text-slate-900 mb-2">
+						<div className="text-center border-b-2 border-dashed border-border pb-6 mb-6">
+							<h1 className="text-2xl font-bold text-muted-foreground mb-2">
 								{t("finance.accounting.voucher.paymentVoucher")}
 							</h1>
 						</div>
@@ -92,25 +92,25 @@ export function PaymentVoucher({
 						{/* Voucher Number and Date */}
 						<div className="flex justify-between mb-8">
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-1">{t("finance.accounting.voucher.voucherNo")}</p>
+								<p className="text-sm text-muted-foreground mb-1">{t("finance.accounting.voucher.voucherNo")}</p>
 								<p className="text-xl font-bold text-primary">
 									{expense.voucherNo || expense.expenseNo}
 								</p>
 							</div>
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-1">{t("finance.accounting.voucher.date")}</p>
+								<p className="text-sm text-muted-foreground mb-1">{t("finance.accounting.voucher.date")}</p>
 								<p className="text-xl font-bold">{formatDate(new Date(expense.date))}</p>
 							</div>
 						</div>
 
 						{/* Amount Box */}
-						<div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 mb-8 border-2 border-red-200 dark:border-red-800">
+						<div className="bg-destructive/15 dark:bg-destructive/20 rounded-xl p-6 mb-8 border-2 border-destructive dark:border-destructive">
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-2">{t("finance.accounting.voucher.amount")}</p>
-								<p className="text-4xl font-bold text-red-600 dark:text-red-400 mb-4">
+								<p className="text-sm text-muted-foreground mb-2">{t("finance.accounting.voucher.amount")}</p>
+								<p className="text-4xl font-bold text-destructive dark:text-destructive mb-4">
 									<Currency amount={Number(expense.amount)} />
 								</p>
-								<p className="text-sm text-slate-600 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{numberToArabicWords(Number(expense.amount))}
 								</p>
 							</div>
@@ -119,8 +119,8 @@ export function PaymentVoucher({
 						{/* Details Grid */}
 						<div className="space-y-4 mb-8">
 							{/* Paid To */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.accounting.voucher.paidTo")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.accounting.voucher.paidTo")}</span>
 								<span className="font-medium">
 									{expense.vendorName || "—"}
 								</span>
@@ -128,21 +128,21 @@ export function PaymentVoucher({
 
 							{/* Description */}
 							{expense.description && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.accounting.voucher.regarding")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.accounting.voucher.regarding")}</span>
 									<span className="font-medium">{expense.description}</span>
 								</div>
 							)}
 
 							{/* Category */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.accounting.voucher.category")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.accounting.voucher.category")}</span>
 								<span className="font-medium">{expense.category}</span>
 							</div>
 
 							{/* Payment Method */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.accounting.voucher.paymentMethod")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.accounting.voucher.paymentMethod")}</span>
 								<span className="font-medium">
 									{PAYMENT_METHOD_KEY_MAP[expense.paymentMethod] ? t(`finance.paymentMethods.${PAYMENT_METHOD_KEY_MAP[expense.paymentMethod]}`) : expense.paymentMethod}
 								</span>
@@ -150,55 +150,55 @@ export function PaymentVoucher({
 
 							{/* Reference Number */}
 							{expense.referenceNo && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.accounting.voucher.referenceNo")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.accounting.voucher.referenceNo")}</span>
 									<span className="font-medium font-mono">{expense.referenceNo}</span>
 								</div>
 							)}
 
 							{/* Source Account */}
 							{expense.sourceAccount && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.accounting.voucher.sourceAccount")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.accounting.voucher.sourceAccount")}</span>
 									<span className="font-medium">{expense.sourceAccount.name}</span>
 								</div>
 							)}
 
 							{/* Project */}
 							{expense.project && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.accounting.voucher.project")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.accounting.voucher.project")}</span>
 									<span className="font-medium">{expense.project.name}</span>
 								</div>
 							)}
 
 							{/* Vendor Tax Number */}
 							{expense.vendorTaxNumber && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.accounting.voucher.vendorTaxNumber")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.accounting.voucher.vendorTaxNumber")}</span>
 									<span className="font-medium font-mono">{expense.vendorTaxNumber}</span>
 								</div>
 							)}
 						</div>
 
 						{/* Signatures */}
-						<div className="grid grid-cols-3 gap-8 pt-8 border-t-2 border-dashed border-slate-300">
+						<div className="grid grid-cols-3 gap-8 pt-8 border-t-2 border-dashed border-border">
 							<div className="text-center">
-								<div className="h-16 border-b border-slate-300 mb-2" />
-								<p className="text-sm text-slate-500">{t("finance.accounting.voucher.accountant")}</p>
+								<div className="h-16 border-b border-border mb-2" />
+								<p className="text-sm text-muted-foreground">{t("finance.accounting.voucher.accountant")}</p>
 							</div>
 							<div className="text-center">
-								<div className="h-16 border-b border-slate-300 mb-2" />
-								<p className="text-sm text-slate-500">{t("finance.accounting.voucher.financeManager")}</p>
+								<div className="h-16 border-b border-border mb-2" />
+								<p className="text-sm text-muted-foreground">{t("finance.accounting.voucher.financeManager")}</p>
 							</div>
 							<div className="text-center">
-								<div className="h-16 border-b border-slate-300 mb-2" />
-								<p className="text-sm text-slate-500">{t("finance.accounting.voucher.recipient")}</p>
+								<div className="h-16 border-b border-border mb-2" />
+								<p className="text-sm text-muted-foreground">{t("finance.accounting.voucher.recipient")}</p>
 							</div>
 						</div>
 
 						{/* Footer */}
-						<div className="mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
+						<div className="mt-8 pt-4 border-t border-border text-center text-xs text-muted-foreground">
 							<p>{t("finance.accounting.voucher.generatedAt", { date: formatDate(new Date()) })}</p>
 						</div>
 					</CardContent>

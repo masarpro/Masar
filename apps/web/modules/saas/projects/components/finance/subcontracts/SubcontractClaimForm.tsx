@@ -288,7 +288,7 @@ export function SubcontractClaimForm({
 							: "bg-muted text-muted-foreground"
 					}`}
 				>
-					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
+					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-card text-xs font-bold">
 						1
 					</span>
 					{t("steps.claimInfo")}
@@ -301,7 +301,7 @@ export function SubcontractClaimForm({
 							: "bg-muted text-muted-foreground"
 					}`}
 				>
-					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
+					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-card text-xs font-bold">
 						2
 					</span>
 					{t("steps.itemsTable")}
@@ -633,13 +633,13 @@ export function SubcontractClaimForm({
 									{financialSummary.penaltyDed > 0 && (
 										<div className="flex justify-between text-sm">
 											<span>(-) {t("penaltyAmount")}:</span>
-											<span className="font-medium text-red-600">{formatSAR(financialSummary.penaltyDed)}</span>
+											<span className="font-medium text-destructive">{formatSAR(financialSummary.penaltyDed)}</span>
 										</div>
 									)}
 									{financialSummary.otherDed > 0 && (
 										<div className="flex justify-between text-sm">
 											<span>(-) {t("otherDeductions")}:</span>
-											<span className="font-medium text-red-600">{formatSAR(financialSummary.otherDed)}</span>
+											<span className="font-medium text-destructive">{formatSAR(financialSummary.otherDed)}</span>
 										</div>
 									)}
 									<div className="flex justify-between text-muted-foreground">
@@ -663,7 +663,7 @@ export function SubcontractClaimForm({
 
 					{/* Additional Deductions (collapsible) */}
 					<details className="rounded-lg border p-3">
-						<summary className="cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300">
+						<summary className="cursor-pointer text-sm font-medium text-muted-foreground dark:text-muted-foreground">
 							{t("additionalDeductions")} ▾
 						</summary>
 						<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

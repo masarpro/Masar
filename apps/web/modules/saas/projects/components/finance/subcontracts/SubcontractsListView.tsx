@@ -43,24 +43,24 @@ const STATUS_STYLES: Record<
 	{ bg: string; text: string }
 > = {
 	DRAFT: {
-		bg: "bg-slate-100 dark:bg-slate-800",
-		text: "text-slate-600 dark:text-slate-400",
+		bg: "bg-muted dark:bg-muted",
+		text: "text-muted-foreground dark:text-muted-foreground",
 	},
 	ACTIVE: {
 		bg: "bg-chart-4/15 dark:bg-chart-4/20",
 		text: "text-chart-4 dark:text-chart-4",
 	},
 	SUSPENDED: {
-		bg: "bg-amber-100 dark:bg-amber-900/40",
-		text: "text-amber-700 dark:text-amber-300",
+		bg: "bg-chart-1/20 dark:bg-chart-1/25",
+		text: "text-chart-1 dark:text-chart-1",
 	},
 	COMPLETED: {
 		bg: "bg-chart-4/15 dark:bg-chart-4/20",
 		text: "text-chart-4 dark:text-chart-4",
 	},
 	TERMINATED: {
-		bg: "bg-red-100 dark:bg-red-900/40",
-		text: "text-red-700 dark:text-red-300",
+		bg: "bg-destructive/15 dark:bg-destructive/20",
+		text: "text-destructive dark:text-destructive",
 	},
 };
 
@@ -140,17 +140,17 @@ export function SubcontractsListView({
 			{/* Header */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="text-xl font-semibold text-muted-foreground dark:text-muted-foreground">
 						{t("subcontracts.title")}
 					</h2>
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("subcontracts.empty.description")}
 					</p>
 				</div>
 				<Link href={`${basePath}/new`}>
 					<Button
 						size="sm"
-						className="rounded-xl bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600"
+						className="rounded-xl bg-chart-1 text-white hover:bg-chart-1 dark:bg-chart-1 dark:hover:bg-chart-1"
 					>
 						<Plus className="me-1.5 h-4 w-4" />
 						{t("subcontracts.newContract")}
@@ -161,46 +161,46 @@ export function SubcontractsListView({
 			{/* Summary Cards */}
 			{summary && summary.contractsCount > 0 && (
 				<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-					<div className="rounded-xl bg-orange-50 p-4 dark:bg-orange-950/30">
+					<div className="rounded-xl bg-chart-1/20 p-4 dark:bg-chart-1/25">
 						<div className="flex items-center gap-2">
-							<div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/50">
-								<FileText className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+							<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+								<FileText className="h-4 w-4 text-chart-1 dark:text-chart-1" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-orange-600 dark:text-orange-400">
+								<p className="text-xs text-chart-1 dark:text-chart-1">
 									{t("subcontracts.summary.totalValue")}
 								</p>
-								<p className="truncate text-sm font-semibold text-orange-700 dark:text-orange-300">
+								<p className="truncate text-sm font-semibold text-chart-1 dark:text-chart-1">
 									{formatSAR(summary.totalValue)}
 								</p>
 							</div>
 						</div>
 					</div>
-					<div className="rounded-xl bg-amber-50 p-4 dark:bg-amber-950/30">
+					<div className="rounded-xl bg-chart-1/20 p-4 dark:bg-chart-1/25">
 						<div className="flex items-center gap-2">
-							<div className="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/50">
-								<TrendingUp className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+							<div className="rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+								<TrendingUp className="h-4 w-4 text-chart-1 dark:text-chart-1" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-amber-600 dark:text-amber-400">
+								<p className="text-xs text-chart-1 dark:text-chart-1">
 									{t("subcontracts.summary.changeOrders")}
 								</p>
-								<p className="truncate text-sm font-semibold text-amber-700 dark:text-amber-300">
+								<p className="truncate text-sm font-semibold text-chart-1 dark:text-chart-1">
 									{formatSAR(summary.coImpact)}
 								</p>
 							</div>
 						</div>
 					</div>
-					<div className="rounded-xl bg-red-50 p-4 dark:bg-red-950/30">
+					<div className="rounded-xl bg-destructive/15 p-4 dark:bg-destructive/20">
 						<div className="flex items-center gap-2">
-							<div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/50">
-								<TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
+							<div className="rounded-lg bg-destructive/15 p-2 dark:bg-destructive/20">
+								<TrendingDown className="h-4 w-4 text-destructive dark:text-destructive" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-red-600 dark:text-red-400">
+								<p className="text-xs text-destructive dark:text-destructive">
 									{t("subcontracts.summary.totalPaid")}
 								</p>
-								<p className="truncate text-sm font-semibold text-red-700 dark:text-red-300">
+								<p className="truncate text-sm font-semibold text-destructive dark:text-destructive">
 									{formatSAR(summary.totalPaid)}
 								</p>
 							</div>
@@ -230,7 +230,7 @@ export function SubcontractsListView({
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						{/* Search */}
 						<div className="relative flex-1">
-							<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 							<Input
 								value={searchQuery}
 								onChange={(e: any) => setSearchQuery(e.target.value)}
@@ -240,14 +240,14 @@ export function SubcontractsListView({
 						</div>
 
 						{/* Status segmented control */}
-						<div className="flex rounded-xl border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+						<div className="flex rounded-xl border border-border bg-muted p-0.5 dark:border-border dark:bg-muted">
 							<button
 								type="button"
 								onClick={() => setStatusFilter("_all")}
 								className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 									statusFilter === "_all"
-										? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+										? "bg-white text-muted-foreground shadow-sm dark:bg-muted dark:text-muted-foreground"
+										: "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-muted-foreground"
 								}`}
 							>
 								{t("subcontracts.list.allStatuses")}
@@ -257,8 +257,8 @@ export function SubcontractsListView({
 								onClick={() => setStatusFilter("ACTIVE")}
 								className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 									statusFilter === "ACTIVE"
-										? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+										? "bg-white text-muted-foreground shadow-sm dark:bg-muted dark:text-muted-foreground"
+										: "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-muted-foreground"
 								}`}
 							>
 								{t("subcontracts.status.ACTIVE")}
@@ -268,8 +268,8 @@ export function SubcontractsListView({
 								onClick={() => setStatusFilter("DRAFT")}
 								className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 									statusFilter === "DRAFT"
-										? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+										? "bg-white text-muted-foreground shadow-sm dark:bg-muted dark:text-muted-foreground"
+										: "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-muted-foreground"
 								}`}
 							>
 								{t("subcontracts.status.DRAFT")}
@@ -279,8 +279,8 @@ export function SubcontractsListView({
 								onClick={() => setStatusFilter("COMPLETED")}
 								className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
 									statusFilter === "COMPLETED"
-										? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+										? "bg-white text-muted-foreground shadow-sm dark:bg-muted dark:text-muted-foreground"
+										: "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-muted-foreground"
 								}`}
 							>
 								{t("subcontracts.status.COMPLETED")}
@@ -337,7 +337,7 @@ export function SubcontractsListView({
 								variant="ghost"
 								size="sm"
 								onClick={clearFilters}
-								className="h-8 rounded-lg px-2 text-xs text-slate-500"
+								className="h-8 rounded-lg px-2 text-xs text-muted-foreground"
 							>
 								<X className="me-1 h-3 w-3" />
 								{t("common.clear")}
@@ -345,7 +345,7 @@ export function SubcontractsListView({
 						)}
 
 						{/* Results count */}
-						<span className="text-xs text-slate-400">
+						<span className="text-xs text-muted-foreground">
 							{t("subcontracts.list.resultsCount", { count: filteredContracts.length })}
 						</span>
 					</div>
@@ -360,7 +360,7 @@ export function SubcontractsListView({
 					description={t("subcontracts.empty.description")}
 				>
 					<Link href={`${basePath}/new`}>
-						<Button className="rounded-xl bg-orange-600 text-white hover:bg-orange-700">
+						<Button className="rounded-xl bg-chart-1 text-white hover:bg-chart-1">
 							<Plus className="me-2 h-4 w-4" />
 							{t("subcontracts.empty.action")}
 						</Button>
@@ -371,17 +371,17 @@ export function SubcontractsListView({
 			{/* No results after filter */}
 			{contracts && contracts.length > 0 && filteredContracts.length === 0 && (
 				<div className="flex flex-col items-center justify-center py-12 text-center">
-					<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-						<Search className="h-8 w-8 text-slate-400" />
+					<div className="mb-4 rounded-2xl bg-muted p-4 dark:bg-muted">
+						<Search className="h-8 w-8 text-muted-foreground" />
 					</div>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 						{t("subcontracts.list.noResults")}
 					</p>
 					<Button
 						variant="ghost"
 						size="sm"
 						onClick={clearFilters}
-						className="mt-2 text-xs text-orange-600"
+						className="mt-2 text-xs text-chart-1"
 					>
 						{t("common.clear")}
 					</Button>
@@ -390,7 +390,7 @@ export function SubcontractsListView({
 
 			{/* Contract List */}
 			{filteredContracts.length > 0 && (
-				<div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+				<div className="overflow-hidden rounded-xl border border-border dark:border-border">
 					{filteredContracts.map((contract, idx) => {
 						const progress =
 							contract.adjustedValue > 0
@@ -409,21 +409,21 @@ export function SubcontractsListView({
 								className="group block"
 							>
 								<div
-									className={`flex flex-col gap-3 p-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 sm:flex-row sm:items-center sm:gap-4 ${
+									className={`flex flex-col gap-3 p-4 transition-colors hover:bg-muted dark:hover:bg-muted sm:flex-row sm:items-center sm:gap-4 ${
 										idx !== filteredContracts.length - 1
-											? "border-b border-slate-100 dark:border-slate-800"
+											? "border-b border-border dark:border-border"
 											: ""
 									}`}
 								>
 									{/* Right section: Name & Status */}
 									<div className="flex min-w-0 flex-1 items-start gap-3">
 										{/* Icon */}
-										<div className="mt-0.5 shrink-0 rounded-lg bg-orange-100 p-2 dark:bg-orange-900/30">
-											<Hammer className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+										<div className="mt-0.5 shrink-0 rounded-lg bg-chart-1/20 p-2 dark:bg-chart-1/25">
+											<Hammer className="h-4 w-4 text-chart-1 dark:text-chart-1" />
 										</div>
 										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">
-												<h3 className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+												<h3 className="truncate text-sm font-semibold text-muted-foreground dark:text-muted-foreground">
 													{contract.name}
 												</h3>
 												<Badge
@@ -432,7 +432,7 @@ export function SubcontractsListView({
 													{t(`subcontracts.status.${contract.status}`)}
 												</Badge>
 											</div>
-											<div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+											<div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground dark:text-muted-foreground">
 												{contract.contractNo && (
 													<span className="font-mono">
 														{contract.contractNo}
@@ -452,20 +452,20 @@ export function SubcontractsListView({
 									<div className="flex items-center gap-4 sm:w-64 sm:shrink-0">
 										<div className="min-w-0 flex-1">
 											<div className="mb-1 flex items-baseline justify-between">
-												<span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+												<span className="text-sm font-bold text-chart-1 dark:text-chart-1">
 													{formatSAR(contract.adjustedValue)}
 												</span>
-												<span className="text-[10px] font-medium text-slate-500">
+												<span className="text-[10px] font-medium text-muted-foreground">
 													{progress.toFixed(0)}%
 												</span>
 											</div>
-											<div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+											<div className="h-1.5 w-full overflow-hidden rounded-full bg-muted dark:bg-muted">
 												<div
-													className="h-full rounded-full bg-orange-500 transition-all"
+													className="h-full rounded-full bg-chart-1 transition-all"
 													style={{ width: `${progress}%` }}
 												/>
 											</div>
-											<div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+											<div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
 												<span>
 													{t("subcontracts.card.paid")}: {formatSAR(contract.totalPaid)}
 												</span>
@@ -477,7 +477,7 @@ export function SubcontractsListView({
 									</div>
 
 									{/* Left section: Date & Counts */}
-									<div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 sm:w-36 sm:shrink-0 sm:flex-col sm:items-end sm:gap-1">
+									<div className="flex items-center gap-4 text-xs text-muted-foreground dark:text-muted-foreground sm:w-36 sm:shrink-0 sm:flex-col sm:items-end sm:gap-1">
 										{contract.startDate && (
 											<span>
 												{format(
@@ -489,12 +489,12 @@ export function SubcontractsListView({
 										)}
 										<div className="flex items-center gap-2">
 											{contract._count.payments > 0 && (
-												<span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] dark:bg-slate-800">
+												<span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] dark:bg-muted">
 													{contract._count.payments} {t("subcontracts.detail.paymentsHistory")}
 												</span>
 											)}
 											{contract._count.changeOrders > 0 && (
-												<span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
+												<span className="rounded-md bg-chart-1/20 px-1.5 py-0.5 text-[10px] text-chart-1 dark:bg-chart-1/25 dark:text-chart-1">
 													{contract._count.changeOrders} {t("subcontracts.detail.changeOrdersSection")}
 												</span>
 											)}

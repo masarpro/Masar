@@ -162,7 +162,7 @@ export function CreatePaymentDialog({
 											<SelectItem key={term.id} value={term.id}>
 												{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
 												{term.amount != null && (
-													<span className="text-xs text-slate-500">
+													<span className="text-xs text-muted-foreground">
 														{" "}
 														({formatSAR(term.paidAmount)} / {formatSAR(term.amount)})
 													</span>

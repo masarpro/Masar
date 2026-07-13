@@ -143,15 +143,15 @@ export function AgedReceivablesReport({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{t("finance.accountingReports.totalOutstanding")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground mt-1">
 									<Currency amount={totals.total} />
 								</p>
 							</div>
-							<div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
-								<DollarSign className="h-6 w-6 text-red-600 dark:text-red-400" />
+							<div className="p-3 bg-destructive/15 dark:bg-destructive/20 rounded-xl">
+								<DollarSign className="h-6 w-6 text-destructive dark:text-destructive" />
 							</div>
 						</div>
 					</CardContent>
@@ -161,15 +161,15 @@ export function AgedReceivablesReport({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{t("finance.accountingReports.overdueClients")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground mt-1">
 									{overdueClients}
 								</p>
 							</div>
-							<div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-								<Users className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+							<div className="p-3 bg-chart-1/20 dark:bg-chart-1/25 rounded-xl">
+								<Users className="h-6 w-6 text-chart-1 dark:text-chart-1" />
 							</div>
 						</div>
 					</CardContent>
@@ -179,15 +179,15 @@ export function AgedReceivablesReport({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{t("finance.accountingReports.largestDebt")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground mt-1">
 									<Currency amount={maxDebt} />
 								</p>
 							</div>
-							<div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-								<AlertTriangle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+							<div className="p-3 bg-chart-4/15 dark:bg-chart-4/20 rounded-xl">
+								<AlertTriangle className="h-6 w-6 text-chart-4 dark:text-chart-4" />
 							</div>
 						</div>
 					</CardContent>
@@ -197,12 +197,12 @@ export function AgedReceivablesReport({
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{t("finance.accountingReports.avgAgingDays")}
 								</p>
-								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+								<p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground mt-1">
 									{avgAgingDays}{" "}
-									<span className="text-sm font-normal text-slate-400">
+									<span className="text-sm font-normal text-muted-foreground">
 										{t("finance.accountingReports.days")}
 									</span>
 								</p>
@@ -225,7 +225,7 @@ export function AgedReceivablesReport({
 					</CardHeader>
 					<CardContent>
 						{rows.length === 0 ? (
-							<div className="text-center py-10 text-slate-500">
+							<div className="text-center py-10 text-muted-foreground">
 								{t("finance.accountingReports.noOutstandingReceivables")}
 							</div>
 						) : (
@@ -236,19 +236,19 @@ export function AgedReceivablesReport({
 											<TableHead className="min-w-[180px]">
 												{t("finance.accountingReports.client")}
 											</TableHead>
-											<TableHead className="text-end bg-green-50 dark:bg-green-950/20">
+											<TableHead className="text-end bg-success/15 dark:bg-success/20">
 												{t("finance.accountingReports.aging.current")}
 											</TableHead>
-											<TableHead className="text-end bg-yellow-50 dark:bg-yellow-950/20">
+											<TableHead className="text-end bg-chart-1/20 dark:bg-chart-1/25">
 												{t("finance.accountingReports.aging.days1to30")}
 											</TableHead>
-											<TableHead className="text-end bg-orange-50 dark:bg-orange-950/20">
+											<TableHead className="text-end bg-chart-1/20 dark:bg-chart-1/25">
 												{t("finance.accountingReports.aging.days31to60")}
 											</TableHead>
-											<TableHead className="text-end bg-red-50 dark:bg-red-950/20">
+											<TableHead className="text-end bg-destructive/15 dark:bg-destructive/20">
 												{t("finance.accountingReports.aging.days61to90")}
 											</TableHead>
-											<TableHead className="text-end bg-red-100 dark:bg-red-950/40">
+											<TableHead className="text-end bg-destructive/15 dark:bg-destructive/20">
 												{t("finance.accountingReports.aging.over90")}
 											</TableHead>
 											<TableHead className="text-end font-bold">
@@ -266,7 +266,7 @@ export function AgedReceivablesReport({
 												<>
 													<TableRow
 														key={key}
-														className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+														className="cursor-pointer hover:bg-muted dark:hover:bg-muted"
 														onClick={() =>
 															toggleClient(key)
 														}
@@ -274,12 +274,12 @@ export function AgedReceivablesReport({
 														<TableCell className="font-medium">
 															<div className="flex items-center gap-2">
 																{isExpanded ? (
-																	<ChevronUp className="h-4 w-4 text-slate-400" />
+																	<ChevronUp className="h-4 w-4 text-muted-foreground" />
 																) : (
-																	<ChevronDown className="h-4 w-4 text-slate-400" />
+																	<ChevronDown className="h-4 w-4 text-muted-foreground" />
 																)}
 																{row.clientName}
-																<span className="text-xs text-slate-400">
+																<span className="text-xs text-muted-foreground">
 																	(
 																	{
 																		row
@@ -329,14 +329,14 @@ export function AgedReceivablesReport({
 															(inv: any) => (
 																<TableRow
 																	key={inv.id}
-																	className="bg-slate-50/50 dark:bg-slate-800/50"
+																	className="bg-muted dark:bg-muted"
 																>
-																	<TableCell className="ps-10 text-sm text-slate-500">
+																	<TableCell className="ps-10 text-sm text-muted-foreground">
 																		{
 																			inv.number
 																		}
 																		{inv.projectName && (
-																			<span className="text-xs text-slate-400 ms-2">
+																			<span className="text-xs text-muted-foreground ms-2">
 																				{
 																					inv.projectName
 																				}
@@ -347,7 +347,7 @@ export function AgedReceivablesReport({
 																		colSpan={
 																			5
 																		}
-																		className="text-sm text-slate-500 text-end"
+																		className="text-sm text-muted-foreground text-end"
 																	>
 																		{t(
 																			"finance.accountingReports.dueDate",
@@ -380,7 +380,7 @@ export function AgedReceivablesReport({
 											);
 										})}
 										{/* Totals Row */}
-										<TableRow className="border-t-2 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 font-bold">
+										<TableRow className="border-t-2 border-border dark:border-border bg-muted dark:bg-muted font-bold">
 											<TableCell>
 												{t(
 													"finance.accountingReports.aging.total",
@@ -448,7 +448,7 @@ export function AgedReceivablesReport({
 						<CardTitle className="text-sm">
 							{t("finance.accountingReports.uninvoicedClaims")}
 						</CardTitle>
-						<p className="text-xs text-slate-500 dark:text-slate-400">
+						<p className="text-xs text-muted-foreground dark:text-muted-foreground">
 							{t("finance.accountingReports.uninvoicedClaimsHint")}
 						</p>
 					</CardHeader>
@@ -483,18 +483,18 @@ export function AgedReceivablesReport({
 											<TableCell className="font-medium">
 												{claim.projectName}
 											</TableCell>
-											<TableCell className="text-slate-500">
+											<TableCell className="text-muted-foreground">
 												{claim.clientName ?? "—"}
 											</TableCell>
 											<TableCell>#{claim.claimNo}</TableCell>
-											<TableCell className="text-sm text-slate-500">
+											<TableCell className="text-sm text-muted-foreground">
 												{claim.approvedAt
 													? new Date(
 															claim.approvedAt,
 														).toLocaleDateString("en-SA")
 													: "—"}
 											</TableCell>
-											<TableCell className="text-sm text-slate-500">
+											<TableCell className="text-sm text-muted-foreground">
 												{claim.dueDate
 													? new Date(
 															claim.dueDate,
@@ -506,7 +506,7 @@ export function AgedReceivablesReport({
 											</TableCell>
 										</TableRow>
 									))}
-									<TableRow className="border-t-2 font-bold bg-slate-50 dark:bg-slate-900">
+									<TableRow className="border-t-2 font-bold bg-muted dark:bg-muted">
 										<TableCell colSpan={5}>
 											{t("finance.accountingReports.aging.total")}
 										</TableCell>
@@ -533,18 +533,18 @@ function AgingCell({
 }) {
 	if (value === 0) {
 		return (
-			<TableCell className="text-end text-slate-300 dark:text-slate-600">
+			<TableCell className="text-end text-muted-foreground dark:text-muted-foreground">
 				-
 			</TableCell>
 		);
 	}
 
 	const colorClasses = {
-		green: "text-green-600 dark:text-green-400",
-		yellow: "text-yellow-600 dark:text-yellow-400",
-		orange: "text-orange-600 dark:text-orange-400",
-		red: "text-red-600 dark:text-red-400",
-		darkred: "text-red-800 dark:text-red-300 font-semibold",
+		green: "text-success dark:text-success",
+		yellow: "text-chart-1 dark:text-chart-1",
+		orange: "text-chart-1 dark:text-chart-1",
+		red: "text-destructive dark:text-destructive",
+		darkred: "text-destructive dark:text-destructive font-semibold",
 	};
 
 	return (

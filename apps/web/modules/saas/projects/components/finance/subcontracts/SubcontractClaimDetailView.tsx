@@ -80,14 +80,14 @@ function formatNumber(value: number, decimals = 2): string {
 }
 
 const statusColors: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
+	DRAFT: "bg-muted text-muted-foreground border-border",
 	SUBMITTED: "bg-chart-4/15 text-chart-4 border-chart-4",
-	UNDER_REVIEW: "bg-orange-50 text-orange-700 border-orange-200",
+	UNDER_REVIEW: "bg-chart-1/20 text-chart-1 border-chart-1",
 	APPROVED: "bg-chart-4/15 text-chart-4 border-chart-4",
-	PARTIALLY_PAID: "bg-yellow-50 text-yellow-700 border-yellow-200",
-	PAID: "bg-green-100 text-green-800 border-green-300",
-	REJECTED: "bg-red-50 text-red-700 border-red-200",
-	CANCELLED: "bg-gray-50 text-gray-500 border-gray-200",
+	PARTIALLY_PAID: "bg-chart-1/20 text-chart-1 border-chart-1",
+	PAID: "bg-success/15 text-success border-success",
+	REJECTED: "bg-destructive/15 text-destructive border-destructive",
+	CANCELLED: "bg-muted text-muted-foreground border-border",
 };
 
 export function SubcontractClaimDetailView({
@@ -224,7 +224,7 @@ export function SubcontractClaimDetailView({
 			{/* Header - Organization */}
 			<div className="text-center border-b-2 border-black pb-3 mb-4">
 				<h1 className="text-xl font-bold">{t("print.title")}</h1>
-				<p className="text-sm text-gray-600 mt-1">
+				<p className="text-sm text-muted-foreground mt-1">
 					{t("claimNumber", { current: claim.claimNo, total: "" })} — {t(`types.${claim.claimType}`)}
 				</p>
 			</div>
@@ -233,9 +233,9 @@ export function SubcontractClaimDetailView({
 			<table className="w-full text-sm border border-black">
 				<tbody>
 					<tr>
-						<td className="border border-black p-2 font-semibold bg-gray-100 w-1/4">{t("print.contractorInfo")}</td>
+						<td className="border border-black p-2 font-semibold bg-muted w-1/4">{t("print.contractorInfo")}</td>
 						<td className="border border-black p-2 w-1/4">{claim.contract?.companyName || claim.contract?.name}</td>
-						<td className="border border-black p-2 font-semibold bg-gray-100 w-1/4">{t("period")}</td>
+						<td className="border border-black p-2 font-semibold bg-muted w-1/4">{t("period")}</td>
 						<td className="border border-black p-2 w-1/4">{formatDate(claim.periodStart)} — {formatDate(claim.periodEnd)}</td>
 					</tr>
 				</tbody>
@@ -244,7 +244,7 @@ export function SubcontractClaimDetailView({
 			{/* Items Table */}
 			<table className="w-full text-xs border-collapse border border-black mt-4">
 				<thead>
-					<tr className="bg-gray-100">
+					<tr className="bg-muted">
 						<th className="border border-black p-1.5">#</th>
 						<th className="border border-black p-1.5">{t("items.description")}</th>
 						<th className="border border-black p-1.5">{t("items.unit")}</th>
@@ -272,7 +272,7 @@ export function SubcontractClaimDetailView({
 							<td className="border border-black p-1 text-center">{formatSAR(item.thisAmount)}</td>
 						</tr>
 					))}
-					<tr className="bg-gray-100 font-bold">
+					<tr className="bg-muted font-bold">
 						<td colSpan={9} className="border border-black p-1.5 text-start">{t("grossAmount")}</td>
 						<td className="border border-black p-1.5 text-center">{formatSAR(claim.grossAmount)}</td>
 					</tr>
@@ -310,7 +310,7 @@ export function SubcontractClaimDetailView({
 							<td className="border border-black p-2 text-center">{formatSAR(claim.vatAmount)}</td>
 						</tr>
 					)}
-					<tr className="bg-gray-100 font-bold text-base">
+					<tr className="bg-muted font-bold text-base">
 						<td className="border border-black p-2">{t("netAmount")}</td>
 						<td className="border border-black p-2 text-center">{formatSAR(claim.netAmount)}</td>
 					</tr>
@@ -620,13 +620,13 @@ export function SubcontractClaimDetailView({
 							{formatSAR(claim.netAmount)}
 						</span>
 					</div>
-					<div className="pt-2 text-sm text-slate-600 dark:text-slate-400">
+					<div className="pt-2 text-sm text-muted-foreground dark:text-muted-foreground">
 						<span className="font-medium">{t("amountInWords")}: </span>
 						{numberToArabicWords(claim.netAmount)}
 					</div>
 					<div className="flex justify-between">
 						<span>{t("paidAmount")}:</span>
-						<span className="tabular-nums text-green-600 font-medium" dir="ltr">
+						<span className="tabular-nums text-success font-medium" dir="ltr">
 							{formatSAR(claim.paidAmount)}
 						</span>
 					</div>
@@ -634,7 +634,7 @@ export function SubcontractClaimDetailView({
 						<span>{t("outstandingAmount")}:</span>
 						<span
 							className={`tabular-nums font-medium ${
-								outstanding > 0 ? "text-orange-600" : "text-green-600"
+								outstanding > 0 ? "text-chart-1" : "text-success"
 							}`}
 							dir="ltr"
 						>
@@ -642,7 +642,7 @@ export function SubcontractClaimDetailView({
 						</span>
 					</div>
 					{outstanding <= 0 && claim.paidAmount > 0 && (
-						<div className="flex items-center gap-2 text-green-600 font-medium pt-2">
+						<div className="flex items-center gap-2 text-success font-medium pt-2">
 							<CheckCircle className="h-4 w-4" />
 							{t("payment.fullyPaid")}
 						</div>
@@ -700,7 +700,7 @@ export function SubcontractClaimDetailView({
 									</TableCell>
 									<TableCell colSpan={2}>
 										{outstanding <= 0 && (
-											<span className="text-green-600 flex items-center gap-1">
+											<span className="text-success flex items-center gap-1">
 												<CheckCircle className="h-3.5 w-3.5" />
 												{t("payment.fullyPaid")}
 											</span>

@@ -52,7 +52,7 @@ export function ReceiptVoucher({
 	if (!payment) {
 		return (
 			<div className="text-center py-20">
-				<p className="text-slate-500">{t("finance.payments.notFound")}</p>
+				<p className="text-muted-foreground">{t("finance.payments.notFound")}</p>
 			</div>
 		);
 	}
@@ -82,33 +82,33 @@ export function ReceiptVoucher({
 				<Card className="rounded-2xl print:rounded-none print:shadow-none print:border-2 print:border-black max-w-[210mm] mx-auto">
 					<CardContent className="p-8">
 						{/* Header */}
-						<div className="text-center border-b-2 border-dashed border-slate-300 pb-6 mb-6">
-							<h1 className="text-2xl font-bold text-slate-900 mb-2">
+						<div className="text-center border-b-2 border-dashed border-border pb-6 mb-6">
+							<h1 className="text-2xl font-bold text-muted-foreground mb-2">
 								{t("finance.receipt.title")}
 							</h1>
-							<p className="text-lg text-slate-600">Receipt Voucher</p>
+							<p className="text-lg text-muted-foreground">Receipt Voucher</p>
 						</div>
 
 						{/* Receipt Number and Date */}
 						<div className="flex justify-between mb-8">
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-1">{t("finance.receipt.number")}</p>
+								<p className="text-sm text-muted-foreground mb-1">{t("finance.receipt.number")}</p>
 								<p className="text-xl font-bold text-primary">{payment.paymentNo}</p>
 							</div>
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-1">{t("finance.receipt.date")}</p>
+								<p className="text-sm text-muted-foreground mb-1">{t("finance.receipt.date")}</p>
 								<p className="text-xl font-bold">{formatDate(new Date(payment.date))}</p>
 							</div>
 						</div>
 
 						{/* Amount Box */}
-						<div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 mb-8 border-2 border-green-200 dark:border-green-800">
+						<div className="bg-success/15 dark:bg-success/20 rounded-xl p-6 mb-8 border-2 border-success dark:border-success">
 							<div className="text-center">
-								<p className="text-sm text-slate-500 mb-2">{t("finance.receipt.amount")}</p>
-								<p className="text-4xl font-bold text-green-600 dark:text-green-400 mb-4">
+								<p className="text-sm text-muted-foreground mb-2">{t("finance.receipt.amount")}</p>
+								<p className="text-4xl font-bold text-success dark:text-success mb-4">
 									<Currency amount={Number(payment.amount)} />
 								</p>
-								<p className="text-sm text-slate-600 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground dark:text-muted-foreground">
 									{numberToArabicWords(Number(payment.amount))}
 								</p>
 							</div>
@@ -117,16 +117,16 @@ export function ReceiptVoucher({
 						{/* Details Grid */}
 						<div className="space-y-4 mb-8">
 							{/* Client */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.receipt.receivedFrom")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.receipt.receivedFrom")}</span>
 								<span className="font-medium">
 									{payment.client?.name || payment.clientName || "-"}
 								</span>
 							</div>
 
 							{/* Payment Method */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.receipt.paymentMethod")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.receipt.paymentMethod")}</span>
 								<span className="font-medium">
 									{getPaymentMethodLabel(payment.paymentMethod)}
 								</span>
@@ -134,22 +134,22 @@ export function ReceiptVoucher({
 
 							{/* Reference Number */}
 							{payment.referenceNo && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.receipt.referenceNo")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.receipt.referenceNo")}</span>
 									<span className="font-medium font-mono">{payment.referenceNo}</span>
 								</div>
 							)}
 
 							{/* Deposited To */}
-							<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-								<span className="text-slate-500">{t("finance.receipt.depositedTo")}</span>
+							<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+								<span className="text-muted-foreground">{t("finance.receipt.depositedTo")}</span>
 								<span className="font-medium">{payment.destinationAccount?.name}</span>
 							</div>
 
 							{/* Project */}
 							{payment.project && (
-								<div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-									<span className="text-slate-500">{t("finance.receipt.project")}</span>
+								<div className="flex items-center justify-between py-3 border-b border-border dark:border-border">
+									<span className="text-muted-foreground">{t("finance.receipt.project")}</span>
 									<span className="font-medium">{payment.project.name}</span>
 								</div>
 							)}
@@ -157,26 +157,26 @@ export function ReceiptVoucher({
 							{/* Description */}
 							{payment.description && (
 								<div className="py-3">
-									<span className="text-slate-500 block mb-2">{t("finance.receipt.description")}</span>
-									<p className="text-slate-700 dark:text-slate-300">{payment.description}</p>
+									<span className="text-muted-foreground block mb-2">{t("finance.receipt.description")}</span>
+									<p className="text-muted-foreground dark:text-muted-foreground">{payment.description}</p>
 								</div>
 							)}
 						</div>
 
 						{/* Signatures */}
-						<div className="grid grid-cols-2 gap-8 pt-8 border-t-2 border-dashed border-slate-300">
+						<div className="grid grid-cols-2 gap-8 pt-8 border-t-2 border-dashed border-border">
 							<div className="text-center">
-								<div className="h-16 border-b border-slate-300 mb-2" />
-								<p className="text-sm text-slate-500">{t("finance.receipt.receiverSignature")}</p>
+								<div className="h-16 border-b border-border mb-2" />
+								<p className="text-sm text-muted-foreground">{t("finance.receipt.receiverSignature")}</p>
 							</div>
 							<div className="text-center">
-								<div className="h-16 border-b border-slate-300 mb-2" />
-								<p className="text-sm text-slate-500">{t("finance.receipt.cashierSignature")}</p>
+								<div className="h-16 border-b border-border mb-2" />
+								<p className="text-sm text-muted-foreground">{t("finance.receipt.cashierSignature")}</p>
 							</div>
 						</div>
 
 						{/* Footer */}
-						<div className="mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
+						<div className="mt-8 pt-4 border-t border-border text-center text-xs text-muted-foreground">
 							<p>{t("finance.receipt.generatedOn")} {formatDate(new Date())}</p>
 						</div>
 					</CardContent>

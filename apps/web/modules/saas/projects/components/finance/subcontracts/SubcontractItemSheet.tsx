@@ -147,7 +147,7 @@ export function SubcontractItemSheet({
 					{/* الوصف بالعربية */}
 					<div className="space-y-2">
 						<Label htmlFor="description">
-							{t("description")} <span className="text-red-500">*</span>
+							{t("description")} <span className="text-destructive">*</span>
 						</Label>
 						<Input
 							id="description"
@@ -172,7 +172,7 @@ export function SubcontractItemSheet({
 
 					{/* وحدة القياس */}
 					<div className="space-y-2">
-						<Label>{t("unit")} <span className="text-red-500">*</span></Label>
+						<Label>{t("unit")} <span className="text-destructive">*</span></Label>
 						<Select value={unit} onValueChange={setUnit}>
 							<SelectTrigger>
 								<SelectValue />
@@ -205,7 +205,7 @@ export function SubcontractItemSheet({
 					{!isLumpSum && (
 						<div className="space-y-2">
 							<Label htmlFor="contractQty">
-								{t("contractQty")} <span className="text-red-500">*</span>
+								{t("contractQty")} <span className="text-destructive">*</span>
 							</Label>
 							<Input
 								id="contractQty"
@@ -223,7 +223,7 @@ export function SubcontractItemSheet({
 					{/* سعر الوحدة */}
 					<div className="space-y-2">
 						<Label htmlFor="unitPrice">
-							{t("unitPrice")} <span className="text-red-500">*</span>
+							{t("unitPrice")} <span className="text-destructive">*</span>
 						</Label>
 						<Input
 							id="unitPrice"

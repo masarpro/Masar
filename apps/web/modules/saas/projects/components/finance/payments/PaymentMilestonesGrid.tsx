@@ -47,12 +47,12 @@ export function PaymentMilestonesGrid({
 	if (isLoading) {
 		return (
 			<div className="space-y-3">
-				<div className="h-6 w-32 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+				<div className="h-6 w-32 animate-pulse rounded bg-muted dark:bg-muted" />
 				<div className="flex gap-3 overflow-x-auto pb-2">
 					{Array.from({ length: 3 }).map((_, i) => (
 						<div
 							key={i}
-							className="h-36 w-64 shrink-0 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
+							className="h-36 w-64 shrink-0 animate-pulse rounded-2xl bg-muted dark:bg-muted"
 						/>
 					))}
 				</div>
@@ -62,9 +62,9 @@ export function PaymentMilestonesGrid({
 
 	if (!data || data.terms.length === 0) {
 		return (
-			<div className="rounded-2xl border border-dashed border-slate-200 py-10 text-center dark:border-slate-700">
-				<Banknote className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
-				<p className="mt-3 text-sm text-slate-500">
+			<div className="rounded-2xl border border-dashed border-border py-10 text-center dark:border-border">
+				<Banknote className="mx-auto h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
+				<p className="mt-3 text-sm text-muted-foreground">
 					{t("projectPayments.noTerms")}
 				</p>
 				<Button
@@ -83,7 +83,7 @@ export function PaymentMilestonesGrid({
 
 	return (
 		<div className="space-y-3">
-			<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+			<h3 className="text-sm font-semibold text-muted-foreground dark:text-muted-foreground">
 				{t("paymentsHub.milestones")}
 			</h3>
 
@@ -141,19 +141,19 @@ function MilestoneCard({
 		? "border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
 		: isNext
 			? "border-chart-4/50 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
-			: "border-slate-200/50 bg-slate-50/80 dark:border-slate-700/30 dark:bg-slate-900/20";
+			: "border-border bg-muted dark:border-border dark:bg-muted";
 
 	const progressColor = term.isComplete
 		? "[&>div]:bg-chart-4"
 		: isNext
 			? "[&>div]:bg-chart-4"
-			: "[&>div]:bg-slate-400";
+			: "[&>div]:bg-muted";
 
 	const progressBg = term.isComplete
 		? "bg-chart-4/15 dark:bg-chart-4/20"
 		: isNext
 			? "bg-chart-4/15 dark:bg-chart-4/20"
-			: "bg-slate-200 dark:bg-slate-700/40";
+			: "bg-muted dark:bg-muted";
 
 	const StatusIcon = term.isComplete
 		? CheckCircle2
@@ -165,7 +165,7 @@ function MilestoneCard({
 		? "text-chart-4"
 		: isNext
 			? "text-chart-4"
-			: "text-slate-400";
+			: "text-muted-foreground";
 
 	return (
 		<div
@@ -184,7 +184,7 @@ function MilestoneCard({
 								? "border-chart-4 bg-chart-4/15 text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
 								: isNext
 									? "border-chart-4 bg-chart-4/15 text-chart-4 dark:border-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
-									: "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+									: "border-border bg-muted text-muted-foreground dark:border-border dark:bg-muted dark:text-muted-foreground"
 						}`}
 					>
 						{t(
@@ -200,7 +200,7 @@ function MilestoneCard({
 
 				{/* Label */}
 				{term.label && (
-					<p className="mb-2 truncate text-sm font-medium text-slate-700 dark:text-slate-300">
+					<p className="mb-2 truncate text-sm font-medium text-muted-foreground dark:text-muted-foreground">
 						{term.label}
 					</p>
 				)}
@@ -213,10 +213,10 @@ function MilestoneCard({
 
 				{/* Amount */}
 				<div className="mb-2 flex items-center justify-between text-xs">
-					<span className="font-mono text-slate-600 dark:text-slate-400">
+					<span className="font-mono text-muted-foreground dark:text-muted-foreground">
 						{formatNumber(Number(term.paidAmount))}
 					</span>
-					<span className="font-mono text-slate-500">
+					<span className="font-mono text-muted-foreground">
 						/ {formatNumber(Number(term.amount))} {t("common.sar")}
 					</span>
 				</div>
@@ -232,7 +232,7 @@ function MilestoneCard({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="h-7 rounded-lg px-2 text-[11px] text-slate-500 hover:text-slate-700"
+									className="h-7 rounded-lg px-2 text-[11px] text-muted-foreground hover:text-muted-foreground"
 								>
 									<FileText className="me-1 h-3 w-3" />
 									{t("projectPayments.paymentsCount", {
@@ -244,13 +244,13 @@ function MilestoneCard({
 								</Button>
 							</CollapsibleTrigger>
 							<CollapsibleContent className="mt-2">
-								<div className="space-y-1.5 rounded-xl border border-slate-100 bg-white/60 p-2 dark:border-slate-700/30 dark:bg-slate-900/30">
+								<div className="space-y-1.5 rounded-xl border border-border bg-card p-2 dark:border-border dark:bg-muted">
 									{term.payments.map((payment) => (
 										<div
 											key={payment.id}
-											className="flex items-center justify-between rounded-lg bg-slate-50/50 p-2 text-xs dark:bg-slate-800/30"
+											className="flex items-center justify-between rounded-lg bg-muted p-2 text-xs dark:bg-muted"
 										>
-											<span className="font-mono text-slate-400">
+											<span className="font-mono text-muted-foreground">
 												{payment.paymentNo}
 											</span>
 											<span className="font-mono font-medium text-chart-4 dark:text-chart-4">
@@ -265,7 +265,7 @@ function MilestoneCard({
 							</CollapsibleContent>
 						</Collapsible>
 					) : (
-						<span className="text-[11px] text-slate-400">
+						<span className="text-[11px] text-muted-foreground">
 							{t("projectPayments.noPaymentsYet")}
 						</span>
 					)}
@@ -277,7 +277,7 @@ function MilestoneCard({
 							className={`h-7 rounded-lg px-2 text-[11px] ${
 								isNext
 									? "bg-chart-4 text-white hover:bg-chart-4 dark:bg-chart-4 dark:hover:bg-chart-4"
-									: "bg-slate-600 text-white hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
+									: "bg-muted text-white hover:bg-muted dark:bg-muted dark:hover:bg-muted"
 							}`}
 						>
 							<Link

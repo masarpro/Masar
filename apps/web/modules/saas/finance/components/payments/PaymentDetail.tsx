@@ -132,11 +132,11 @@ export function PaymentDetail({
 
 	const getStatusColor = (status: string) => {
 		const colors: Record<string, string> = {
-			COMPLETED: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400",
-			PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-			CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
+			COMPLETED: "bg-success/15 text-success dark:bg-success/20 dark:text-success",
+			PENDING: "bg-chart-1/20 text-chart-1 dark:bg-chart-1/25 dark:text-chart-1",
+			CANCELLED: "bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive",
 		};
-		return colors[status] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+		return colors[status] || "bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground";
 	};
 
 	if (isLoading) {
@@ -146,8 +146,8 @@ export function PaymentDetail({
 	if (!payment) {
 		return (
 			<div className="text-center py-20">
-				<TrendingUp className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-				<p className="text-slate-500 dark:text-slate-400">
+				<TrendingUp className="h-12 w-12 mx-auto text-muted-foreground dark:text-muted-foreground mb-4" />
+				<p className="text-muted-foreground dark:text-muted-foreground">
 					{t("finance.payments.notFound")}
 				</p>
 			</div>
@@ -206,18 +206,18 @@ export function PaymentDetail({
 				<CardContent className="p-6">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-4">
-							<div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl">
-								<TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
+							<div className="p-3 bg-success/15 dark:bg-success/20 rounded-xl">
+								<TrendingUp className="h-8 w-8 text-success dark:text-success" />
 							</div>
 							<div>
-								<p className="text-sm text-slate-500">{t("finance.payments.amount")}</p>
-								<p className="text-3xl font-bold text-green-600 dark:text-green-400">
+								<p className="text-sm text-muted-foreground">{t("finance.payments.amount")}</p>
+								<p className="text-3xl font-bold text-success dark:text-success">
 									+<Currency amount={Number(payment.amount)} />
 								</p>
 							</div>
 						</div>
 						<div className="text-end">
-							<div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+							<div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
 								<Calendar className="h-4 w-4" />
 								{formatDate(new Date(payment.date))}
 							</div>
@@ -235,7 +235,7 @@ export function PaymentDetail({
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+					<div className="p-4 bg-muted dark:bg-muted rounded-xl">
 						<div className="flex items-center gap-3">
 							<User className="h-5 w-5 text-primary" />
 							<div>
@@ -243,7 +243,7 @@ export function PaymentDetail({
 									{payment.client?.name || payment.clientName || "-"}
 								</p>
 								{payment.client?.email && (
-									<p className="text-sm text-slate-500">{payment.client.email}</p>
+									<p className="text-sm text-muted-foreground">{payment.client.email}</p>
 								)}
 							</div>
 						</div>
@@ -260,18 +260,18 @@ export function PaymentDetail({
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+					<div className="p-4 bg-success/15 dark:bg-success/20 rounded-xl border border-success dark:border-success">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
 								{payment.destinationAccount?.accountType === "BANK" ? (
 									<Building className="h-6 w-6 text-chart-4" />
 								) : (
-									<Wallet className="h-6 w-6 text-green-500" />
+									<Wallet className="h-6 w-6 text-success" />
 								)}
 								<div>
 									<p className="font-medium">{payment.destinationAccount?.name}</p>
 									{payment.destinationAccount?.bankName && (
-										<p className="text-sm text-slate-500">
+										<p className="text-sm text-muted-foreground">
 											{payment.destinationAccount.bankName}
 										</p>
 									)}
@@ -296,14 +296,14 @@ export function PaymentDetail({
 					</CardHeader>
 					<CardContent className="space-y-4">
 						{payment.project && (
-							<div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-								<p className="text-sm text-slate-500">{t("finance.payments.project")}</p>
+							<div className="p-4 bg-muted dark:bg-muted rounded-xl">
+								<p className="text-sm text-muted-foreground">{t("finance.payments.project")}</p>
 								<p className="font-medium">{payment.project.name}</p>
 							</div>
 						)}
 						{payment.invoice && (
-							<div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-								<p className="text-sm text-slate-500">{t("finance.payments.invoice")}</p>
+							<div className="p-4 bg-muted dark:bg-muted rounded-xl">
+								<p className="text-sm text-muted-foreground">{t("finance.payments.invoice")}</p>
 								<p className="font-medium">{payment.invoice.invoiceNo}</p>
 							</div>
 						)}
@@ -329,7 +329,7 @@ export function PaymentDetail({
 								dir="ltr"
 							/>
 						) : (
-							<p className="mt-1 text-slate-600 dark:text-slate-400">
+							<p className="mt-1 text-muted-foreground dark:text-muted-foreground">
 								{payment.referenceNo || "-"}
 							</p>
 						)}
@@ -347,7 +347,7 @@ export function PaymentDetail({
 								rows={2}
 							/>
 						) : (
-							<p className="mt-1 text-slate-600 dark:text-slate-400">
+							<p className="mt-1 text-muted-foreground dark:text-muted-foreground">
 								{payment.description || "-"}
 							</p>
 						)}
@@ -365,7 +365,7 @@ export function PaymentDetail({
 								rows={3}
 							/>
 						) : (
-							<p className="mt-1 text-slate-600 dark:text-slate-400">
+							<p className="mt-1 text-muted-foreground dark:text-muted-foreground">
 								{payment.notes || "-"}
 							</p>
 						)}
@@ -376,7 +376,7 @@ export function PaymentDetail({
 			{/* Metadata */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
-					<div className="flex items-center justify-between text-sm text-slate-500">
+					<div className="flex items-center justify-between text-sm text-muted-foreground">
 						<span>
 							{t("common.createdAt")}: {formatDate(new Date(payment.createdAt))}
 						</span>

@@ -115,7 +115,7 @@ export function ReceiptVoucherDetail({
 			<div className="hidden print:block print:space-y-4">
 				<div className="text-center border-b-2 border-black pb-3 mb-4">
 					<h1 className="text-2xl font-bold">{t("print.receiptVoucher")}</h1>
-					<p className="text-sm text-gray-500">RECEIPT VOUCHER</p>
+					<p className="text-sm text-muted-foreground">RECEIPT VOUCHER</p>
 				</div>
 				<div className="flex justify-between text-sm mb-4">
 					<div><span className="font-medium">{t("finance.receiptVouchers.voucherNo")}:</span> <span className="font-mono">{voucher.voucherNo}</span></div>
@@ -123,39 +123,39 @@ export function ReceiptVoucherDetail({
 				</div>
 				<table className="w-full border-collapse text-sm">
 					<tbody>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">{t("finance.receiptVouchers.receivedFrom")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted w-1/4 border-e border-border">{t("finance.receiptVouchers.receivedFrom")}</td>
 							<td className="p-2">{voucher.receivedFrom}</td>
 						</tr>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.amount")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.amount")}</td>
 							<td className="p-2 font-bold text-lg">{new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(voucher.amount))}</td>
 						</tr>
 						{voucher.amountInWords && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.amountInWords")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.amountInWords")}</td>
 								<td className="p-2 font-medium">{voucher.amountInWords} {t("print.only")}</td>
 							</tr>
 						)}
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.paymentMethod")}</td>
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.paymentMethod")}</td>
 							<td className="p-2">{t(`finance.payments.methods.${voucher.paymentMethod}`)}</td>
 						</tr>
 						{voucher.checkNumber && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.checkNumber")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.checkNumber")}</td>
 								<td className="p-2">{voucher.checkNumber}</td>
 							</tr>
 						)}
 						{voucher.transferRef && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.transferRef")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.transferRef")}</td>
 								<td className="p-2">{voucher.transferRef}</td>
 							</tr>
 						)}
 						{voucher.description && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.description")}</td>
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">{t("finance.receiptVouchers.description")}</td>
 								<td className="p-2">{voucher.description}</td>
 							</tr>
 						)}
@@ -364,11 +364,11 @@ export function ReceiptVoucherDetail({
 					</span>
 					{voucher.status === "CANCELLED" && (
 						<>
-							<span className="text-red-600">
+							<span className="text-destructive">
 								{t("finance.receiptVouchers.cancelledAt")}:{" "}
 								{voucher.cancelledAt ? formatDate(voucher.cancelledAt) : ""}
 							</span>
-							<span className="text-red-600">
+							<span className="text-destructive">
 								{t("finance.receiptVouchers.cancelReason")}: {voucher.cancelReason}
 							</span>
 						</>

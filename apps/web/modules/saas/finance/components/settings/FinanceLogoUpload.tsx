@@ -174,8 +174,8 @@ export function FinanceLogoUpload({
 		<div className="space-y-4">
 			{displayUrl ? (
 				// ── Logo preview (pending or saved) ──
-				<div className="flex flex-col items-center gap-4 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
-					<div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
+				<div className="flex flex-col items-center gap-4 p-6 rounded-xl border border-border dark:border-border bg-muted dark:bg-muted">
+					<div className="rounded-xl border border-border dark:border-border bg-white dark:bg-muted p-3">
 						<img
 							src={previewSrc}
 							alt="Logo"
@@ -228,7 +228,7 @@ export function FinanceLogoUpload({
 								size="sm"
 								onClick={handleRemoveLogo}
 								disabled={removeMutation.isPending}
-								className="rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+								className="rounded-xl text-destructive hover:text-destructive hover:bg-destructive/15 dark:hover:bg-destructive/20"
 							>
 								{removeMutation.isPending ? (
 									<Loader2 className="h-4 w-4 ms-2 animate-spin" />
@@ -247,27 +247,27 @@ export function FinanceLogoUpload({
 					className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-colors ${
 						isDragActive
 							? "border-primary bg-primary/5"
-							: "border-slate-300 dark:border-slate-600 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+							: "border-border dark:border-border hover:border-primary/50 hover:bg-muted dark:hover:bg-muted"
 					} p-6`}
 				>
 					<input {...getInputProps()} />
 					{uploading ? (
 						<div className="flex flex-col items-center gap-2">
 							<Loader2 className="h-8 w-8 animate-spin text-primary" />
-							<p className="text-sm text-slate-500">{t("upload.uploading")}</p>
+							<p className="text-sm text-muted-foreground">{t("upload.uploading")}</p>
 						</div>
 					) : (
 						<div className="flex flex-col items-center gap-2 text-center">
 							{isDragActive ? (
 								<Upload className="h-8 w-8 text-primary" />
 							) : (
-								<ImageIcon className="h-8 w-8 text-slate-400" />
+								<ImageIcon className="h-8 w-8 text-muted-foreground" />
 							)}
 							<div>
-								<p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								<p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
 									{t("finance.settings.logoDropzoneTitle")}
 								</p>
-								<p className="text-xs text-slate-500 mt-1">
+								<p className="text-xs text-muted-foreground mt-1">
 									{t("finance.settings.logoDropzoneHint")}
 								</p>
 							</div>

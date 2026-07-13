@@ -10,7 +10,7 @@ import {
 import { useTranslations } from "next-intl";
 
 const glassCard =
-	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
+	"bg-card border-2 rounded-2xl";
 
 const LEAD_STATUS_COLORS: Record<string, string> = {
 	NEW: "#9ca3af",
@@ -42,9 +42,9 @@ export function OperationalSection({
 
 	const miniStats = [
 		{ label: t("dashboard.operational.activeProjects"), value: activeProjects, color: "text-chart-4 dark:text-chart-4", bgColor: "bg-chart-4/15 dark:bg-chart-4/20", icon: FolderOpen },
-		{ label: t("dashboard.operational.completedProjects"), value: completedProjects, color: "text-green-600 dark:text-green-400", bgColor: "bg-green-50 dark:bg-green-950/20", icon: CheckCircle },
-		{ label: t("dashboard.operational.onHoldProjects"), value: onHoldProjects, color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-950/20", icon: PauseCircle },
-		{ label: t("dashboard.operational.openIssues"), value: openIssues, color: "text-red-600 dark:text-red-400", bgColor: "bg-red-50 dark:bg-red-950/20", icon: AlertTriangle },
+		{ label: t("dashboard.operational.completedProjects"), value: completedProjects, color: "text-success dark:text-success", bgColor: "bg-success/15 dark:bg-success/20", icon: CheckCircle },
+		{ label: t("dashboard.operational.onHoldProjects"), value: onHoldProjects, color: "text-chart-1 dark:text-chart-1", bgColor: "bg-chart-1/20 dark:bg-chart-1/25", icon: PauseCircle },
+		{ label: t("dashboard.operational.openIssues"), value: openIssues, color: "text-destructive dark:text-destructive", bgColor: "bg-destructive/15 dark:bg-destructive/20", icon: AlertTriangle },
 	];
 
 	const pipelineTotal = Object.values(leadsPipeline).reduce((s, v) => s + v, 0);

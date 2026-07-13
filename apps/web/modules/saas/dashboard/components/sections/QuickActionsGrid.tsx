@@ -112,12 +112,12 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 
 	return (
 		<>
-			<div className="shrink-0 rounded-3xl border-2 bg-card p-5">
-				<p className="mb-3 text-base font-semibold text-card-foreground">
+			<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border-2 bg-card p-5">
+				<p className="mb-3 shrink-0 text-base font-semibold text-card-foreground">
 					{t("dashboard.quickActions")}
 				</p>
 
-				<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+				<div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
 					{visibleActions.map((action, i) => {
 						const Icon = action.icon;
 						const createChip = "flex size-7 shrink-0 items-center justify-center rounded-lg border-2 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground";

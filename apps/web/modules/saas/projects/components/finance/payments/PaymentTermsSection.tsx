@@ -75,8 +75,8 @@ const STATUS_ICON_MAP: Record<string, typeof CheckCircle2> = {
 };
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-	PENDING: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-	PARTIALLY_PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+	PENDING: "bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground",
+	PARTIALLY_PAID: "bg-chart-1/20 text-chart-1 dark:bg-chart-1/25 dark:text-chart-1",
 	FULLY_PAID: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
 };
 
@@ -106,7 +106,7 @@ export function PaymentTermsSection({
 
 	return (
 		<div className="space-y-3">
-			<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+			<h3 className="text-base font-semibold text-muted-foreground dark:text-muted-foreground">
 				{t("projectPayments.paymentTerms")}
 			</h3>
 			{terms.map((term) => {
@@ -120,12 +120,12 @@ export function PaymentTermsSection({
 
 				return (
 					<Collapsible key={term.id}>
-						<div className="rounded-xl border border-slate-200/60 bg-white/80 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/50">
+						<div className="rounded-xl border border-border bg-card shadow-sm dark:border-border dark:bg-muted">
 							<div className="flex items-center">
 								<CollapsibleTrigger className="flex flex-1 items-center gap-3 p-4 text-start">
-									<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform [[data-state=open]>&]:rotate-180" />
+									<ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
 									<div className="flex flex-1 flex-wrap items-center gap-2">
-										<span className="font-medium text-slate-900 dark:text-slate-100">
+										<span className="font-medium text-muted-foreground dark:text-muted-foreground">
 											{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
 										</span>
 										<Badge variant="secondary" className="text-xs">
@@ -137,7 +137,7 @@ export function PaymentTermsSection({
 										</Badge>
 									</div>
 									<div className="flex shrink-0 items-center gap-4 text-sm">
-										<span className="text-slate-500">
+										<span className="text-muted-foreground">
 											{formatSAR(term.paidAmount)} / {formatSAR(termAmount)}
 										</span>
 										<span className="font-mono font-semibold text-chart-4 dark:text-chart-4">
@@ -148,7 +148,7 @@ export function PaymentTermsSection({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="h-9 w-9 shrink-0 text-slate-400 hover:text-chart-4"
+									className="h-9 w-9 shrink-0 text-muted-foreground hover:text-chart-4"
 									onClick={() => setEditTerm(term)}
 									aria-label={t("projectPayments.editTerm")}
 								>
@@ -157,7 +157,7 @@ export function PaymentTermsSection({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="me-2 h-9 w-9 shrink-0 text-slate-400 hover:text-red-600"
+									className="me-2 h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
 									onClick={() => setDeleteTermId(term.id)}
 									aria-label={t("projectPayments.deleteTerm")}
 								>
@@ -166,10 +166,10 @@ export function PaymentTermsSection({
 							</div>
 
 							<CollapsibleContent>
-								<div className="border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-800">
+								<div className="border-t border-border px-4 pb-4 pt-3 dark:border-border">
 									<Progress
 										value={paidPercent}
-										className="mb-4 h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-chart-4"
+										className="mb-4 h-2 bg-muted dark:bg-muted [&>div]:bg-chart-4"
 									/>
 									<PaymentsTable
 										organizationId={organizationId}
@@ -214,7 +214,7 @@ export function PaymentTermsSection({
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
-							className="bg-red-600 hover:bg-red-700"
+							className="bg-destructive hover:bg-destructive"
 							disabled={deleteMutation.isPending}
 							onClick={(e) => {
 								e.preventDefault();

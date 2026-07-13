@@ -31,19 +31,19 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 		<div className="p-3 sm:p-5">
 			{/* Value Cards */}
 			<div className="mb-4 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
-				<div className="min-w-0 rounded-xl bg-slate-50 p-2.5 sm:p-3 dark:bg-slate-800/50">
-					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-500">
+				<div className="min-w-0 rounded-xl bg-muted p-2.5 sm:p-3 dark:bg-muted">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
 						{t("subcontracts.detail.originalValue")}
 					</p>
-					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-slate-800 dark:text-slate-200">
+					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-muted-foreground dark:text-muted-foreground">
 						{formatCurrency(contractValue)}
 					</p>
 				</div>
-				<div className="min-w-0 rounded-xl bg-amber-50 p-2.5 sm:p-3 dark:bg-amber-950/20">
-					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
+				<div className="min-w-0 rounded-xl bg-chart-1/20 p-2.5 sm:p-3 dark:bg-chart-1/25">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-chart-1 dark:text-chart-1">
 						{t("subcontracts.detail.changeOrders")}
 					</p>
-					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${coImpact >= 0 ? "text-amber-700 dark:text-amber-300" : "text-red-600"}`}>
+					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${coImpact >= 0 ? "text-chart-1 dark:text-chart-1" : "text-destructive"}`}>
 						{coImpact >= 0 ? "+" : ""}{formatCurrency(coImpact)}
 					</p>
 				</div>
@@ -55,11 +55,11 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 						{formatCurrency(totalPaid)}
 					</p>
 				</div>
-				<div className={`min-w-0 rounded-xl p-2.5 sm:p-3 ${isOverBudget ? "bg-red-50 dark:bg-red-950/20" : "rounded-xl bg-chart-4/15 dark:bg-chart-4/20"}`}>
-					<p className={`truncate text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-red-600 dark:text-red-400" : "text-chart-4 dark:text-chart-4"}`}>
+				<div className={`min-w-0 rounded-xl p-2.5 sm:p-3 ${isOverBudget ? "bg-destructive/15 dark:bg-destructive/20" : "rounded-xl bg-chart-4/15 dark:bg-chart-4/20"}`}>
+					<p className={`truncate text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-destructive dark:text-destructive" : "text-chart-4 dark:text-chart-4"}`}>
 						{t("subcontracts.detail.remaining")}
 					</p>
-					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${isOverBudget ? "text-red-700 dark:text-red-300" : "text-chart-4 dark:text-chart-4"}`}>
+					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${isOverBudget ? "text-destructive dark:text-destructive" : "text-chart-4 dark:text-chart-4"}`}>
 						{formatCurrency(remaining)}
 					</p>
 				</div>
@@ -68,16 +68,16 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 			{/* Progress Bar */}
 			<div className="space-y-2">
 				<div className="flex items-center justify-between text-xs">
-					<span className="text-slate-500">
-						{t("subcontracts.detail.adjustedValue")}: <span className="font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(adjustedValue)}</span>
+					<span className="text-muted-foreground">
+						{t("subcontracts.detail.adjustedValue")}: <span className="font-semibold text-muted-foreground dark:text-muted-foreground">{formatCurrency(adjustedValue)}</span>
 					</span>
-					<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-chart-4"}`}>
+					<span className={`font-bold ${isOverBudget ? "text-destructive" : "text-chart-4"}`}>
 						{progress.toFixed(1)}%
 					</span>
 				</div>
-				<div className="h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+				<div className="h-3 w-full overflow-hidden rounded-full bg-muted dark:bg-muted">
 					<div
-						className={`h-full rounded-full transition-all ${isOverBudget ? "bg-red-500" : progress >= 100 ? "bg-chart-4" : "bg-orange-500"}`}
+						className={`h-full rounded-full transition-all ${isOverBudget ? "bg-destructive" : progress >= 100 ? "bg-chart-4" : "bg-chart-1"}`}
 						style={{ width: `${Math.min(progress, 100)}%` }}
 					/>
 				</div>
@@ -85,9 +85,9 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 
 			{/* Scope */}
 			{scopeOfWork && (
-				<div className="mt-4 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/30">
-					<p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-slate-500">{t("subcontracts.form.scopeOfWork")}</p>
-					<p className="text-sm text-slate-700 dark:text-slate-300">{scopeOfWork}</p>
+				<div className="mt-4 rounded-lg bg-muted p-3 dark:bg-muted">
+					<p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{t("subcontracts.form.scopeOfWork")}</p>
+					<p className="text-sm text-muted-foreground dark:text-muted-foreground">{scopeOfWork}</p>
 				</div>
 			)}
 		</div>

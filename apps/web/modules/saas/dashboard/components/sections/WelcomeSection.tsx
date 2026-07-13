@@ -50,7 +50,7 @@ export function WelcomeSection({
 	].filter((section) => section.visible);
 
 	return (
-		<div className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 p-4 sm:p-6">
+		<div className="bg-card border-2 rounded-2xl p-4 sm:p-6">
 			<h2 className="font-semibold text-base sm:text-lg">
 				{t("dashboard.welcome.title")}
 			</h2>

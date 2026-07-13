@@ -113,7 +113,7 @@ export function FieldActivityCard({
 						</>
 					) : (
 						<>
-							<span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+							<span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-success/15 text-success dark:text-success">
 								<CircleCheck className="size-4" />
 							</span>
 							<span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">

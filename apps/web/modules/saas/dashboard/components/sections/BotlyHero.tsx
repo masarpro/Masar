@@ -59,7 +59,7 @@ export function BotlyHero({
 
 	return (
 		<div
-			className="relative h-full min-h-[320px] overflow-hidden rounded-[32px]"
+			className="relative h-full min-h-[260px] overflow-hidden rounded-[32px] xl:min-h-0"
 			style={{
 				backgroundImage:
 					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
@@ -86,14 +86,14 @@ export function BotlyHero({
 			{stats.length > 0 && (
 				<div className="absolute inset-x-3 bottom-3">
 					<div
-						className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-4 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-6"
+						className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5"
 					>
 						{stats.map((s) => (
-							<div key={s.label} className="flex min-w-0 flex-1 flex-col gap-1 xl:gap-2">
-								<p className="truncate text-sm font-semibold leading-6 text-[#1d1d1d] xl:text-[18px]">
+							<div key={s.label} className="flex min-w-0 flex-1 flex-col gap-1 xl:gap-1.5">
+								<p className="truncate text-sm font-semibold leading-6 text-[#1d1d1d] xl:text-[17px]">
 									{s.label}
 								</p>
-								<p className="truncate text-2xl font-bold tabular-nums leading-none tracking-[-0.84px] text-[#1d1d1d] xl:text-5xl xl:leading-[1.1]">
+								<p className="truncate text-2xl font-bold tabular-nums leading-none tracking-[-0.84px] text-[#1d1d1d] xl:text-4xl xl:leading-[1.1]">
 									{s.value}
 								</p>
 							</div>

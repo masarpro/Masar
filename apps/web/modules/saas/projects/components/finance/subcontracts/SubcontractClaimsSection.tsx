@@ -13,8 +13,8 @@ import { ClipboardCheck, Plus, Printer, Eye, Loader2 } from "lucide-react";
 
 const CLAIM_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
 	INTERIM: { bg: "bg-chart-4/15", text: "text-chart-4" },
-	FINAL: { bg: "bg-purple-50", text: "text-purple-700" },
-	RETENTION: { bg: "bg-orange-50", text: "text-orange-700" },
+	FINAL: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	RETENTION: { bg: "bg-chart-1/20", text: "text-chart-1" },
 };
 
 interface SubcontractClaimsSectionProps {
@@ -51,18 +51,18 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 	const canCreate = contractStatus === "ACTIVE";
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-white dark:border-emerald-800/30 dark:bg-slate-900/50">
-			<div className="flex items-center justify-between border-b border-emerald-100 p-5 dark:border-emerald-800/30">
+		<div className="overflow-hidden rounded-2xl border border-success bg-white dark:border-success dark:bg-muted">
+			<div className="flex items-center justify-between border-b border-success p-5 dark:border-success">
 				<div className="flex items-center gap-3">
-					<div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-						<ClipboardCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+					<div className="rounded-lg bg-success/15 p-2 dark:bg-success/20">
+						<ClipboardCheck className="h-5 w-5 text-success dark:text-success" />
 					</div>
 					<div>
-						<h2 className="font-semibold text-emerald-700 dark:text-emerald-300">
+						<h2 className="font-semibold text-success dark:text-success">
 							{t("claims.subcontractClaims")}
 						</h2>
 						{claims && claims.length > 0 && (
-							<span className="text-xs text-slate-500">
+							<span className="text-xs text-muted-foreground">
 								{claims.length} {t("claims.title")}
 							</span>
 						)}
@@ -73,7 +73,7 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 						<Button
 							variant="outline"
 							size="sm"
-							className="rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400"
+							className="rounded-xl border-success text-success hover:bg-success/15 dark:border-success dark:text-success"
 						>
 							<Plus className="me-1 h-4 w-4" />
 							{t("claims.new")}
@@ -84,20 +84,20 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 
 			{/* Summary badges */}
 			{summary && (
-				<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-b border-emerald-100/50 p-4 dark:border-emerald-800/20">
-					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
-						<p className="text-lg font-bold text-slate-800 dark:text-slate-200">
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-b border-success p-4 dark:border-success">
+					<div className="rounded-lg bg-muted p-3 text-center dark:bg-muted">
+						<p className="text-lg font-bold text-muted-foreground dark:text-muted-foreground">
 							{formatSAR(summary.totalClaimed)}
 						</p>
-						<p className="text-xs text-slate-500">{t("claims.totalClaimed")}</p>
+						<p className="text-xs text-muted-foreground">{t("claims.totalClaimed")}</p>
 					</div>
-					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
-						<p className="text-lg font-bold text-green-600">{formatSAR(summary.totalPaid)}</p>
-						<p className="text-xs text-slate-500">{t("claims.totalPaid")}</p>
+					<div className="rounded-lg bg-muted p-3 text-center dark:bg-muted">
+						<p className="text-lg font-bold text-success">{formatSAR(summary.totalPaid)}</p>
+						<p className="text-xs text-muted-foreground">{t("claims.totalPaid")}</p>
 					</div>
-					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
-						<p className="text-lg font-bold text-orange-600">{formatSAR(summary.totalOutstanding)}</p>
-						<p className="text-xs text-slate-500">{t("claims.totalOutstanding")}</p>
+					<div className="rounded-lg bg-muted p-3 text-center dark:bg-muted">
+						<p className="text-lg font-bold text-chart-1">{formatSAR(summary.totalOutstanding)}</p>
+						<p className="text-xs text-muted-foreground">{t("claims.totalOutstanding")}</p>
 					</div>
 				</div>
 			)}
@@ -105,10 +105,10 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 			<div className="p-4">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-8">
-						<Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
+						<Loader2 className="h-6 w-6 animate-spin text-success" />
 					</div>
 				) : !claims || claims.length === 0 ? (
-					<p className="py-6 text-center text-sm text-slate-500">
+					<p className="py-6 text-center text-sm text-muted-foreground">
 						{t("claims.empty.title")}
 					</p>
 				) : (
@@ -118,11 +118,11 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 							return (
 								<div
 									key={claim.id}
-									className="flex items-center justify-between rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50"
+									className="flex items-center justify-between rounded-xl bg-muted p-3 dark:bg-muted"
 								>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2 flex-wrap">
-											<span className="text-xs font-medium text-slate-500">#{claim.claimNo}</span>
+											<span className="text-xs font-medium text-muted-foreground">#{claim.claimNo}</span>
 											<Badge className={`border-0 text-[10px] ${typeStyle.bg} ${typeStyle.text}`}>
 												{t(`claims.types.${claim.claimType}`)}
 											</Badge>
@@ -130,10 +130,10 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 												{t(`claims.statuses.${claim.status}`)}
 											</Badge>
 										</div>
-										<p className="mt-0.5 text-sm text-slate-700 dark:text-slate-300 truncate">
+										<p className="mt-0.5 text-sm text-muted-foreground dark:text-muted-foreground truncate">
 											{claim.title}
 										</p>
-										<div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
+										<div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
 											<span>{t("claims.grossAmount")}: {formatSAR(claim.grossAmount)}</span>
 											<span>{t("claims.netAmount")}: {formatSAR(claim.netAmount)}</span>
 										</div>

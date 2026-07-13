@@ -91,7 +91,7 @@ export function OwnerDrawingDetail({
 			<div className="hidden print:block print:space-y-4">
 				<div className="text-center border-b-2 border-black pb-3 mb-4">
 					<h1 className="text-2xl font-bold">{t("finance.ownerDrawings.drawingVoucher")}</h1>
-					<p className="text-sm text-gray-500">OWNER DRAWING VOUCHER</p>
+					<p className="text-sm text-muted-foreground">OWNER DRAWING VOUCHER</p>
 				</div>
 				<div className="flex justify-between text-sm mb-4">
 					<div>
@@ -105,45 +105,45 @@ export function OwnerDrawingDetail({
 				</div>
 				<table className="w-full border-collapse text-sm">
 					<tbody>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted w-1/4 border-e border-border">
 								{t("finance.ownerDrawings.ownerName")}
 							</td>
 							<td className="p-2">{drawing.owner?.name ?? "-"}</td>
 						</tr>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">
 								{t("finance.ownerDrawings.amount")}
 							</td>
 							<td className="p-2 font-bold text-lg">
 								{new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(drawing.amount))}
 							</td>
 						</tr>
-						<tr className="border border-gray-400">
-							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">
+						<tr className="border border-border">
+							<td className="p-2 font-medium bg-muted border-e border-border">
 								{t("finance.ownerDrawings.type")}
 							</td>
 							<td className="p-2">{t(`finance.ownerDrawings.types.${drawing.type}`)}</td>
 						</tr>
 						{drawing.project && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">
 									{t("finance.ownerDrawings.project")}
 								</td>
 								<td className="p-2">{drawing.project.name}</td>
 							</tr>
 						)}
 						{drawing.bankAccount && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">
 									{t("finance.ownerDrawings.bankAccount")}
 								</td>
 								<td className="p-2">{drawing.bankAccount.name}</td>
 							</tr>
 						)}
 						{drawing.description && (
-							<tr className="border border-gray-400">
-								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">
+							<tr className="border border-border">
+								<td className="p-2 font-medium bg-muted border-e border-border">
 									{t("finance.ownerDrawings.description")}
 								</td>
 								<td className="p-2">{drawing.description}</td>
