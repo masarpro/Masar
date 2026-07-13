@@ -20,6 +20,9 @@ import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
+// Home page = Botly landing header (Figma 226:1357): transparent over the
+// fixed-dark hero, 50%-white menu links, white pill CTA. Other pages keep
+// the token-driven light/dark surface.
 export function NavBar() {
 	const t = useTranslations();
 	const { user } = useSession();
@@ -68,14 +71,6 @@ export function NavBar() {
 			label: t("common.menu.faq"),
 			href: "/faq",
 		},
-		// {
-		// 	label: t("common.menu.blog"),
-		// 	href: "/blog",
-		// },
-		// {
-		// 	label: t("common.menu.changelog"),
-		// 	href: "/changelog",
-		// },
 		...(config.contactForm.enabled
 			? [
 					{
@@ -94,18 +89,10 @@ export function NavBar() {
 				"fixed top-0 left-0 z-50 w-full transition-all duration-500",
 				!isTop || isDocsPage
 					? isHomePage
-						? "backdrop-blur-2xl border-b shadow-sm"
+						? "border-b border-white/10 bg-[#131313]/85 backdrop-blur-2xl"
 						: "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
 					: "bg-transparent",
 			)}
-			style={
-				!isTop && isHomePage
-					? {
-							background: "var(--lp-nav-scrolled-bg)",
-							borderColor: "var(--lp-nav-scrolled-border)",
-						}
-					: undefined
-			}
 			data-test="navigation"
 		>
 			<div className="container">
@@ -118,12 +105,11 @@ export function NavBar() {
 					<div className="flex flex-1 justify-start">
 						<LocaleLink
 							href="/"
-							className={cn(
-								"block hover:no-underline active:no-underline",
-								isHomePage && "logo-light",
-							)}
+							className="block hover:no-underline active:no-underline"
 						>
-							<Logo />
+							{/* mono + white: the wordmark must stay visible on the
+							    fixed-dark landing hero in both themes */}
+							<Logo mono={isHomePage} className={cn(isHomePage && "text-white")} />
 						</LocaleLink>
 					</div>
 
@@ -133,38 +119,17 @@ export function NavBar() {
 								key={menuItem.href}
 								href={menuItem.href}
 								className={cn(
-									"block px-4 py-2 font-medium text-sm rounded-[10px] transition-all duration-300",
-									!isHomePage && "text-foreground/80",
-									!isHomePage &&
-										isMenuItemActive(menuItem.href) &&
-										"font-bold text-foreground",
-								)}
-								style={
+									"block px-4 py-2 font-medium text-sm rounded-[10px] transition-colors duration-300",
 									isHomePage
-										? {
-												color: isMenuItemActive(menuItem.href)
-													? "var(--lp-nav-link-active)"
-													: "var(--lp-nav-link)",
-												fontWeight: isMenuItemActive(menuItem.href)
-													? 700
-													: undefined,
-											}
-										: undefined
-								}
-								onMouseEnter={(e: any) => {
-									if (isHomePage) {
-										e.currentTarget.style.color = "var(--lp-nav-link-hover)";
-										e.currentTarget.style.backgroundColor = "var(--lp-nav-link-hover-bg)";
-									}
-								}}
-								onMouseLeave={(e: any) => {
-									if (isHomePage) {
-										e.currentTarget.style.color = isMenuItemActive(menuItem.href)
-											? "var(--lp-nav-link-active)"
-											: "var(--lp-nav-link)";
-										e.currentTarget.style.backgroundColor = "transparent";
-									}
-								}}
+										? isMenuItemActive(menuItem.href)
+											? "font-bold text-white"
+											: "text-white/50 hover:bg-white/5 hover:text-white"
+										: cn(
+												"text-foreground/80",
+												isMenuItemActive(menuItem.href) &&
+													"font-bold text-foreground",
+											),
+								)}
 								prefetch
 							>
 								{menuItem.label}
@@ -172,10 +137,10 @@ export function NavBar() {
 						))}
 					</div>
 
-						<div
+					<div
 						className={cn(
 							"flex flex-1 items-center justify-end gap-3",
-							isHomePage && "lp-nav-buttons",
+							isHomePage && "bl-nav-buttons",
 						)}
 					>
 						<ColorModeToggle />
@@ -238,7 +203,11 @@ export function NavBar() {
 							(user ? (
 								<Button
 									key="dashboard"
-									className="hidden lg:flex shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
+									className={cn(
+										"hidden lg:flex",
+										isHomePage &&
+											"rounded-[12px] bg-white font-bold text-[#1d1d1d] hover:bg-white/90",
+									)}
 									asChild
 									variant="primary"
 								>
@@ -251,16 +220,7 @@ export function NavBar() {
 									<NextLink
 										key="login-home"
 										href="/auth/login"
-										className="hidden lg:block px-4 py-2 text-sm font-medium transition-colors duration-300"
-										style={{
-											color: "var(--lp-nav-login)",
-										}}
-										onMouseEnter={(e: any) => {
-											e.currentTarget.style.color = "var(--lp-nav-login-hover)";
-										}}
-										onMouseLeave={(e: any) => {
-											e.currentTarget.style.color = "var(--lp-nav-login)";
-										}}
+										className="hidden px-4 py-2 text-sm font-medium text-white/60 transition-colors duration-300 hover:text-white lg:block"
 										prefetch
 									>
 										{t("common.menu.login")}
@@ -268,14 +228,7 @@ export function NavBar() {
 									<NextLink
 										key="signup-home"
 										href="/auth/signup"
-										className="hidden lg:block px-6 py-2.5 rounded-[14px] text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden"
-										style={{
-											background:
-												"linear-gradient(135deg, #0ea5e9, #0284c7)",
-											border: `1px solid var(--lp-nav-signup-border)`,
-											boxShadow:
-												"var(--lp-nav-signup-shadow)",
-										}}
+										className="hidden rounded-[12px] bg-white px-6 py-2.5 text-sm font-bold text-[#1d1d1d] transition-opacity duration-300 hover:opacity-90 lg:block"
 									>
 										{t("common.menu.signup")}
 									</NextLink>
@@ -283,7 +236,7 @@ export function NavBar() {
 							) : (
 								<Button
 									key="login"
-									className="hidden lg:flex hover:-translate-y-0.5 transition-all duration-300"
+									className="hidden lg:flex"
 									asChild
 									variant="ghost"
 								>

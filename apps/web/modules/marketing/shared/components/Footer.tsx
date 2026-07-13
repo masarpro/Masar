@@ -59,18 +59,10 @@ export function Footer() {
 		<footer
 			className={cn(
 				"border-t py-14 text-sm",
-				!isHomePage &&
-					"border-border/50 bg-muted/50 text-foreground/70",
-			)}
-			style={
 				isHomePage
-					? {
-							background: "var(--lp-footer-bg)",
-							borderColor: "var(--lp-footer-border)",
-							color: "var(--lp-footer-text)",
-						}
-					: undefined
-			}
+					? "border-white/10 bg-[#131313] text-white/70"
+					: "border-border/50 bg-muted/50 text-foreground/70",
+			)}
 		>
 			<div className={cn("container", isHomePage && "max-w-[1200px]")}>
 				<div className="grid grid-cols-2 gap-10 md:grid-cols-5">
@@ -78,19 +70,10 @@ export function Footer() {
 					<div className="col-span-2">
 						{isHomePage ? (
 							<div className="flex items-center gap-2.5">
-								<div
-									className="flex h-8 w-8 items-center justify-center rounded-[10px] font-black text-base text-white"
-									style={{
-										background:
-											"linear-gradient(135deg, #0ea5e9, #06B6D4)",
-									}}
-								>
+								<div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-white font-black text-base text-[#1d1d1d]">
 									م
 								</div>
-								<span
-									className="font-bold text-[17px]"
-									style={{ color: "var(--lp-footer-brand)" }}
-								>
+								<span className="font-bold text-[17px] text-white">
 									مسار
 								</span>
 							</div>
@@ -141,13 +124,8 @@ export function Footer() {
 				<div
 					className={cn(
 						"mt-12 border-t pt-6 text-center",
-						!isHomePage && "border-border/50",
+						isHomePage ? "border-white/10" : "border-border/50",
 					)}
-					style={
-						isHomePage
-							? { borderColor: "var(--lp-footer-border)" }
-							: undefined
-					}
 				>
 					<p className="text-[13px] opacity-60">
 						© {new Date().getFullYear()} {config.appName} —{" "}

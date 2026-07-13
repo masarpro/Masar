@@ -2,7 +2,7 @@
 
 import { LocaleLink } from "@i18n/routing";
 import { cn } from "@ui/lib";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -20,20 +20,28 @@ function FAQItem({
 	onToggle: () => void;
 }) {
 	return (
-		<div className={cn("mas-faq-item", isOpen && "open")}>
+		<div
+			className={cn(
+				"rounded-[20px] border-2 bg-card transition-colors",
+				isOpen && "border-primary/30",
+			)}
+		>
 			<button
 				type="button"
 				onClick={onToggle}
-				className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-transparent border-none cursor-pointer text-start"
+				className="flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent px-6 py-5 text-start"
 			>
-				<span
-					className="text-[16px] font-bold flex-1"
-					style={{ color: "var(--mas-ink)" }}
-				>
+				<span className="flex-1 text-[16px] font-bold text-foreground">
 					{question}
 				</span>
-				<span className="mas-faq-plus" aria-hidden="true">
-					+
+				<span
+					className={cn(
+						"grid size-8 shrink-0 place-items-center rounded-lg border-2 text-muted-foreground transition-transform duration-300",
+						isOpen && "rotate-45 bg-primary text-primary-foreground",
+					)}
+					aria-hidden="true"
+				>
+					<Plus className="size-4" />
 				</span>
 			</button>
 			<div
@@ -43,10 +51,7 @@ function FAQItem({
 					transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)",
 				}}
 			>
-				<p
-					className="text-[14.5px] leading-[1.9] px-6 pb-6"
-					style={{ color: "var(--mas-muted)" }}
-				>
+				<p className="px-6 pb-6 text-[14.5px] leading-[1.9] text-muted-foreground">
 					{answer}
 				</p>
 			</div>
@@ -54,6 +59,7 @@ function FAQItem({
 	);
 }
 
+// Botly flat accordion cards.
 export function FaqSection({ className }: { className?: string }) {
 	const t = useTranslations();
 	const locale = useLocale();
@@ -62,40 +68,41 @@ export function FaqSection({ className }: { className?: string }) {
 
 	return (
 		<section
-			className={cn("scroll-mt-20 py-24 md:py-32 px-6", className)}
+			className={cn(
+				"scroll-mt-20 border-t-2 bg-background px-6 py-24 md:py-32",
+				className,
+			)}
 			id="faq"
-			style={{
-				background: "var(--mas-bg-2)",
-				borderTop: "1px solid var(--mas-line)",
-			}}
 		>
-			<div className="max-w-[760px] mx-auto">
+			<div className="mx-auto max-w-[760px]">
 				{/* Header */}
-				<div className="mas-sec-head mas-rv text-center mb-12 md:mb-14">
-					<span className="mas-dim">{t("faq.title")}</span>
-					<h2>{t("faq.heading")}</h2>
+				<div className="bl-rv mb-12 text-center md:mb-14">
+					<span className="inline-flex items-center rounded-full border-2 bg-card px-4 py-1.5 text-[13px] font-semibold text-muted-foreground">
+						{t("faq.title")}
+					</span>
+					<h2 className="mt-4 text-3xl font-extrabold text-foreground md:text-4xl">
+						{t("faq.heading")}
+					</h2>
 				</div>
 
 				{/* Items */}
-				<div className="mas-rv grid gap-3">
+				<div className="bl-rv grid gap-3">
 					{faqKeys.map((key, i) => (
 						<FAQItem
 							key={key}
 							question={t(`faq.items.${key}.question`)}
 							answer={t(`faq.items.${key}.answer`)}
 							isOpen={openFaq === i}
-							onToggle={() =>
-								setOpenFaq(openFaq === i ? null : i)
-							}
+							onToggle={() => setOpenFaq(openFaq === i ? null : i)}
 						/>
 					))}
 				</div>
 
 				{/* Full FAQ page link */}
-				<div className="mas-rv mt-10 text-center">
+				<div className="bl-rv mt-10 text-center">
 					<LocaleLink
 						href="/faq"
-						className="mas-btn mas-btn-ghost !min-h-[46px] !py-2.5 !px-6 !text-[14px]"
+						className="inline-flex items-center gap-2 rounded-[12px] border-2 bg-card px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-accent"
 					>
 						{t("faqPage.viewAll")}
 						<ArrowIcon className="size-4" />

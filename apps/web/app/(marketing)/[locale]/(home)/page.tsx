@@ -20,10 +20,7 @@ export default async function Home({
 	setRequestLocale(locale);
 
 	return (
-		<div
-			className="overflow-x-hidden -mt-[72px]"
-			style={{ background: "var(--mas-bg)", color: "var(--mas-ink)" }}
-		>
+		<div className="-mt-[72px] overflow-x-hidden bg-background text-foreground">
 			<Hero />
 			<ModulesTicker />
 			<AiFeatureSection />
