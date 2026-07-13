@@ -26,7 +26,7 @@ const PLANS: Plan[] = [
 	},
 	{
 		id: "yearly",
-		hot: true,
+		hot: false,
 		hasSubtitle: true,
 		featureCount: 7,
 		ctaHref: "/auth/signup?plan=pro_yearly",
@@ -34,7 +34,7 @@ const PLANS: Plan[] = [
 	},
 	{
 		id: "monthly",
-		hot: false,
+		hot: true,
 		hasSubtitle: false,
 		featureCount: 7,
 		ctaHref: "/auth/signup?plan=pro_monthly",

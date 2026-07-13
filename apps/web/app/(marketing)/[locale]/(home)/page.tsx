@@ -5,7 +5,6 @@ import { FinalCTA } from "@marketing/home/components/FinalCTA";
 import { Hero } from "@marketing/home/components/Hero";
 import { HowItWorks } from "@marketing/home/components/HowItWorks";
 import { LandingFx } from "@marketing/home/components/LandingFx";
-import { ModulesTicker } from "@marketing/home/components/ModulesTicker";
 import { PricingSection } from "@marketing/home/components/PricingSection";
 import { RolesStrip } from "@marketing/home/components/RolesStrip";
 import { ZatcaBadge } from "@marketing/home/components/ZatcaBadge";
@@ -22,7 +21,6 @@ export default async function Home({
 	return (
 		<div className="-mt-[72px] overflow-x-hidden bg-background text-foreground">
 			<Hero />
-			<ModulesTicker />
 			<AiFeatureSection />
 			<Features />
 			<RolesStrip />

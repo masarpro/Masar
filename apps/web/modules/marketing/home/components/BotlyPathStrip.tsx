@@ -33,13 +33,16 @@ export function BotlyPathStrip() {
 	}, []);
 
 	return (
+		// On phones the 900-unit viewBox would shrink labels to ~6px, so the
+		// strip keeps a readable minimum width and scrolls horizontally; the
+		// RTL scroll container starts at station 01 (right edge).
 		<div
-			className="mx-auto w-full max-w-[900px]"
+			className="no-scrollbar mx-auto w-full max-w-[900px] overflow-x-auto"
 			aria-label={t("hero.stations.aria")}
 		>
 			{/* The path coordinates are authored LTR; pin direction so the
 			    curve renders identically in RTL */}
-			<div dir="ltr">
+			<div dir="ltr" className="min-w-[680px]">
 				<svg
 					className="block h-auto w-full overflow-visible"
 					viewBox="0 0 900 130"

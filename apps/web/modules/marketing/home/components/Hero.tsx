@@ -19,7 +19,7 @@ export function Hero() {
 	return (
 		<section
 			id="top"
-			className="relative overflow-hidden px-4 pt-32 pb-20 md:px-6 md:pt-40 md:pb-28"
+			className="relative overflow-hidden px-4 pt-44 pb-20 md:px-6 md:pt-40 md:pb-28"
 			style={{ background: "#0f0b1d" }}
 		>
 			{/* Botly gradient atmosphere (Figma 226:1340/1343): purple
@@ -61,7 +61,7 @@ export function Hero() {
 				<span className="absolute start-[45%] top-[14%] size-1 rounded-full bg-white opacity-30" />
 			</div>
 
-			<div className="relative z-10 mx-auto w-full max-w-[1180px]">
+			<div className="relative z-10 mx-auto w-full max-w-[1240px]">
 				<div className="mx-auto max-w-[820px] text-center">
 					{/* Badge */}
 					<span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[13px] font-semibold text-white/80">
@@ -145,7 +145,7 @@ export function Hero() {
 
 				{/* Product frame — Botly's bordered gradient frame, holding the
 				    live dashboard replica instead of a screenshot */}
-				<div className="relative mx-auto mt-12 max-w-[1024px] md:mt-16">
+				<div className="relative mx-auto mt-12 max-w-[1240px] md:mt-16">
 					<div
 						className="pointer-events-none absolute -inset-6 rounded-[48px] opacity-60"
 						aria-hidden="true"
