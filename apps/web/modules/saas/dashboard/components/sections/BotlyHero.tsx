@@ -59,7 +59,7 @@ export function BotlyHero({
 
 	return (
 		<div
-			className="relative h-full min-h-[260px] overflow-hidden rounded-[32px] xl:min-h-0"
+			className="relative h-full min-h-[190px] overflow-hidden rounded-[32px] xl:min-h-0"
 			style={{
 				backgroundImage:
 					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
@@ -70,11 +70,12 @@ export function BotlyHero({
 				<h2 className="min-w-0 flex-1 truncate text-base font-bold leading-tight text-[#1d1d1d] xl:text-xl">
 					{t("dashboard.welcome.greeting", { name: orgName })}
 				</h2>
-				{/* Botly Button 45:4490: #1d1d1d, rounded-12, semibold */}
+				{/* Botly Button 45:4490: #1d1d1d, rounded-12, semibold.
+				    Hidden on mobile so the org name gets the full row on one line. */}
 				{showFinance && (
 					<Link
 						href={`/app/${organizationSlug}/finance`}
-						className="flex shrink-0 items-center justify-center gap-2 rounded-[12px] bg-[#1d1d1d] px-4 py-2.5 text-sm font-semibold leading-6 text-white transition-opacity hover:opacity-90"
+						className="hidden shrink-0 items-center justify-center gap-2 rounded-[12px] bg-[#1d1d1d] px-4 py-2.5 text-sm font-semibold leading-6 text-white transition-opacity hover:opacity-90 xl:flex"
 					>
 						{t("dashboard.cashFlow.goToFinance")}
 						<ChevronLeft className="size-5 rtl-flip" />

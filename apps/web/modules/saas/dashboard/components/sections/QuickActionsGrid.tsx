@@ -117,7 +117,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 					{t("dashboard.quickActions")}
 				</p>
 
-				<div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+				<div className="grid min-h-0 flex-1 auto-rows-min grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-3">
 					{visibleActions.map((action, i) => {
 						const Icon = action.icon;
 						const createChip = "flex size-7 shrink-0 items-center justify-center rounded-lg border-2 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground";

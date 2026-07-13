@@ -36,7 +36,7 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 						href="/app"
 						className="absolute inset-0 flex items-center justify-center text-sidebar-accent-foreground"
 					>
-						<Logo />
+						<Logo mono />
 					</Link>
 				)}
 				<button

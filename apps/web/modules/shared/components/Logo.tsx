@@ -2,9 +2,12 @@ import { cn } from "@ui/lib";
 
 export function Logo({
 	className,
+	mono,
 }: {
 	className?: string;
 	withLabel?: boolean;
+	/** Monochrome: whole wordmark (incl. the blue alef) uses currentColor. */
+	mono?: boolean;
 }) {
 	return (
 		<span
@@ -13,15 +16,23 @@ export function Logo({
 				className,
 			)}
 		>
-			<MasarLogoSvg className="h-10 w-auto" />
+			<MasarLogoSvg className="h-10 w-auto" mono={mono} />
 		</span>
 	);
 }
 
-export function MasarLogoSvg({ className }: { className?: string }) {
+export function MasarLogoSvg({
+	className,
+	mono,
+}: {
+	className?: string;
+	mono?: boolean;
+}) {
 	return (
 		<svg
-			className={cn("text-foreground", className)}
+			// mono → inherit color from the parent (e.g. the sidebar's inverse
+			// text color) instead of forcing the brand foreground/blue.
+			className={cn(!mono && "text-foreground", className)}
 			viewBox="0 0 2284 669"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +45,7 @@ export function MasarLogoSvg({ className }: { className?: string }) {
 			>
 				{/* الألف مع السهم */}
 				<path
-					fill="#0284c7"
+					fill={mono ? "currentColor" : "#0284c7"}
 					d="M6700 6563 c-47 -58 -97 -119 -112 -137 -14 -17 -63 -76 -108 -131 -45 -55 -92 -111 -104 -125 -11 -14 -39 -47 -61 -75 -21 -27 -44 -54 -50 -60 -6 -5 -30 -35 -54 -65 -24 -30 -60 -75 -81 -100 -21 -25 -98 -117 -170 -205 -73 -88 -150 -180 -171 -205 -20 -25 -53 -64 -71 -87 -55 -69 -151 -186 -174 -213 -12 -14 -55 -65 -97 -115 l-75 -90 349 -3 349 -2 0 -2475 0 -2475 1425 0 1425 0 0 724 0 724 -272 4 c-244 4 -282 7 -353 27 -371 104 -638 370 -747 746 l-23 80 -3 1323 -2 1322 345 0 c190 0 345 3 345 6 0 3 -7 12 -15 20 -13 13 -719 866 -855 1034 -199 244 -545 660 -550 659 -3 0 -43 -48 -90 -106z"
 				/>
 				{/* حرف ر */}
