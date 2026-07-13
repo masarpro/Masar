@@ -92,10 +92,10 @@ export function PricingModeDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-3xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh]">
-				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle>{t("pricing.title")}</DialogTitle>
 					{items && (
-						<p className="text-sm text-slate-500">
+						<p className="text-sm text-muted-foreground">
 							{t("pricing.unpricedCount", { count: items.length })}
 						</p>
 					)}
@@ -104,12 +104,12 @@ export function PricingModeDialog({
 				<div className="overflow-y-auto max-h-[60vh]">
 					{isLoading ? (
 						<div className="flex items-center justify-center py-10">
-							<Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+							<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 						</div>
 					) : items && items.length > 0 ? (
 						<Table>
 							<TableHeader>
-								<TableRow className="bg-slate-50 dark:bg-slate-800/50">
+								<TableRow>
 									<TableHead className="min-w-[200px]">{t("table.description")}</TableHead>
 									<TableHead className="w-20">{t("table.unit")}</TableHead>
 									<TableHead className="w-24 text-end">{t("table.quantity")}</TableHead>
@@ -126,12 +126,12 @@ export function PricingModeDialog({
 											<TableCell className="text-sm">
 												<div>{item.description}</div>
 												{item.specifications && (
-													<div className="text-xs text-slate-400 mt-0.5 truncate max-w-[250px]">
+													<div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[250px]">
 														{item.specifications}
 													</div>
 												)}
 											</TableCell>
-											<TableCell className="text-sm text-slate-500">{item.unit}</TableCell>
+											<TableCell className="text-sm text-muted-foreground">{item.unit}</TableCell>
 											<TableCell className="text-end text-sm">
 												{item.quantity.toLocaleString("en-US")}
 											</TableCell>
@@ -159,16 +159,16 @@ export function PricingModeDialog({
 							</TableBody>
 						</Table>
 					) : (
-						<div className="py-10 text-center text-slate-400">
+						<div className="py-10 text-center text-muted-foreground">
 							{t("emptyState.title")}
 						</div>
 					)}
 				</div>
 
-				<div className="bg-slate-50 dark:bg-slate-800/50 border-t px-5 py-3 flex items-center justify-between">
+				<div className="bg-muted border-t-2 px-5 py-3 flex items-center justify-between">
 					<div className="text-sm">
-						<span className="text-slate-500">{t("pricing.totalAfterPricing")}:</span>{" "}
-						<span className="font-semibold text-slate-900 dark:text-slate-100">
+						<span className="text-muted-foreground">{t("pricing.totalAfterPricing")}:</span>{" "}
+						<span className="font-semibold text-card-foreground">
 							{formatNumber(totalAfterPricing, 2)} {tCommon("sar")}
 						</span>
 					</div>

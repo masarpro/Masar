@@ -29,13 +29,13 @@ export function LookaheadActivityCard({ activity }: LookaheadActivityCardProps) 
 	const locale = useLocale();
 
 	const isDelayed = activity.status === "DELAYED";
-	const statusColor = STATUS_COLORS[activity.status] ?? "#94a3b8";
+	const statusColor = STATUS_COLORS[activity.status] ?? "var(--muted-foreground)";
 
 	return (
 		<div
-			className={`rounded-lg border p-3 space-y-2 ${
-				isDelayed ? "border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20" : ""
-			} ${activity.isCritical ? "border-s-2 border-s-red-500" : ""}`}
+			className={`rounded-2xl border-2 bg-card p-3 space-y-2 ${
+				isDelayed ? "border-destructive/40 bg-destructive/10" : ""
+			} ${activity.isCritical ? "border-s-2 border-s-destructive" : ""}`}
 		>
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex-1 min-w-0">

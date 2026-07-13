@@ -592,7 +592,7 @@ function GanttInnerContent({
 	useGanttKeyboard();
 
 	return (
-		<div className="flex h-[calc(100vh-200px)] min-h-[500px] flex-col rounded-lg border bg-background">
+		<div className="flex h-[calc(100vh-200px)] min-h-[500px] flex-col rounded-2xl border-2 bg-card">
 			<GanttToolbar
 				onOpenCalendarSettings={onOpenCalendarSettings}
 				onOpenBaselineManagement={onOpenBaselineManagement}

@@ -103,10 +103,10 @@ export const GanttActivityBar = memo(function GanttActivityBar({
 
 	const fillColor = isCritical
 		? CRITICAL_PATH_BG
-		: STATUS_BG_COLORS[activity.status] ?? "#e2e8f0";
+		: STATUS_BG_COLORS[activity.status] ?? "var(--muted)";
 	const strokeColor = isCritical
 		? CRITICAL_PATH_COLOR
-		: STATUS_COLORS[activity.status] ?? "#94a3b8";
+		: STATUS_COLORS[activity.status] ?? "var(--muted-foreground)";
 	const progressWidth = (pos.width * Number(activity.progress)) / 100;
 
 	return (
@@ -215,7 +215,7 @@ export const GanttActivityBar = memo(function GanttActivityBar({
 						cy={pos.y + GANTT_BAR_HEIGHT / 2}
 						r={5}
 						fill={strokeColor}
-						stroke="white"
+						stroke="var(--card)"
 						strokeWidth={1.5}
 						cursor="crosshair"
 						onMouseDown={(e) => onAnchorDragStart(activity.id, "start", e)}
@@ -228,7 +228,7 @@ export const GanttActivityBar = memo(function GanttActivityBar({
 						cy={pos.y + GANTT_BAR_HEIGHT / 2}
 						r={5}
 						fill={strokeColor}
-						stroke="white"
+						stroke="var(--card)"
 						strokeWidth={1.5}
 						cursor="crosshair"
 						onMouseDown={(e) => onAnchorDragStart(activity.id, "end", e)}

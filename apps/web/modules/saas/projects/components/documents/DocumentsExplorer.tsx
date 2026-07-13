@@ -47,14 +47,14 @@ interface DocumentsExplorerProps {
 
 // خرائط ألوان مجلدات (مفتاح اللون → أصناف Tailwind)
 const FOLDER_COLOR_MAP: Record<string, { bg: string; icon: string }> = {
-	slate: { bg: "bg-slate-100 dark:bg-slate-800", icon: "text-slate-500" },
-	blue: { bg: "bg-chart-4/15 dark:bg-chart-4/20", icon: "text-chart-4" },
-	purple: { bg: "bg-purple-100 dark:bg-purple-950/40", icon: "text-purple-500" },
-	green: { bg: "bg-green-100 dark:bg-green-950/40", icon: "text-green-500" },
-	amber: { bg: "bg-amber-100 dark:bg-amber-950/40", icon: "text-amber-600" },
-	pink: { bg: "bg-pink-100 dark:bg-pink-950/40", icon: "text-pink-500" },
-	cyan: { bg: "bg-chart-4/15 dark:bg-chart-4/20", icon: "text-chart-4" },
-	red: { bg: "bg-red-100 dark:bg-red-950/40", icon: "text-red-500" },
+	slate: { bg: "bg-muted", icon: "text-muted-foreground" },
+	blue: { bg: "bg-chart-4/15", icon: "text-chart-4" },
+	purple: { bg: "bg-chart-4/15", icon: "text-chart-4" },
+	green: { bg: "bg-success/15", icon: "text-success" },
+	amber: { bg: "bg-chart-1/15", icon: "text-chart-1" },
+	pink: { bg: "bg-chart-2/15", icon: "text-chart-2" },
+	cyan: { bg: "bg-chart-3/15", icon: "text-chart-3" },
+	red: { bg: "bg-destructive/15", icon: "text-destructive" },
 };
 
 function folderColor(color?: string | null) {
@@ -64,11 +64,11 @@ function folderColor(color?: string | null) {
 function approvalBadge(status?: string) {
 	switch (status) {
 		case "PENDING":
-			return <Clock className="h-3.5 w-3.5 text-amber-500" />;
+			return <Clock className="h-3.5 w-3.5 text-chart-1" />;
 		case "APPROVED":
-			return <CheckCircle className="h-3.5 w-3.5 text-green-500" />;
+			return <CheckCircle className="h-3.5 w-3.5 text-success" />;
 		case "REJECTED":
-			return <XCircle className="h-3.5 w-3.5 text-red-500" />;
+			return <XCircle className="h-3.5 w-3.5 text-destructive" />;
 		default:
 			return null;
 	}
@@ -197,11 +197,11 @@ export function DocumentsExplorer({
 							className="rounded-xl shrink-0"
 							onClick={() => setActive(null)}
 						>
-							<ChevronLeft className="h-5 w-5 rtl:rotate-180 text-slate-500" />
+							<ChevronLeft className="h-5 w-5 rtl:rotate-180 text-muted-foreground" />
 						</Button>
 					)}
 					<div className="min-w-0">
-						<h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">
+						<h1 className="truncate text-2xl font-semibold text-foreground">
 							{isSearching
 								? t("searchResults")
 								: inFolder
@@ -209,7 +209,7 @@ export function DocumentsExplorer({
 									: t("title")}
 						</h1>
 						{!isSearching && !inFolder && (
-							<p className="text-sm text-slate-500">{t("explorerSubtitle")}</p>
+							<p className="text-sm text-muted-foreground">{t("explorerSubtitle")}</p>
 						)}
 					</div>
 				</div>
@@ -232,13 +232,13 @@ export function DocumentsExplorer({
 
 			{/* Search */}
 			<div className="relative">
-				<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+				<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 				<input
 					type="text"
 					placeholder={t("searchPlaceholder")}
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pe-4 ps-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900"
+					className="w-full rounded-lg border border-input bg-card py-2.5 pe-4 ps-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 				/>
 			</div>
 
@@ -250,7 +250,7 @@ export function DocumentsExplorer({
 							{Array.from({ length: 6 }).map((_, i) => (
 								<div
 									key={i}
-									className="h-16 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+									className="h-16 animate-pulse rounded-xl border-2 bg-card"
 								/>
 							))}
 						</div>
@@ -267,17 +267,17 @@ export function DocumentsExplorer({
 								return (
 									<div
 										key={f.id}
-										className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-all hover:border-primary/40 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
+										className="group relative flex cursor-pointer items-center gap-3 rounded-xl border-2 bg-card p-3 transition-all hover:border-primary/40"
 										onClick={() => setActive({ id: f.id, name: f.name })}
 									>
 										<span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", c.bg)}>
 											<Folder className={cn("h-5 w-5", c.icon)} />
 										</span>
 										<div className="min-w-0 flex-1">
-											<p className="truncate font-medium text-slate-900 dark:text-slate-100">
+											<p className="truncate font-medium text-card-foreground">
 												{f.name}
 											</p>
-											<p className="text-xs text-slate-500">
+											<p className="text-xs text-muted-foreground">
 												{t("filesCount", { count: f.documentCount })}
 											</p>
 										</div>
@@ -298,7 +298,7 @@ export function DocumentsExplorer({
 													</DropdownMenuItem>
 													<DropdownMenuSeparator />
 													<DropdownMenuItem
-														className="text-red-600 focus:text-red-600"
+														className="text-destructive focus:text-destructive"
 														onClick={() =>
 															setDeleteTarget({
 																id: f.id,
@@ -320,17 +320,17 @@ export function DocumentsExplorer({
 							{/* بطاقة "غير مصنّفة" */}
 							{uncategorizedCount > 0 && (
 								<div
-									className="group flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 transition-all hover:border-primary/40 dark:border-slate-700 dark:bg-slate-900/50"
+									className="group flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed bg-card p-3 transition-all hover:border-primary/40"
 									onClick={() => setActive({ id: null, name: t("uncategorized") })}
 								>
-									<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800">
-										<FolderOpen className="h-5 w-5 text-slate-400" />
+									<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+										<FolderOpen className="h-5 w-5 text-muted-foreground" />
 									</span>
 									<div className="min-w-0 flex-1">
-										<p className="truncate font-medium text-slate-700 dark:text-slate-300">
+										<p className="truncate font-medium text-card-foreground">
 											{t("uncategorized")}
 										</p>
-										<p className="text-xs text-slate-500">
+										<p className="text-xs text-muted-foreground">
 											{t("filesCount", { count: uncategorizedCount })}
 										</p>
 									</div>
@@ -349,16 +349,16 @@ export function DocumentsExplorer({
 							{Array.from({ length: 8 }).map((_, i) => (
 								<div
 									key={i}
-									className="h-16 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+									className="h-16 animate-pulse rounded-xl border-2 bg-card"
 								/>
 							))}
 						</div>
 					) : docs.length === 0 ? (
-						<div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50">
-							<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-								<FolderOpen className="h-12 w-12 text-slate-400" />
+						<div className="flex flex-col items-center justify-center rounded-2xl border-2 bg-card py-16">
+							<div className="mb-4 rounded-2xl bg-muted p-4">
+								<FolderOpen className="h-12 w-12 text-muted-foreground" />
 							</div>
-							<p className="mb-2 text-lg font-medium text-slate-700 dark:text-slate-300">
+							<p className="mb-2 text-lg font-medium text-card-foreground">
 								{isSearching ? t("noSearchResults") : t("noDocuments")}
 							</p>
 							{!isSearching && (
@@ -375,7 +375,7 @@ export function DocumentsExplorer({
 								return (
 									<div
 										key={doc.id}
-										className="group relative flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-all hover:border-primary/50 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
+										className="group relative flex items-center gap-3 rounded-xl border-2 bg-card p-3 transition-all hover:border-primary/40"
 									>
 										<button
 											type="button"
@@ -389,16 +389,16 @@ export function DocumentsExplorer({
 											onClick={() => setViewerDoc(doc)}
 											className="min-w-0 flex-1 text-start"
 										>
-											<p className="truncate text-sm font-medium text-slate-900 group-hover:text-primary dark:text-slate-100">
+											<p className="truncate text-sm font-medium text-card-foreground group-hover:text-primary">
 												{doc.title}
 											</p>
-											<div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+											<div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
 												{isSearching && doc.folderRef && (
 													<>
-														<Badge className="border-0 bg-slate-100 px-1.5 py-0 text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+														<Badge className="border-0 bg-muted px-1.5 py-0 text-[10px] text-muted-foreground">
 															{doc.folderRef.name}
 														</Badge>
-														<span className="text-slate-300">•</span>
+														<span className="text-muted-foreground">•</span>
 													</>
 												)}
 												{doc.fileSize ? <span>{formatFileSize(doc.fileSize)}</span> : null}
@@ -431,7 +431,7 @@ export function DocumentsExplorer({
 													</DropdownMenuItem>
 													<DropdownMenuSeparator />
 													<DropdownMenuItem
-														className="text-red-600 focus:text-red-600"
+														className="text-destructive focus:text-destructive"
 														onClick={() => handleDeleteDoc(doc.id)}
 													>
 														<Trash2 className="h-4 w-4 me-2" />
@@ -502,14 +502,14 @@ function EmptyState({
 	onUpload: () => void;
 }) {
 	return (
-		<div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50">
-			<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-				<FolderOpen className="h-12 w-12 text-slate-400" />
+		<div className="flex flex-col items-center justify-center rounded-2xl border-2 bg-card py-16">
+			<div className="mb-4 rounded-2xl bg-muted p-4">
+				<FolderOpen className="h-12 w-12 text-muted-foreground" />
 			</div>
-			<p className="mb-1 text-lg font-medium text-slate-700 dark:text-slate-300">
+			<p className="mb-1 text-lg font-medium text-card-foreground">
 				{t("noFolders")}
 			</p>
-			<p className="mb-6 text-sm text-slate-500">{t("noFoldersDescription")}</p>
+			<p className="mb-6 text-sm text-muted-foreground">{t("noFoldersDescription")}</p>
 			<div className="flex gap-2">
 				<Button variant="outline" className="rounded-xl" onClick={onNewFolder}>
 					<FolderPlus className="h-4 w-4 me-2" />

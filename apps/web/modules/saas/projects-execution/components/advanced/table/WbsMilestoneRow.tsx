@@ -44,7 +44,7 @@ export const WbsMilestoneRow = memo(function WbsMilestoneRow({
 				<div
 					className="h-2.5 w-2.5 rounded-full shrink-0"
 					style={{
-						backgroundColor: STATUS_COLORS[milestone.status] ?? "#94a3b8",
+						backgroundColor: STATUS_COLORS[milestone.status] ?? "var(--muted-foreground)",
 					}}
 				/>
 				<span className="truncate">{milestone.title}</span>

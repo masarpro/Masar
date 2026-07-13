@@ -26,17 +26,17 @@ export function LookaheadSummary({
 		{
 			label: t("execution.lookahead.summary.criticalActivities"),
 			value: criticalActivities,
-			color: "text-red-500",
+			color: "text-destructive",
 		},
 		{
 			label: t("execution.lookahead.summary.completedActivities"),
 			value: completedActivities,
-			color: "text-green-500",
+			color: "text-success",
 		},
 		{
 			label: t("execution.lookahead.summary.delayedActivities"),
 			value: delayedActivities,
-			color: "text-amber-500",
+			color: "text-chart-1",
 		},
 	];
 
@@ -45,7 +45,7 @@ export function LookaheadSummary({
 			{stats.map((stat) => (
 				<div
 					key={stat.label}
-					className="rounded-lg border p-3 text-center"
+					className="rounded-2xl border-2 bg-card p-3 text-center"
 				>
 					<div className={`text-2xl font-bold ${stat.color}`}>
 						{stat.value}

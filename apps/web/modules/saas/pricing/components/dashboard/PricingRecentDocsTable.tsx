@@ -37,11 +37,11 @@ interface PricingRecentDocsTableProps {
 }
 
 const studyStatusConfig: Record<string, { bg: string; text: string }> = {
-	draft: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	in_review: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
-	in_progress: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
-	completed: { bg: "bg-emerald-100 dark:bg-emerald-900/50", text: "text-emerald-600 dark:text-emerald-400" },
-	approved: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },
+	draft: { bg: "bg-muted", text: "text-muted-foreground" },
+	in_review: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	in_progress: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	completed: { bg: "bg-success/15", text: "text-success" },
+	approved: { bg: "bg-success/15", text: "text-success" },
 };
 
 // Map DB status to translation key
@@ -54,13 +54,13 @@ const studyStatusTranslationKey: Record<string, string> = {
 };
 
 const quotationStatusConfig: Record<string, { bg: string; text: string }> = {
-	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	SENT: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
-	VIEWED: { bg: "bg-purple-100 dark:bg-purple-900/50", text: "text-purple-600 dark:text-purple-400" },
-	ACCEPTED: { bg: "bg-green-100 dark:bg-green-900/50", text: "text-green-600 dark:text-green-400" },
-	REJECTED: { bg: "bg-red-100 dark:bg-red-900/50", text: "text-red-600 dark:text-red-400" },
-	EXPIRED: { bg: "bg-amber-100 dark:bg-amber-900/50", text: "text-amber-600 dark:text-amber-400" },
-	CONVERTED: { bg: "bg-emerald-100 dark:bg-emerald-900/50", text: "text-emerald-600 dark:text-emerald-400" },
+	DRAFT: { bg: "bg-muted", text: "text-muted-foreground" },
+	SENT: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	VIEWED: { bg: "bg-chart-4/15", text: "text-chart-4" },
+	ACCEPTED: { bg: "bg-success/15", text: "text-success" },
+	REJECTED: { bg: "bg-destructive/15", text: "text-destructive" },
+	EXPIRED: { bg: "bg-chart-1/15", text: "text-chart-1" },
+	CONVERTED: { bg: "bg-success/15", text: "text-success" },
 };
 
 export function PricingRecentDocsTable({
@@ -71,17 +71,17 @@ export function PricingRecentDocsTable({
 	const basePath = `/app/${organizationSlug}/pricing`;
 
 	return (
-		<Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 transition-all duration-300 hover:shadow-xl">
+		<Card className="rounded-3xl">
 			<CardHeader className="flex flex-row items-center justify-between pb-4">
-				<CardTitle className="text-lg font-medium text-slate-900 dark:text-slate-100">
+				<CardTitle className="text-lg font-semibold text-card-foreground">
 					{t("pricing.dashboard.recentDocuments")}
 				</CardTitle>
 				<Link
 					href={`${basePath}/studies`}
-					className="text-sm text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+					className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
 				>
 					{t("common.viewAll")}
-					<ArrowUpRight className="h-4 w-4" />
+					<ArrowUpRight className="h-4 w-4 rtl-flip" />
 				</Link>
 			</CardHeader>
 			<CardContent>
@@ -128,13 +128,13 @@ export function PricingRecentDocsTable({
 									return (
 										<TableRow
 											key={`${doc.type}-${doc.id}`}
-											className="group hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors"
+											className="group hover:bg-accent transition-colors"
 										>
 											<TableCell>
 												{isStudy ? (
 													<Calculator className="h-4 w-4 text-chart-4" />
 												) : (
-													<FileSpreadsheet className="h-4 w-4 text-violet-500" />
+													<FileSpreadsheet className="h-4 w-4 text-chart-4" />
 												)}
 											</TableCell>
 											<TableCell>
@@ -145,7 +145,7 @@ export function PricingRecentDocsTable({
 													{doc.title}
 												</Link>
 											</TableCell>
-											<TableCell className="text-slate-600 dark:text-slate-400">
+											<TableCell className="text-muted-foreground">
 												{doc.clientName || "—"}
 											</TableCell>
 											<TableCell className="text-end font-medium">
@@ -153,12 +153,12 @@ export function PricingRecentDocsTable({
 											</TableCell>
 											<TableCell>
 												<span
-													className={`text-xs px-2.5 py-1 rounded-full ${statusConfig.bg} ${statusConfig.text}`}
+													className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusConfig.bg} ${statusConfig.text}`}
 												>
 													{statusLabel}
 												</span>
 											</TableCell>
-											<TableCell className="text-slate-500 text-sm">
+											<TableCell className="text-muted-foreground text-sm">
 												{formatDate(doc.createdAt)}
 											</TableCell>
 											<TableCell>
@@ -166,7 +166,7 @@ export function PricingRecentDocsTable({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8 hover:bg-white/80 dark:hover:bg-slate-700/80"
+														className="h-8 w-8"
 														asChild
 													>
 														<Link href={detailPath}>
@@ -182,7 +182,7 @@ export function PricingRecentDocsTable({
 						</Table>
 					</div>
 				) : (
-					<p className="text-center text-slate-500 py-8">
+					<p className="text-center text-muted-foreground py-8">
 						{t("pricing.dashboard.noRecentDocuments")}
 					</p>
 				)}

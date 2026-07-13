@@ -451,7 +451,7 @@ export function PlainConcreteSection({
 									</div>
 									<div className="bg-background rounded-lg p-3 text-center">
 										<p className="text-xs text-muted-foreground">الحجم للوحدة</p>
-										<p className="text-lg font-bold text-green-600">
+										<p className="text-lg font-bold text-success">
 											{formatNumber(calculations.volumePerUnit)} م³
 										</p>
 									</div>

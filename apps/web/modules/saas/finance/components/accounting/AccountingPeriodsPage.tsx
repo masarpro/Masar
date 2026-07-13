@@ -63,7 +63,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 		<div className="space-y-4">
 			{/* Year selector + Generate */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
-				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+				<div className="flex gap-1 bg-muted rounded-xl p-1">
 					{[currentYear - 1, currentYear, currentYear + 1].map((y) => (
 						<Button key={y} variant={year === y ? "primary" : "ghost"} size="sm" className="rounded-lg" onClick={() => setYear(y)}>
 							{y}
@@ -84,7 +84,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 
 			{periodsList.length === 0 ? (
 				<Card className="rounded-2xl">
-					<CardContent className="p-12 text-center text-slate-500">
+					<CardContent className="p-12 text-center text-muted-foreground">
 						{t("finance.accounting.periods.noPeriods")}
 					</CardContent>
 				</Card>
@@ -109,7 +109,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 									return (
 										<TableRow key={period.id}>
 											<TableCell className="font-medium">{period.name}</TableCell>
-											<TableCell className="text-sm text-slate-500">
+											<TableCell className="text-sm text-muted-foreground">
 												{new Date(period.startDate).toLocaleDateString("en-SA")} — {new Date(period.endDate).toLocaleDateString("en-SA")}
 											</TableCell>
 											<TableCell className="text-center">
@@ -122,12 +122,12 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 											</TableCell>
 											<TableCell className="text-center">
 												{period.isClosed ? (
-													<Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+													<Badge className="bg-success/15 text-success">
 														<CheckCircle className="h-3 w-3 me-1" />
 														{t("finance.accounting.periods.closed")}
 													</Badge>
 												) : (
-													<Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+													<Badge variant="secondary" className="bg-chart-1/15 text-chart-1">
 														<CircleDot className="h-3 w-3 me-1" />
 														{t("finance.accounting.periods.open")}
 													</Badge>

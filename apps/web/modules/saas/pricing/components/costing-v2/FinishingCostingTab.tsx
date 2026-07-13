@@ -376,7 +376,7 @@ export function FinishingCostingTab({
 						className={cn(
 							"flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all",
 							viewMode === "cards"
-								? "bg-background text-foreground shadow-sm"
+								? "bg-background text-foreground"
 								: "text-muted-foreground hover:text-foreground",
 						)}
 					>
@@ -389,7 +389,7 @@ export function FinishingCostingTab({
 						className={cn(
 							"flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all",
 							viewMode === "quick"
-								? "bg-background text-foreground shadow-sm"
+								? "bg-background text-foreground"
 								: "text-muted-foreground hover:text-foreground",
 						)}
 					>
@@ -507,7 +507,7 @@ export function FinishingCostingTab({
 													className={cn(
 														"text-[10px] px-1.5 py-0.5 rounded-md border transition-colors",
 														isLumpSum
-															? "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400"
+															? "bg-chart-1/15 border-chart-1 text-chart-1"
 															: "bg-chart-4/15 border-chart-4 text-chart-4 dark:bg-chart-4/20 dark:border-chart-4 dark:text-chart-4",
 													)}
 												>
@@ -658,7 +658,7 @@ export function FinishingCostingTab({
 											{item.unit})
 										</span>
 										{isLumpSum && (
-											<span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400">
+											<span className="text-[10px] px-1.5 py-0.5 rounded-md bg-chart-1/15 border border-chart-1 text-chart-1">
 												{t("common.lumpSum")}
 											</span>
 										)}

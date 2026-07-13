@@ -58,8 +58,8 @@ export function OwnerPaymentsSkeleton() {
 /** /owner/[token]/chat — chat card frame: header, bubbles, input */
 export function OwnerChatSkeleton() {
 	return (
-		<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-			<div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+		<div className="overflow-hidden rounded-2xl border-2 bg-card">
+			<div className="flex items-center justify-between border-b-2 px-6 py-4">
 				<Skeleton className="h-5 w-32" />
 				<Skeleton className="h-8 w-20 rounded-xl" />
 			</div>
@@ -76,7 +76,7 @@ export function OwnerChatSkeleton() {
 					</div>
 				))}
 			</div>
-			<div className="border-t border-slate-200 p-4 dark:border-slate-700">
+			<div className="border-t-2 p-4">
 				<Skeleton className="h-[60px] w-full rounded-xl" />
 			</div>
 		</div>

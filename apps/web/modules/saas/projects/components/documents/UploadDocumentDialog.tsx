@@ -201,18 +201,18 @@ export function UploadDocumentDialog({
 							"cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors",
 							isDragActive
 								? "border-primary bg-primary/5"
-								: "border-slate-300 bg-slate-50 hover:border-primary/50 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-primary/50 dark:hover:bg-slate-800/50",
+								: "border-border bg-muted/50 hover:border-primary/50 hover:bg-muted",
 						)}
 					>
 						<input {...getInputProps()} />
 						<div className="flex flex-col items-center gap-2">
-							<div className="rounded-2xl bg-slate-200 p-3 dark:bg-slate-700">
-								<Upload className="h-6 w-6 text-slate-500 dark:text-slate-400" />
+							<div className="rounded-2xl bg-muted p-3">
+								<Upload className="h-6 w-6 text-muted-foreground" />
 							</div>
-							<p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<p className="text-sm font-medium text-card-foreground">
 								{isDragActive ? t("dropHere") : t("dragAndDrop")}
 							</p>
-							<p className="text-xs text-slate-500">{t("maxFileSize")}</p>
+							<p className="text-xs text-muted-foreground">{t("maxFileSize")}</p>
 						</div>
 					</div>
 
@@ -224,21 +224,21 @@ export function UploadDocumentDialog({
 								return (
 									<div
 										key={item.id}
-										className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900"
+										className="flex items-center gap-3 rounded-xl border-2 bg-card p-2.5"
 									>
 										<span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", bg)}>
 											<Icon className={cn("h-5 w-5", color)} />
 										</span>
 										<div className="min-w-0 flex-1">
-											<p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+											<p className="truncate text-sm font-medium text-card-foreground">
 												{item.file.name}
 											</p>
 											{item.status === "uploading" ? (
 												<Progress value={item.progress} className="mt-1 h-1.5" />
 											) : (
-												<p className="text-xs text-slate-500">
+												<p className="text-xs text-muted-foreground">
 													{item.status === "error" ? (
-														<span className="text-red-500">{item.error}</span>
+														<span className="text-destructive">{item.error}</span>
 													) : (
 														formatFileSize(item.file.size)
 													)}
@@ -246,19 +246,19 @@ export function UploadDocumentDialog({
 											)}
 										</div>
 										{item.status === "done" ? (
-											<CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
+											<CheckCircle className="h-5 w-5 shrink-0 text-success" />
 										) : item.status === "error" ? (
-											<AlertCircle className="h-5 w-5 shrink-0 text-red-500" />
+											<AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
 										) : item.status === "pending" && !isUploading ? (
 											<button
 												type="button"
 												onClick={() => removeItem(item.id)}
-												className="shrink-0 rounded-lg p-1 text-slate-400 hover:text-red-500"
+												className="shrink-0 rounded-lg p-1 text-muted-foreground hover:text-destructive"
 											>
 												<X className="h-4 w-4" />
 											</button>
 										) : (
-											<span className="w-6 shrink-0 text-center text-xs text-slate-400">
+											<span className="w-6 shrink-0 text-center text-xs text-muted-foreground">
 												{item.progress}%
 											</span>
 										)}

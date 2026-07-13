@@ -61,7 +61,7 @@ export function MilestoneTemplateDialog({
 								onClick={() => onApply(template)}
 							>
 								<div className="flex items-start gap-3">
-									<div className="p-2 rounded-lg bg-primary/10">
+									<div className="p-2 rounded-xl bg-primary/10">
 										<Icon className="h-5 w-5 text-primary" />
 									</div>
 									<div className="flex-1 min-w-0">

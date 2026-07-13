@@ -87,7 +87,7 @@ export function QuotationPreview({
 	if (!quotation) {
 		return (
 			<div className="text-center py-20">
-				<p className="text-slate-500">{t("pricing.quotations.notFound")}</p>
+				<p className="text-muted-foreground">{t("pricing.quotations.notFound")}</p>
 				<Link href={basePath}>
 					<Button variant="outline" className="mt-4 rounded-xl">
 						<ArrowLeft className="h-4 w-4 me-2" />
@@ -220,7 +220,7 @@ export function QuotationPreview({
 			{/* Template name badge */}
 			{template && (
 				<div className="text-center print:hidden">
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("finance.templates.select")}: {template.name}
 					</p>
 				</div>

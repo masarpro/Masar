@@ -47,8 +47,8 @@ export function FinanceView({
 			href: `${financePath}/expenses`,
 			newHref: `${financePath}/expenses/new`,
 			newLabel: t("finance.expenses.new"),
-			iconBg: "bg-red-100 dark:bg-red-900/50",
-			iconColor: "text-red-600 dark:text-red-400",
+			iconBg: "bg-destructive/15",
+			iconColor: "text-destructive",
 			value: summary?.actualExpenses ?? 0,
 		},
 		{
@@ -58,8 +58,8 @@ export function FinanceView({
 			href: `${financePath}/payments`,
 			newHref: `${financePath}/payments/new`,
 			newLabel: t("finance.payments.new"),
-			iconBg: "bg-green-100 dark:bg-green-900/50",
-			iconColor: "text-green-600 dark:text-green-400",
+			iconBg: "bg-success/15",
+			iconColor: "text-success",
 			value: summary?.totalPayments ?? 0,
 		},
 		{
@@ -69,8 +69,8 @@ export function FinanceView({
 			href: `${financePath}/claims`,
 			newHref: `${financePath}/claims/new`,
 			newLabel: t("finance.claims.new"),
-			iconBg: "bg-amber-100 dark:bg-amber-900/50",
-			iconColor: "text-amber-600 dark:text-amber-400",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
 			value: summary?.claimsPaid ?? 0,
 		},
 	];
@@ -90,7 +90,7 @@ export function FinanceView({
 			<div className="grid gap-4 sm:grid-cols-3">
 				{sections.map((section) => (
 					<Link key={section.title} href={section.href}>
-						<Card className="rounded-2xl transition-shadow hover:shadow-md cursor-pointer h-full">
+						<Card className="rounded-2xl transition-colors hover:bg-accent cursor-pointer h-full">
 							<CardContent className="p-5">
 								<div className="flex items-start gap-3">
 									<div className={`rounded-xl ${section.iconBg} p-2.5`}>
@@ -99,10 +99,10 @@ export function FinanceView({
 										/>
 									</div>
 									<div className="min-w-0 flex-1">
-										<h3 className="font-semibold text-slate-900 dark:text-slate-100">
+										<h3 className="font-semibold text-card-foreground">
 											{section.title}
 										</h3>
-										<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+										<p className="mt-1 text-sm text-muted-foreground">
 											{section.description}
 										</p>
 									</div>

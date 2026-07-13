@@ -45,32 +45,35 @@ export const ZOOM_CONFIGS: Record<GanttZoomLevel, ZoomConfig> = {
 
 // ─── Status Colors ───
 export const STATUS_COLORS: Record<string, string> = {
-	NOT_STARTED: "#94a3b8",
-	PLANNED: "#94a3b8",
-	IN_PROGRESS: "#14b8a6",
-	COMPLETED: "#22c55e",
-	DELAYED: "#ef4444",
-	ON_HOLD: "#f59e0b",
-	CANCELLED: "#cbd5e1",
+	NOT_STARTED: "var(--muted-foreground)",
+	PLANNED: "var(--muted-foreground)",
+	IN_PROGRESS: "var(--chart-3)",
+	COMPLETED: "var(--success)",
+	DELAYED: "var(--destructive)",
+	ON_HOLD: "var(--chart-1)",
+	CANCELLED: "var(--border)",
 };
 
 export const STATUS_BG_COLORS: Record<string, string> = {
-	NOT_STARTED: "#e2e8f0",
-	PLANNED: "#e2e8f0",
-	IN_PROGRESS: "#ccfbf1",
-	COMPLETED: "#dcfce7",
-	DELAYED: "#fee2e2",
-	ON_HOLD: "#fef3c7",
-	CANCELLED: "#f1f5f9",
+	NOT_STARTED: "color-mix(in srgb, var(--muted-foreground) 15%, transparent)",
+	PLANNED: "color-mix(in srgb, var(--muted-foreground) 15%, transparent)",
+	IN_PROGRESS: "color-mix(in srgb, var(--chart-3) 15%, transparent)",
+	COMPLETED: "color-mix(in srgb, var(--success) 15%, transparent)",
+	DELAYED: "color-mix(in srgb, var(--destructive) 15%, transparent)",
+	ON_HOLD: "color-mix(in srgb, var(--chart-1) 15%, transparent)",
+	CANCELLED: "var(--muted)",
 };
 
 // ─── Special Colors ───
-export const CRITICAL_PATH_COLOR = "#ef4444";
-export const CRITICAL_PATH_BG = "#fecaca";
-export const DEPENDENCY_ARROW_COLOR = "#64748b";
-export const BASELINE_GHOST_COLOR = "rgba(100,116,139,0.35)";
-export const TODAY_LINE_COLOR = "#ef4444";
-export const WEEKEND_BG_COLOR = "rgba(148,163,184,0.08)";
+export const CRITICAL_PATH_COLOR = "var(--destructive)";
+export const CRITICAL_PATH_BG =
+	"color-mix(in srgb, var(--destructive) 25%, transparent)";
+export const DEPENDENCY_ARROW_COLOR = "var(--muted-foreground)";
+export const BASELINE_GHOST_COLOR =
+	"color-mix(in srgb, var(--muted-foreground) 35%, transparent)";
+export const TODAY_LINE_COLOR = "var(--destructive)";
+export const WEEKEND_BG_COLOR =
+	"color-mix(in srgb, var(--muted-foreground) 8%, transparent)";
 
 // ─── WBS Table Columns ───
 export const WBS_TABLE_COLUMNS = [

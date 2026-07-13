@@ -32,14 +32,14 @@ const STATUS_COLORS: Record<string, { bar: string; fill: string; text: string }>
 		text: "text-chart-4",
 	},
 	COMPLETED: {
-		bar: "bg-green-100 border-green-500",
-		fill: "bg-green-600",
-		text: "text-green-700",
+		bar: "bg-success/15 border-success",
+		fill: "bg-success",
+		text: "text-success",
 	},
 	DELAYED: {
-		bar: "bg-red-100 border-red-500",
-		fill: "bg-red-600",
-		text: "text-red-700",
+		bar: "bg-destructive/15 border-destructive",
+		fill: "bg-destructive",
+		text: "text-destructive",
 	},
 	CANCELLED: {
 		bar: "bg-gray-100 border-gray-400",
@@ -229,7 +229,7 @@ export function GanttPrintCanvas({
 							{/* today marker */}
 							{todayPct >= 0 && (
 								<div
-									className="absolute top-0 bottom-0 w-px bg-red-500 z-10"
+									className="absolute top-0 bottom-0 w-px bg-destructive z-10"
 									style={{ insetInlineStart: `${todayPct}%` }}
 								/>
 							)}
@@ -274,7 +274,7 @@ export function GanttPrintCanvas({
 					))}
 					{todayPct >= 0 && (
 						<span className="inline-flex items-center gap-1">
-							<span className="inline-block w-px h-3 bg-red-500" />
+							<span className="inline-block w-px h-3 bg-destructive" />
 							{t("execution.print.today")}
 						</span>
 					)}

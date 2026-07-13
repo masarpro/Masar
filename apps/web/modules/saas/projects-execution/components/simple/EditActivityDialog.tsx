@@ -159,7 +159,7 @@ export function EditActivityDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
+				<DialogHeader className="bg-card border-b px-5 py-4">
 					<DialogTitle>{t("execution.activity.edit")}</DialogTitle>
 				</DialogHeader>
 
@@ -279,7 +279,7 @@ export function EditActivityDialog({
 						</div>
 					</div>
 
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t px-5 py-3 flex justify-between gap-3">
+					<div className="bg-muted/50 border-t px-5 py-3 flex justify-between gap-3">
 						<Button
 							type="button"
 							variant="outline"

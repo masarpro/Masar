@@ -239,7 +239,7 @@ export function BOQSummaryTable({
 						onClick={() => setActiveTab(tab.key)}
 						className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
 							activeTab === tab.key
-								? "bg-background text-foreground shadow-sm"
+								? "bg-background text-foreground"
 								: "text-muted-foreground hover:text-foreground"
 						}`}
 					>
@@ -396,7 +396,7 @@ function FloorMaterialView({
 					title={t("structural.boq.concreteSection")}
 					icon={Box}
 					iconColor="text-chart-4"
-					borderColor="border-l-blue-500"
+					borderColor="border-s-chart-4"
 					items={concreteRows}
 					valueAccessor={(item) => item.concreteVolume}
 					valueLabel={t("structural.boq.volume")}
@@ -412,8 +412,8 @@ function FloorMaterialView({
 				<MaterialSectionCard
 					title={t("structural.boq.steelSection")}
 					icon={Columns3}
-					iconColor="text-orange-600"
-					borderColor="border-l-orange-500"
+					iconColor="text-chart-1"
+					borderColor="border-s-chart-1"
 					items={steelRows}
 					valueAccessor={(item) => item.steelWeight}
 					valueLabel={t("structural.boq.weight")}
@@ -429,8 +429,8 @@ function FloorMaterialView({
 				<MaterialSectionCard
 					title={t("structural.boq.blockSection")}
 					icon={Grid3X3}
-					iconColor="text-emerald-600"
-					borderColor="border-l-emerald-500"
+					iconColor="text-success"
+					borderColor="border-s-success"
 					items={blockRows}
 					valueAccessor={(item) => item.quantity}
 					valueLabel={t("structural.quantity")}
@@ -494,7 +494,7 @@ function MaterialSectionCard({
 }) {
 	const t = useTranslations("pricing.studies");
 	return (
-		<Card className={`border-r-4 ${borderColor} overflow-hidden`}>
+		<Card className={`border-s-4 ${borderColor} overflow-hidden`}>
 			<Collapsible open={isExpanded} onOpenChange={onToggle}>
 				<CollapsibleTrigger asChild>
 					<button
@@ -576,7 +576,7 @@ function SharedItemsCard({
 	const totalSteel = items.reduce((s, d) => s + d.item.steelWeight, 0);
 
 	return (
-		<Card className="border-r-4 border-l-slate-400 overflow-hidden">
+		<Card className="border-s-4 border-s-border overflow-hidden">
 			<Collapsible open={isExpanded} onOpenChange={onToggle}>
 				<CollapsibleTrigger asChild>
 					<button
@@ -589,7 +589,7 @@ function SharedItemsCard({
 							) : (
 								<ChevronLeft className="h-4 w-4 text-muted-foreground" />
 							)}
-							<Layers className="h-5 w-5 text-slate-500" />
+							<Layers className="h-5 w-5 text-muted-foreground" />
 							<span className="font-semibold">{t("structural.boq.sharedItems")}</span>
 							<Badge variant="secondary" className="text-xs">
 								{t("boq.itemsCount", { count: items.length })}
@@ -602,7 +602,7 @@ function SharedItemsCard({
 								</span>
 							)}
 							{totalSteel > 0 && (
-								<span className="text-orange-600 font-medium">
+								<span className="text-chart-1 font-medium">
 									{formatNumber(totalSteel)} كجم
 								</span>
 							)}
@@ -634,7 +634,7 @@ function SharedItemsCard({
 											<TableCell className="text-sm text-chart-4">
 												{formatNumber(item.concreteVolume)}
 											</TableCell>
-											<TableCell className="text-sm text-orange-600">
+											<TableCell className="text-sm text-chart-1">
 												{formatNumber(item.steelWeight)}
 											</TableCell>
 										</TableRow>
@@ -654,14 +654,14 @@ function SharedItemsCard({
 // ─────────────────────────────────────────────────────────────
 
 const SECTION_COLORS: Record<string, string> = {
-	plainConcrete: "border-l-gray-500",
-	foundations: "border-l-amber-500",
-	groundBeams: "border-l-teal-500",
-	beams: "border-l-blue-500",
-	columns: "border-l-purple-500",
-	slabs: "border-l-emerald-500",
-	blocks: "border-l-orange-500",
-	stairs: "border-l-rose-500",
+	plainConcrete: "border-s-border",
+	foundations: "border-s-chart-1",
+	groundBeams: "border-s-chart-3",
+	beams: "border-s-chart-3",
+	columns: "border-s-chart-4",
+	slabs: "border-s-success",
+	blocks: "border-s-chart-1",
+	stairs: "border-s-destructive",
 };
 
 function SectionCard({
@@ -678,10 +678,10 @@ function SectionCard({
 	toggleCutting: (key: string) => void;
 }) {
 	const t = useTranslations("pricing.studies");
-	const borderColor = SECTION_COLORS[section.category] || "border-l-gray-400";
+	const borderColor = SECTION_COLORS[section.category] || "border-s-border";
 
 	return (
-		<Card className={`border-r-4 ${borderColor} overflow-hidden`}>
+		<Card className={`border-s-4 ${borderColor} overflow-hidden`}>
 			<Collapsible open={isExpanded} onOpenChange={onToggle}>
 				<CollapsibleTrigger asChild>
 					<button
@@ -712,12 +712,12 @@ function SectionCard({
 								</span>
 							)}
 							{section.totalRebar > 0 && (
-								<span className="text-orange-600 font-medium">
+								<span className="text-chart-1 font-medium">
 									{formatNumber(section.totalRebar)} كجم
 								</span>
 							)}
 							{section.totalBlocks > 0 && (
-								<span className="text-emerald-600 font-medium">
+								<span className="text-success font-medium">
 									{formatNumber(section.totalBlocks)} {t("structural.otherStructural.results.blockUnit")}
 								</span>
 							)}
@@ -847,11 +847,11 @@ function SubGroupView({
 										<TableCell className="text-sm text-chart-4">
 											{formatNumber(detail.item.concreteVolume)}
 										</TableCell>
-										<TableCell className="text-sm text-orange-600">
+										<TableCell className="text-sm text-chart-1">
 											{formatNumber(detail.item.steelWeight)}
 										</TableCell>
 										{category === "blocks" && (
-											<TableCell className="text-sm text-emerald-600">
+											<TableCell className="text-sm text-success">
 												{formatNumber(detail.item.quantity)}
 											</TableCell>
 										)}
@@ -867,7 +867,7 @@ function SubGroupView({
 												</button>
 											) : category !== "plainConcrete" && category !== "blocks" ? (
 												<span title={t("boq.cuttingDetailsUnavailable")}>
-													<AlertCircle className="h-3.5 w-3.5 text-amber-400" />
+													<AlertCircle className="h-3.5 w-3.5 text-chart-1" />
 												</span>
 											) : null}
 										</TableCell>
@@ -946,10 +946,10 @@ function CuttingDetailsInline({
 									<span
 										className={
 											d.wastePercentage > 15
-												? "text-red-600"
+												? "text-destructive"
 												: d.wastePercentage > 8
-													? "text-amber-600"
-													: "text-green-600"
+													? "text-chart-1"
+													: "text-success"
 										}
 									>
 										{d.wastePercentage}%
@@ -1006,7 +1006,7 @@ function GrandTotalCards({
 				totals.rebar > 0
 					? `(${formatNumber(totals.rebar)} كجم)`
 					: undefined,
-			color: "text-orange-600",
+			color: "text-chart-1",
 			bgColor: "bg-orange-50 dark:bg-orange-950/30",
 			borderColor: "border-orange-200 dark:border-orange-800",
 		},
@@ -1015,7 +1015,7 @@ function GrandTotalCards({
 			icon: Grid3X3,
 			value: totals.blocks > 0 ? formatNumber(totals.blocks) : "—",
 			unit: t("structural.otherStructural.results.blockUnit"),
-			color: "text-emerald-600",
+			color: "text-success",
 			bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
 			borderColor: "border-emerald-200 dark:border-emerald-800",
 		},
@@ -1024,7 +1024,7 @@ function GrandTotalCards({
 			icon: Ruler,
 			value: totals.formwork > 0 ? formatNumber(totals.formwork) : "—",
 			unit: "م²",
-			color: "text-amber-600",
+			color: "text-chart-1",
 			bgColor: "bg-amber-50 dark:bg-amber-950/30",
 			borderColor: "border-amber-200 dark:border-amber-800",
 		},
@@ -1148,7 +1148,7 @@ function FactoryOrderTab({
 									<TableCell>
 										{formatNumber(entry.weight)}
 									</TableCell>
-									<TableCell className="font-bold text-orange-600">
+									<TableCell className="font-bold text-chart-1">
 										{formatNumber(entry.weight / 1000, 3)}
 									</TableCell>
 								</TableRow>
@@ -1160,7 +1160,7 @@ function FactoryOrderTab({
 								<TableCell></TableCell>
 								<TableCell>{totalBars}</TableCell>
 								<TableCell>{formatNumber(totalWeight)}</TableCell>
-								<TableCell className="text-orange-600 text-lg">
+								<TableCell className="text-chart-1 text-lg">
 									{formatNumber(totalWeight / 1000, 3)} طن
 								</TableCell>
 							</TableRow>
@@ -1252,7 +1252,7 @@ function CuttingWorkshopTab({
 							</div>
 							<div className="flex items-center gap-3 text-xs text-muted-foreground">
 								<span>{t("boq.factoryBarsCount", { count: groupStocks })}</span>
-								<span className="font-medium text-orange-600">
+								<span className="font-medium text-chart-1">
 									{formatNumber(groupWeight)} كجم
 								</span>
 							</div>
@@ -1314,10 +1314,10 @@ function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
 								<span
 									className={
 										d.wastePercentage > 15
-											? "text-red-600 font-medium"
+											? "text-destructive font-medium"
 											: d.wastePercentage > 8
-												? "text-amber-600"
-												: "text-green-600"
+												? "text-chart-1"
+												: "text-success"
 									}
 								>
 									{d.wastePercentage}%

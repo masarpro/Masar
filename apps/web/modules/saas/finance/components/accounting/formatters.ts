@@ -28,9 +28,9 @@ export function formatPercent(value: number): string {
  * Account type color classes
  */
 export const ACCOUNT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-	ASSET: { bg: "bg-chart-4/15 dark:bg-chart-4/20", text: "text-chart-4 dark:text-chart-4" },
-	LIABILITY: { bg: "bg-red-50 dark:bg-red-950/20", text: "text-red-700 dark:text-red-300" },
-	EQUITY: { bg: "bg-purple-50 dark:bg-purple-950/20", text: "text-purple-700 dark:text-purple-300" },
-	REVENUE: { bg: "bg-green-50 dark:bg-green-950/20", text: "text-green-700 dark:text-green-300" },
-	EXPENSE: { bg: "bg-amber-50 dark:bg-amber-950/20", text: "text-amber-700 dark:text-amber-300" },
+	ASSET: { bg: "bg-chart-3/10", text: "text-chart-3" },
+	LIABILITY: { bg: "bg-destructive/10", text: "text-destructive" },
+	EQUITY: { bg: "bg-chart-4/10", text: "text-chart-4" },
+	REVENUE: { bg: "bg-success/10", text: "text-success" },
+	EXPENSE: { bg: "bg-chart-1/10", text: "text-chart-1" },
 };

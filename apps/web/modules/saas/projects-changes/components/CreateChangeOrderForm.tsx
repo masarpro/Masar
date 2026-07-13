@@ -220,7 +220,7 @@ export function CreateChangeOrderForm({
 								placeholder="0"
 								step="any"
 							/>
-							<p className="text-xs text-slate-500">
+							<p className="text-xs text-muted-foreground">
 								{t("changeOrders.form.costImpactHint")}
 							</p>
 						</div>
@@ -238,7 +238,7 @@ export function CreateChangeOrderForm({
 								min={-365}
 								max={365}
 							/>
-							<p className="text-xs text-slate-500">
+							<p className="text-xs text-muted-foreground">
 								{t("changeOrders.form.timeImpactHint")}
 							</p>
 						</div>

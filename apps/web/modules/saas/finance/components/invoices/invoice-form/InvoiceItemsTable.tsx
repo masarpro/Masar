@@ -61,13 +61,13 @@ export function InvoiceItemsTable({
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
 
 	return (
-		<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-			<div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+		<div className="bg-card rounded-2xl border-2 overflow-hidden">
+			<div className="flex items-center justify-between px-5 py-3.5 border-b-2">
 				<div className="flex items-center gap-2.5">
-					<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-800/20 flex items-center justify-center">
-						<FileText className="h-[15px] w-[15px] text-amber-500" />
+					<div className="flex size-8 items-center justify-center rounded-xl bg-chart-1/15 text-chart-1">
+						<FileText className="h-[15px] w-[15px]" />
 					</div>
-					<span className="text-sm font-semibold text-foreground">{t("finance.invoices.items")}</span>
+					<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.items")}</span>
 					<span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">{items.filter((i) => i.description.trim()).length}</span>
 				</div>
 				<div className="flex items-center gap-3">
@@ -94,13 +94,13 @@ export function InvoiceItemsTable({
 			<div className="overflow-x-auto">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b bg-slate-50/80 dark:bg-slate-800/30">
-							{isColumnVisible("index") && <th className="p-3 text-center w-12 text-[11.5px] font-semibold text-muted-foreground tracking-wide">#</th>}
-							{isColumnVisible("description") && <th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground min-w-[180px] tracking-wide">{columnLabels.description}</th>}
-							{isColumnVisible("unit") && <th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground w-24 tracking-wide">{columnLabels.unit}</th>}
-							{isColumnVisible("unitPrice") && <th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground w-28 tracking-wide">{columnLabels.unitPrice}</th>}
-							{isColumnVisible("quantity") && <th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground w-20 tracking-wide">{columnLabels.quantity}</th>}
-							{isColumnVisible("total") && <th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground w-28 tracking-wide">{columnLabels.total}</th>}
+						<tr className="border-b-2">
+							{isColumnVisible("index") && <th className="p-3 text-center w-12 text-sm font-medium text-muted-foreground">#</th>}
+							{isColumnVisible("description") && <th className="p-3 text-start text-sm font-medium text-muted-foreground min-w-[180px]">{columnLabels.description}</th>}
+							{isColumnVisible("unit") && <th className="p-3 text-center text-sm font-medium text-muted-foreground w-24">{columnLabels.unit}</th>}
+							{isColumnVisible("unitPrice") && <th className="p-3 text-center text-sm font-medium text-muted-foreground w-28">{columnLabels.unitPrice}</th>}
+							{isColumnVisible("quantity") && <th className="p-3 text-center text-sm font-medium text-muted-foreground w-20">{columnLabels.quantity}</th>}
+							{isColumnVisible("total") && <th className="p-3 text-center text-sm font-medium text-muted-foreground w-28">{columnLabels.total}</th>}
 							<th className="p-3 w-10" />
 						</tr>
 					</thead>
@@ -108,14 +108,14 @@ export function InvoiceItemsTable({
 						{items.map((item, index) => {
 							const hasError = !!itemErrors?.[item.id];
 							return (
-								<tr key={item.id} data-item-id={item.id} className="border-b border-slate-50 dark:border-slate-800/30 last:border-0 hover:bg-primary/[0.02] transition-colors">
+								<tr key={item.id} data-item-id={item.id} className="border-b-2 last:border-0 hover:bg-accent/50 transition-colors">
 									{isColumnVisible("index") && (
 										<td className="p-2 text-center">
 											<div className="flex flex-col items-center gap-0.5">
 												<button type="button" onClick={() => onMoveItemUp(index)} disabled={index === 0} className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
 													<ChevronUp className="h-3 w-3 text-muted-foreground" />
 												</button>
-												<span className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center text-xs font-bold">{index + 1}</span>
+												<span className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{index + 1}</span>
 												<button type="button" onClick={() => onMoveItemDown(index)} disabled={index === items.length - 1} className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
 													<ChevronDown className="h-3 w-3 text-muted-foreground" />
 												</button>
@@ -149,7 +149,7 @@ export function InvoiceItemsTable({
 												className={`w-full min-h-[36px] max-h-[300px] px-3 py-2 rounded-[10px] text-sm border focus:ring-[3px] focus:outline-none overflow-y-auto resize-y whitespace-pre-wrap break-words transition-all ${
 													hasError
 														? "border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/20"
-														: "border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-primary/[0.08]"
+														: "border-transparent bg-transparent hover:bg-accent focus:bg-background focus:border-primary/30 focus:ring-primary/[0.08]"
 												}`}
 											/>
 											{hasError && (
@@ -167,17 +167,17 @@ export function InvoiceItemsTable({
 									)}
 									{isColumnVisible("unitPrice") && (
 										<td className="p-2">
-											<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => onUpdateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+											<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => onUpdateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-accent focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 										</td>
 									)}
 									{isColumnVisible("quantity") && (
 										<td className="p-2">
-											<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => onUpdateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+											<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => onUpdateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-accent focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 										</td>
 									)}
 									{isColumnVisible("total") && (
 										<td className="p-2 text-center">
-											<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 dark:bg-chart-4/20 border border-chart-4 dark:border-chart-4/30 text-chart-4 dark:text-chart-4" : "text-muted-foreground"}`}>
+											<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-chart-4/15 text-chart-4" : "text-muted-foreground"}`}>
 												{formatCurrency(item.quantity * item.unitPrice)}
 											</div>
 										</td>
@@ -196,11 +196,11 @@ export function InvoiceItemsTable({
 				</table>
 			</div>
 
-			<div className="p-4 border-t border-slate-100 dark:border-slate-800/60">
+			<div className="p-4 border-t-2">
 				<button
 					type="button"
 					onClick={onAddItem}
-					className="w-full py-3.5 rounded-xl border-2 border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.02] to-primary/[0.06] hover:from-primary/[0.04] hover:to-primary/[0.10] hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+					className="w-full py-3.5 rounded-xl border-2 border-dashed border-primary/25 hover:bg-accent hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
 				>
 					<Plus className="h-[18px] w-[18px]" />
 					{t("finance.items.add")}

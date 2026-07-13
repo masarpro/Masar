@@ -39,10 +39,10 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 			icon: Calculator,
 			browsePath: `${basePath}/studies`,
 			createAction: "dialog",
-			iconColor: "text-chart-4 dark:text-chart-4",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			hoverBg: "hover:bg-chart-4/15 dark:hover:bg-chart-4/20",
-			borderColor: "border-chart-4/50 dark:border-chart-4/50",
+			iconColor: "text-chart-4",
+			bgColor: "bg-chart-4/15",
+			hoverBg: "hover:bg-accent",
+			borderColor: "border-border",
 		},
 		{
 			id: "quotations",
@@ -50,10 +50,10 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 			browsePath: `${basePath}/quotations`,
 			createAction: "link",
 			createPath: `${basePath}/quotations/new`,
-			iconColor: "text-violet-500 dark:text-violet-400",
-			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
-			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",
-			borderColor: "border-violet-200/50 dark:border-violet-800/50",
+			iconColor: "text-chart-4",
+			bgColor: "bg-chart-4/15",
+			hoverBg: "hover:bg-accent",
+			borderColor: "border-border",
 		},
 		{
 			id: "leads",
@@ -61,10 +61,10 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 			browsePath: `${basePath}/leads`,
 			createAction: "link",
 			createPath: `${basePath}/leads/new`,
-			iconColor: "text-amber-500 dark:text-amber-400",
-			bgColor: "bg-amber-50/80 dark:bg-amber-950/30",
-			hoverBg: "hover:bg-amber-100 dark:hover:bg-amber-900/50",
-			borderColor: "border-amber-200/50 dark:border-amber-800/50",
+			iconColor: "text-chart-1",
+			bgColor: "bg-chart-1/15",
+			hoverBg: "hover:bg-accent",
+			borderColor: "border-border",
 		},
 	];
 
@@ -77,18 +77,18 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 					return (
 						<div
 							key={section.id}
-							className={`flex items-center gap-3 rounded-xl border ${section.borderColor} ${section.bgColor} p-2.5`}
+							className={`flex items-center gap-3 rounded-xl border-2 ${section.borderColor} bg-card p-2.5`}
 						>
 							<Link
 								href={section.browsePath}
 								className="flex min-w-0 flex-1 items-center gap-2.5"
 							>
 								<div
-									className={`shrink-0 rounded-lg bg-card/60 p-1.5 ${section.iconColor}`}
+									className={`shrink-0 rounded-xl ${section.bgColor} p-1.5 ${section.iconColor}`}
 								>
 									<Icon className="h-4 w-4" />
 								</div>
-								<span className="truncate text-sm font-medium text-foreground/80">
+								<span className="truncate text-sm font-medium text-card-foreground">
 									{t(`pricing.dashboard.nav.${section.id}`)}
 								</span>
 							</Link>
@@ -96,7 +96,7 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 								<Link
 									href={section.createPath!}
 									aria-label={t(`pricing.dashboard.nav.${section.id}New`)}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
+									className={`shrink-0 rounded-lg p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
 								>
 									<Plus className="h-4 w-4" />
 								</Link>
@@ -105,7 +105,7 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 									type="button"
 									onClick={() => setShowCreateDialog(true)}
 									aria-label={t(`pricing.dashboard.nav.${section.id}New`)}
-									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
+									className={`shrink-0 rounded-lg p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
 								>
 									<Plus className="h-4 w-4" />
 								</button>
@@ -122,19 +122,19 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 					return (
 						<div
 							key={section.id}
-							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
+							className="bg-card border-2 rounded-2xl overflow-hidden transition-colors"
 						>
 							{/* Browse Section (Top) */}
 							<Link
 								href={section.browsePath}
-								className={`flex flex-col items-center gap-2 p-4 ${section.bgColor} ${section.hoverBg} transition-colors border-b ${section.borderColor}`}
+								className={`flex flex-col items-center gap-2 p-4 ${section.hoverBg} transition-colors border-b-2 ${section.borderColor}`}
 							>
 								<div
-									className={`p-3 rounded-xl bg-card/60 ${section.iconColor}`}
+									className={`p-3 rounded-xl ${section.bgColor} ${section.iconColor}`}
 								>
 									<Icon className="h-6 w-6" />
 								</div>
-								<span className="text-sm font-medium text-foreground/80 text-center">
+								<span className="text-sm font-medium text-card-foreground text-center">
 									{t(`pricing.dashboard.nav.${section.id}`)}
 								</span>
 							</Link>
@@ -143,7 +143,7 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 							{section.createAction === "link" ? (
 								<Link
 									href={section.createPath!}
-									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+									className="flex items-center justify-center gap-2 p-3 hover:bg-accent transition-colors"
 								>
 									<Plus className={`h-4 w-4 ${section.iconColor}`} />
 									<span className={`text-xs font-medium ${section.iconColor}`}>
@@ -154,7 +154,7 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 								<button
 									type="button"
 									onClick={() => setShowCreateDialog(true)}
-									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors w-full"
+									className="flex items-center justify-center gap-2 p-3 hover:bg-accent transition-colors w-full"
 								>
 									<Plus className={`h-4 w-4 ${section.iconColor}`} />
 									<span className={`text-xs font-medium ${section.iconColor}`}>

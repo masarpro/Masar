@@ -140,7 +140,7 @@ export function ActivityDetailSheet({ onClose }: ActivityDetailSheetProps) {
 								<Badge
 									style={{
 										backgroundColor:
-											STATUS_COLORS[selectedActivity.status] ?? "#94a3b8",
+											STATUS_COLORS[selectedActivity.status] ?? "var(--muted-foreground)",
 										color: "white",
 									}}
 								>

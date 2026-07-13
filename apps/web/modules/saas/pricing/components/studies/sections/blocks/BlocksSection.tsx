@@ -134,7 +134,7 @@ export function BlocksSection({
 			<div
 				className={`border rounded-lg overflow-hidden transition-all ${
 					generalItems.length > 0
-						? "border-amber-200/50 bg-amber-50/20 dark:bg-amber-950/10"
+						? "border-chart-1/50 bg-chart-1/10 dark:bg-chart-1/15"
 						: "border-border"
 				}`}
 			>
@@ -218,7 +218,7 @@ export function BlocksSection({
 								: "border-border"
 						} ${
 							floor.isRepeated && hasItems
-								? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10"
+								? "border-chart-4/50 bg-chart-4/10 dark:bg-chart-4/15"
 								: ""
 						}`}
 					>
@@ -237,7 +237,7 @@ export function BlocksSection({
 								<span className="text-lg">{floor.icon}</span>
 								<span className="font-semibold">{floor.label}</span>
 								{floor.isRepeated && floor.repeatCount > 1 && (
-									<Badge variant="default" className="bg-purple-600 text-xs">
+									<Badge variant="default" className="bg-chart-4 text-xs">
 										{floor.repeatCount} أدوار
 									</Badge>
 								)}

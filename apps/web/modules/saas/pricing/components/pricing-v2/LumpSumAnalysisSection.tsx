@@ -36,9 +36,9 @@ function getRecommendation(profitPct: number) {
 		return {
 			labelKey: "lumpSum.recommendations.excellent.label" as const,
 			descriptionKey: "lumpSum.recommendations.excellent.description" as const,
-			color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-			borderColor: "border-emerald-200 dark:border-emerald-800",
-			bgColor: "bg-emerald-50/50 dark:bg-emerald-950/20",
+			color: "bg-success/15 text-success",
+			borderColor: "border-success",
+			bgColor: "bg-success/10",
 			icon: CheckCircle2,
 		};
 	}
@@ -56,9 +56,9 @@ function getRecommendation(profitPct: number) {
 		return {
 			labelKey: "lumpSum.recommendations.acceptable.label" as const,
 			descriptionKey: "lumpSum.recommendations.acceptable.description" as const,
-			color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-			borderColor: "border-amber-200 dark:border-amber-800",
-			bgColor: "bg-amber-50/50 dark:bg-amber-950/20",
+			color: "bg-chart-1/15 text-chart-1",
+			borderColor: "border-chart-1",
+			bgColor: "bg-chart-1/10",
 			icon: AlertTriangle,
 		};
 	}
@@ -66,9 +66,9 @@ function getRecommendation(profitPct: number) {
 		return {
 			labelKey: "lumpSum.recommendations.weak.label" as const,
 			descriptionKey: "lumpSum.recommendations.weak.description" as const,
-			color: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-			borderColor: "border-orange-200 dark:border-orange-800",
-			bgColor: "bg-orange-50/50 dark:bg-orange-950/20",
+			color: "bg-chart-2/15 text-chart-2",
+			borderColor: "border-chart-2",
+			bgColor: "bg-chart-2/10",
 			icon: AlertTriangle,
 		};
 	}

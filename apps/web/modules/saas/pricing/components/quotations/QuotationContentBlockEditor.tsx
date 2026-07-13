@@ -55,7 +55,7 @@ export function QuotationContentBlockEditor({
 			{filtered.map((block) => (
 				<div
 					key={block.id}
-					className="rounded-xl border border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 p-4 space-y-3"
+					className="rounded-2xl border-2 bg-card p-4 space-y-3"
 				>
 					<div className="flex items-center gap-2">
 						<Input
@@ -63,7 +63,7 @@ export function QuotationContentBlockEditor({
 							onChange={(e: any) => handleUpdate(block.id, "title", e.target.value)}
 							placeholder={t("blockTitlePlaceholder")}
 							disabled={disabled}
-							className="font-semibold text-base border-0 border-b border-slate-200 dark:border-slate-700/50 focus-visible:ring-0 rounded-none px-0 bg-transparent"
+							className="font-semibold text-base border-0 border-b border-input focus-visible:ring-0 rounded-none px-0 bg-transparent"
 							maxLength={200}
 						/>
 						{!disabled && (
@@ -93,7 +93,7 @@ export function QuotationContentBlockEditor({
 				<button
 					type="button"
 					onClick={handleAdd}
-					className="w-full py-3 rounded-xl border-2 border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.02] to-primary/[0.06] hover:from-primary/[0.04] hover:to-primary/[0.10] hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+					className="w-full py-3 rounded-xl border-2 border-dashed border-primary/25 hover:bg-primary/5 hover:border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 transition-all"
 				>
 					<Plus className="h-[18px] w-[18px]" />
 					{t("addContentBlock")}

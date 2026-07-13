@@ -31,10 +31,10 @@ export function QuickActions({
 			label: t("projects.commandCenter.dailyReport"),
 			href: `${basePath}/execution/new-report`,
 			section: "execution",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconColor: "text-chart-4 dark:text-chart-4",
-			textColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
+			textColor: "text-card-foreground",
 		},
 		{
 			id: "upload-photo",
@@ -42,10 +42,10 @@ export function QuickActions({
 			label: t("projects.commandCenter.uploadPhoto"),
 			href: `${basePath}/execution/upload`,
 			section: "execution",
-			bgColor: "bg-purple-50 dark:bg-purple-950/30",
-			iconBg: "bg-purple-100 dark:bg-purple-900/50",
-			iconColor: "text-purple-600 dark:text-purple-400",
-			textColor: "text-purple-700 dark:text-purple-300",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-3/15",
+			iconColor: "text-chart-3",
+			textColor: "text-card-foreground",
 		},
 		{
 			id: "add-expense",
@@ -54,10 +54,10 @@ export function QuickActions({
 			href: null,
 			onClick: () => setExpenseDialogOpen(true),
 			section: "finance",
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconColor: "text-chart-4 dark:text-chart-4",
-			textColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-5/15",
+			iconColor: "text-chart-5",
+			textColor: "text-card-foreground",
 		},
 		{
 			id: "report-issue",
@@ -65,10 +65,10 @@ export function QuickActions({
 			label: t("projects.commandCenter.reportIssue"),
 			href: `${basePath}/execution/new-issue`,
 			section: "execution",
-			bgColor: "bg-amber-50 dark:bg-amber-950/30",
-			iconBg: "bg-amber-100 dark:bg-amber-900/50",
-			iconColor: "text-amber-600 dark:text-amber-400",
-			textColor: "text-amber-700 dark:text-amber-300",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
+			textColor: "text-card-foreground",
 		},
 	].filter((a) => canViewSection(a.section));
 
@@ -79,7 +79,7 @@ export function QuickActions({
 			<div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
 				{actions.map((action) => {
 					const Icon = action.icon;
-					const className = `flex min-w-0 flex-1 rounded-2xl border border-slate-200/60 shadow-lg shadow-black/5 transition-all hover:shadow-xl dark:border-slate-700/50 ${action.bgColor} p-4`;
+					const className = `flex min-w-0 flex-1 rounded-2xl border-2 transition-colors hover:bg-accent ${action.bgColor} p-4`;
 					const content = (
 						<div className="flex min-w-0 items-center gap-3">
 							<div className={`shrink-0 rounded-xl ${action.iconBg} p-2.5`}>

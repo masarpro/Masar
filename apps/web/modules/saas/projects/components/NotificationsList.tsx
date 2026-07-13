@@ -155,10 +155,10 @@ export function NotificationsList({
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="text-2xl font-semibold text-foreground">
 						{t("notifications.title")}
 					</h1>
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("notifications.description")}
 					</p>
 				</div>
@@ -212,7 +212,7 @@ export function NotificationsList({
 			{/* Stats */}
 			{data && (
 				<div className="flex gap-4">
-					<Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+					<Badge className="border-0 bg-muted text-muted-foreground">
 						{t("notifications.total")}: {total}
 					</Badge>
 					{unreadCount > 0 && (
@@ -260,7 +260,7 @@ export function NotificationsList({
 				<div className="space-y-6">
 					{dayGroups.map((dayGroup) => (
 						<div key={dayGroup.dayKey} className="space-y-3">
-							<h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+							<h2 className="text-sm font-semibold text-muted-foreground">
 								{formatDayHeading(dayGroup.dayKey)}
 							</h2>
 							{dayGroup.items.map((notification) => {
@@ -276,23 +276,23 @@ export function NotificationsList({
 								const content = (
 									// biome-ignore lint/correctness/useJsxKeyInIterable: key is set on the Link/div wrapper below
 									<div
-										className={`group flex gap-4 rounded-2xl border p-4 transition-colors ${
+										className={`group flex gap-4 rounded-2xl border-2 p-4 transition-colors ${
 											isUnread
-												? "border-primary/30 bg-primary/5 dark:border-primary/20 dark:bg-primary/10"
-												: "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/50"
+												? "border-primary/30 bg-primary/5"
+												: "border-border bg-card hover:bg-accent"
 										}`}
 									>
-										<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
-											<EventIcon className="h-5 w-5 text-slate-500" />
+										<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+											<EventIcon className="h-5 w-5 text-muted-foreground" />
 										</div>
 										<div className="min-w-0 flex-1">
 											<div className="flex items-start justify-between gap-2">
 												<h3
-													className={`font-medium ${isUnread ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}
+													className={`font-medium ${isUnread ? "text-card-foreground" : "text-muted-foreground"}`}
 												>
 													{notification.title}
 												</h3>
-												<span className="shrink-0 text-xs text-slate-400">
+												<span className="shrink-0 text-xs text-muted-foreground">
 													{new Date(
 														notification.createdAt,
 													).toLocaleTimeString(
@@ -307,7 +307,7 @@ export function NotificationsList({
 												</span>
 											</div>
 											{notification.body && (
-												<p className="mt-1 line-clamp-2 text-sm text-slate-500">
+												<p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
 													{notification.body}
 												</p>
 											)}

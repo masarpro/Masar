@@ -7,17 +7,17 @@ import { ELEMENT_CATALOG } from "../../../../constants/other-structural";
 import type { OtherStructuralElementType } from "../../../../types/other-structural";
 
 const COLOR_MAP: Record<string, string> = {
-	amber: "border-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/30 dark:hover:bg-amber-950/50",
+	amber: "border-chart-1 bg-chart-1/15 hover:bg-chart-1/15 dark:bg-chart-1/20 dark:hover:bg-chart-1/20",
 	blue: "border-chart-4 bg-chart-4/15 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:hover:bg-chart-4/20",
 	sky: "border-chart-4 bg-chart-4/15 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:hover:bg-chart-4/20",
-	slate: "border-slate-300 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/30 dark:hover:bg-slate-800/50",
-	orange: "border-orange-300 bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/30 dark:hover:bg-orange-950/50",
-	stone: "border-stone-300 bg-stone-50 hover:bg-stone-100 dark:bg-stone-800/30 dark:hover:bg-stone-800/50",
-	zinc: "border-zinc-300 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/30 dark:hover:bg-zinc-800/50",
-	emerald: "border-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50",
-	teal: "border-teal-300 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/30 dark:hover:bg-teal-950/50",
-	purple: "border-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/30 dark:hover:bg-purple-950/50",
-	gray: "border-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/30 dark:hover:bg-gray-800/50",
+	slate: "border-border bg-muted hover:bg-muted dark:bg-muted/50 dark:hover:bg-muted/70",
+	orange: "border-chart-1 bg-chart-1/15 hover:bg-chart-1/15 dark:bg-chart-1/20 dark:hover:bg-chart-1/20",
+	stone: "border-border bg-muted hover:bg-muted dark:bg-muted/50 dark:hover:bg-muted/70",
+	zinc: "border-border bg-muted hover:bg-muted dark:bg-muted/50 dark:hover:bg-muted/70",
+	emerald: "border-success bg-success/15 hover:bg-success/15 dark:bg-success/20 dark:hover:bg-success/20",
+	teal: "border-chart-3 bg-chart-3/15 hover:bg-chart-3/15 dark:bg-chart-3/20 dark:hover:bg-chart-3/20",
+	purple: "border-chart-4 bg-chart-4/15 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:hover:bg-chart-4/20",
+	gray: "border-border bg-muted hover:bg-muted dark:bg-muted/50 dark:hover:bg-muted/70",
 };
 
 interface ElementTypePickerProps {

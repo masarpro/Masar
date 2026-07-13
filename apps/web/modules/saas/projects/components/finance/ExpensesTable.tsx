@@ -68,32 +68,32 @@ function getCategoryBadge(
 	const categoryConfig: Record<string, { className: string; label: string }> = {
 		MATERIALS: {
 			className:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+				"bg-chart-4/15 text-chart-4",
 			label: t("finance.category.MATERIALS"),
 		},
 		LABOR: {
 			className:
-				"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+				"bg-chart-1/15 text-chart-1",
 			label: t("finance.category.LABOR"),
 		},
 		EQUIPMENT: {
 			className:
-				"bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+				"bg-chart-4/15 text-chart-4",
 			label: t("finance.category.EQUIPMENT"),
 		},
 		SUBCONTRACTOR: {
 			className:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+				"bg-chart-4/15 text-chart-4",
 			label: t("finance.category.SUBCONTRACTOR"),
 		},
 		TRANSPORT: {
 			className:
-				"bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+				"bg-chart-1/15 text-chart-1",
 			label: t("finance.category.TRANSPORT"),
 		},
 		MISC: {
 			className:
-				"bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+				"bg-muted text-muted-foreground",
 			label: t("finance.category.MISC"),
 		},
 	};
@@ -103,7 +103,7 @@ function getCategoryBadge(
 		<div className="flex items-center gap-1.5">
 			<Badge className={`border-0 ${config.className}`}>{config.label}</Badge>
 			{_type === "subcontract_payment" && (
-				<Badge className="border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 px-1.5">
+				<Badge className="border-0 bg-chart-4/15 text-chart-4 px-1.5">
 					<Hammer className="h-3 w-3" />
 				</Badge>
 			)}
@@ -141,7 +141,7 @@ export function ExpensesTable({
 				{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
 				<div className="flex items-center gap-2 sm:hidden">
 					<div className="relative min-w-0 flex-1">
-						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							placeholder={t("finance.expenses.searchPlaceholder")}
 							value={searchQuery}
@@ -184,7 +184,7 @@ export function ExpensesTable({
 				<div className="hidden gap-3 sm:flex sm:items-center sm:justify-between">
 					<div className="flex flex-1 items-center gap-3">
 						<div className="relative flex-1 max-w-xs">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 							<Input
 								placeholder={t("finance.expenses.searchPlaceholder")}
 								value={searchQuery}
@@ -241,7 +241,7 @@ export function ExpensesTable({
 						)}
 					</EmptyState>
 				) : (
-					<div className="rounded-xl border border-slate-200 dark:border-slate-800">
+					<div className="rounded-xl border-2">
 						<Table>
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
@@ -282,10 +282,10 @@ export function ExpensesTable({
 										<TableCell className="font-semibold">
 											{formatSAR(expense.amount)}
 										</TableCell>
-										<TableCell className="text-slate-600 dark:text-slate-400">
+										<TableCell className="text-muted-foreground">
 											{expense.vendorName || "-"}
 										</TableCell>
-										<TableCell className="text-slate-600 dark:text-slate-400 max-w-[200px] truncate">
+										<TableCell className="text-muted-foreground max-w-[200px] truncate">
 											{expense.description ||
 												expense.note ||
 												"-"}

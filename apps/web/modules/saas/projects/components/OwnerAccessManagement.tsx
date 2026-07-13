@@ -162,10 +162,10 @@ export function OwnerAccessManagement({
 			{/* Header */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+					<h2 className="text-xl font-semibold text-foreground">
 						{t("ownerAccess.title")}
 					</h2>
-					<p className="text-sm text-slate-500 mt-1">
+					<p className="text-sm text-muted-foreground mt-1">
 						{t("ownerAccess.description")}
 					</p>
 				</div>
@@ -178,15 +178,15 @@ export function OwnerAccessManagement({
 			</div>
 
 			{/* Access Links List */}
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+			<div className="rounded-2xl border-2 bg-card">
 				{isLoading ? <ListTableSkeleton /> : !accessList?.length ? (
-					<div className="flex flex-col items-center justify-center py-12 text-slate-500">
-						<Users className="h-12 w-12 mb-3 text-slate-300" />
+					<div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+						<Users className="h-12 w-12 mb-3 text-muted-foreground" />
 						<p className="font-medium">{t("ownerAccess.noLinks")}</p>
 						<p className="text-sm mt-1">{t("ownerAccess.noLinksDescription")}</p>
 					</div>
 				) : (
-					<div className="divide-y divide-slate-100 dark:divide-slate-800">
+					<div className="divide-y-2 divide-border">
 						{accessList.map((access: any) => {
 							const expiryStatus = getExpiryStatus(access.expiresAt);
 							return (
@@ -195,33 +195,33 @@ export function OwnerAccessManagement({
 									className="flex items-center justify-between p-4"
 								>
 									<div className="flex items-center gap-4">
-										<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+										<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
 											<Key className="h-5 w-5 text-primary" />
 										</div>
 										<div>
 											<div className="flex items-center gap-2">
-												<span className="font-medium text-slate-900 dark:text-slate-100">
+												<span className="font-medium text-card-foreground">
 													{access.label || t("ownerAccess.defaultLabel")}
 												</span>
 												{access.isRevoked ? (
-													<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+													<Badge className="border-0 bg-destructive/15 text-destructive">
 														{t("ownerAccess.revoked")}
 													</Badge>
 												) : expiryStatus === "expired" ? (
-													<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+													<Badge className="border-0 bg-destructive/15 text-destructive">
 														{t("ownerAccess.expired")}
 													</Badge>
 												) : expiryStatus === "expiring_soon" ? (
-													<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+													<Badge className="border-0 bg-chart-1/15 text-chart-1">
 														{t("ownerAccess.expiringSoon")}
 													</Badge>
 												) : (
-													<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+													<Badge className="border-0 bg-success/15 text-success">
 														{t("ownerAccess.active")}
 													</Badge>
 												)}
 											</div>
-											<div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+											<div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
 												<span>
 													{t("ownerAccess.createdAt")}: {new Date(access.createdAt).toLocaleDateString("ar-SA")}
 												</span>
@@ -234,9 +234,9 @@ export function OwnerAccessManagement({
 														<span>•</span>
 														<span className={
 															expiryStatus === "expired"
-																? "text-red-600 dark:text-red-400"
+																? "text-destructive"
 																: expiryStatus === "expiring_soon"
-																	? "text-amber-600 dark:text-amber-400"
+																	? "text-chart-1"
 																	: ""
 														}>
 															{t("ownerAccess.expiresAt")}: {new Date(access.expiresAt).toLocaleDateString("ar-SA")}
@@ -258,7 +258,7 @@ export function OwnerAccessManagement({
 															setRenewTarget(access.id);
 															setRenewDays("30");
 														}}
-														className="rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+														className="rounded-lg text-chart-1 hover:text-chart-1 hover:bg-chart-1/10"
 													>
 														<RefreshCw className="h-4 w-4 me-1" />
 														{t("ownerAccess.renewLink")}
@@ -290,7 +290,7 @@ export function OwnerAccessManagement({
 													variant="ghost"
 													size="sm"
 													onClick={() => setRevokeTarget(access.id)}
-													className="rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50"
+													className="rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
 												>
 													<Trash2 className="h-4 w-4" />
 												</Button>
@@ -368,9 +368,9 @@ export function OwnerAccessManagement({
 					</DialogHeader>
 
 					<div className="space-y-4 py-4">
-						<div className="flex items-center gap-2 p-3 rounded-lg bg-slate-100 dark:bg-slate-800">
-							<Link2 className="h-4 w-4 text-slate-500 shrink-0" />
-							<code className="text-sm flex-1 truncate text-slate-700 dark:text-slate-300">
+						<div className="flex items-center gap-2 p-3 rounded-lg bg-muted">
+							<Link2 className="h-4 w-4 text-muted-foreground shrink-0" />
+							<code className="text-sm flex-1 truncate text-foreground">
 								{portalUrl}
 							</code>
 							<Button
@@ -384,7 +384,7 @@ export function OwnerAccessManagement({
 								<Copy className="h-4 w-4" />
 							</Button>
 						</div>
-						<p className="text-sm text-amber-600 dark:text-amber-400">
+						<p className="text-sm text-chart-1">
 							{t("ownerAccess.warningCopyNow")}
 						</p>
 					</div>

@@ -77,16 +77,16 @@ function SectionCard({
 	return (
 		<Link
 			href={href}
-			className={`group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md active:scale-[0.99] dark:border-slate-800 dark:bg-slate-900 dark:hover:border-primary/40 sm:p-5 ${className ?? ""}`}
+			className={`group flex flex-col rounded-2xl border-2 bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.99] sm:p-5 ${className ?? ""}`}
 		>
 			<div className="mb-3 flex items-center justify-between gap-2">
 				<div className="flex items-center gap-2.5">
 					<div className={`rounded-xl p-2 ${iconClass}`}>{icon}</div>
-					<h3 className="font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="font-semibold text-card-foreground">
 						{title}
 					</h3>
 				</div>
-				<ChevronLeft className="h-4 w-4 shrink-0 text-slate-300 transition-colors group-hover:text-primary dark:text-slate-600" />
+				<ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-primary" />
 			</div>
 			<div className="flex-1">{children}</div>
 		</Link>
@@ -108,27 +108,27 @@ export function OwnerSummarySectionCards({
 			{/* Schedule */}
 			<SectionCard
 				href={`${basePath}/schedule`}
-				icon={<Calendar className="h-5 w-5 text-chart-4 dark:text-chart-4" />}
-				iconClass="bg-chart-4/15 dark:bg-chart-4/20"
+				icon={<Calendar className="h-5 w-5 text-chart-4" />}
+				iconClass="bg-chart-4/15"
 				title={t("ownerPortal.tabs.schedule")}
 			>
 				{schedule.total > 0 ? (
 					<div className="space-y-2">
 						<div className="flex items-baseline justify-between">
-							<span className="text-sm text-slate-500 dark:text-slate-400">
+							<span className="text-sm text-muted-foreground">
 								{t("ownerPortal.summary.stageOf", {
 									current: Math.min(schedule.completed + 1, schedule.total),
 									total: schedule.total,
 								})}
 							</span>
 							{schedule.current && (
-								<span className="text-sm font-semibold text-chart-4 dark:text-chart-4">
+								<span className="text-sm font-semibold text-chart-4">
 									{schedule.current.progress}%
 								</span>
 							)}
 						</div>
 						{schedule.current && (
-							<p className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
+							<p className="truncate text-sm font-medium text-card-foreground">
 								{schedule.current.title}
 							</p>
 						)}
@@ -138,7 +138,7 @@ export function OwnerSummarySectionCards({
 						/>
 					</div>
 				) : (
-					<p className="text-sm text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("ownerPortal.schedule.noMilestones")}
 					</p>
 				)}
@@ -148,32 +148,32 @@ export function OwnerSummarySectionCards({
 			<SectionCard
 				href={`${basePath}/payments`}
 				icon={
-					<CreditCard className="h-5 w-5 text-green-600 dark:text-green-400" />
+					<CreditCard className="h-5 w-5 text-success" />
 				}
-				iconClass="bg-green-100 dark:bg-green-900/40"
+				iconClass="bg-success/15"
 				title={t("ownerPortal.tabs.payments")}
 			>
 				<div className="space-y-2">
 					<div className="flex items-baseline justify-between">
-						<span className="text-sm text-slate-500 dark:text-slate-400">
+						<span className="text-sm text-muted-foreground">
 							{t("ownerPortal.summary.collected")}
 						</span>
-						<span className="text-sm font-semibold text-green-600 dark:text-green-400">
+						<span className="text-sm font-semibold text-success">
 							{payments.collectionPercent}%
 						</span>
 					</div>
 					<Progress value={payments.collectionPercent} className="h-1.5" />
 					{payments.nextPayment ? (
-						<p className="text-xs text-slate-500 dark:text-slate-400">
+						<p className="text-xs text-muted-foreground">
 							{t("ownerPortal.summary.nextPaymentShort")}:{" "}
-							<span className="font-medium text-amber-600 dark:text-amber-400">
+							<span className="font-medium text-chart-1">
 								{formatSARArabic(payments.nextPayment.amount)}
 							</span>
 						</p>
 					) : (
-						<p className="text-xs text-slate-500 dark:text-slate-400">
+						<p className="text-xs text-muted-foreground">
 							{t("ownerPortal.summary.remainingShort")}:{" "}
-							<span className="font-medium text-slate-700 dark:text-slate-300">
+							<span className="font-medium text-card-foreground">
 								{formatSARArabic(payments.remaining)}
 							</span>
 						</p>
@@ -185,9 +185,9 @@ export function OwnerSummarySectionCards({
 			<SectionCard
 				href={`${basePath}/photos`}
 				icon={
-					<ImageIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+					<ImageIcon className="h-5 w-5 text-chart-4" />
 				}
-				iconClass="bg-violet-100 dark:bg-violet-900/40"
+				iconClass="bg-chart-4/15"
 				title={t("ownerPortal.tabs.photos")}
 			>
 				{photos.count > 0 ? (

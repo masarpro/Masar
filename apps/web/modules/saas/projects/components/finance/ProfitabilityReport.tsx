@@ -51,7 +51,7 @@ export function ProfitabilityReport({
 
 	if (!data) {
 		return (
-			<div className="flex items-center justify-center py-12 text-slate-500">
+			<div className="flex items-center justify-center py-12 text-muted-foreground">
 				{t("finance.profitability.noData")}
 			</div>
 		);
@@ -65,17 +65,17 @@ export function ProfitabilityReport({
 			{/* KPI Cards */}
 			<div className="grid gap-4 sm:grid-cols-3">
 				{/* Total Revenue */}
-				<Card className="rounded-2xl border-slate-200/60 shadow-lg shadow-black/5 bg-green-50 dark:bg-green-950/30 dark:border-slate-700/50">
+				<Card className="rounded-2xl">
 					<CardContent className="p-5">
 						<div className="flex items-center gap-3">
-							<div className="shrink-0 rounded-xl bg-green-100 dark:bg-green-900/50 p-2.5">
-								<TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+							<div className="shrink-0 rounded-xl bg-success/15 p-2.5">
+								<TrendingUp className="h-5 w-5 text-success" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-green-600 dark:text-green-400">
+								<p className="text-xs text-muted-foreground">
 									{t("finance.profitability.revenue")}
 								</p>
-								<p className="truncate text-lg font-semibold text-green-700 dark:text-green-300">
+								<p className="truncate text-lg font-semibold text-card-foreground">
 									{formatSAR(revenue.totalContractValue)}
 								</p>
 							</div>
@@ -84,17 +84,17 @@ export function ProfitabilityReport({
 				</Card>
 
 				{/* Total Costs */}
-				<Card className="rounded-2xl border-slate-200/60 shadow-lg shadow-black/5 bg-red-50 dark:bg-red-950/30 dark:border-slate-700/50">
+				<Card className="rounded-2xl">
 					<CardContent className="p-5">
 						<div className="flex items-center gap-3">
-							<div className="shrink-0 rounded-xl bg-red-100 dark:bg-red-900/50 p-2.5">
-								<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+							<div className="shrink-0 rounded-xl bg-destructive/15 p-2.5">
+								<TrendingDown className="h-5 w-5 text-destructive" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-red-600 dark:text-red-400">
+								<p className="text-xs text-muted-foreground">
 									{t("finance.profitability.totalCosts")}
 								</p>
-								<p className="truncate text-lg font-semibold text-red-700 dark:text-red-300">
+								<p className="truncate text-lg font-semibold text-card-foreground">
 									{formatSAR(costs.totalCosts)}
 								</p>
 							</div>
@@ -103,45 +103,33 @@ export function ProfitabilityReport({
 				</Card>
 
 				{/* Net Profit */}
-				<Card
-					className={`rounded-2xl border-slate-200/60 shadow-lg shadow-black/5 dark:border-slate-700/50 ${
-						isProfitable
-							? "bg-emerald-50 dark:bg-emerald-950/30"
-							: "bg-orange-50 dark:bg-orange-950/30"
-					}`}
-				>
+				<Card className="rounded-2xl">
 					<CardContent className="p-5">
 						<div className="flex items-center gap-3">
 							<div
 								className={`shrink-0 rounded-xl p-2.5 ${
 									isProfitable
-										? "bg-emerald-100 dark:bg-emerald-900/50"
-										: "bg-orange-100 dark:bg-orange-900/50"
+										? "bg-success/15"
+										: "bg-chart-1/15"
 								}`}
 							>
 								<DollarSign
 									className={`h-5 w-5 ${
 										isProfitable
-											? "text-emerald-600 dark:text-emerald-400"
-											: "text-orange-600 dark:text-orange-400"
+											? "text-success"
+											: "text-chart-1"
 									}`}
 								/>
 							</div>
 							<div className="min-w-0 flex-1">
-								<p
-									className={`text-xs ${
-										isProfitable
-											? "text-emerald-600 dark:text-emerald-400"
-											: "text-orange-600 dark:text-orange-400"
-									}`}
-								>
+								<p className="text-xs text-muted-foreground">
 									{t("finance.profitability.grossProfit")}
 								</p>
 								<p
 									className={`truncate text-lg font-semibold ${
 										isProfitable
-											? "text-emerald-700 dark:text-emerald-300"
-											: "text-orange-700 dark:text-orange-300"
+											? "text-success"
+											: "text-chart-1"
 									}`}
 								>
 									{formatSAR(profitability.grossProfit)}
@@ -149,8 +137,8 @@ export function ProfitabilityReport({
 								<p
 									className={`text-xs ${
 										isProfitable
-											? "text-emerald-600 dark:text-emerald-400"
-											: "text-orange-600 dark:text-orange-400"
+											? "text-success"
+											: "text-chart-1"
 									}`}
 								>
 									{formatPercent(profitability.profitMargin)}{" "}
@@ -166,7 +154,7 @@ export function ProfitabilityReport({
 			<Card className="rounded-2xl">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2 text-base">
-						<ArrowUpRight className="h-4 w-4 text-green-500" />
+						<ArrowUpRight className="h-4 w-4 text-success" />
 						{t("finance.profitability.revenue")}
 					</CardTitle>
 				</CardHeader>
@@ -191,7 +179,7 @@ export function ProfitabilityReport({
 									</TableCell>
 								</TableRow>
 							)}
-							<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-semibold">
+							<TableRow className="bg-muted/50 font-semibold">
 								<TableCell>
 									{t("finance.profitability.totalContractValue")}
 								</TableCell>
@@ -219,7 +207,7 @@ export function ProfitabilityReport({
 								<TableCell className="font-medium">
 									{t("finance.profitability.outstandingAmount")}
 								</TableCell>
-								<TableCell className="text-end text-amber-600">
+								<TableCell className="text-end text-chart-1">
 									{formatSAR(revenue.outstandingAmount)}
 								</TableCell>
 							</TableRow>
@@ -229,16 +217,16 @@ export function ProfitabilityReport({
 					{/* Collection Progress Bar */}
 					<div className="mt-4 space-y-2">
 						<div className="flex items-center justify-between text-sm">
-							<span className="text-slate-600 dark:text-slate-400">
+							<span className="text-muted-foreground">
 								{t("finance.profitability.collectionRate")}
 							</span>
 							<span className="font-medium">
 								{formatPercent(revenue.collectionRate)}
 							</span>
 						</div>
-						<div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+						<div className="h-2.5 w-full overflow-hidden rounded-[4px] bg-muted">
 							<div
-								className="h-full rounded-full bg-green-500 transition-all"
+								className="h-full rounded-[4px] bg-success transition-all"
 								style={{
 									width: `${Math.min(revenue.collectionRate, 100)}%`,
 								}}
@@ -252,7 +240,7 @@ export function ProfitabilityReport({
 			<Card className="rounded-2xl">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2 text-base">
-						<ArrowDownRight className="h-4 w-4 text-red-500" />
+						<ArrowDownRight className="h-4 w-4 text-destructive" />
 						{t("finance.profitability.costs")}
 					</CardTitle>
 				</CardHeader>
@@ -271,7 +259,7 @@ export function ProfitabilityReport({
 
 							{/* Category Breakdown */}
 							{costs.directExpenses.byCategory.map((cat: any) => (
-								<TableRow key={cat.category} className="text-slate-500 dark:text-slate-400">
+								<TableRow key={cat.category} className="text-muted-foreground">
 									<TableCell className="ps-8 text-sm">
 										{t(`finance.category.${cat.category}` as any) ?? cat.category} ({cat.count})
 									</TableCell>
@@ -293,7 +281,7 @@ export function ProfitabilityReport({
 
 							{/* Subcontract Details */}
 							{costs.subcontracts.contracts.map((sc: any) => (
-								<TableRow key={sc.id} className="text-slate-500 dark:text-slate-400">
+								<TableRow key={sc.id} className="text-muted-foreground">
 									<TableCell className="ps-8 text-sm">
 										{sc.name} ({sc.contractNo})
 									</TableCell>
@@ -324,7 +312,7 @@ export function ProfitabilityReport({
 							</TableRow>
 
 							{/* Total */}
-							<TableRow className="bg-slate-50 dark:bg-slate-800/50 font-semibold">
+							<TableRow className="bg-muted/50 font-semibold">
 								<TableCell>
 									{t("finance.profitability.totalCosts")}
 								</TableCell>
@@ -341,7 +329,7 @@ export function ProfitabilityReport({
 			<Card className="rounded-2xl">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2 text-base">
-						<DollarSign className="h-4 w-4 text-emerald-500" />
+						<DollarSign className="h-4 w-4 text-success" />
 						{t("finance.profitability.profit")}
 					</CardTitle>
 				</CardHeader>
@@ -354,7 +342,7 @@ export function ProfitabilityReport({
 								</TableCell>
 								<TableCell
 									className={`text-end font-semibold ${
-										isProfitable ? "text-green-600" : "text-red-600"
+										isProfitable ? "text-success" : "text-destructive"
 									}`}
 								>
 									{formatSAR(profitability.grossProfit)}
@@ -366,7 +354,7 @@ export function ProfitabilityReport({
 								</TableCell>
 								<TableCell
 									className={`text-end font-semibold ${
-										isProfitable ? "text-green-600" : "text-red-600"
+										isProfitable ? "text-success" : "text-destructive"
 									}`}
 								>
 									{formatPercent(profitability.profitMargin)}
@@ -379,8 +367,8 @@ export function ProfitabilityReport({
 								<TableCell
 									className={`text-end ${
 										profitability.realizedProfit >= 0
-											? "text-green-600"
-											: "text-red-600"
+											? "text-success"
+											: "text-destructive"
 									}`}
 								>
 									{formatSAR(profitability.realizedProfit)}

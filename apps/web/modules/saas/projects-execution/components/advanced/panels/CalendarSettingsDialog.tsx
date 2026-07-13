@@ -155,7 +155,7 @@ export function CalendarSettingsDialog({
 								{holidays.map((holiday, idx) => (
 									<div
 										key={idx}
-										className="flex items-end gap-2 rounded-md border p-2"
+										className="flex items-end gap-2 rounded-xl border-2 p-2"
 									>
 										<div className="flex-1 space-y-1">
 											<Label className="text-xs">

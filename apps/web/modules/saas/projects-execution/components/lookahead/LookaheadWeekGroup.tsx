@@ -28,7 +28,7 @@ export function LookaheadWeekGroup({
 					{formatDateShort(weekEnd, locale)}
 				</h3>
 				{isCurrentWeek && (
-					<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+					<span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
 						{t("execution.lookahead.thisWeek")}
 					</span>
 				)}

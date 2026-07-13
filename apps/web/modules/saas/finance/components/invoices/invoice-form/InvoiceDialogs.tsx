@@ -52,8 +52,8 @@ export function PreviewDialog({ open, onOpenChange }: PreviewDialogProps) {
 						{t("finance.actions.preview")}
 					</DialogTitle>
 				</DialogHeader>
-				<div className="bg-slate-100 dark:bg-slate-900 p-4 min-h-[60vh]">
-					<div className="bg-white dark:bg-card rounded-xl shadow-lg overflow-hidden p-8">
+				<div className="bg-muted p-4 min-h-[60vh]">
+					<div className="bg-card rounded-xl border-2 overflow-hidden p-8">
 						<div className="text-center text-muted-foreground py-16">{t("finance.invoices.previewAvailableAfterSave")}</div>
 					</div>
 				</div>
@@ -261,7 +261,7 @@ export function DeletePaymentDialog({ open, onOpenChange, isPending, onConfirm }
 					<AlertDialogAction
 						onClick={onConfirm}
 						disabled={isPending}
-						className="rounded-xl bg-red-600 hover:bg-red-700"
+						className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 					>
 						{isPending ? t("common.deleting") : t("common.delete")}
 					</AlertDialogAction>

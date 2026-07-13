@@ -63,27 +63,27 @@ function getStatusBadge(
 	> = {
 		DRAFT: {
 			className:
-				"bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+				"bg-muted text-muted-foreground",
 			label: t("finance.status.DRAFT"),
 		},
 		SUBMITTED: {
 			className:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+				"bg-chart-4/15 text-chart-4",
 			label: t("finance.status.SUBMITTED"),
 		},
 		APPROVED: {
 			className:
-				"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+				"bg-chart-4/15 text-chart-4",
 			label: t("finance.status.APPROVED"),
 		},
 		PAID: {
 			className:
-				"bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+				"bg-success/15 text-success",
 			label: t("finance.status.PAID"),
 		},
 		REJECTED: {
 			className:
-				"bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+				"bg-destructive/15 text-destructive",
 			label: t("finance.status.REJECTED"),
 		},
 	};
@@ -163,7 +163,7 @@ export function ClaimsTable({
 	}
 
 	return (
-		<div className="rounded-xl border border-slate-200 dark:border-slate-800">
+		<div className="rounded-xl border-2">
 			<Table>
 				<TableHeader>
 					<TableRow className="hover:bg-transparent">
@@ -204,7 +204,7 @@ export function ClaimsTable({
 							<TableCell className="font-medium">#{claim.claimNo}</TableCell>
 							<TableCell>
 								{claim.periodStart && claim.periodEnd ? (
-									<span className="text-sm text-slate-600 dark:text-slate-400">
+									<span className="text-sm text-muted-foreground">
 										{format(new Date(claim.periodStart), "dd/MM/yyyy", {
 											locale: ar,
 										})}{" "}

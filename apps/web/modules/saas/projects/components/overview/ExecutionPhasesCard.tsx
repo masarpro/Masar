@@ -112,9 +112,9 @@ export function ExecutionPhasesCard({
 			case "IN_PROGRESS":
 				return "bg-chart-4";
 			case "DELAYED":
-				return "bg-red-500";
+				return "bg-destructive";
 			default:
-				return "bg-slate-300 dark:bg-slate-600";
+				return "bg-muted-foreground/40";
 		}
 	}
 
@@ -126,9 +126,9 @@ export function ExecutionPhasesCard({
 			case "IN_PROGRESS":
 				return "bg-chart-4";
 			case "DELAYED":
-				return "bg-red-500";
+				return "bg-destructive";
 			default:
-				return "bg-slate-200 dark:bg-slate-700";
+				return "bg-muted";
 		}
 	}
 
@@ -145,9 +145,9 @@ export function ExecutionPhasesCard({
 		},
 		ON_HOLD: {
 			label: t("projects.commandCenter.atRisk"),
-			bgClass: "bg-amber-50 dark:bg-amber-900/30",
-			textClass: "text-amber-700 dark:text-amber-400",
-			dotClass: "bg-amber-500",
+			bgClass: "bg-chart-1/15",
+			textClass: "text-chart-1",
+			dotClass: "bg-chart-1",
 		},
 		COMPLETED: {
 			label: t("projects.commandCenter.completedLabel"),
@@ -161,21 +161,21 @@ export function ExecutionPhasesCard({
 	// Loading state
 	if (milestonesLoading) {
 		return (
-			<div className="flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-slate-200/60 bg-white py-20 shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
-				<Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+			<div className="flex flex-col items-center justify-center overflow-hidden rounded-2xl border-2 bg-card py-20">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+		<div className="flex flex-col overflow-hidden rounded-2xl border-2 bg-card">
 			{/* Header */}
-			<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+			<div className="flex items-center justify-between border-b-2 px-5 py-3.5">
 				<div className="flex items-center gap-2">
-					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<BarChart3 className="h-4 w-4 text-chart-4 dark:text-chart-4" />
+					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-xl bg-chart-4/15">
+						<BarChart3 className="h-4 w-4 text-chart-4" />
 					</div>
-					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
+					<h3 className="text-[15px] font-semibold text-card-foreground">
 						{t("projects.commandCenter.executionAndPhases")}
 					</h3>
 				</div>
@@ -206,7 +206,7 @@ export function ExecutionPhasesCard({
 								cy="55"
 								r={radius}
 								fill="none"
-								className="stroke-slate-100 dark:stroke-slate-800"
+								className="stroke-muted"
 								strokeWidth="12"
 							/>
 							{completedPct > 0 && (
@@ -215,7 +215,7 @@ export function ExecutionPhasesCard({
 									cy="55"
 									r={radius}
 									fill="none"
-									stroke="#22C55E"
+									stroke="var(--chart-5)"
 									strokeWidth="12"
 									strokeDasharray={`${completedDash} ${circumference - completedDash}`}
 									strokeDashoffset={0}
@@ -228,7 +228,7 @@ export function ExecutionPhasesCard({
 									cy="55"
 									r={radius}
 									fill="none"
-									stroke="#3B82F6"
+									stroke="var(--chart-4)"
 									strokeWidth="12"
 									strokeDasharray={`${inProgressDash} ${circumference - inProgressDash}`}
 									strokeDashoffset={-completedDash}
@@ -241,7 +241,7 @@ export function ExecutionPhasesCard({
 									cy="55"
 									r={radius}
 									fill="none"
-									stroke="#94a3b8"
+									stroke="var(--border)"
 									strokeWidth="12"
 									strokeDasharray={`${notStartedDash} ${circumference - notStartedDash}`}
 									strokeDashoffset={-(completedDash + inProgressDash)}
@@ -250,10 +250,10 @@ export function ExecutionPhasesCard({
 							)}
 						</svg>
 						<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-							<div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+							<div className="text-2xl font-bold text-card-foreground">
 								{overallProgress}%
 							</div>
-							<div className="text-[10px] text-slate-400">
+							<div className="text-[10px] text-muted-foreground">
 								{t("projects.commandCenter.achievement")}
 							</div>
 						</div>
@@ -261,42 +261,42 @@ export function ExecutionPhasesCard({
 
 					{/* Legend */}
 					<div className="flex flex-1 flex-col gap-1.5">
-						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-sm bg-chart-4" />
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+							<span className="h-2 w-2 shrink-0 rounded-sm bg-chart-5" />
 							{t("projects.commandCenter.completedLabel")}
 							<span
-								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-card-foreground"
 								dir="ltr"
 							>
 								{completedPct}%
 							</span>
 						</div>
-						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-chart-4" />
 							{t("projects.commandCenter.inProgressLabel")}
 							<span
-								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-card-foreground"
 								dir="ltr"
 							>
 								{inProgressPct}%
 							</span>
 						</div>
-						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-sm bg-slate-200 dark:bg-slate-600" />
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+							<span className="h-2 w-2 shrink-0 rounded-sm bg-border" />
 							{t("projects.commandCenter.notStartedLabel")}
 							<span
-								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-card-foreground"
 								dir="ltr"
 							>
 								{notStartedPct}%
 							</span>
 						</div>
-						<div className="my-0.5 h-px bg-slate-100 dark:bg-slate-800" />
-						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-full bg-violet-500" />
+						<div className="my-0.5 h-px bg-border" />
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+							<span className="h-2 w-2 shrink-0 rounded-full bg-chart-4" />
 							{t("projects.commandCenter.completedLabel")}:{" "}
 							{completedCount}/{totalMilestones}
-							<span className="ms-auto text-[13px] text-slate-400">
+							<span className="ms-auto text-[13px] text-muted-foreground">
 								{t("projects.commandCenter.phasesLabel")}
 							</span>
 						</div>
@@ -306,22 +306,22 @@ export function ExecutionPhasesCard({
 				{/* Milestones List */}
 				{totalMilestones > 0 ? (
 					<div>
-						<div className="mb-1.5 text-xs font-semibold tracking-wide text-slate-400">
+						<div className="mb-1.5 text-xs font-semibold tracking-wide text-muted-foreground">
 							{t("projects.commandCenter.executionPhases")}
 						</div>
 						<div className="flex flex-col gap-1.5">
 							{milestones.map((milestone: any) => (
 								<div
 									key={milestone.id}
-									className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2.5 py-[7px] dark:border-slate-800 dark:bg-slate-800/50"
+									className="flex items-center gap-2 rounded-lg border bg-muted/50 px-2.5 py-[7px]"
 								>
 									<span
 										className={`h-1.5 w-1.5 shrink-0 rounded-full ${getStatusDotColor(milestone.status)}`}
 									/>
-									<span className="flex-1 truncate text-xs font-medium text-slate-700 dark:text-slate-300">
+									<span className="flex-1 truncate text-xs font-medium text-card-foreground">
 										{milestone.title}
 									</span>
-									<div className="h-[5px] w-14 shrink-0 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+									<div className="h-[5px] w-14 shrink-0 overflow-hidden rounded-full bg-muted">
 										<div
 											className={`h-full rounded-full ${getBarColor(milestone.status)}`}
 											style={{
@@ -330,7 +330,7 @@ export function ExecutionPhasesCard({
 										/>
 									</div>
 									<span
-										className="w-7 shrink-0 text-start text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+										className="w-7 shrink-0 text-start text-[11px] font-semibold text-muted-foreground"
 										dir="ltr"
 									>
 										{Math.round(Number(milestone.progress))}%
@@ -341,8 +341,8 @@ export function ExecutionPhasesCard({
 					</div>
 				) : (
 					<div className="flex flex-1 flex-col items-center justify-center gap-2 py-4">
-						<Clock className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-						<p className="text-[13px] text-slate-400">
+						<Clock className="h-8 w-8 text-muted-foreground/50" />
+						<p className="text-[13px] text-muted-foreground">
 							{t("projects.commandCenter.noMilestones")}
 						</p>
 					</div>
@@ -350,28 +350,28 @@ export function ExecutionPhasesCard({
 			</div>
 
 			{/* Footer - Health Chips */}
-			<div className="flex flex-wrap gap-1.5 border-t border-slate-100 px-5 py-3 dark:border-slate-800">
+			<div className="flex flex-wrap gap-1.5 border-t-2 px-5 py-3">
 				{onTrackCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-chart-4/15 px-2.5 py-1 text-[11px] font-semibold text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+					<span className="inline-flex items-center gap-1 rounded-full bg-chart-4/15 px-2.5 py-1 text-[11px] font-semibold text-chart-4">
 						<CheckCircle2 className="h-3 w-3" />
 						{onTrackCount} {t("projects.commandCenter.onTrack")}
 					</span>
 				)}
 				{atRiskCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-chart-1/15 px-2.5 py-1 text-[11px] font-semibold text-chart-1">
 						<AlertTriangle className="h-3 w-3" />
 						{atRiskCount} {t("projects.commandCenter.atRiskCount")}
 					</span>
 				)}
 				{delayedCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2.5 py-1 text-[11px] font-semibold text-destructive">
 						<AlertTriangle className="h-3 w-3" />
 						{delayedCount}{" "}
 						{t("projects.commandCenter.delayed")}
 					</span>
 				)}
 				{totalMilestones === 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
 						{t("projects.commandCenter.noMilestones")}
 					</span>
 				)}

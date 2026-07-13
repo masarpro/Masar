@@ -41,7 +41,7 @@ export const GanttMilestoneGroupBar = memo(function GanttMilestoneGroupBar({
 
 	if (!pos) return null;
 
-	const color = STATUS_COLORS[milestone.status] ?? "#94a3b8";
+	const color = STATUS_COLORS[milestone.status] ?? "var(--muted-foreground)";
 
 	return (
 		<g>

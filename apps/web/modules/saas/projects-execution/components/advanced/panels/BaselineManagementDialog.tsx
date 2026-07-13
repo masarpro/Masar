@@ -94,7 +94,7 @@ export function BaselineManagementDialog({
 							{baselines.map((baseline) => (
 								<div
 									key={baseline.id}
-									className="flex items-center justify-between rounded-lg border p-3"
+									className="flex items-center justify-between rounded-xl border-2 p-3"
 								>
 									<div className="flex items-center gap-2">
 										<span className="font-medium text-sm">

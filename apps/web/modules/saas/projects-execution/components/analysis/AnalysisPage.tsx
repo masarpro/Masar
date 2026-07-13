@@ -99,7 +99,7 @@ export function AnalysisPage({ projectId }: AnalysisPageProps) {
 					<Link
 						href={`/app/${organizationSlug}/projects/${projectId}/execution`}
 					>
-						<ArrowRightIcon className="h-4 w-4 me-1" />
+						<ArrowRightIcon className="h-4 w-4 me-1 rtl-flip" />
 						{t("execution.analysis.backToExecution")}
 					</Link>
 				</Button>
@@ -120,7 +120,7 @@ export function AnalysisPage({ projectId }: AnalysisPageProps) {
 				</TabsList>
 
 				<TabsContent value="sCurve" className="mt-4">
-					<div className="rounded-lg border p-4">
+					<div className="rounded-2xl border-2 bg-card p-4">
 						<h3 className="font-medium mb-4">
 							{t("execution.analysis.sCurve.title")}
 						</h3>

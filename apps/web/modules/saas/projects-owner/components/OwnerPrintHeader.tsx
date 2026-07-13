@@ -36,7 +36,7 @@ export function OwnerPrintHeader({
 	});
 
 	return (
-		<div className="mb-6 border-slate-300 border-b pb-4">
+		<div className="mb-6 border-border border-b pb-4">
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex items-center gap-3">
 					{resolveImageSrc(orgLogo) ? (
@@ -49,36 +49,36 @@ export function OwnerPrintHeader({
 							unoptimized
 						/>
 					) : (
-						<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
-							<Building2 className="h-6 w-6 text-slate-500" />
+						<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+							<Building2 className="h-6 w-6 text-muted-foreground" />
 						</div>
 					)}
 					<div>
-						<p className="font-bold text-slate-800 text-sm">{orgName ?? ""}</p>
-						<p className="text-slate-500 text-xs">{today}</p>
+						<p className="font-bold text-foreground text-sm">{orgName ?? ""}</p>
+						<p className="text-muted-foreground text-xs">{today}</p>
 					</div>
 				</div>
 				<div className="text-end">
-					<h1 className="font-bold text-lg text-slate-800">{reportTitle}</h1>
+					<h1 className="font-bold text-lg text-foreground">{reportTitle}</h1>
 				</div>
 			</div>
 
 			<div className="mt-4 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
 				<div>
-					<p className="text-slate-400">المشروع</p>
-					<p className="font-semibold text-slate-700">{projectName ?? "-"}</p>
+					<p className="text-muted-foreground">المشروع</p>
+					<p className="font-semibold text-foreground">{projectName ?? "-"}</p>
 				</div>
 				<div>
-					<p className="text-slate-400">العميل</p>
-					<p className="font-semibold text-slate-700">{clientName ?? "-"}</p>
+					<p className="text-muted-foreground">العميل</p>
+					<p className="font-semibold text-foreground">{clientName ?? "-"}</p>
 				</div>
 				<div>
-					<p className="text-slate-400">تاريخ البداية</p>
-					<p className="font-semibold text-slate-700">{formatDate(startDate)}</p>
+					<p className="text-muted-foreground">تاريخ البداية</p>
+					<p className="font-semibold text-foreground">{formatDate(startDate)}</p>
 				</div>
 				<div>
-					<p className="text-slate-400">تاريخ النهاية</p>
-					<p className="font-semibold text-slate-700">{formatDate(endDate)}</p>
+					<p className="text-muted-foreground">تاريخ النهاية</p>
+					<p className="font-semibold text-foreground">{formatDate(endDate)}</p>
 				</div>
 			</div>
 		</div>

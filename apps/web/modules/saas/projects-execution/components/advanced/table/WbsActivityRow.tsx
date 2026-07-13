@@ -26,11 +26,11 @@ export const WbsActivityRow = memo(function WbsActivityRow({
 		if (isSelected) return "bg-primary/10 border-s-2 border-s-primary";
 		if (isHovered) return "bg-muted/30";
 		if (isCritical && activity.status !== "COMPLETED")
-			return "bg-red-50/50 dark:bg-red-950/20 hover:bg-red-50/70 dark:hover:bg-red-950/30";
+			return "bg-destructive/10 hover:bg-destructive/15";
 		if (activity.status === "COMPLETED")
-			return "bg-green-50/50 dark:bg-green-950/20 hover:bg-green-50/70 dark:hover:bg-green-950/30";
+			return "bg-success/10 hover:bg-success/15";
 		if (activity.status === "DELAYED")
-			return "bg-yellow-50/50 dark:bg-yellow-950/20 hover:bg-yellow-50/70 dark:hover:bg-yellow-950/30";
+			return "bg-chart-1/10 hover:bg-chart-1/15";
 		return "hover:bg-muted/20";
 	};
 
@@ -63,7 +63,7 @@ export const WbsActivityRow = memo(function WbsActivityRow({
 					style={{
 						backgroundColor: isCritical
 							? CRITICAL_PATH_COLOR
-							: STATUS_COLORS[activity.status] ?? "#94a3b8",
+							: STATUS_COLORS[activity.status] ?? "var(--muted-foreground)",
 					}}
 				/>
 				<span className="truncate">{activity.title}</span>

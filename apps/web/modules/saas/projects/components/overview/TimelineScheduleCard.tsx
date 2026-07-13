@@ -79,26 +79,26 @@ export function TimelineScheduleCard({
 	const isOnTrack = variance >= -5;
 
 	return (
-		<div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+		<div className="flex flex-col overflow-hidden rounded-3xl border-2 bg-card">
 			{/* Header */}
-			<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+			<div className="flex items-center justify-between border-b-2 px-5 py-3.5">
 				<div className="flex items-center gap-2">
-					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-						<TrendingUp className="h-4 w-4 text-chart-4 dark:text-chart-4" />
+					<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<TrendingUp className="h-4 w-4" />
 					</div>
-					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
+					<h3 className="text-[15px] font-semibold text-card-foreground">
 						{t("projects.commandCenter.timeline")}
 					</h3>
 				</div>
 				<span
 					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
 						isOnTrack
-							? "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4"
-							: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+							? "bg-chart-4/15 text-chart-4"
+							: "bg-chart-1/15 text-chart-1"
 					}`}
 				>
 					<span
-						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-chart-4" : "bg-amber-500"}`}
+						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-chart-4" : "bg-chart-1"}`}
 					/>
 					{isOnTrack
 						? t("projects.commandCenter.onTrack")
@@ -110,15 +110,15 @@ export function TimelineScheduleCard({
 			<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-5">
 				{/* Legend Row */}
 				<div className="flex items-center gap-3.5">
-					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+					<div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
 						<span className="inline-block h-[3px] w-5 rounded-full border-[1.5px] border-dashed border-chart-4 bg-transparent" />
 						{t("projects.commandCenter.plannedProgress")}
 					</div>
-					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+					<div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
 						<span className="inline-block h-[3px] w-5 rounded-full bg-chart-4" />
 						{t("projects.commandCenter.actualProgress")}
 					</div>
-					<span className="mr-auto text-xs text-slate-400">
+					<span className="ms-auto text-xs text-muted-foreground">
 						{t("projects.commandCenter.achievement")}:{" "}
 						<strong className="text-chart-4">
 							{projectProgress}%
@@ -140,7 +140,7 @@ export function TimelineScheduleCard({
 							<CartesianGrid
 								strokeDasharray="3 3"
 								vertical={false}
-								className="stroke-slate-200 dark:stroke-slate-700"
+								className="stroke-border"
 							/>
 							<XAxis
 								dataKey="period"
@@ -199,31 +199,31 @@ export function TimelineScheduleCard({
 						<span className="text-xs font-semibold text-chart-4">
 							{projectProgress}%
 						</span>
-						<div className="relative h-[7px] flex-1 overflow-visible rounded-full bg-slate-200 dark:bg-slate-700">
+						<div className="relative h-[7px] flex-1 overflow-visible rounded-full bg-muted">
 							<div
-								className="h-full rounded-full bg-gradient-to-l from-chart-4 to-chart-4"
+								className="h-full rounded-full bg-chart-4"
 								style={{
 									width: `${projectProgress}%`,
 								}}
 							/>
 							{/* Progress indicator dot */}
 							<div
-								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-chart-4 shadow-md dark:border-slate-900"
+								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-card bg-chart-4"
 								style={{
 									left: `${projectProgress}%`,
 									transform: `translateX(-50%) translateY(-50%)`,
 								}}
 							/>
 						</div>
-						<span className="text-xs font-semibold text-slate-400">
+						<span className="text-xs font-semibold text-muted-foreground">
 							100%
 						</span>
 					</div>
 					<div className="mt-1 flex justify-between gap-2">
-						<span className="min-w-0 truncate text-[10px] text-slate-400">
+						<span className="min-w-0 truncate text-[10px] text-muted-foreground">
 							{formatDate(startDate)}
 						</span>
-						<span className="min-w-0 truncate text-start text-[10px] text-slate-400">
+						<span className="min-w-0 truncate text-start text-[10px] text-muted-foreground">
 							{formatDate(endDate)}
 						</span>
 					</div>

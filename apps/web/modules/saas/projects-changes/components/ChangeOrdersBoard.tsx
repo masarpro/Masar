@@ -197,14 +197,14 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 					<Card className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-								<FileTextIcon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+							<div className="rounded-xl bg-muted p-2.5">
+								<FileTextIcon className="h-5 w-5 text-muted-foreground" />
 							</div>
 							<div>
-								<p className="text-xs text-slate-500 dark:text-slate-400">
+								<p className="text-xs text-muted-foreground">
 									{t("changeOrders.stats.total")}
 								</p>
-								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+								<p className="text-xl font-semibold text-card-foreground">
 									{stats.total}
 								</p>
 							</div>
@@ -213,14 +213,14 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 					<Card className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-900/50">
-								<ClockIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+							<div className="rounded-xl bg-chart-1/15 p-2.5">
+								<ClockIcon className="h-5 w-5 text-chart-1" />
 							</div>
 							<div>
-								<p className="text-xs text-amber-600 dark:text-amber-400">
+								<p className="text-xs text-chart-1">
 									{t("changeOrders.stats.pending")}
 								</p>
-								<p className="text-xl font-semibold text-amber-700 dark:text-amber-300">
+								<p className="text-xl font-semibold text-chart-1">
 									{stats.SUBMITTED}
 								</p>
 							</div>
@@ -270,7 +270,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-4">
 					<div className="relative flex-1 max-w-sm">
-						<SearchIcon className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<SearchIcon className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder={t("changeOrders.search")}
 							value={searchQuery}
@@ -319,11 +319,11 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 			<Card>
 				{isLoading ? <CardGridSkeleton /> : changeOrders.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-20 text-center">
-						<FileTextIcon className="h-16 w-16 text-slate-300 dark:text-slate-600" />
-						<p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">
+						<FileTextIcon className="h-16 w-16 text-muted-foreground/40" />
+						<p className="mt-4 text-lg font-medium text-card-foreground">
 							{t("changeOrders.empty.title")}
 						</p>
-						<p className="mt-1 text-slate-500 dark:text-slate-400">
+						<p className="mt-1 text-muted-foreground">
 							{t("changeOrders.empty.description")}
 						</p>
 						<Button onClick={() => setIsCreateOpen(true)} className="mt-4">
@@ -351,18 +351,18 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 						<TableBody>
 							{changeOrders.map((co) => (
 								<TableRow key={co.id}>
-									<TableCell className="font-mono text-sm text-slate-500">
+									<TableCell className="font-mono text-sm text-muted-foreground">
 										CO-{co.coNo}
 									</TableCell>
 									<TableCell>
 										<Link
 											href={`changes/${co.id}`}
-											className="font-medium text-slate-900 hover:text-primary dark:text-slate-100"
+											className="font-medium text-card-foreground hover:text-primary"
 										>
 											{co.title}
 										</Link>
 									</TableCell>
-									<TableCell className="text-sm text-slate-600 dark:text-slate-400">
+									<TableCell className="text-sm text-muted-foreground">
 										{getCategoryLabel(co.category, t)}
 									</TableCell>
 									<TableCell className="text-center">
@@ -370,8 +370,8 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 											<span
 												className={
 													Number(co.costImpact) >= 0
-														? "text-chart-4 dark:text-chart-4"
-														: "text-red-600 dark:text-red-400"
+														? "text-chart-4"
+														: "text-destructive"
 												}
 											>
 												{Number(co.costImpact) > 0 ? "+" : ""}
@@ -386,8 +386,8 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 											<span
 												className={
 													co.timeImpactDays >= 0
-														? "text-chart-4 dark:text-chart-4"
-														: "text-orange-600 dark:text-orange-400"
+														? "text-chart-4"
+														: "text-chart-1"
 												}
 											>
 												{co.timeImpactDays > 0 ? "+" : ""}
@@ -398,7 +398,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 										)}
 									</TableCell>
 									<TableCell>{getStatusBadge(co.status, t)}</TableCell>
-									<TableCell className="text-sm text-slate-500">
+									<TableCell className="text-sm text-muted-foreground">
 										{new Date(co.updatedAt).toLocaleDateString("ar-SA")}
 									</TableCell>
 								</TableRow>
@@ -418,7 +418,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 						>
 							{t("common.previous")}
 						</Button>
-						<span className="text-sm text-slate-500">
+						<span className="text-sm text-muted-foreground">
 							{t("common.pageOf", {
 								current: page,
 								total: changeOrdersData.totalPages,

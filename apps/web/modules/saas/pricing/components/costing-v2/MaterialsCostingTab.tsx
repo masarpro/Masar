@@ -484,9 +484,9 @@ export function MaterialsCostingTab({
 								return (
 									<div
 										key={sg.key}
-										className="rounded-xl border border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-800 p-3 min-w-[140px] flex-1 max-w-[200px]"
+										className="rounded-xl border border-chart-1 bg-chart-1/15 dark:bg-chart-1/20 dark:border-chart-1 p-3 min-w-[140px] flex-1 max-w-[200px]"
 									>
-										<div className="text-xs text-orange-600 dark:text-orange-400 font-medium mb-1">
+										<div className="text-xs text-chart-1 dark:text-chart-1 font-medium mb-1">
 											{sg.label}
 										</div>
 										{isEditing ? (
@@ -513,7 +513,7 @@ export function MaterialsCostingTab({
 												<button
 													type="button"
 													onClick={() => setEditingCard(`steel-${sg.key}`)}
-													className="text-orange-400 hover:text-orange-600 transition-colors"
+													className="text-chart-1 hover:text-chart-1 transition-colors"
 												>
 													<Pencil className="h-3.5 w-3.5" />
 												</button>

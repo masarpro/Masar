@@ -74,17 +74,17 @@ export function CreateClaimForm({
 					variant="ghost"
 					size="icon"
 					asChild
-					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+					className="shrink-0 rounded-xl hover:bg-accent hover:text-accent-foreground"
 				>
 					<Link href={basePath}>
-						<ChevronLeft className="h-5 w-5 text-slate-500" />
+						<ChevronLeft className="rtl-flip h-5 w-5 text-muted-foreground" />
 					</Link>
 				</Button>
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="text-2xl font-semibold text-foreground">
 						{t("finance.claims.new")}
 					</h1>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
+					<p className="text-sm text-muted-foreground">
 						{t("finance.claims.newSubtitle")}
 					</p>
 				</div>
@@ -93,7 +93,7 @@ export function CreateClaimForm({
 			{/* Form */}
 			<form
 				onSubmit={handleSubmit}
-				className="mx-auto max-w-xl space-y-6 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+				className="mx-auto max-w-xl space-y-6 rounded-2xl border-2 bg-card p-6"
 			>
 				<div className="space-y-4">
 					<div className="grid grid-cols-2 gap-4">

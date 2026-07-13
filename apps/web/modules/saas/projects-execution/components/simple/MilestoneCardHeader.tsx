@@ -39,23 +39,23 @@ function StatusBadge({ status }: { status: ExecutionMilestone["status"] }) {
 
 	const variants: Record<string, { className: string; label: string }> = {
 		PLANNED: {
-			className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+			className: "bg-muted text-muted-foreground",
 			label: t("timeline.status.planned"),
 		},
 		IN_PROGRESS: {
-			className: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+			className: "bg-chart-4/15 text-chart-4",
 			label: t("timeline.status.inProgress"),
 		},
 		COMPLETED: {
-			className: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+			className: "bg-success/15 text-success",
 			label: t("timeline.status.completed"),
 		},
 		DELAYED: {
-			className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+			className: "bg-destructive/15 text-destructive",
 			label: t("timeline.status.delayed"),
 		},
 		CANCELLED: {
-			className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
+			className: "bg-muted text-muted-foreground",
 			label: t("execution.milestone.cancelled"),
 		},
 	};
@@ -136,7 +136,7 @@ export function MilestoneCardHeader({
 						{milestone.title}
 					</h3>
 					{milestone.isCritical && (
-						<AlertTriangleIcon className="h-4 w-4 text-orange-500" />
+						<AlertTriangleIcon className="h-4 w-4 text-chart-1" />
 					)}
 					<StatusBadge status={milestone.status} />
 					{daysInfo && (

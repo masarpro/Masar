@@ -69,7 +69,7 @@ export function BeamInputRow({
 					</span>
 					<span>
 						حديد:{" "}
-						<span className="font-semibold text-orange-600">
+						<span className="font-semibold text-chart-1">
 							{formatNumber(calc.grossWeight)} كجم
 						</span>
 					</span>

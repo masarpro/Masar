@@ -157,8 +157,8 @@ export function DocumentViewer({
 			<Dialog open={open} onOpenChange={(v: any) => !v && onClose()}>
 				<DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0">
 					{/* Header */}
-					<div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-						<h2 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<div className="flex items-center justify-between border-b-2 px-4 py-3">
+						<h2 className="truncate text-sm font-semibold text-card-foreground">
 							{doc.title}
 						</h2>
 						<div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ export function DocumentViewer({
 					</div>
 
 					{/* Content */}
-					<div className="flex-1 overflow-hidden bg-slate-100 dark:bg-slate-950">
+					<div className="flex-1 overflow-hidden bg-muted">
 						{isLoadingUrl || !googleViewerUrl ? (
 							<div className="flex h-full items-center justify-center">
 								<Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -200,13 +200,13 @@ export function DocumentViewer({
 					</div>
 
 					{/* Footer */}
-					<div className="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-700">
+					<div className="flex items-center gap-2 border-t-2 px-4 py-2 text-xs text-muted-foreground">
 						{doc.fileName && (
 							<span className="truncate max-w-[200px]">{doc.fileName}</span>
 						)}
 						{doc.fileSize && (
 							<>
-								<span className="text-slate-300">•</span>
+								<span className="text-muted-foreground">•</span>
 								<span className="shrink-0">{formatFileSize(doc.fileSize)}</span>
 							</>
 						)}
@@ -221,10 +221,10 @@ export function DocumentViewer({
 		<Dialog open={open} onOpenChange={(v: any) => !v && onClose()}>
 			<DialogContent className="max-w-md">
 				<div className="flex flex-col items-center gap-4 py-6 text-center">
-					<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+					<p className="text-sm font-medium text-card-foreground">
 						{doc.title}
 					</p>
-					<p className="text-sm text-slate-500">{t("noPreview")}</p>
+					<p className="text-sm text-muted-foreground">{t("noPreview")}</p>
 					<Button
 						variant="outline"
 						className="rounded-xl"

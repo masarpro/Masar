@@ -99,7 +99,7 @@ export function ConvertToQuotationButton({
 		<Button
 			onClick={handleConvert}
 			disabled={createMutation.isPending}
-			className="bg-red-600 hover:bg-red-700 text-white gap-2"
+			className="bg-destructive hover:bg-destructive/90 text-destructive-foreground gap-2"
 		>
 			{createMutation.isPending ? (
 				<Loader2 className="h-4 w-4 animate-spin" />

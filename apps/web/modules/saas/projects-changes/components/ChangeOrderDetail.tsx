@@ -63,14 +63,11 @@ interface ChangeOrderDetailProps {
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
 	const colors: Record<ChangeOrderStatus, string> = {
-		DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-		SUBMITTED:
-			"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-		APPROVED:
-			"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-		REJECTED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-		IMPLEMENTED:
-			"bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+		DRAFT: "bg-muted text-muted-foreground",
+		SUBMITTED: "bg-chart-1/15 text-chart-1",
+		APPROVED: "bg-chart-4/15 text-chart-4",
+		REJECTED: "bg-destructive/15 text-destructive",
+		IMPLEMENTED: "bg-chart-4/15 text-chart-4",
 	};
 
 	return (
@@ -271,13 +268,13 @@ export function ChangeOrderDetail({
 	if (!changeOrder) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<AlertTriangleIcon className="h-16 w-16 text-amber-500" />
-				<p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">
+				<AlertTriangleIcon className="h-16 w-16 text-chart-1" />
+				<p className="mt-4 text-lg font-medium text-card-foreground">
 					{t("changeOrders.notFound")}
 				</p>
 				<Button asChild className="mt-4" variant="outline">
 					<Link href=".">
-						<ArrowLeftIcon className="me-2 h-4 w-4" />
+						<ArrowLeftIcon className="rtl-flip me-2 h-4 w-4" />
 						{t("changeOrders.backToList")}
 					</Link>
 				</Button>
@@ -321,15 +318,15 @@ export function ChangeOrderDetail({
 			<div className="flex items-center gap-4">
 				<Button variant="ghost" size="icon" asChild>
 					<Link href=".">
-						<ArrowLeftIcon className="h-5 w-5" />
+						<ArrowLeftIcon className="rtl-flip h-5 w-5" />
 					</Link>
 				</Button>
 				<div className="flex-1">
 					<div className="flex items-center gap-3">
-						<span className="font-mono text-sm text-slate-500">CO-{co.coNo}</span>
+						<span className="font-mono text-sm text-muted-foreground">CO-{co.coNo}</span>
 						{getStatusBadge(co.status, t)}
 					</div>
-					<h1 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="mt-1 text-2xl font-semibold text-card-foreground">
 						{co.title}
 					</h1>
 				</div>
@@ -339,18 +336,18 @@ export function ChangeOrderDetail({
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
-							<DollarSignIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<DollarSignIcon className="h-5 w-5 text-chart-4" />
 						</div>
 						<div>
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="text-sm text-muted-foreground">
 								{t("changeOrders.fields.costImpact")}
 							</p>
 							<p
 								className={`text-xl font-semibold ${
 									co.costImpact && Number(co.costImpact) >= 0
-										? "text-chart-4 dark:text-chart-4"
-										: "text-red-600 dark:text-red-400"
+										? "text-chart-4"
+										: "text-destructive"
 								}`}
 							>
 								{co.costImpact
@@ -364,14 +361,14 @@ export function ChangeOrderDetail({
 
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-chart-4/15 p-2.5 dark:bg-chart-4/20">
-							<ClockIcon className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<ClockIcon className="h-5 w-5 text-chart-4" />
 						</div>
 						<div>
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="text-sm text-muted-foreground">
 								{t("changeOrders.fields.timeImpact")}
 							</p>
-							<p className="text-xl font-semibold text-chart-4 dark:text-chart-4">
+							<p className="text-xl font-semibold text-chart-4">
 								{co.timeImpactDays !== null && co.timeImpactDays !== undefined
 									? `${co.timeImpactDays > 0 ? "+" : ""}${co.timeImpactDays} ${t("common.days")}`
 									: "-"}
@@ -382,14 +379,14 @@ export function ChangeOrderDetail({
 
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-purple-100 p-2.5 dark:bg-purple-900/50">
-							<FlagIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+						<div className="rounded-xl bg-chart-4/15 p-2.5">
+							<FlagIcon className="h-5 w-5 text-chart-4" />
 						</div>
 						<div>
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="text-sm text-muted-foreground">
 								{t("changeOrders.fields.linkedMilestone")}
 							</p>
-							<p className="text-lg font-medium text-purple-600 dark:text-purple-400">
+							<p className="text-lg font-medium text-chart-4">
 								{co.milestone?.title ?? "-"}
 							</p>
 						</div>
@@ -401,16 +398,16 @@ export function ChangeOrderDetail({
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<Card className="lg:col-span-2 p-6 space-y-6">
 					<div>
-						<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+						<h2 className="text-lg font-semibold text-card-foreground mb-3">
 							{t("changeOrders.fields.description")}
 						</h2>
-						<p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
+						<p className="text-muted-foreground whitespace-pre-wrap">
 							{co.description || t("changeOrders.noDescription")}
 						</p>
 					</div>
 
 					<div className="border-t pt-6">
-						<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+						<h2 className="text-lg font-semibold text-card-foreground mb-3">
 							{t("changeOrders.fields.category")}
 						</h2>
 						<Badge variant="outline">
@@ -420,10 +417,10 @@ export function ChangeOrderDetail({
 
 					{co.decisionNote && (
 						<div className="border-t pt-6">
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+							<h2 className="text-lg font-semibold text-card-foreground mb-3">
 								{t("changeOrders.fields.decisionNote")}
 							</h2>
-							<p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
+							<p className="text-muted-foreground whitespace-pre-wrap">
 								{co.decisionNote}
 							</p>
 						</div>
@@ -494,21 +491,21 @@ export function ChangeOrderDetail({
 				{/* Sidebar */}
 				<Card className="p-6 space-y-6">
 					<div>
-						<h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
+						<h3 className="text-sm font-medium text-muted-foreground mb-2">
 							{t("changeOrders.fields.requestedBy")}
 						</h3>
 						<div className="flex items-center gap-2">
-							<div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-								<UserIcon className="h-4 w-4 text-slate-500" />
+							<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+								<UserIcon className="h-4 w-4 text-muted-foreground" />
 							</div>
 							<div>
-								<p className="font-medium text-slate-900 dark:text-slate-100">
+								<p className="font-medium text-card-foreground">
 									{co.requestedBy.name}
 								</p>
 							</div>
 						</div>
 						{co.requestedAt && (
-							<p className="mt-1 text-sm text-slate-500">
+							<p className="mt-1 text-sm text-muted-foreground">
 								<CalendarIcon className="inline me-1 h-3 w-3" />
 								{new Date(co.requestedAt).toLocaleDateString("ar-SA")}
 							</p>
@@ -517,21 +514,21 @@ export function ChangeOrderDetail({
 
 					{co.decidedBy && (
 						<div className="border-t pt-4">
-							<h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
+							<h3 className="text-sm font-medium text-muted-foreground mb-2">
 								{t("changeOrders.fields.decidedBy")}
 							</h3>
 							<div className="flex items-center gap-2">
-								<div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-									<UserIcon className="h-4 w-4 text-slate-500" />
+								<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+									<UserIcon className="h-4 w-4 text-muted-foreground" />
 								</div>
 								<div>
-									<p className="font-medium text-slate-900 dark:text-slate-100">
+									<p className="font-medium text-card-foreground">
 										{co.decidedBy.name}
 									</p>
 								</div>
 							</div>
 							{co.decidedAt && (
-								<p className="mt-1 text-sm text-slate-500">
+								<p className="mt-1 text-sm text-muted-foreground">
 									<CalendarIcon className="inline me-1 h-3 w-3" />
 									{new Date(co.decidedAt).toLocaleDateString("ar-SA")}
 								</p>
@@ -541,21 +538,21 @@ export function ChangeOrderDetail({
 
 					{co.implementedBy && (
 						<div className="border-t pt-4">
-							<h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
+							<h3 className="text-sm font-medium text-muted-foreground mb-2">
 								{t("changeOrders.fields.implementedBy")}
 							</h3>
 							<div className="flex items-center gap-2">
-								<div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-									<UserIcon className="h-4 w-4 text-slate-500" />
+								<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+									<UserIcon className="h-4 w-4 text-muted-foreground" />
 								</div>
 								<div>
-									<p className="font-medium text-slate-900 dark:text-slate-100">
+									<p className="font-medium text-card-foreground">
 										{co.implementedBy.name}
 									</p>
 								</div>
 							</div>
 							{co.implementedAt && (
-								<p className="mt-1 text-sm text-slate-500">
+								<p className="mt-1 text-sm text-muted-foreground">
 									<CalendarIcon className="inline me-1 h-3 w-3" />
 									{new Date(co.implementedAt).toLocaleDateString("ar-SA")}
 								</p>
@@ -564,10 +561,10 @@ export function ChangeOrderDetail({
 					)}
 
 					<div className="border-t pt-4">
-						<h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
+						<h3 className="text-sm font-medium text-muted-foreground mb-2">
 							{t("changeOrders.fields.createdAt")}
 						</h3>
-						<p className="text-sm text-slate-600 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{new Date(co.createdAt).toLocaleDateString("ar-SA", {
 								year: "numeric",
 								month: "long",
@@ -629,7 +626,7 @@ export function ChangeOrderDetail({
 							}}
 							className={
 								decisionType === "reject"
-									? "bg-red-600 hover:bg-red-700"
+									? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
 									: ""
 							}
 						>
@@ -659,7 +656,7 @@ export function ChangeOrderDetail({
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={() => deleteMutation.mutate()}
-							className="bg-red-600 hover:bg-red-700"
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{t("changeOrders.actions.delete")}
 						</AlertDialogAction>

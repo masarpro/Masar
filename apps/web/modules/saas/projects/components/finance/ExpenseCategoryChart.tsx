@@ -42,8 +42,8 @@ export function ExpenseCategoryChart({
 
 	if (data.length === 0) {
 		return (
-			<div className="flex h-48 items-center justify-center rounded-2xl border border-white/20 bg-white/70 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/30 dark:bg-slate-900/70">
-				<p className="text-sm text-slate-500 dark:text-slate-400">
+			<div className="flex h-48 items-center justify-center rounded-2xl border-2 bg-card">
+				<p className="text-sm text-muted-foreground">
 					{t("finance.categoryChart.noData")}
 				</p>
 			</div>
@@ -63,8 +63,8 @@ export function ExpenseCategoryChart({
 	};
 
 	return (
-		<div className="rounded-2xl border border-white/20 bg-white/70 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/30 dark:bg-slate-900/70">
-			<h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+		<div className="rounded-2xl border-2 bg-card p-4">
+			<h3 className="mb-3 text-sm font-semibold text-card-foreground">
 				{t("finance.categoryChart.title")}
 			</h3>
 
@@ -79,14 +79,14 @@ export function ExpenseCategoryChart({
 								? ((Number(item.value) / totalAmount) * 100).toFixed(1)
 								: "0";
 							return (
-								<div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-									<p className="text-xs font-medium text-slate-600 dark:text-slate-300">
+								<div className="rounded-lg border bg-popover px-3 py-2 shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]">
+									<p className="text-xs font-medium text-muted-foreground">
 										{t(`finance.category.${item.name}`)}
 									</p>
-									<p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+									<p className="text-sm font-semibold text-popover-foreground">
 										{formatSAR(Number(item.value))}
 									</p>
-									<p className="text-xs text-slate-400">{percentage}%</p>
+									<p className="text-xs text-muted-foreground">{percentage}%</p>
 								</div>
 							);
 						}}
@@ -121,7 +121,7 @@ export function ExpenseCategoryChart({
 						y="50%"
 						textAnchor="middle"
 						dominantBaseline="middle"
-						className="fill-slate-700 text-sm font-semibold dark:fill-slate-300"
+						className="fill-foreground text-sm font-semibold"
 					>
 						{formatSAR(totalAmount)}
 					</text>
@@ -143,9 +143,9 @@ export function ExpenseCategoryChart({
 								key={item.category}
 								type="button"
 								onClick={() => handleClick(item.category)}
-								className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-xs transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${
+								className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-xs transition-colors hover:bg-accent hover:text-accent-foreground ${
 									selectedCategory === item.category
-										? "bg-slate-100 dark:bg-slate-800"
+										? "bg-accent"
 										: ""
 								}`}
 							>
@@ -156,11 +156,11 @@ export function ExpenseCategoryChart({
 											backgroundColor: CATEGORY_COLORS[item.category] || CHART_SEMANTIC.neutral,
 										}}
 									/>
-									<span className="text-slate-600 dark:text-slate-400">
+									<span className="text-muted-foreground">
 										{t(`finance.category.${item.category}`)}
 									</span>
 								</div>
-								<span className="font-medium text-slate-700 dark:text-slate-300">
+								<span className="font-medium text-card-foreground">
 									{percentage}%
 								</span>
 							</button>

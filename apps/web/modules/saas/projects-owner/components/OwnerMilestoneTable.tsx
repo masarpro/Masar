@@ -59,30 +59,30 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 
 	const statusBadge: Record<string, { className: string; label: string }> = {
 		PLANNED: {
-			className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+			className: "bg-muted text-muted-foreground",
 			label: t("timeline.status.planned"),
 		},
 		IN_PROGRESS: {
-			className: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
+			className: "bg-chart-4/15 text-chart-4",
 			label: t("timeline.status.inProgress"),
 		},
 		COMPLETED: {
-			className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+			className: "bg-success/15 text-success",
 			label: t("timeline.status.completed"),
 		},
 		DELAYED: {
-			className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+			className: "bg-destructive/15 text-destructive",
 			label: t("timeline.status.delayed"),
 		},
 		CANCELLED: {
-			className: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+			className: "bg-muted text-muted-foreground",
 			label: t("execution.milestone.cancelled"),
 		},
 	};
 
 	if (milestones.length === 0) {
 		return (
-			<p className="py-8 text-center text-slate-500">
+			<p className="py-8 text-center text-muted-foreground">
 				{t("ownerPortal.schedule.noMilestones")}
 			</p>
 		);
@@ -101,14 +101,14 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 					return (
 						<div
 							key={m.id}
-							className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+							className="rounded-xl border-2 p-4"
 						>
 							<div className="flex items-start justify-between gap-2">
 								<div className="flex min-w-0 items-baseline gap-1.5">
 									<span className="shrink-0 text-muted-foreground text-xs">
 										{i + 1}.
 									</span>
-									<span className="font-medium text-slate-900 dark:text-slate-100">
+									<span className="font-medium text-card-foreground">
 										{m.title}
 									</span>
 								</div>
@@ -127,7 +127,7 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 								</span>
 							</div>
 
-							<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-xs dark:text-slate-400">
+							<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
 								<span>
 									{formatDate(m.plannedStart, "ar-SA", DATE_OPTIONS)} —{" "}
 									{formatDate(m.plannedEnd, "ar-SA", DATE_OPTIONS)}
@@ -144,7 +144,7 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 			</div>
 
 			{/* Desktop: table */}
-			<div className="hidden overflow-x-auto rounded-xl border border-slate-200 sm:block dark:border-slate-800">
+			<div className="hidden overflow-x-auto rounded-xl border-2 sm:block">
 			<Table>
 				<TableHeader>
 					<TableRow>

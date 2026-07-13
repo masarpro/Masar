@@ -37,8 +37,8 @@ function getDaysLeft(
 const STATUS_BADGE: Record<string, string> = {
 	PLANNED: "bg-slate-100 text-slate-700 border-slate-300",
 	IN_PROGRESS: "bg-chart-4/15 text-chart-4 border-chart-4",
-	COMPLETED: "bg-green-100 text-green-700 border-green-300",
-	DELAYED: "bg-red-100 text-red-700 border-red-300",
+	COMPLETED: "bg-success/15 text-success border-success",
+	DELAYED: "bg-destructive/15 text-destructive border-destructive",
 	CANCELLED: "bg-gray-100 text-gray-500 border-gray-300",
 };
 
@@ -126,10 +126,10 @@ export function TablePrintLayout({ projectId }: TablePrintLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50 py-6">
+		<div className="min-h-screen bg-muted py-6">
 			{/* Action bar — hidden when printing */}
 			<div className="max-w-[800px] mx-auto px-4 mb-4 flex items-center justify-between print:hidden">
-				<h1 className="text-lg font-bold text-slate-700">
+				<h1 className="text-lg font-bold text-foreground">
 					{t("execution.print.tableTitle")}
 				</h1>
 				<div className="flex items-center gap-2">

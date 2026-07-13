@@ -476,11 +476,11 @@ export function StairsSection({
 			{/* Auto-mode section */}
 			{isAutoMode && !isAdding && (
 				showAutoForm ? (
-					<Card className="border-dashed border-2 border-emerald-500/50">
+					<Card className="border-dashed border-2 border-success/50">
 						<CardContent className="p-4 space-y-4">
 							<div className="flex items-center justify-between mb-2">
 								<div className="flex items-center gap-2">
-									<Building2 className="h-5 w-5 text-emerald-600" />
+									<Building2 className="h-5 w-5 text-success" />
 									<h4 className="font-medium">{t("pricing.studies.structural.sections.stairs.autoTitle")}</h4>
 									<Badge variant="secondary" className="text-xs">{t("pricing.studies.structural.sections.stairs.stairsCount", { count: stairConnections.length })}</Badge>
 								</div>
@@ -488,7 +488,7 @@ export function StairsSection({
 							</div>
 
 							{/* Stair connections preview */}
-							<div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 rounded-lg p-3">
+							<div className="bg-success/10 border border-success/20 rounded-lg p-3">
 								<h5 className="text-sm font-medium mb-2">{t("pricing.studies.structural.sections.stairs.requiredStairs")}:</h5>
 								<div className="flex flex-wrap gap-2">
 									{stairConnections.map(conn => (
@@ -500,7 +500,7 @@ export function StairsSection({
 							</div>
 
 							{/* Unified form inputs (same for all stairs) */}
-							<div className="border rounded-lg p-4 bg-slate-50/30 dark:bg-slate-900/30">
+							<div className="border rounded-lg p-4 bg-muted/30">
 								<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.unifiedDimensions")}</h5>
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 									<div>
@@ -612,8 +612,7 @@ export function StairsSection({
 								<Button variant="outline" onClick={() => setShowAutoForm(false)}>
 									{t("pricing.studies.form.cancel")}
 								</Button>
-								<Button onClick={handleAutoSave} disabled={isAutoSaving || !autoCalculations || autoCalculations.length === 0}
-									className="bg-emerald-600 hover:bg-emerald-700">
+								<Button onClick={handleAutoSave} disabled={isAutoSaving || !autoCalculations || autoCalculations.length === 0}>
 									<Save className="h-4 w-4 me-2" />
 									{t("pricing.studies.structural.sections.stairs.saveCount", { count: autoCalculations?.length || 0 })}
 								</Button>
@@ -622,7 +621,7 @@ export function StairsSection({
 					</Card>
 				) : (
 					<Button variant="outline"
-						className="w-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-2 border-dashed border-emerald-400/40 hover:bg-emerald-500/20 hover:border-emerald-400/60 transition-all"
+						className="w-full bg-success/10 text-success border-2 border-dashed border-success/40 hover:bg-success/20 hover:border-success/60 transition-all"
 						onClick={() => setShowAutoForm(true)}>
 						<Building2 className="h-5 w-5 me-2" />
 						<span className="font-semibold">{t("pricing.studies.structural.sections.stairs.autoButton")}</span>
@@ -657,7 +656,7 @@ export function StairsSection({
 						/>
 
 						{/* أبعاد السلم */}
-						<div className="border rounded-lg p-4 bg-slate-50/30 dark:bg-slate-900/30">
+						<div className="border rounded-lg p-4 bg-muted/30">
 							<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.stairDimensions")}</h5>
 							<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 								<div>
@@ -729,7 +728,7 @@ export function StairsSection({
 						</div>
 
 						{/* الدرجات */}
-						<div className="border rounded-lg p-4 bg-amber-50/30 dark:bg-amber-900/20">
+						<div className="border rounded-lg p-4 bg-chart-1/10">
 							<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.steps")}</h5>
 							<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 								<div>

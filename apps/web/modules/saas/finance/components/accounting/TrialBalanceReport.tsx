@@ -59,7 +59,7 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 					<Label className="text-xs">{t("finance.accounting.trialBalance.periodFrom")}</Label>
 					<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
-				<label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+				<label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
 					<input type="checkbox" checked={includeZero} onChange={(e) => setIncludeZero(e.target.checked)} className="rounded" />
 					{t("finance.accounting.trialBalance.includeZero")}
 				</label>
@@ -84,22 +84,22 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 			{data && (
 				<>
 					{/* Balance Status */}
-					<Card className={`rounded-2xl ${data.isBalanced ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800"}`}>
+					<Card className={`rounded-2xl border-2 ${data.isBalanced ? "border-success/30" : "border-destructive/30"}`}>
 						<CardContent className="p-4 flex items-center gap-3">
 							{data.isBalanced ? (
 								<>
-									<CheckCircle className="h-5 w-5 text-green-600" />
-									<span className="font-medium text-green-700 dark:text-green-300">{t("finance.accounting.trialBalance.balanced")}</span>
+									<CheckCircle className="h-5 w-5 text-success" />
+									<span className="font-medium text-success">{t("finance.accounting.trialBalance.balanced")}</span>
 								</>
 							) : (
 								<>
-									<XCircle className="h-5 w-5 text-red-600" />
-									<span className="font-medium text-red-700 dark:text-red-300">
+									<XCircle className="h-5 w-5 text-destructive" />
+									<span className="font-medium text-destructive">
 										{t("finance.accounting.trialBalance.notBalanced")}: {formatAccounting(data.difference)}
 									</span>
 								</>
 							)}
-							<span className="ms-auto text-sm text-slate-500">
+							<span className="ms-auto text-sm text-muted-foreground">
 								{t("finance.accounting.trialBalance.accountCount")}: {data.accountCount}
 							</span>
 						</CardContent>
@@ -109,7 +109,7 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 					<Card className="rounded-2xl">
 						<CardContent className="p-0 overflow-x-auto">
 							{data.rows.length === 0 ? (
-								<div className="text-center py-12 text-slate-500">{t("finance.accounting.trialBalance.noEntries")}</div>
+								<div className="text-center py-12 text-muted-foreground">{t("finance.accounting.trialBalance.noEntries")}</div>
 							) : (
 								<Table>
 									<TableHeader>
@@ -140,7 +140,7 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 											);
 										})}
 										{/* Totals */}
-										<TableRow className="border-t-2 border-double border-slate-400 dark:border-slate-500 font-bold bg-slate-100 dark:bg-slate-800">
+										<TableRow className="border-t-2 border-double border-border font-bold bg-muted">
 											<TableCell colSpan={2}>{t("finance.accounting.aging.total")}</TableCell>
 											<TableCell className="text-end">{formatAccounting(data.totals.totalPeriodDebit)}</TableCell>
 											<TableCell className="text-end">{formatAccounting(data.totals.totalPeriodCredit)}</TableCell>

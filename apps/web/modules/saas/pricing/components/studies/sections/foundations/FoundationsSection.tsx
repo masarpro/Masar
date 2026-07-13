@@ -628,7 +628,7 @@ export function FoundationsSection({
 
 								{/* عرض خرسانة النظافة إن وجدت */}
 								{'leanConcreteVolume' in calculations && calculations.leanConcreteVolume != null && calculations.leanConcreteVolume > 0 && (
-									<div className="text-sm bg-amber-50 border border-amber-200 rounded p-2">
+									<div className="text-sm bg-chart-1/10 border border-chart-1/30 rounded p-2">
 										<span className="text-muted-foreground">{t("pricing.studies.structural.leanConcrete.label")}: </span>
 										<span className="font-medium">{formatNumber(calculations.leanConcreteVolume)} م³</span>
 									</div>
@@ -636,9 +636,9 @@ export function FoundationsSection({
 
 								{/* عرض خصم التقاطعات — strip only */}
 								{'intersectionDeduction' in calculations && calculations.intersectionDeduction != null && calculations.intersectionDeduction > 0 && (
-									<div className="text-sm bg-orange-50 border border-orange-200 rounded p-2">
+									<div className="text-sm bg-chart-1/10 border border-chart-1/30 rounded p-2">
 										<span className="text-muted-foreground">{t("pricing.studies.structural.strip.intersectionDeduction")}: </span>
-										<span className="font-medium text-orange-700">-{formatNumber(calculations.intersectionDeduction)} م³</span>
+										<span className="font-medium text-chart-1">-{formatNumber(calculations.intersectionDeduction)} م³</span>
 										<span className="text-xs text-muted-foreground ms-2">
 											({formData.stripIntersectionCount} × {formatNumber(formData.stripIntersectingStripWidth)}×{formatNumber(formData.width)}×{formatNumber(formData.height)}
 											{formData.quantity > 1 ? `×${formData.quantity}` : ''})

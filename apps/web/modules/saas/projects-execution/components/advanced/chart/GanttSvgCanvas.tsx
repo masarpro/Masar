@@ -86,7 +86,7 @@ export function GanttSvgCanvas({
 					refY="3"
 					orient="auto"
 				>
-					<polygon points="0 0, 8 3, 0 6" fill="#64748b" />
+					<polygon points="0 0, 8 3, 0 6" fill="var(--muted-foreground)" />
 				</marker>
 				<marker
 					id="arrowhead-critical"
@@ -96,7 +96,7 @@ export function GanttSvgCanvas({
 					refY="3"
 					orient="auto"
 				>
-					<polygon points="0 0, 8 3, 0 6" fill="#ef4444" />
+					<polygon points="0 0, 8 3, 0 6" fill="var(--destructive)" />
 				</marker>
 			</defs>
 

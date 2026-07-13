@@ -56,10 +56,10 @@ export function HealthStatStrip({ health, isLoading }: HealthStatStripProps) {
 			label: t("execution.health.delayedCount"),
 			value: String(health.milestones.delayed),
 			icon: AlertTriangleIcon,
-			color: health.milestones.delayed > 0 ? "text-red-600" : "text-green-600",
+			color: health.milestones.delayed > 0 ? "text-destructive" : "text-success",
 			bgColor: health.milestones.delayed > 0
-				? "bg-red-50 dark:bg-red-950/30"
-				: "bg-green-50 dark:bg-green-950/30",
+				? "bg-destructive/15"
+				: "bg-success/15",
 			highlight: health.milestones.delayed > 0,
 		},
 		{
@@ -68,8 +68,8 @@ export function HealthStatStrip({ health, isLoading }: HealthStatStripProps) {
 				? t("execution.health.daysUntil", { days: health.upcomingMilestone.daysUntil })
 				: t("execution.health.noUpcoming"),
 			icon: CalendarIcon,
-			color: "text-purple-600",
-			bgColor: "bg-purple-50 dark:bg-purple-950/30",
+			color: "text-chart-4",
+			bgColor: "bg-chart-4/15",
 		},
 	];
 
@@ -78,7 +78,7 @@ export function HealthStatStrip({ health, isLoading }: HealthStatStripProps) {
 			{stats.map((stat) => (
 				<Card
 					key={stat.label}
-					className={`${stat.bgColor} border-0 backdrop-blur-sm ${stat.highlight ? "ring-2 ring-red-200 dark:ring-red-800" : ""}`}
+					className={`border-2 ${stat.highlight ? "border-destructive/40" : ""}`}
 				>
 					<CardContent className="p-2.5 sm:p-4">
 						<div className="flex items-center gap-1.5 sm:gap-2 mb-1">

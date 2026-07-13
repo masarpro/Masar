@@ -51,9 +51,9 @@ const KIND_ICONS: Record<Kind, any> = {
 
 const KIND_COLORS: Record<Kind, string> = {
 	STRUCTURAL: "text-chart-4",
-	FINISHING: "text-amber-500",
-	MEP: "text-emerald-500",
-	LABOR: "text-orange-500",
+	FINISHING: "text-chart-1",
+	MEP: "text-success",
+	LABOR: "text-chart-2",
 };
 
 function formatNumber(v: number | null | undefined) {
@@ -180,16 +180,16 @@ export function AddStudyItemsToPhaseDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-3xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh] flex flex-col">
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4 shrink-0">
 					<DialogTitle className="text-base font-semibold">
 						{t("addStudyToPhase.title")}
 					</DialogTitle>
-					<div className="mt-1.5 flex items-center gap-2 text-xs text-slate-500">
+					<div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
 						<Flag className="h-3.5 w-3.5 text-chart-4" />
 						<span>{targetPhaseTitle}</span>
 						{step === "pickItems" && selectedStudyName && (
 							<>
-								<ArrowRight className="h-3 w-3" />
+								<ArrowRight className="h-3 w-3 rtl-flip" />
 								<span>{selectedStudyName}</span>
 							</>
 						)}
@@ -200,7 +200,7 @@ export function AddStudyItemsToPhaseDialog({
 					{step === "pickStudy" ? (
 						<div className="space-y-4">
 							<div className="relative">
-								<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+								<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 								<Input
 									value={search}
 									onChange={(e: any) => setSearch(e.target.value)}
@@ -216,10 +216,10 @@ export function AddStudyItemsToPhaseDialog({
 									))
 								) : studyList.length === 0 ? (
 									<div className="flex flex-col items-center justify-center py-12 text-center">
-										<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-											<PackageOpen className="h-7 w-7 text-slate-400" />
+										<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+											<PackageOpen className="h-7 w-7 text-muted-foreground" />
 										</div>
-										<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+										<p className="text-sm font-medium text-muted-foreground">
 											{t("copyStudy.noStudies")}
 										</p>
 									</div>
@@ -229,14 +229,14 @@ export function AddStudyItemsToPhaseDialog({
 											key={study.id}
 											type="button"
 											onClick={() => handlePickStudy(study.id, study.name)}
-											className="w-full text-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
+											className="w-full text-start rounded-xl border-2 bg-card p-4 hover:bg-accent transition-colors"
 										>
 											<div className="flex items-start justify-between gap-3">
 												<div className="min-w-0 flex-1">
-													<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+													<h4 className="text-sm font-semibold text-card-foreground truncate">
 														{study.name}
 													</h4>
-													<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+													<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
 														{study.itemCounts?.structuralItems > 0 && (
 															<span className="flex items-center gap-1">
 																<HardHat className="h-3.5 w-3.5 text-chart-4" />
@@ -245,25 +245,25 @@ export function AddStudyItemsToPhaseDialog({
 														)}
 														{study.itemCounts?.finishingItems > 0 && (
 															<span className="flex items-center gap-1">
-																<PaintBucket className="h-3.5 w-3.5 text-amber-500" />
+																<PaintBucket className="h-3.5 w-3.5 text-chart-1" />
 																{study.itemCounts.finishingItems}
 															</span>
 														)}
 														{study.itemCounts?.mepItems > 0 && (
 															<span className="flex items-center gap-1">
-																<Zap className="h-3.5 w-3.5 text-emerald-500" />
+																<Zap className="h-3.5 w-3.5 text-success" />
 																{study.itemCounts.mepItems}
 															</span>
 														)}
 														{study.itemCounts?.laborItems > 0 && (
 															<span className="flex items-center gap-1">
-																<Hammer className="h-3.5 w-3.5 text-orange-500" />
+																<Hammer className="h-3.5 w-3.5 text-chart-2" />
 																{study.itemCounts.laborItems}
 															</span>
 														)}
 													</div>
 												</div>
-												<ArrowRight className="h-4 w-4 text-slate-400 shrink-0 mt-1 rtl:rotate-180" />
+												<ArrowRight className="h-4 w-4 text-muted-foreground shrink-0 mt-1 rtl-flip" />
 											</div>
 										</button>
 									))
@@ -280,22 +280,22 @@ export function AddStudyItemsToPhaseDialog({
 								</div>
 							) : !detail || totalAvailable === 0 ? (
 								<div className="flex flex-col items-center justify-center py-12 text-center">
-									<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-										<PackageOpen className="h-7 w-7 text-slate-400" />
+									<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+										<PackageOpen className="h-7 w-7 text-muted-foreground" />
 									</div>
-									<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+									<p className="text-sm font-medium text-muted-foreground">
 										{t("addStudyToPhase.noItemsInStudy")}
 									</p>
 								</div>
 							) : (
 								<>
-									<div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-2.5 flex items-center justify-between">
-										<span className="text-xs text-slate-600 dark:text-slate-300">
+									<div className="rounded-xl border-2 bg-muted px-4 py-2.5 flex items-center justify-between">
+										<span className="text-xs text-muted-foreground">
 											{t("addStudyToPhase.selectedCount", { count: totalSelected })}
 										</span>
 										<button
 											type="button"
-											className="text-xs text-slate-600 hover:text-slate-900 underline"
+											className="text-xs text-muted-foreground hover:text-foreground underline"
 											onClick={() => {
 												setStep("pickStudy");
 												setSelected(new Set());
@@ -344,7 +344,7 @@ export function AddStudyItemsToPhaseDialog({
 					)}
 				</div>
 
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex justify-between items-center gap-3 shrink-0">
+				<div className="bg-card border-t-2 px-5 py-3 flex justify-between items-center gap-3 shrink-0">
 					<Button
 						type="button"
 						variant="outline"
@@ -399,18 +399,18 @@ function KindSection({
 	t: any;
 }) {
 	return (
-		<div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-			<div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+		<div className="rounded-xl border-2 overflow-hidden">
+			<div className="bg-muted px-4 py-2.5 flex items-center justify-between border-b-2">
 				<div className="flex items-center gap-2">
 					<Icon className={`h-4 w-4 ${iconColor}`} />
-					<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+					<span className="text-sm font-semibold text-card-foreground">
 						{t(`addStudyToPhase.kind.${kind}`)}
 					</span>
-					<span className="text-xs text-slate-500">({items.length})</span>
+					<span className="text-xs text-muted-foreground">({items.length})</span>
 				</div>
 				<button
 					type="button"
-					className="text-xs text-slate-600 hover:text-slate-900 underline"
+					className="text-xs text-muted-foreground hover:text-foreground underline"
 					onClick={onToggleAll}
 				>
 					{allSelected
@@ -418,7 +418,7 @@ function KindSection({
 						: t("addStudyToPhase.selectAllInSection")}
 				</button>
 			</div>
-			<div className="divide-y divide-slate-100 dark:divide-slate-800">
+			<div className="divide-y">
 				{items.map((item) => (
 					<div
 						key={item.id}
@@ -431,7 +431,7 @@ function KindSection({
 								onToggleOne(item.id);
 							}
 						}}
-						className="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 cursor-pointer"
+						className="px-4 py-2.5 flex items-center gap-3 hover:bg-accent cursor-pointer"
 					>
 						<Checkbox
 							className="pointer-events-none"
@@ -439,23 +439,23 @@ function KindSection({
 							tabIndex={-1}
 						/>
 						<div className="min-w-0 flex-1">
-							<div className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+							<div className="text-sm font-medium text-card-foreground truncate">
 								{item.name}
 							</div>
-							<div className="text-xs text-slate-500 mt-0.5 truncate">
+							<div className="text-xs text-muted-foreground mt-0.5 truncate">
 								{item.category}
 								{item.subCategory && ` / ${item.subCategory}`}
 								{item.floorName && ` • ${item.floorName}`}
 							</div>
 						</div>
-						<div className="text-end text-xs font-mono text-slate-600 dark:text-slate-300 shrink-0">
+						<div className="text-end text-xs font-mono text-muted-foreground shrink-0">
 							<div>
 								{kind === "LABOR"
 									? `${formatNumber(item.quantity * item.durationDays)} ${t("addStudyToPhase.workDays")}`
 									: `${formatNumber(item.quantity ?? item.area)} ${item.unit ?? ""}`}
 							</div>
 							{item.totalCost > 0 && (
-								<div className="text-emerald-600 dark:text-emerald-400 mt-0.5">
+								<div className="text-success mt-0.5">
 									{new Intl.NumberFormat("en-SA", {
 										style: "currency",
 										currency: "SAR",

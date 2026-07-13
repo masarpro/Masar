@@ -114,17 +114,17 @@ export function CreateDocumentForm({
 					variant="ghost"
 					size="icon"
 					asChild
-					className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+					className="rounded-xl hover:bg-accent hover:text-accent-foreground"
 				>
 					<Link href={`${basePath}/documents`}>
-						<ChevronLeft className="h-5 w-5 text-slate-500" />
+						<ChevronLeft className="rtl-flip h-5 w-5 text-muted-foreground" />
 					</Link>
 				</Button>
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+					<h1 className="text-2xl font-semibold text-foreground">
 						{t("addDocument")}
 					</h1>
-					<p className="text-sm text-slate-500">
+					<p className="text-sm text-muted-foreground">
 						{t("addDocumentDescription")}
 					</p>
 				</div>
@@ -132,7 +132,7 @@ export function CreateDocumentForm({
 
 			{/* Form */}
 			<form onSubmit={handleSubmit} className="space-y-6">
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+				<div className="rounded-2xl border-2 bg-card p-6">
 					<div className="grid gap-6 sm:grid-cols-2">
 						<div className="space-y-2">
 							<Label htmlFor="folder">{t("folder")}</Label>

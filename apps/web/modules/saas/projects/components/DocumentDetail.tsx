@@ -58,33 +58,33 @@ function formatFileSize(bytes?: number | null): string {
 }
 
 const FOLDER_COLORS: Record<string, string> = {
-	CONTRACT: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4",
-	DRAWINGS: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-	CLAIMS: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-	LETTERS: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-	PHOTOS: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
-	OTHER: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+	CONTRACT: "bg-chart-4/15 text-chart-4",
+	DRAWINGS: "bg-chart-4/15 text-chart-4",
+	CLAIMS: "bg-success/15 text-success",
+	LETTERS: "bg-chart-1/15 text-chart-1",
+	PHOTOS: "bg-chart-2/15 text-chart-2",
+	OTHER: "bg-muted text-muted-foreground",
 };
 
 function getApprovalStatusBadge(status: string, t: ReturnType<typeof useTranslations>) {
 	switch (status) {
 		case "PENDING":
 			return (
-				<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+				<Badge className="border-0 bg-chart-1/15 text-chart-1">
 					<Clock className="h-3 w-3 me-1" />
 					{t("approvalPending")}
 				</Badge>
 			);
 		case "APPROVED":
 			return (
-				<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+				<Badge className="border-0 bg-success/15 text-success">
 					<CheckCircle className="h-3 w-3 me-1" />
 					{t("approvalApproved")}
 				</Badge>
 			);
 		case "REJECTED":
 			return (
-				<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+				<Badge className="border-0 bg-destructive/15 text-destructive">
 					<XCircle className="h-3 w-3 me-1" />
 					{t("approvalRejected")}
 				</Badge>
@@ -310,8 +310,8 @@ export function DocumentDetail({
 	if (!document) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-					<FileText className="h-12 w-12 text-slate-400" />
+				<div className="mb-4 rounded-2xl bg-muted p-4">
+					<FileText className="h-12 w-12 text-muted-foreground" />
 				</div>
 				<p className="mb-4 text-lg text-muted-foreground">
 					{t("notFound")}
@@ -352,18 +352,18 @@ export function DocumentDetail({
 						variant="ghost"
 						size="icon"
 						asChild
-						className="mt-1 shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+						className="mt-1 shrink-0 rounded-xl hover:bg-accent hover:text-accent-foreground"
 					>
 						<Link href={`${basePath}/documents`}>
-							<ChevronLeft className="h-5 w-5 text-slate-500" />
+							<ChevronLeft className="rtl-flip h-5 w-5 text-muted-foreground" />
 						</Link>
 					</Button>
 					<div className="space-y-2">
 						<div className="flex flex-wrap items-center gap-3">
-							<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+							<h1 className="text-2xl font-semibold text-foreground">
 								{document.title}
 							</h1>
-							<Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+							<Badge className="border-0 bg-muted text-muted-foreground">
 								{document.folderRef?.name
 									? document.folderRef.name
 									: document.folder
@@ -372,7 +372,7 @@ export function DocumentDetail({
 							</Badge>
 						</div>
 						{document.description && (
-							<p className="text-slate-500">{document.description}</p>
+							<p className="text-muted-foreground">{document.description}</p>
 						)}
 					</div>
 				</div>
@@ -396,7 +396,7 @@ export function DocumentDetail({
 					</Button>
 					<Button
 						variant="outline"
-						className="rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
+						className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
 						onClick={handleDelete}
 						disabled={deleteMutation.isPending}
 					>
@@ -411,45 +411,45 @@ export function DocumentDetail({
 				{/* Main Info */}
 				<div className="lg:col-span-2 space-y-6">
 					{/* File Info Card */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-						<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+					<div className="rounded-2xl border-2 bg-card p-6">
+						<h2 className="mb-4 text-lg font-semibold text-card-foreground">
 							{t("fileInfo")}
 						</h2>
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="flex items-center gap-3">
-								<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-									<User className="h-4 w-4 text-slate-500" />
+								<div className="rounded-lg bg-muted p-2">
+									<User className="h-4 w-4 text-muted-foreground" />
 								</div>
 								<div>
-									<p className="text-xs text-slate-500">{t("createdBy")}</p>
-									<p className="font-medium text-slate-900 dark:text-slate-100">
+									<p className="text-xs text-muted-foreground">{t("createdBy")}</p>
+									<p className="font-medium text-card-foreground">
 										{document.createdBy.name}
 									</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-3">
-								<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-									<Calendar className="h-4 w-4 text-slate-500" />
+								<div className="rounded-lg bg-muted p-2">
+									<Calendar className="h-4 w-4 text-muted-foreground" />
 								</div>
 								<div>
-									<p className="text-xs text-slate-500">{t("createdAt")}</p>
-									<p className="font-medium text-slate-900 dark:text-slate-100">
+									<p className="text-xs text-muted-foreground">{t("createdAt")}</p>
+									<p className="font-medium text-card-foreground">
 										{new Date(document.createdAt).toLocaleDateString("ar-SA")}
 									</p>
 								</div>
 							</div>
 							{document.fileName && (
 								<div className="flex items-center gap-3">
-									<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
+									<div className="rounded-lg bg-muted p-2">
 										{isImage ? (
-											<Image className="h-4 w-4 text-pink-500" />
+											<Image className="h-4 w-4 text-chart-2" />
 										) : (
 											<File className="h-4 w-4 text-chart-4" />
 										)}
 									</div>
 									<div>
-										<p className="text-xs text-slate-500">{t("fileName")}</p>
-										<p className="font-medium text-slate-900 dark:text-slate-100">
+										<p className="text-xs text-muted-foreground">{t("fileName")}</p>
+										<p className="font-medium text-card-foreground">
 											{document.fileName}
 										</p>
 									</div>
@@ -457,12 +457,12 @@ export function DocumentDetail({
 							)}
 							{document.fileSize && (
 								<div className="flex items-center gap-3">
-									<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-										<FileText className="h-4 w-4 text-slate-500" />
+									<div className="rounded-lg bg-muted p-2">
+										<FileText className="h-4 w-4 text-muted-foreground" />
 									</div>
 									<div>
-										<p className="text-xs text-slate-500">{t("fileSize")}</p>
-										<p className="font-medium text-slate-900 dark:text-slate-100">
+										<p className="text-xs text-muted-foreground">{t("fileSize")}</p>
+										<p className="font-medium text-card-foreground">
 											{formatFileSize(document.fileSize)}
 										</p>
 									</div>
@@ -472,10 +472,10 @@ export function DocumentDetail({
 					</div>
 
 					{/* Approvals Section */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+					<div className="rounded-2xl border-2 bg-card p-6">
 						<div className="mb-4 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-								<Shield className="inline h-5 w-5 me-2 text-slate-400" />
+							<h2 className="text-lg font-semibold text-card-foreground">
+								<Shield className="inline h-5 w-5 me-2 text-muted-foreground" />
 								{t("approvals")}
 							</h2>
 							{!hasPendingApproval && (
@@ -489,7 +489,7 @@ export function DocumentDetail({
 										<DialogHeader>
 											<DialogTitle>{t("requestApproval")}</DialogTitle>
 										</DialogHeader>
-										<p className="text-sm text-slate-500">
+										<p className="text-sm text-muted-foreground">
 											{t("requestApprovalDescription")}
 										</p>
 									</DialogContent>
@@ -502,36 +502,36 @@ export function DocumentDetail({
 								{document.approvals.map((approval: any) => (
 									<div
 										key={approval.id}
-										className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
+										className="rounded-xl border-2 p-4"
 									>
 										<div className="flex items-center justify-between mb-3">
 											{getApprovalStatusBadge(approval.status, t)}
-											<span className="text-xs text-slate-500">
+											<span className="text-xs text-muted-foreground">
 												{new Date(approval.requestedAt).toLocaleDateString("ar-SA")}
 											</span>
 										</div>
 										<div className="mb-3">
-											<p className="text-xs text-slate-500 mb-1">{t("requestedBy")}</p>
+											<p className="text-xs text-muted-foreground mb-1">{t("requestedBy")}</p>
 											<p className="text-sm font-medium">{approval.requestedBy.name}</p>
 										</div>
 										{approval.approvers && approval.approvers.length > 0 && (
 											<div>
-												<p className="text-xs text-slate-500 mb-2">{t("approvers")}</p>
+												<p className="text-xs text-muted-foreground mb-2">{t("approvers")}</p>
 												<div className="flex flex-wrap gap-2">
 													{approval.approvers.map((approver: any) => (
 														<div
 															key={approver.id}
-															className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
+															className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5"
 														>
 															<span className="text-sm">{approver.user.name}</span>
 															{approver.status === "APPROVED" && (
-																<CheckCircle className="h-4 w-4 text-green-500" />
+																<CheckCircle className="h-4 w-4 text-success" />
 															)}
 															{approver.status === "REJECTED" && (
-																<XCircle className="h-4 w-4 text-red-500" />
+																<XCircle className="h-4 w-4 text-destructive" />
 															)}
 															{approver.status === "PENDING" && (
-																<Clock className="h-4 w-4 text-amber-500" />
+																<Clock className="h-4 w-4 text-chart-1" />
 															)}
 														</div>
 													))}
@@ -542,7 +542,7 @@ export function DocumentDetail({
 											<div className="mt-4 flex gap-2">
 												<Button
 													size="sm"
-													className="rounded-lg bg-green-600 hover:bg-green-700"
+													className="rounded-lg bg-success hover:bg-success/90"
 													onClick={() => handleApprovalAction("APPROVED")}
 													disabled={actOnApprovalMutation.isPending}
 												>
@@ -565,20 +565,20 @@ export function DocumentDetail({
 								))}
 							</div>
 						) : (
-							<p className="text-center text-sm text-slate-500 py-8">
+							<p className="text-center text-sm text-muted-foreground py-8">
 								{t("noApprovals")}
 							</p>
 						)}
 					</div>
 
 						{/* Versions Section */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+					<div className="rounded-2xl border-2 bg-card p-6">
 						<div className="mb-4 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-								<Layers className="inline h-5 w-5 me-2 text-slate-400" />
+							<h2 className="text-lg font-semibold text-card-foreground">
+								<Layers className="inline h-5 w-5 me-2 text-muted-foreground" />
 								{t("versions.title")}
 								{document.version > 1 && (
-									<Badge className="ms-2 border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+									<Badge className="ms-2 border-0 bg-chart-4/15 text-chart-4">
 										v{document.version}
 									</Badge>
 								)}
@@ -630,26 +630,26 @@ export function DocumentDetail({
 										key={version.id}
 										className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
 											version.versionNumber === versionsData.currentVersion
-												? "border-chart-4 bg-chart-4/15 dark:border-chart-4/30 dark:bg-chart-4/20"
-												: "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/30"
+												? "border-chart-4 bg-chart-4/15"
+												: "border-border hover:bg-accent"
 										}`}
 									>
 										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">
-												<span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+												<span className="text-sm font-semibold text-card-foreground">
 													v{version.versionNumber}
 												</span>
 												{version.versionNumber === versionsData.currentVersion && (
-													<Badge className="border-0 bg-chart-4/15 text-chart-4 dark:bg-chart-4/20 dark:text-chart-4 text-[10px]">
+													<Badge className="border-0 bg-chart-4/15 text-chart-4 text-[10px]">
 														{t("versions.current")}
 													</Badge>
 												)}
 											</div>
-											<p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+											<p className="text-xs text-muted-foreground mt-0.5">
 												{version.fileName} • {formatFileSize(version.fileSize)} • {new Date(version.createdAt).toLocaleDateString("ar-SA")}
 											</p>
 											{version.changeNotes && (
-												<p className="text-xs text-slate-600 dark:text-slate-300 mt-1 italic">
+												<p className="text-xs text-muted-foreground mt-1 italic">
 													{version.changeNotes}
 												</p>
 											)}
@@ -684,7 +684,7 @@ export function DocumentDetail({
 								))}
 							</div>
 						) : (
-							<p className="text-center text-sm text-slate-500 py-4">
+							<p className="text-center text-sm text-muted-foreground py-4">
 								{t("versions.noVersions")}
 							</p>
 						)}
@@ -692,9 +692,9 @@ export function DocumentDetail({
 				</div>
 
 			{/* Audit Log Sidebar */}
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-						<History className="inline h-5 w-5 me-2 text-slate-400" />
+				<div className="rounded-2xl border-2 bg-card p-6">
+					<h2 className="mb-4 text-lg font-semibold text-card-foreground">
+						<History className="inline h-5 w-5 me-2 text-muted-foreground" />
 						{t("auditLog")}
 					</h2>
 					{document.auditLogs && document.auditLogs.length > 0 ? (
@@ -702,12 +702,12 @@ export function DocumentDetail({
 							{document.auditLogs.map((log: any) => (
 								<div
 									key={log.id}
-									className="border-s-2 border-slate-200 ps-3 dark:border-slate-700"
+									className="border-s-2 border-border ps-3"
 								>
-									<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+									<p className="text-sm font-medium text-card-foreground">
 										{getActionLabel(log.action, t)}
 									</p>
-									<p className="text-xs text-slate-500">
+									<p className="text-xs text-muted-foreground">
 										{log.actor.name} •{" "}
 										{new Date(log.createdAt).toLocaleDateString("ar-SA")}
 									</p>
@@ -715,7 +715,7 @@ export function DocumentDetail({
 							))}
 						</div>
 					) : (
-						<p className="text-center text-sm text-slate-500 py-4">
+						<p className="text-center text-sm text-muted-foreground py-4">
 							{t("noAuditLogs")}
 						</p>
 					)}

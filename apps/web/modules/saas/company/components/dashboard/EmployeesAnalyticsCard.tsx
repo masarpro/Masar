@@ -67,19 +67,19 @@ export function EmployeesAnalyticsCard({
 	const isEmpty = total === 0;
 
 	return (
-		<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
+		<div className="bg-card border-2 rounded-2xl p-5">
 			{/* Header */}
 			<div className="flex items-center gap-3 mb-5">
-				<div className="p-2 rounded-lg bg-chart-4/15 dark:bg-chart-4/20">
-					<Users className="h-5 w-5 text-chart-4 dark:text-chart-4" />
+				<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+					<Users className="h-5 w-5" />
 				</div>
-				<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+				<h3 className="text-sm font-semibold text-card-foreground">
 					{t("company.dashboard.employeeAnalytics")}
 				</h3>
 			</div>
 
 			{isEmpty ? (
-				<div className="flex items-center justify-center h-[180px] text-sm text-slate-400 dark:text-slate-500">
+				<div className="flex items-center justify-center h-[180px] text-sm text-muted-foreground">
 					{t("company.dashboard.noData")}
 				</div>
 			) : (
@@ -110,7 +110,7 @@ export function EmployeesAnalyticsCard({
 									y="46%"
 									textAnchor="middle"
 									dominantBaseline="middle"
-									className="fill-slate-900 dark:fill-slate-100 text-2xl font-bold"
+									className="fill-foreground text-2xl font-bold"
 									style={{ fontSize: "24px", fontWeight: 700 }}
 								>
 									{total}
@@ -120,7 +120,7 @@ export function EmployeesAnalyticsCard({
 									y="60%"
 									textAnchor="middle"
 									dominantBaseline="middle"
-									className="fill-slate-500 dark:fill-slate-400"
+									className="fill-muted-foreground"
 									style={{ fontSize: "11px" }}
 								>
 									{t("company.dashboard.employee")}
@@ -141,11 +141,11 @@ export function EmployeesAnalyticsCard({
 										className="w-2.5 h-2.5 rounded-full shrink-0"
 										style={{ backgroundColor: item.color }}
 									/>
-									<span className="text-slate-600 dark:text-slate-400">
+									<span className="text-muted-foreground">
 										{item.label}
 									</span>
 								</div>
-								<span className="font-semibold text-slate-900 dark:text-slate-100">
+								<span className="font-semibold text-card-foreground">
 									{item.value}
 								</span>
 							</div>
@@ -153,35 +153,35 @@ export function EmployeesAnalyticsCard({
 					</div>
 
 					{/* Footer */}
-					<div className="border-t border-slate-200/60 dark:border-slate-700/40 pt-3 space-y-1.5">
+					<div className="border-t-2 pt-3 space-y-1.5">
 						<div className="flex items-center justify-between text-xs">
-							<span className="text-slate-500 dark:text-slate-400">
+							<span className="text-muted-foreground">
 								{t("company.dashboard.salaries")}
 							</span>
 							<span
-								className="font-semibold text-slate-700 dark:text-slate-300"
+								className="font-semibold text-card-foreground"
 								dir="ltr"
 							>
 								{formatCurrency(Number(employees.totalMonthlySalaries))}
 							</span>
 						</div>
 						<div className="flex items-center justify-between text-xs">
-							<span className="text-slate-500 dark:text-slate-400">
+							<span className="text-muted-foreground">
 								{t("company.dashboard.gosi")}
 							</span>
 							<span
-								className="font-semibold text-slate-700 dark:text-slate-300"
+								className="font-semibold text-card-foreground"
 								dir="ltr"
 							>
 								{formatCurrency(Number(employees.totalMonthlyGosi))}
 							</span>
 						</div>
 						<div className="flex items-center justify-between text-sm mt-2">
-							<span className="font-bold text-slate-900 dark:text-slate-100">
+							<span className="font-bold text-card-foreground">
 								{t("company.dashboard.totalMonthlyCost")}
 							</span>
 							<span
-								className="font-bold text-slate-900 dark:text-slate-100"
+								className="font-bold text-card-foreground"
 								dir="ltr"
 							>
 								{formatCurrency(Number(employees.totalMonthlyCost))}

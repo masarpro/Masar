@@ -44,17 +44,17 @@ const PROJECT_TYPES = [
 	{
 		value: "COMMERCIAL",
 		labelKey: "projects.type.COMMERCIAL",
-		color: "bg-violet-500",
+		color: "bg-chart-4",
 	},
 	{
 		value: "INDUSTRIAL",
 		labelKey: "projects.type.INDUSTRIAL",
-		color: "bg-orange-500",
+		color: "bg-chart-1",
 	},
 	{
 		value: "INFRASTRUCTURE",
 		labelKey: "projects.type.INFRASTRUCTURE",
-		color: "bg-slate-500",
+		color: "bg-muted-foreground",
 	},
 	{ value: "MIXED", labelKey: "projects.type.MIXED", color: "bg-chart-4" },
 ];
@@ -242,18 +242,18 @@ export function CreateProjectForm({
 					variant="ghost"
 					size="icon"
 					asChild
-					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+					className="shrink-0 rounded-xl hover:bg-accent hover:text-accent-foreground"
 				>
 					<Link href={`/app/${organizationSlug}/projects`}>
-						<ChevronLeft className="h-5 w-5 text-slate-500" />
+						<ChevronLeft className="rtl-flip h-5 w-5 text-muted-foreground" />
 					</Link>
 				</Button>
 				<div className="flex flex-1 items-center gap-3">
 					<div>
-						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+						<h1 className="text-2xl font-semibold text-foreground">
 							{t("projects.createProject.title")}
 						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+						<p className="text-sm text-muted-foreground">
 							{t("projects.newProjectSubtitle")}
 						</p>
 					</div>
@@ -261,7 +261,7 @@ export function CreateProjectForm({
 						{nextNoData?.projectNo && (
 							<Badge
 								variant="outline"
-								className="rounded-lg border-indigo-200 bg-indigo-50 px-3 py-1 font-mono text-sm text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300"
+								className="rounded-lg bg-chart-4/15 px-3 py-1 font-mono text-sm text-chart-4"
 							>
 								{nextNoData.projectNo}
 							</Badge>
@@ -271,13 +271,13 @@ export function CreateProjectForm({
 			</div>
 
 			{/* ═══ Section 1: Project Info ═══════════════════════ */}
-			<div className="overflow-hidden rounded-2xl border border-indigo-200/50 bg-indigo-50/50 dark:border-indigo-800/30 dark:bg-indigo-950/20">
-				<div className="border-b border-indigo-200/50 p-5 dark:border-indigo-800/30">
+			<div className="overflow-hidden rounded-3xl border-2 bg-card">
+				<div className="border-b-2 p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-indigo-100 p-2.5 dark:bg-indigo-900/50">
-							<FolderPlus className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+							<FolderPlus className="h-5 w-5" />
 						</div>
-						<h2 className="text-lg font-medium text-indigo-900 dark:text-indigo-100">
+						<h2 className="text-lg font-semibold text-card-foreground">
 							{t("projects.createProject.projectInfo")}
 						</h2>
 					</div>
@@ -286,7 +286,7 @@ export function CreateProjectForm({
 				<div className="space-y-5 p-5">
 					<div className="grid gap-5 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("projects.createProject.projectName")} *
 							</Label>
 							<Input
@@ -297,12 +297,12 @@ export function CreateProjectForm({
 								placeholder={t(
 									"projects.form.namePlaceholder",
 								)}
-								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+								className="rounded-xl border-input bg-card"
 								required
 							/>
 						</div>
 						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							<Label className="text-sm font-medium text-foreground">
 								{t("projects.createProject.projectType")}
 							</Label>
 							<Select
@@ -311,7 +311,7 @@ export function CreateProjectForm({
 									updateProjectField("type", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50">
+								<SelectTrigger className="rounded-xl border-input bg-card">
 									<SelectValue
 										placeholder={t(
 											"projects.form.typePlaceholder",
@@ -340,7 +340,7 @@ export function CreateProjectForm({
 
 					{/* ─── Client Section ─── */}
 					<div className="space-y-3">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("projects.createProject.clientName")}
 						</Label>
 						<div className="flex items-center gap-3">
@@ -383,10 +383,10 @@ export function CreateProjectForm({
 								onCancel={() => setShowInlineClientForm(false)}
 							/>
 						) : clientId && clientName ? (
-							<div className="rounded-xl border border-indigo-200/60 bg-gradient-to-br from-chart-4/15 to-indigo-50/50 dark:from-chart-4/20 dark:to-indigo-950/30 overflow-hidden">
-								<div className="flex items-center justify-between p-3 border-b border-chart-4 dark:border-chart-4/50">
+							<div className="rounded-xl border-2 bg-card overflow-hidden">
+								<div className="flex items-center justify-between p-3 border-b-2">
 									<div className="flex items-center gap-3">
-										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-chart-4 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+										<div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
 											{clientName.charAt(0).toUpperCase()}
 										</div>
 										<div>
@@ -413,24 +413,24 @@ export function CreateProjectForm({
 									<div className="p-3 flex flex-wrap gap-3">
 										{clientPhone && (
 											<div className="flex items-center gap-2 text-sm">
-												<div className="w-6 h-6 rounded-lg bg-chart-4/15 dark:bg-chart-4/20 flex items-center justify-center">
-													<Phone className="h-3 w-3 text-chart-4 dark:text-chart-4" />
+												<div className="w-6 h-6 rounded-lg bg-chart-4/15 flex items-center justify-center">
+													<Phone className="h-3 w-3 text-chart-4" />
 												</div>
 												<span className="text-muted-foreground text-xs">{clientPhone}</span>
 											</div>
 										)}
 										{clientEmail && (
 											<div className="flex items-center gap-2 text-sm">
-												<div className="w-6 h-6 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-													<Mail className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+												<div className="w-6 h-6 rounded-lg bg-chart-4/15 flex items-center justify-center">
+													<Mail className="h-3 w-3 text-chart-4" />
 												</div>
 												<span className="text-muted-foreground text-xs">{clientEmail}</span>
 											</div>
 										)}
 										{clientTaxNumber && (
 											<div className="flex items-center gap-2 text-sm">
-												<div className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-													<CreditCard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+												<div className="w-6 h-6 rounded-lg bg-chart-1/15 flex items-center justify-center">
+													<CreditCard className="h-3 w-3 text-chart-1" />
 												</div>
 												<span className="text-muted-foreground text-xs font-mono">{clientTaxNumber}</span>
 											</div>
@@ -443,7 +443,7 @@ export function CreateProjectForm({
 
 					{/* ─── Location ─── */}
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("projects.createProject.location")}
 						</Label>
 						<Input
@@ -457,12 +457,12 @@ export function CreateProjectForm({
 							placeholder={t(
 								"projects.form.locationPlaceholder",
 							)}
-							className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+							className="rounded-xl border-input bg-card"
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+						<Label className="text-sm font-medium text-foreground">
 							{t("projects.createProject.description")}
 						</Label>
 						<Textarea
@@ -477,7 +477,7 @@ export function CreateProjectForm({
 								"projects.form.descriptionPlaceholder",
 							)}
 							rows={3}
-							className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+							className="rounded-xl border-input bg-card"
 						/>
 					</div>
 				</div>
@@ -495,14 +495,14 @@ export function CreateProjectForm({
 					type="button"
 					variant="outline"
 					onClick={() => router.back()}
-					className="rounded-xl border-slate-200 px-6 dark:border-slate-700"
+					className="rounded-xl px-6"
 				>
 					{t("projects.createProject.cancel")}
 				</Button>
 				<Button
 					type="submit"
 					disabled={createMutation.isPending}
-					className="rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					className="rounded-xl px-8"
 				>
 					{createMutation.isPending ? (
 						<>

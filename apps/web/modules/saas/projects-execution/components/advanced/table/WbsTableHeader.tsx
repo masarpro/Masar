@@ -8,7 +8,7 @@ export function WbsTableHeader() {
 
 	return (
 		<div
-			className="sticky top-0 z-10 flex items-center border-b bg-muted/50 text-xs font-medium text-muted-foreground"
+			className="sticky top-0 z-10 flex items-center border-b-2 bg-card text-xs font-medium text-muted-foreground"
 			style={{ height: GANTT_HEADER_HEIGHT }}
 		>
 			<div className="w-[70px] shrink-0 px-2 text-center">

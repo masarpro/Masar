@@ -107,7 +107,7 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 					{data.profitPercent > 0 && (
 						<div className="text-center">
 							<span className="text-muted-foreground">نسبة الربح الفعلية: </span>
-							<span className="font-bold text-emerald-600 text-lg" dir="ltr">
+							<span className="font-bold text-success text-lg" dir="ltr">
 								{fmt(data.profitPercent)}%
 							</span>
 						</div>
@@ -117,8 +117,8 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 
 			{/* Lump sum analysis */}
 			{data.lumpSumAnalysis && (
-				<div className="m-4 mt-0 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-3 space-y-1.5">
-					<h5 className="text-sm font-medium text-amber-700 dark:text-amber-400">
+				<div className="m-4 mt-0 rounded-lg border border-chart-1 bg-chart-1/10 p-3 space-y-1.5">
+					<h5 className="text-sm font-medium text-chart-1">
 						تحليل المقطوعية
 					</h5>
 					<div className="flex items-center justify-between text-sm">
@@ -130,7 +130,7 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 					<div className="flex items-center justify-between text-sm">
 						<span className="text-muted-foreground">الربح المتوقع</span>
 						<span
-							className={`font-medium ${data.lumpSumAnalysis.expectedProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}
+							className={`font-medium ${data.lumpSumAnalysis.expectedProfit >= 0 ? "text-success" : "text-destructive"}`}
 							dir="ltr"
 						>
 							{fmt(data.lumpSumAnalysis.expectedProfit)} ر.س

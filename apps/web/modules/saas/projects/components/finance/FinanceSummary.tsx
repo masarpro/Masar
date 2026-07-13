@@ -30,21 +30,21 @@ export function FinanceSummary({
 			title: t("finance.summary.contractValue"),
 			value: contractValue,
 			icon: Banknote,
-			bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-			iconBg: "bg-indigo-100 dark:bg-indigo-900/50",
-			iconColor: "text-indigo-600 dark:text-indigo-400",
-			textColor: "text-indigo-700 dark:text-indigo-300",
-			labelColor: "text-indigo-600 dark:text-indigo-400",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 		{
 			title: t("finance.summary.expenses"),
 			value: actualExpenses,
 			icon: TrendingDown,
-			bgColor: "bg-red-50 dark:bg-red-950/30",
-			iconBg: "bg-red-100 dark:bg-red-900/50",
-			iconColor: "text-red-600 dark:text-red-400",
-			textColor: "text-red-700 dark:text-red-300",
-			labelColor: "text-red-600 dark:text-red-400",
+			bgColor: "bg-card",
+			iconBg: "bg-destructive/15",
+			iconColor: "text-destructive",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 		...(totalPayments !== undefined
 			? [
@@ -52,11 +52,11 @@ export function FinanceSummary({
 						title: t("finance.summary.payments"),
 						value: totalPayments,
 						icon: TrendingUp,
-						bgColor: "bg-green-50 dark:bg-green-950/30",
-						iconBg: "bg-green-100 dark:bg-green-900/50",
-						iconColor: "text-green-600 dark:text-green-400",
-						textColor: "text-green-700 dark:text-green-300",
-						labelColor: "text-green-600 dark:text-green-400",
+						bgColor: "bg-card",
+						iconBg: "bg-success/15",
+						iconColor: "text-success",
+						textColor: "text-card-foreground",
+						labelColor: "text-muted-foreground",
 					},
 				]
 			: []),
@@ -64,21 +64,21 @@ export function FinanceSummary({
 			title: t("finance.summary.remaining"),
 			value: remaining,
 			icon: Wallet,
-			bgColor: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconBg: "bg-chart-4/15 dark:bg-chart-4/20",
-			iconColor: "text-chart-4 dark:text-chart-4",
-			textColor: "text-chart-4 dark:text-chart-4",
-			labelColor: "text-chart-4 dark:text-chart-4",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-4/15",
+			iconColor: "text-chart-4",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 		{
 			title: t("finance.summary.claimsPaid"),
 			value: claimsPaid,
 			icon: Receipt,
-			bgColor: "bg-amber-50 dark:bg-amber-950/30",
-			iconBg: "bg-amber-100 dark:bg-amber-900/50",
-			iconColor: "text-amber-600 dark:text-amber-400",
-			textColor: "text-amber-700 dark:text-amber-300",
-			labelColor: "text-amber-600 dark:text-amber-400",
+			bgColor: "bg-card",
+			iconBg: "bg-chart-1/15",
+			iconColor: "text-chart-1",
+			textColor: "text-card-foreground",
+			labelColor: "text-muted-foreground",
 		},
 	];
 
@@ -87,7 +87,7 @@ export function FinanceSummary({
 			{cards.map((card) => (
 				<div
 					key={card.title}
-					className={`flex min-w-0 flex-1 rounded-xl sm:rounded-2xl border border-slate-200/60 shadow-sm sm:shadow-lg shadow-black/5 ${card.bgColor} p-2.5 dark:border-slate-700/50 sm:p-5`}
+					className={`flex min-w-0 flex-1 rounded-xl sm:rounded-2xl border-2 ${card.bgColor} p-2.5 sm:p-5`}
 				>
 					<div className="flex min-w-0 items-center gap-2 sm:gap-3">
 						<div className={`shrink-0 rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2.5`}>
@@ -105,7 +105,7 @@ export function FinanceSummary({
 								adjustedContractValue !== undefined &&
 								adjustedContractValue > 0 &&
 								changeOrdersImpact !== 0 && (
-									<p className="mt-0.5 truncate text-xs text-chart-4 dark:text-chart-4">
+									<p className="mt-0.5 truncate text-xs text-chart-4">
 										{t("projects.contract.summary.adjustedValue")}:{" "}
 										{formatSAR(adjustedContractValue)}
 									</p>

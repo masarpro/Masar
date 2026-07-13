@@ -173,13 +173,13 @@ export function BOQOverview({
 	return (
 		<div className="space-y-6">
 			{isEmpty ? (
-				<Card className="rounded-2xl border border-slate-200 dark:border-slate-800">
+				<Card className="rounded-2xl border-2">
 					<CardContent className="flex flex-col items-center justify-center py-16 text-center">
-						<ClipboardList className="h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" />
-						<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+						<ClipboardList className="h-12 w-12 text-muted-foreground mb-4" />
+						<h3 className="text-lg font-semibold text-card-foreground mb-2">
 							{t("emptyState.title")}
 						</h3>
-						<p className="text-sm text-slate-500 mb-6 max-w-md">
+						<p className="text-sm text-muted-foreground mb-6 max-w-md">
 							{t("emptyState.description")}
 						</p>
 						<div className="flex flex-wrap gap-3 justify-center">
@@ -272,14 +272,14 @@ export function BOQOverview({
 							{t("actions.copyFromExecution")}
 						</Button>
 
-						<div className="ms-auto inline-flex rounded-xl border border-slate-200 dark:border-slate-700 p-0.5 bg-white dark:bg-slate-900">
+						<div className="ms-auto inline-flex rounded-xl border-2 p-0.5 bg-card">
 							<button
 								type="button"
 								onClick={() => setViewMode("flat")}
 								className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 									viewMode === "flat"
-										? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+										? "bg-accent text-accent-foreground"
+										: "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 								}`}
 							>
 								<List className="h-3.5 w-3.5" />
@@ -290,8 +290,8 @@ export function BOQOverview({
 								onClick={() => setViewMode("byPhase")}
 								className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 									viewMode === "byPhase"
-										? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-										: "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+										? "bg-accent text-accent-foreground"
+										: "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 								}`}
 							>
 								<Layers className="h-3.5 w-3.5" />
@@ -470,7 +470,7 @@ export function BOQOverview({
 							{t("actions.cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
-							className="rounded-xl bg-red-600 hover:bg-red-700"
+							className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							onClick={handleDelete}
 						>
 							{t("actions.deleteSelected")}

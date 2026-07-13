@@ -51,11 +51,11 @@ export function InvoiceFormHeader({
 	const t = useTranslations();
 
 	return (
-		<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+		<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-card border-2">
 			<div className="flex flex-wrap items-center justify-between gap-3 max-w-6xl mx-auto">
 				{/* Start: back + breadcrumb/title */}
 				<div className="flex items-center gap-3 min-w-0">
-					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border">
 						<Link href={`/app/${organizationSlug}/finance/invoices`}>
 							<ArrowRight className="h-4 w-4" />
 						</Link>
@@ -76,7 +76,7 @@ export function InvoiceFormHeader({
 							{isEditDraft ? (
 								<>
 									{sourceInvoiceNo ?? t("finance.invoices.title")}
-									<span className="text-[10px] font-medium rounded-md px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+									<span className="text-[10px] font-semibold rounded-full px-2 py-0.5 bg-chart-1/15 text-chart-1">
 										{t("drafts.editDraftBadge")}
 									</span>
 								</>
@@ -106,7 +106,7 @@ export function InvoiceFormHeader({
 						<Save className="h-3.5 w-3.5 me-1.5" />
 						{isSaving ? t("common.saving") : t("common.save")}
 					</Button>
-					<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
+					<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="h-8 rounded-[10px] text-xs px-5">
 						<FileCheck className="h-3.5 w-3.5 me-1.5" />
 						{isIssuing ? t("common.saving") : t("finance.invoices.issueInvoice")}
 					</Button>

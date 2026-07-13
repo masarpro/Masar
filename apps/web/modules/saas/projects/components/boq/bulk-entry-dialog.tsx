@@ -112,7 +112,7 @@ export function BulkEntryDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh]">
-				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle>{t("bulkEntry.title")}</DialogTitle>
 				</DialogHeader>
 
@@ -134,12 +134,12 @@ export function BulkEntryDialog({
 								</SelectContent>
 							</Select>
 						</div>
-						<p className="text-xs text-slate-400 mt-5">{t("bulkEntry.hint")}</p>
+						<p className="text-xs text-muted-foreground mt-5">{t("bulkEntry.hint")}</p>
 					</div>
 
 					{/* Rows */}
 					<div className="space-y-2">
-						<div className="grid grid-cols-[60px_1fr_80px_90px_100px_32px] gap-2 text-xs font-medium text-slate-500 px-1">
+						<div className="grid grid-cols-[60px_1fr_80px_90px_100px_32px] gap-2 text-xs font-medium text-muted-foreground px-1">
 							<span>{t("table.code")}</span>
 							<span>{t("table.description")} *</span>
 							<span>{t("table.unit")} *</span>
@@ -190,7 +190,7 @@ export function BulkEntryDialog({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
+									className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
 									onClick={() => removeRow(idx)}
 									disabled={rows.length <= 1}
 								>
@@ -211,7 +211,7 @@ export function BulkEntryDialog({
 					</Button>
 				</div>
 
-				<div className="bg-slate-50 dark:bg-slate-800/50 border-t px-5 py-3 flex gap-3 justify-end">
+				<div className="bg-muted border-t-2 px-5 py-3 flex gap-3 justify-end">
 					<Button
 						variant="outline"
 						className="rounded-xl"

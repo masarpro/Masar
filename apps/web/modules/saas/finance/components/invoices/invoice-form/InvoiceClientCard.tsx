@@ -52,12 +52,12 @@ export function InvoiceClientCard({
 	const t = useTranslations();
 
 	return (
-		<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-				<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
-					<User className="h-[15px] w-[15px] text-chart-4" />
+		<div className="bg-card rounded-2xl border-2 overflow-hidden">
+			<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2">
+				<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+					<User className="h-[15px] w-[15px]" />
 				</div>
-				<span className="text-sm font-semibold text-foreground">{t("finance.invoices.clientInfo")}</span>
+				<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.clientInfo")}</span>
 				<Button type="button" variant="ghost" size="sm" onClick={onShowNewClientDialog} className="ms-auto rounded-lg h-7 text-xs border border-dashed border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 px-3">
 					<Plus className="h-3 w-3 me-1" />
 					{t("finance.clients.addClient")}
@@ -67,7 +67,7 @@ export function InvoiceClientCard({
 				<ClientSelector organizationId={organizationId} onSelect={onClientSelect} selectedClientId={clientId} />
 
 				{clientName && (
-					<div className="rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 border border-primary/15 px-4 py-3 space-y-1.5">
+					<div className="rounded-xl bg-primary/10 border border-primary/15 px-4 py-3 space-y-1.5">
 						<div className="flex items-center justify-between">
 							<span className="font-medium text-sm">{clientName}</span>
 							{clientTaxNumber && (

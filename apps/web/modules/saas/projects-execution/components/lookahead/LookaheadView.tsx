@@ -128,7 +128,7 @@ export function LookaheadView({ projectId }: LookaheadViewProps) {
 						<Link
 							href={`/app/${organizationSlug}/projects/${projectId}/execution`}
 						>
-							<ArrowRightIcon className="h-4 w-4 me-1" />
+							<ArrowRightIcon className="h-4 w-4 me-1 rtl-flip" />
 							{t("execution.lookahead.backToExecution")}
 						</Link>
 					</Button>

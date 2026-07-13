@@ -68,8 +68,8 @@ export function DeleteFolderDialog({
 				<AlertDialogHeader>
 					<AlertDialogTitle className="flex items-center gap-2">
 						{hasDocuments && (
-							<span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/40">
-								<AlertTriangle className="h-5 w-5 text-red-600" />
+							<span className="flex h-9 w-9 items-center justify-center rounded-xl bg-destructive/15">
+								<AlertTriangle className="h-5 w-5 text-destructive" />
 							</span>
 						)}
 						{t("deleteFolderTitle")}
@@ -78,11 +78,11 @@ export function DeleteFolderDialog({
 						<span className="block">
 							{t.rich("deleteFolderConfirm", {
 								name: folder?.name ?? "",
-								b: (chunks) => <strong className="text-slate-900 dark:text-slate-100">{chunks}</strong>,
+								b: (chunks) => <strong className="text-foreground">{chunks}</strong>,
 							})}
 						</span>
 						{hasDocuments && (
-							<span className="block rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">
+							<span className="block rounded-lg bg-destructive/15 p-3 text-sm text-destructive">
 								{t("deleteFolderWithDocsWarning", { count: folder?.documentCount ?? 0 })}
 							</span>
 						)}
@@ -91,7 +91,7 @@ export function DeleteFolderDialog({
 				<AlertDialogFooter>
 					<AlertDialogCancel className="rounded-xl">{tCommon("cancel")}</AlertDialogCancel>
 					<AlertDialogAction
-						className="rounded-xl bg-red-600 text-white hover:bg-red-700"
+						className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						onClick={(e) => {
 							e.preventDefault();
 							handleConfirm();

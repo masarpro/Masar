@@ -52,18 +52,18 @@ export function AccountingHealthPage({
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<h1 className="text-2xl font-bold text-foreground">
 					{t("finance.accounting.health.title")}
 				</h1>
 			</div>
 
 			{/* Summary */}
-			<Card className={`rounded-2xl border-2 ${data.isHealthy ? "border-green-200 dark:border-green-800" : "border-red-200 dark:border-red-800"}`}>
+			<Card className={`rounded-2xl border-2 ${data.isHealthy ? "border-success/30" : "border-destructive/30"}`}>
 				<CardContent className="p-6 flex items-center gap-4">
 					{data.isHealthy ? (
-						<CheckCircle className="h-10 w-10 text-green-600" />
+						<CheckCircle className="h-10 w-10 text-success" />
 					) : (
-						<HeartPulse className="h-10 w-10 text-red-600" />
+						<HeartPulse className="h-10 w-10 text-destructive" />
 					)}
 					<div>
 						<h2 className="text-lg font-bold">
@@ -72,7 +72,7 @@ export function AccountingHealthPage({
 								: t("finance.accounting.health.issues", { count: totalIssues })}
 						</h2>
 						{!data.isHealthy && (
-							<p className="text-sm text-slate-500 mt-1">
+							<p className="text-sm text-muted-foreground mt-1">
 								{t("finance.accounting.health.reviewBelow")}
 							</p>
 						)}
@@ -94,9 +94,9 @@ export function AccountingHealthPage({
 
 			{/* Backfill Result */}
 			{backfillMutation.data && backfillMutation.data.total > 0 && (
-				<div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-					<CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-					<span className="text-sm text-green-700 dark:text-green-300">
+				<div className="flex items-center gap-2 p-3 bg-success/10 rounded-xl border border-success/30">
+					<CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
+					<span className="text-sm text-success">
 						{t("finance.accounting.backfill.success", { total: backfillMutation.data.total })}
 					</span>
 				</div>
@@ -113,7 +113,7 @@ export function AccountingHealthPage({
 					{data.unbalancedEntries?.map((e: any) => (
 						<div key={e.id} className="flex items-center justify-between py-1 text-sm">
 							<span className="font-mono">{e.entry_no}</span>
-							<span className="text-red-600">{t("finance.accounting.health.diffAmount")}: {Number(e.diff).toFixed(2)}</span>
+							<span className="text-destructive">{t("finance.accounting.health.diffAmount")}: {Number(e.diff).toFixed(2)}</span>
 						</div>
 					))}
 				</HealthCheckSection>
@@ -155,7 +155,7 @@ export function AccountingHealthPage({
 					{data.orphanedInvoiceEntries?.map((e: any) => (
 						<div key={e.id} className="flex items-center justify-between py-1 text-sm">
 							<span className="font-mono">{e.entry_no}</span>
-							<span className="text-xs text-slate-500">{e.reference_id}</span>
+							<span className="text-xs text-muted-foreground">{e.reference_id}</span>
 						</div>
 					))}
 				</HealthCheckSection>
@@ -183,12 +183,12 @@ function HealthCheckSection({
 		<Card className="rounded-2xl">
 			<CardHeader className="pb-2">
 				<CardTitle className="flex items-center gap-3 text-base">
-					<div className={`p-2 rounded-lg ${isOk ? "bg-green-100 dark:bg-green-900/30 text-green-600" : "bg-red-100 dark:bg-red-900/30 text-red-600"}`}>
+					<div className={`flex size-9 items-center justify-center rounded-xl ${isOk ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
 						{isOk ? <CheckCircle className="h-5 w-5" /> : icon}
 					</div>
 					<div className="flex-1">
 						<span>{title}</span>
-						{subtitle && <p className="text-xs text-slate-500 font-normal mt-0.5">{subtitle}</p>}
+						{subtitle && <p className="text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</p>}
 					</div>
 					<Badge variant={isOk ? "secondary" : "destructive"} className="text-xs">
 						{count}

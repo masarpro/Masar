@@ -101,7 +101,7 @@ export function GanttToolbar({
 			{/* Back to simple mode */}
 			<Button variant="ghost" size="sm" className="h-8 text-xs gap-1" asChild>
 				<Link href={basePath}>
-					<ArrowLeftIcon className="h-3.5 w-3.5" />
+					<ArrowLeftIcon className="h-3.5 w-3.5 rtl-flip" />
 					{t("execution.advanced.toolbar.simpleMode")}
 				</Link>
 			</Button>

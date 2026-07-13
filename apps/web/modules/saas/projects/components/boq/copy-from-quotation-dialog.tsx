@@ -85,7 +85,7 @@ export function CopyFromQuotationDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+				<DialogHeader className="bg-card border-b-2 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("copyQuotation.title")}
 					</DialogTitle>
@@ -94,7 +94,7 @@ export function CopyFromQuotationDialog({
 				<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 					{/* Search Input */}
 					<div className="relative">
-						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							value={search}
 							onChange={(e: any) => setSearch(e.target.value)}
@@ -104,7 +104,7 @@ export function CopyFromQuotationDialog({
 					</div>
 
 					{/* Include Prices Toggle */}
-					<div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+					<div className="flex items-center gap-2 p-3 rounded-xl bg-card border-2">
 						<Checkbox
 							id="includePrices"
 							checked={includePrices}
@@ -129,7 +129,7 @@ export function CopyFromQuotationDialog({
 								{[1, 2, 3].map((i) => (
 									<div
 										key={i}
-										className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3"
+										className="rounded-xl border-2 p-4 space-y-3"
 									>
 										<Skeleton className="h-5 w-48" />
 										<div className="flex gap-4">
@@ -142,10 +142,10 @@ export function CopyFromQuotationDialog({
 							</>
 						) : quotationList.length === 0 ? (
 							<div className="flex flex-col items-center justify-center py-12 text-center">
-								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-									<PackageOpen className="h-7 w-7 text-slate-400" />
+								<div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+									<PackageOpen className="h-7 w-7 text-muted-foreground" />
 								</div>
-								<p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+								<p className="text-sm font-medium text-muted-foreground">
 									{t("copyQuotation.noQuotations")}
 								</p>
 							</div>
@@ -153,20 +153,20 @@ export function CopyFromQuotationDialog({
 							quotationList.map((quotation: any) => (
 								<div
 									key={quotation.id}
-									className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
+									className="rounded-xl border-2 bg-card p-4 hover:bg-accent transition-colors"
 								>
 									{/* Quotation Header */}
 									<div className="flex items-start justify-between gap-3">
 										<div className="min-w-0 flex-1">
-											<h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate flex items-center gap-2">
-												<FileText className="h-4 w-4 text-slate-400 shrink-0" />
+											<h4 className="text-sm font-semibold text-card-foreground truncate flex items-center gap-2">
+												<FileText className="h-4 w-4 text-muted-foreground shrink-0" />
 												{quotation.quotationNo || quotation.id}
 											</h4>
 										</div>
 									</div>
 
 									{/* Quotation Details */}
-									<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+									<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
 										{quotation.client?.name && (
 											<span className="flex items-center gap-1">
 												<User className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ export function CopyFromQuotationDialog({
 											</span>
 										)}
 										{quotation.total != null && (
-											<span className="font-medium text-emerald-600 dark:text-emerald-400">
+											<span className="font-medium text-success">
 												{formatSAR(Number(quotation.total))}
 											</span>
 										)}
@@ -213,7 +213,7 @@ export function CopyFromQuotationDialog({
 				</div>
 
 				{/* Footer */}
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex justify-end">
+				<div className="bg-muted border-t-2 px-5 py-3 flex justify-end">
 					<Button
 						type="button"
 						variant="outline"

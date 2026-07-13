@@ -25,11 +25,11 @@ export const GanttBarTooltip = memo(function GanttBarTooltip({
 	if (!visible) return null;
 
 	const duration = getDurationDays(activity.plannedStart, activity.plannedEnd);
-	const statusColor = STATUS_COLORS[activity.status] ?? "#94a3b8";
+	const statusColor = STATUS_COLORS[activity.status] ?? "var(--muted-foreground)";
 
 	return (
 		<foreignObject x={x} y={y - 80} width={220} height={76} style={{ overflow: "visible" }}>
-			<div className="rounded-lg border bg-popover p-2 text-xs shadow-md">
+			<div className="rounded-lg border bg-popover p-2 text-xs shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]">
 				<div className="font-medium truncate mb-1">{activity.title}</div>
 				<div className="flex items-center gap-2 text-muted-foreground">
 					<span

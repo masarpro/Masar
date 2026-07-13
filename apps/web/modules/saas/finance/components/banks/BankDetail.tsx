@@ -198,8 +198,8 @@ export function BankDetail({
 	if (!account) {
 		return (
 			<div className="text-center py-20">
-				<Building className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-				<p className="text-slate-500 dark:text-slate-400">
+				<Building className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+				<p className="text-muted-foreground">
 					{t("finance.banks.notFound")}
 				</p>
 			</div>
@@ -215,22 +215,22 @@ export function BankDetail({
 						<div className="flex items-center gap-4">
 							<div className={`p-3 rounded-xl ${
 								account.accountType === "BANK"
-									? "bg-chart-4/15 dark:bg-chart-4/20"
-									: "bg-green-100 dark:bg-green-900/50"
+									? "bg-chart-4/15"
+									: "bg-success/15"
 							}`}>
 								{account.accountType === "BANK" ? (
-									<Building className="h-8 w-8 text-chart-4 dark:text-chart-4" />
+									<Building className="h-8 w-8 text-chart-4" />
 								) : (
-									<Wallet className="h-8 w-8 text-green-600 dark:text-green-400" />
+									<Wallet className="h-8 w-8 text-success" />
 								)}
 							</div>
 							<div>
 								<div className="flex items-center gap-2">
-									<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+									<h2 className="text-xl font-semibold text-card-foreground">
 										{account.name}
 									</h2>
 									{account.isDefault && (
-										<Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+										<Star className="h-4 w-4 text-chart-1 fill-chart-1" />
 									)}
 								</div>
 								<div className="flex items-center gap-2 mt-1">
@@ -243,30 +243,30 @@ export function BankDetail({
 											: t("finance.banks.types.cashBox")}
 									</Badge>
 									{account.bankName && (
-										<span className="text-sm text-slate-500">{account.bankName}</span>
+										<span className="text-sm text-muted-foreground">{account.bankName}</span>
 									)}
 								</div>
 							</div>
 						</div>
 						<div className="text-end">
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="text-sm text-muted-foreground">
 								{t("finance.banks.currentBalance")}
 							</p>
 							<p className={`text-2xl font-bold ${
 								Number(account.balance) >= 0
-									? "text-green-600 dark:text-green-400"
-									: "text-red-600 dark:text-red-400"
+									? "text-success"
+									: "text-destructive"
 							}`}>
 								<Currency amount={Number(account.balance)} />
 							</p>
 							{summary && (
 								summary.isBalanced ? (
-									<Badge className="mt-2 rounded-lg border-0 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+									<Badge className="mt-2 rounded-lg border-0 bg-success/15 text-success">
 										<CheckCircle2 className="h-3.5 w-3.5 me-1" />
 										{t("finance.banks.ledger.balanced")}
 									</Badge>
 								) : (
-									<Badge className="mt-2 rounded-lg border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+									<Badge className="mt-2 rounded-lg border-0 bg-chart-1/15 text-chart-1">
 										<AlertTriangle className="h-3.5 w-3.5 me-1" />
 										{t("finance.banks.ledger.unbalanced", { amount: summary.delta.toFixed(2) })}
 									</Badge>
@@ -282,31 +282,31 @@ export function BankDetail({
 				<div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+							<div className="flex items-center gap-2 text-success">
 								<ArrowDownLeft className="h-4 w-4" />
-								<span className="text-xs text-slate-500">{t("finance.banks.ledger.totalIn")}</span>
+								<span className="text-xs text-muted-foreground">{t("finance.banks.ledger.totalIn")}</span>
 							</div>
-							<p className="text-lg font-bold mt-1 text-green-600 dark:text-green-400">
+							<p className="text-lg font-bold mt-1 text-success">
 								<Currency amount={summary.totalIn} />
 							</p>
 						</CardContent>
 					</Card>
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+							<div className="flex items-center gap-2 text-destructive">
 								<ArrowUpRight className="h-4 w-4" />
-								<span className="text-xs text-slate-500">{t("finance.banks.ledger.totalOut")}</span>
+								<span className="text-xs text-muted-foreground">{t("finance.banks.ledger.totalOut")}</span>
 							</div>
-							<p className="text-lg font-bold mt-1 text-red-600 dark:text-red-400">
+							<p className="text-lg font-bold mt-1 text-destructive">
 								<Currency amount={summary.totalOut} />
 							</p>
 						</CardContent>
 					</Card>
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-chart-4 dark:text-chart-4">
+							<div className="flex items-center gap-2 text-chart-4">
 								<ArrowDownLeft className="h-4 w-4" />
-								<span className="text-xs text-slate-500">{t("finance.banks.ledger.transfersIn")}</span>
+								<span className="text-xs text-muted-foreground">{t("finance.banks.ledger.transfersIn")}</span>
 							</div>
 							<p className="text-lg font-bold mt-1">
 								<Currency amount={summary.totalTransfersIn} />
@@ -315,9 +315,9 @@ export function BankDetail({
 					</Card>
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+							<div className="flex items-center gap-2 text-chart-4">
 								<ArrowUpRight className="h-4 w-4" />
-								<span className="text-xs text-slate-500">{t("finance.banks.ledger.transfersOut")}</span>
+								<span className="text-xs text-muted-foreground">{t("finance.banks.ledger.transfersOut")}</span>
 							</div>
 							<p className="text-lg font-bold mt-1">
 								<Currency amount={summary.totalTransfersOut} />
@@ -326,14 +326,14 @@ export function BankDetail({
 					</Card>
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
-							<div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+							<div className="flex items-center gap-2 text-muted-foreground">
 								<ArrowLeftRight className="h-4 w-4" />
-								<span className="text-xs text-slate-500">{t("finance.banks.ledger.netChange")}</span>
+								<span className="text-xs text-muted-foreground">{t("finance.banks.ledger.netChange")}</span>
 							</div>
 							<p className={`text-lg font-bold mt-1 ${
 								summary.netChange >= 0
-									? "text-green-600 dark:text-green-400"
-									: "text-red-600 dark:text-red-400"
+									? "text-success"
+									: "text-destructive"
 							}`}>
 								<Currency amount={summary.netChange} />
 							</p>
@@ -349,10 +349,10 @@ export function BankDetail({
 					className="h-auto py-4 rounded-xl justify-start"
 					onClick={() => setExpenseDialogOpen(true)}
 				>
-					<TrendingDown className="h-5 w-5 me-3 text-red-500" />
+					<TrendingDown className="h-5 w-5 me-3 text-destructive" />
 					<div className="text-start">
 						<div className="font-medium">{t("finance.expenses.create")}</div>
-						<div className="text-xs text-slate-500">{t("finance.banks.recordExpense")}</div>
+						<div className="text-xs text-muted-foreground">{t("finance.banks.recordExpense")}</div>
 					</div>
 				</Button>
 				<Button
@@ -360,10 +360,10 @@ export function BankDetail({
 					className="h-auto py-4 rounded-xl justify-start"
 					onClick={() => setPaymentDialogOpen(true)}
 				>
-					<TrendingUp className="h-5 w-5 me-3 text-green-500" />
+					<TrendingUp className="h-5 w-5 me-3 text-success" />
 					<div className="text-start">
 						<div className="font-medium">{t("finance.payments.create")}</div>
-						<div className="text-xs text-slate-500">{t("finance.banks.recordPayment")}</div>
+						<div className="text-xs text-muted-foreground">{t("finance.banks.recordPayment")}</div>
 					</div>
 				</Button>
 				<Button
@@ -374,7 +374,7 @@ export function BankDetail({
 					<ArrowLeftRight className="h-5 w-5 me-3 text-chart-4" />
 					<div className="text-start">
 						<div className="font-medium">{t("finance.banks.transfer")}</div>
-						<div className="text-xs text-slate-500">{t("finance.banks.transferBetweenAccounts")}</div>
+						<div className="text-xs text-muted-foreground">{t("finance.banks.transferBetweenAccounts")}</div>
 					</div>
 				</Button>
 			</div>

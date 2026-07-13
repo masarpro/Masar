@@ -29,7 +29,7 @@ export function MilestoneLinkedItems({
 			{issuesCount > 0 && (
 				<Badge
 					variant="secondary"
-					className="text-xs gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
+					className="text-xs gap-1 bg-chart-1/15 text-chart-1"
 				>
 					⚠️ {t("execution.milestone.linkedIssues", { count: issuesCount })}
 				</Badge>

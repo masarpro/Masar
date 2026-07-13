@@ -31,33 +31,33 @@ export function PlannedVsActualTable({ data }: PlannedVsActualTableProps) {
 	}
 
 	return (
-		<div className="overflow-x-auto rounded-lg border">
+		<div className="overflow-x-auto rounded-2xl border-2">
 			<table className="w-full text-sm">
 				<thead>
-					<tr className="border-b bg-muted/50">
-						<th className="px-3 py-2 text-start font-medium">
+					<tr className="border-b-2">
+						<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.activity")}
 						</th>
-						<th className="px-3 py-2 text-start font-medium">
+						<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.plannedStart")}
 						</th>
-						<th className="px-3 py-2 text-start font-medium">
+						<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.plannedEnd")}
 						</th>
-						<th className="px-3 py-2 text-start font-medium">
+						<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.actualStart")}
 						</th>
-						<th className="px-3 py-2 text-start font-medium">
+						<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.actualEnd")}
 						</th>
-						<th className="px-3 py-2 text-center font-medium">
+						<th className="px-3 py-2 text-center font-medium text-muted-foreground">
 							{t("execution.analysis.plannedVsActual.variance")}
 						</th>
 					</tr>
 				</thead>
 				<tbody>
 					{data.map((item) => (
-						<tr key={item.activityId} className="border-b">
+						<tr key={item.activityId} className="border-b-2">
 							<td className="px-3 py-2 font-medium">
 								{item.activityTitle}
 							</td>

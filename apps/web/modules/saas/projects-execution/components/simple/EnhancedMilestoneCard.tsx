@@ -38,11 +38,11 @@ export function EnhancedMilestoneCard({
 
 	const borderColor =
 		milestone.status === "COMPLETED"
-			? "border-green-200 dark:border-green-800"
+			? "border-success/40"
 			: milestone.status === "DELAYED"
-				? "border-red-200 dark:border-red-800"
+				? "border-destructive/40"
 				: milestone.isCritical
-					? "border-orange-200 dark:border-orange-800"
+					? "border-chart-1/40"
 					: "";
 
 	return (

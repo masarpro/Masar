@@ -89,7 +89,7 @@ export const GanttTimeHeader = memo(function GanttTimeHeader({
 							x={x + interval.width / 2}
 							y={halfHeight + halfHeight / 2 + 4}
 							textAnchor="middle"
-							className={`text-[10px] ${interval.isToday ? "fill-red-500 font-bold" : "fill-muted-foreground"}`}
+							className={`text-[10px] ${interval.isToday ? "fill-destructive font-bold" : "fill-muted-foreground"}`}
 						>
 							{interval.label}
 						</text>

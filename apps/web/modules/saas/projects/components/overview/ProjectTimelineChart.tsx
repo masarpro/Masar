@@ -50,13 +50,13 @@ export function ProjectTimelineChart({
 	const t = useTranslations();
 
 	return (
-		<div className="flex h-full flex-col rounded-2xl border border-white/20 bg-white/70 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/30 dark:bg-slate-900/70 sm:p-6">
+		<div className="flex h-full flex-col rounded-3xl border-2 bg-card p-4 sm:p-6">
 			<div className="mb-4 flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-chart-4/15 p-2 dark:bg-chart-4/20">
-						<Calendar className="h-4 w-4 text-chart-4 dark:text-chart-4" />
+					<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<Calendar className="h-4 w-4" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("projects.commandCenter.timelineChart")}
 					</h3>
 				</div>
@@ -66,7 +66,7 @@ export function ProjectTimelineChart({
 							className="h-2.5 w-2.5 rounded-full"
 							style={{ backgroundColor: CHART_SEMANTIC.primary }}
 						/>
-						<span className="text-[10px] text-slate-500 dark:text-slate-400">
+						<span className="text-[10px] text-muted-foreground">
 							{t("projects.commandCenter.plannedProgress")}
 						</span>
 					</div>
@@ -75,7 +75,7 @@ export function ProjectTimelineChart({
 							className="h-2.5 w-2.5 rounded-full"
 							style={{ backgroundColor: CHART_PALETTE[0] }}
 						/>
-						<span className="text-[10px] text-slate-500 dark:text-slate-400">
+						<span className="text-[10px] text-muted-foreground">
 							{t("projects.commandCenter.actualProgress")}
 						</span>
 					</div>

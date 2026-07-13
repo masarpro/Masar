@@ -88,10 +88,10 @@ export function GanttPrintLayout({ projectId }: GanttPrintLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50 py-6">
+		<div className="min-h-screen bg-muted py-6">
 			{/* Action bar — hidden when printing */}
 			<div className="max-w-[1600px] mx-auto px-4 mb-4 flex items-center justify-between print:hidden">
-				<h1 className="text-lg font-bold text-slate-700">
+				<h1 className="text-lg font-bold text-foreground">
 					{t("execution.print.ganttTitle")}
 				</h1>
 				<div className="flex items-center gap-2">

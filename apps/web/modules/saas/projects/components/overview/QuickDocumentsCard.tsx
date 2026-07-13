@@ -29,13 +29,13 @@ export function QuickDocumentsCard({
 	const documents = (documentsData as any)?.documents?.slice(0, 2) ?? (Array.isArray(documentsData) ? documentsData.slice(0, 2) : []);
 
 	return (
-		<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 flex flex-col">
+		<div className="rounded-2xl border-2 bg-card p-4 flex flex-col">
 			<div className="flex items-center justify-between mb-3">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-chart-4/15 dark:bg-chart-4/20 p-2">
-						<FolderOpen className="h-4 w-4 text-chart-4 dark:text-chart-4" />
+					<div className="flex size-8 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+						<FolderOpen className="h-4 w-4" />
 					</div>
-					<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<h3 className="text-sm font-semibold text-card-foreground">
 						{t("projects.commandCenter.quickDocuments")}
 					</h3>
 				</div>
@@ -51,9 +51,9 @@ export function QuickDocumentsCard({
 			{documents.length > 0 ? (
 				<div className="flex-1 space-y-2">
 					{documents.map((doc: any) => (
-						<div key={doc.id} className="flex items-center gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2">
-							<FileText className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-							<span className="text-xs text-slate-600 dark:text-slate-400 truncate">
+						<div key={doc.id} className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2">
+							<FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+							<span className="text-xs text-muted-foreground truncate">
 								{doc.title || doc.name || doc.fileName}
 							</span>
 						</div>
@@ -61,7 +61,7 @@ export function QuickDocumentsCard({
 				</div>
 			) : (
 				<div className="flex-1 flex items-center justify-center py-4">
-					<p className="text-xs text-slate-400">
+					<p className="text-xs text-muted-foreground">
 						{t("projects.commandCenter.noDocumentsYet")}
 					</p>
 				</div>

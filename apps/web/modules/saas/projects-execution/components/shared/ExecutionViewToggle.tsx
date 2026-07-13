@@ -22,7 +22,7 @@ export function ExecutionViewToggle({
 	const projectId = params.projectId as string;
 
 	return (
-		<div className="flex items-center gap-1 rounded-lg border bg-muted/50 p-1">
+		<div className="flex items-center gap-1 rounded-lg border-2 bg-card p-1">
 			<Button
 				variant={view === "cards" ? "secondary" : "ghost"}
 				size="sm"

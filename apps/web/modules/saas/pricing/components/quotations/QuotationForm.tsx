@@ -849,15 +849,15 @@ export function QuotationForm({
 	}
 
 	return (
-		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 			<form onSubmit={handleSubmit} className="space-y-5 max-w-6xl mx-auto">
 
 				{/* ─── Header (Sticky) ──────────────────────────────── */}
-				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-card border-2">
 					<div className="flex flex-wrap items-center justify-between gap-3 max-w-6xl mx-auto">
 						{/* Start: back + breadcrumb/title */}
 						<div className="flex items-center gap-3 min-w-0">
-							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border">
 								<Link href={`/app/${organizationSlug}/pricing/quotations`}>
 									<ArrowRight className="h-4 w-4" />
 								</Link>
@@ -921,7 +921,7 @@ export function QuotationForm({
 								<Save className="h-3.5 w-3.5 me-1.5" />
 								{isCommitting ? t("common.saving") : t("common.save")}
 							</Button>
-							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow transition-all">
+							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="h-8 rounded-[10px] text-xs px-5">
 								<Send className="h-3.5 w-3.5 me-1.5" />
 								{isPublishing ? t("common.saving") : t("pricing.quotations.actions.send")}
 							</Button>
@@ -942,9 +942,9 @@ export function QuotationForm({
 				<div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
 
 					{/* Client Card */}
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
+						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2">
+							<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 								<User className="h-[15px] w-[15px] text-chart-4" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">{t("pricing.quotations.clientInfo")}</span>
@@ -1016,9 +1016,9 @@ export function QuotationForm({
 					</div>
 
 					{/* Details Card */}
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
+						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2">
+							<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 								<Calendar className="h-[15px] w-[15px] text-chart-4" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">{t("pricing.quotations.detailsMetadata")}</span>
@@ -1110,11 +1110,11 @@ export function QuotationForm({
 
 				{/* ─── Introduction (Collapsible) ─────────────────────── */}
 				<Collapsible defaultOpen={!!introduction}>
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
 							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
 								<span className="flex items-center gap-2.5">
-									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-4/15 dark:from-chart-4/20 dark:to-chart-4/20 flex items-center justify-center">
+									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
 										<BookOpen className="h-[15px] w-[15px] text-chart-4" />
 									</div>
 									{t("pricing.quotations.introduction")}
@@ -1140,12 +1140,12 @@ export function QuotationForm({
 
 				{/* ─── Content Blocks: BEFORE_TABLE ───────────────��───── */}
 				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "BEFORE_TABLE")}>
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
 							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
 								<span className="flex items-center gap-2.5">
-									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/40 dark:to-violet-800/20 flex items-center justify-center">
-										<ListChecks className="h-[15px] w-[15px] text-violet-500" />
+									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
+										<ListChecks className="h-[15px] w-[15px] text-chart-4" />
 									</div>
 									{t("pricing.quotations.contentBlocksBeforeTable")}
 								</span>
@@ -1166,11 +1166,11 @@ export function QuotationForm({
 				</Collapsible>
 
 				{/* ─── Items Table ─────────────────────────────────────── */}
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-					<div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+				<div className="bg-card rounded-2xl border-2 overflow-hidden">
+					<div className="flex items-center justify-between px-5 py-3.5 border-b-2">
 						<div className="flex items-center gap-2.5">
-							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-800/20 flex items-center justify-center">
-								<FileText className="h-[15px] w-[15px] text-amber-500" />
+							<div className="w-[30px] h-[30px] rounded-xl bg-chart-1/15 flex items-center justify-center">
+								<FileText className="h-[15px] w-[15px] text-chart-1" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">{t("pricing.quotations.items")}</span>
 							<span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">{items.filter((i) => i.description.trim()).length}</span>
@@ -1296,7 +1296,7 @@ export function QuotationForm({
 					</div>
 
 					{isEditable && (
-						<div className="p-4 border-t border-slate-100 dark:border-slate-800/60">
+						<div className="p-4 border-t-2">
 							<button
 								type="button"
 								onClick={addItem}
@@ -1311,12 +1311,12 @@ export function QuotationForm({
 
 				{/* ─── Content Blocks: AFTER_TABLE ────────────────────── */}
 				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "AFTER_TABLE")}>
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
 							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
 								<span className="flex items-center gap-2.5">
-									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/40 dark:to-violet-800/20 flex items-center justify-center">
-										<ListChecks className="h-[15px] w-[15px] text-violet-500" />
+									<div className="w-[30px] h-[30px] rounded-xl bg-chart-4/15 flex items-center justify-center">
+										<ListChecks className="h-[15px] w-[15px] text-chart-4" />
 									</div>
 									{t("pricing.quotations.contentBlocksAfterTable")}
 								</span>
@@ -1338,12 +1338,12 @@ export function QuotationForm({
 
 				{/* ─── Terms & Conditions (Collapsible) ───────────────── */}
 				<Collapsible defaultOpen={!!termsAndConditions}>
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<CollapsibleTrigger asChild>
 							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
 								<span className="flex items-center gap-2.5">
-									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-800/20 flex items-center justify-center">
-										<ScrollText className="h-[15px] w-[15px] text-emerald-500" />
+									<div className="w-[30px] h-[30px] rounded-xl bg-success/15 flex items-center justify-center">
+										<ScrollText className="h-[15px] w-[15px] text-success" />
 									</div>
 									{t("pricing.quotations.termsAndConditions")}
 								</span>
@@ -1370,9 +1370,9 @@ export function QuotationForm({
 				<div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
 
 					{/* Notes / Terms Tabs */}
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+					<div className="bg-card rounded-2xl border-2 overflow-hidden">
 						<Tabs defaultValue="notes">
-							<div className="flex border-b border-slate-100 dark:border-slate-800/60 px-5">
+							<div className="flex border-b-2 px-5">
 								<TabsList className="bg-transparent h-auto p-0 gap-0">
 									<TabsTrigger value="notes" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none bg-transparent px-4 py-3.5 text-[13px] font-medium gap-1.5">
 										<StickyNote className="h-3.5 w-3.5" />
@@ -1410,10 +1410,10 @@ export function QuotationForm({
 					</div>
 
 					{/* Summary / Totals */}
-					<div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col">
-						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900/40 dark:to-pink-800/20 flex items-center justify-center">
-								<Receipt className="h-[15px] w-[15px] text-pink-500" />
+					<div className="bg-card rounded-2xl border-2 overflow-hidden flex flex-col">
+						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2">
+							<div className="w-[30px] h-[30px] rounded-xl bg-chart-2/15 flex items-center justify-center">
+								<Receipt className="h-[15px] w-[15px] text-chart-2" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">{t("finance.summary.total")}</span>
 						</div>

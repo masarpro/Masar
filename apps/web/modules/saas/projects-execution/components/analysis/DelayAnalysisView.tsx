@@ -44,30 +44,30 @@ export function DelayAnalysisView({ data }: DelayAnalysisViewProps) {
 			</div>
 
 			{/* Table */}
-			<div className="overflow-x-auto rounded-lg border">
+			<div className="overflow-x-auto rounded-2xl border-2">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b bg-muted/50">
-							<th className="px-3 py-2 text-start font-medium">
+						<tr className="border-b-2">
+							<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 								{t("execution.analysis.delay.activity")}
 							</th>
-							<th className="px-3 py-2 text-start font-medium">
+							<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 								{t("execution.analysis.delay.milestone")}
 							</th>
-							<th className="px-3 py-2 text-start font-medium">
+							<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 								{t("execution.analysis.delay.plannedEnd")}
 							</th>
-							<th className="px-3 py-2 text-start font-medium">
+							<th className="px-3 py-2 text-start font-medium text-muted-foreground">
 								{t("execution.analysis.delay.actualEnd")}
 							</th>
-							<th className="px-3 py-2 text-center font-medium">
+							<th className="px-3 py-2 text-center font-medium text-muted-foreground">
 								{t("execution.analysis.delay.delayDays")}
 							</th>
 						</tr>
 					</thead>
 					<tbody>
 						{sorted.map((item) => (
-							<tr key={item.activityId} className="border-b">
+							<tr key={item.activityId} className="border-b-2">
 								<td className="px-3 py-2">{item.activityTitle}</td>
 								<td className="px-3 py-2 text-muted-foreground">
 									{item.milestoneName}
@@ -79,7 +79,7 @@ export function DelayAnalysisView({ data }: DelayAnalysisViewProps) {
 									{formatDateShort(item.actualEnd, locale)}
 								</td>
 								<td className="px-3 py-2 text-center">
-									<span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+									<span className="inline-flex items-center rounded-full bg-destructive/15 px-2.5 py-0.5 text-xs font-semibold text-destructive">
 										+{item.delayDays}d
 									</span>
 								</td>

@@ -268,7 +268,7 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 
 			{/* Delayed warning */}
 			{delayedMilestones.length > 0 && (
-				<div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 p-3 text-sm text-red-700 dark:text-red-400">
+				<div className="flex items-center gap-2 rounded-xl border-2 border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
 					<AlertTriangleIcon className="h-4 w-4 shrink-0" />
 					{t("timeline.delayedWarning", {
 						count: delayedMilestones.length,
