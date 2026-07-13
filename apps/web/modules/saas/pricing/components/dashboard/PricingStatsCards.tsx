@@ -38,6 +38,7 @@ export function PricingStatsCards({
 				subtitle={t("pricing.dashboard.stats.expiringQuotationsSubtitle")}
 			/>
 			<GlassStatCard
+				className="col-span-2 sm:col-span-1"
 				colorScheme="blue"
 				icon={<TrendingUp className="h-4 w-4 text-chart-4 dark:text-chart-4" />}
 				title={t("pricing.dashboard.stats.conversionRate")}

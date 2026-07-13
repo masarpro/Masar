@@ -49,61 +49,73 @@ export function PricingDashboard({
 	const recentDocuments = data?.recentDocuments ?? [];
 
 	return (
-		<div className="space-y-6" dir="rtl">
-			{/* Row 1 — Botly hero (65%) beside the pricing pipeline chart (35%) */}
-			<div className="grid grid-cols-1 gap-6 lg:grid-cols-[65fr_35fr]">
-				<div className="lg:h-[300px]">
-					<ModuleHeroCard
-						fill
-						title={t("pricing.title")}
-						subtitle={`${t("pricing.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
-						cta={{
-							label: t("pricing.studies.newStudy"),
-							href: `/app/${orgSlug}/pricing/studies?new=1`,
-						}}
-						stats={[
-							{
-								label: t("pricing.dashboard.overview.studiesValue"),
-								value: <Currency amount={studies?.totalValue ?? 0} />,
-							},
-							{
-								label: t("pricing.dashboard.overview.activeQuotations"),
-								value: <Currency amount={quotations?.activeValue ?? 0} />,
-							},
-							{
-								label: t("pricing.dashboard.overview.leadsPipeline"),
-								value: <Currency amount={leads?.openEstimatedValue ?? 0} />,
-							},
-						]}
-					/>
-				</div>
-				<div className="lg:h-[300px]">
-					{pipeline ? (
-						<PricingPipelineChart pipeline={pipeline} />
-					) : (
-						<div className="flex h-full min-h-[200px] items-center justify-center rounded-3xl border-2 bg-card text-sm text-muted-foreground">
-							—
-						</div>
-					)}
-				</div>
+		// One grid: mobile stacks in DOM order (hero → shortcuts → chart → stats →
+		// recent docs); on lg, explicit placement rebuilds the 65/35 rows
+		// (hero|chart · stats · recent-docs|shortcuts) so desktop is unchanged.
+		<div
+			className="grid grid-cols-1 gap-6 lg:grid-cols-[65fr_35fr] lg:grid-rows-[300px_auto_auto]"
+			dir="rtl"
+		>
+			{/* Hero — mobile 1st · desktop col 1 / row 1 */}
+			<div className="lg:col-start-1 lg:row-start-1">
+				<ModuleHeroCard
+					fill
+					title={t("pricing.title")}
+					subtitle={`${t("pricing.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
+					cta={{
+						label: t("pricing.studies.newStudy"),
+						href: `/app/${orgSlug}/pricing/studies?new=1`,
+					}}
+					stats={[
+						{
+							label: t("pricing.dashboard.overview.studiesValue"),
+							value: <Currency amount={studies?.totalValue ?? 0} />,
+						},
+						{
+							label: t("pricing.dashboard.overview.activeQuotations"),
+							value: <Currency amount={quotations?.activeValue ?? 0} />,
+						},
+						{
+							label: t("pricing.dashboard.overview.leadsPipeline"),
+							value: <Currency amount={leads?.openEstimatedValue ?? 0} />,
+						},
+					]}
+				/>
 			</div>
 
-			{/* Row 2 — stat cards in one line (Clients, Expiring, Conversion Rate) */}
-			<PricingStatsCards
-				activeClients={clients?.total ?? 0}
-				expiringQuotations={quotations?.expiringCount ?? 0}
-				conversionRate={quotations?.conversionRate ?? 0}
-			/>
-
-			{/* Row 3 — recent documents (65%) beside pricing shortcuts (35%) */}
-			<div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[65fr_35fr]">
-				<PricingRecentDocsTable
-					documents={recentDocuments}
-					organizationSlug={orgSlug}
-				/>
+			{/* Shortcuts — mobile directly under the hero · desktop col 2 / row 3 */}
+			<div className="lg:col-start-2 lg:row-start-3">
 				<PricingShortcutsCard
 					organizationSlug={orgSlug}
 					organizationId={organizationId}
+				/>
+			</div>
+
+			{/* Pipeline chart — mobile 3rd · desktop col 2 / row 1 */}
+			<div className="lg:col-start-2 lg:row-start-1">
+				{pipeline ? (
+					<PricingPipelineChart pipeline={pipeline} />
+				) : (
+					<div className="flex h-full min-h-[200px] items-center justify-center rounded-3xl border-2 bg-card text-sm text-muted-foreground">
+						—
+					</div>
+				)}
+			</div>
+
+			{/* Stats — mobile 4th · desktop spans both cols / row 2 */}
+			<div className="lg:col-span-2 lg:row-start-2">
+				<PricingStatsCards
+					activeClients={clients?.total ?? 0}
+					expiringQuotations={quotations?.expiringCount ?? 0}
+					conversionRate={quotations?.conversionRate ?? 0}
+				/>
+			</div>
+
+			{/* Recent documents — mobile 5th · desktop col 1 / row 3 */}
+			<div className="lg:col-start-1 lg:row-start-3">
+				<PricingRecentDocsTable
+					documents={recentDocuments}
+					organizationSlug={orgSlug}
 				/>
 			</div>
 		</div>
