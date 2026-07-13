@@ -22,7 +22,8 @@ export function FloatingAssistantButton() {
       aria-haspopup="dialog"
       title={`${t("title")} (${t("shortcut")})`}
       className={cn(
-        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-chart-4 text-white shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105 active:scale-95",
+        // Botly floating action (Brand/04 blue) with a soft branded glow
+        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-chart-4 text-white ring-1 ring-white/15 shadow-[0_10px_30px_-4px_rgba(93,116,241,0.5)] transition-all duration-300 hover:scale-105 active:scale-95",
       )}
     >
       <span

@@ -318,7 +318,9 @@ export function AssistantPanel() {
         role="dialog"
         aria-label={t("title")}
         className={cn(
-          "fixed z-[60] flex flex-col overflow-hidden rounded-2xl border bg-background shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
+          // Botly floating surface: 20px radius + soft shadow (matches the
+          // command palette, dropdowns and profile card).
+          "fixed z-[60] flex flex-col overflow-hidden rounded-[20px] border bg-background shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
           "transition-all duration-200 ease-out",
           // Mobile
           "bottom-[96px] inset-x-4 h-[70vh]",
@@ -333,17 +335,21 @@ export function AssistantPanel() {
             : "opacity-0 scale-95 translate-y-2",
         )}
       >
-        {/* Header */}
+        {/* Header — Botly chat identity: branded bot chip + title */}
         <div className="flex items-center justify-between border-b p-3">
-          <div className="flex items-center gap-2">
-            <Sparkles size={18} className="text-chart-4" />
-            <span className="text-sm font-bold">{t("title")}</span>
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+              <Sparkles size={18} />
+            </span>
+            <span className="truncate text-sm font-semibold text-foreground">
+              {t("title")}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={handleNewChat}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label={t("newChat")}
               title={t("newChat")}
             >
@@ -355,7 +361,7 @@ export function AssistantPanel() {
                 setShowHistory(true);
                 refreshChats();
               }}
-              className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="relative flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               title={t("history.title")}
             >
               <History size={16} />
@@ -367,7 +373,7 @@ export function AssistantPanel() {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="hidden h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:flex"
+              className="hidden h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:flex"
               title={isExpanded ? t("collapse") : t("expand")}
             >
               {isExpanded ? (
@@ -379,7 +385,7 @@ export function AssistantPanel() {
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label={t("close")}
               title={t("close")}
             >
@@ -387,9 +393,6 @@ export function AssistantPanel() {
             </button>
           </div>
         </div>
-
-        {/* Gradient line */}
-        <div className="h-[1px] bg-border" />
 
         {/* Context Badge */}
         <AssistantContextBadge pageContext={pageContext} />
