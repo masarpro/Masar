@@ -774,6 +774,7 @@ model User {
   messagesSent            ProjectMessage[]          @relation("MessageSender")
   notifications           Notification[]            @relation("NotificationRecipient")
   notificationPreferences NotificationPreference[]  @relation("NotificationPreferences")
+  dashboardPreferences    UserDashboardPreference[] @relation("UserDashboardPreferences")
 
   // علاقات بوابة المالك
   ownerAccessesCreated ProjectOwnerAccess[] @relation("OwnerAccessCreator")
@@ -1082,6 +1083,9 @@ model Organization {
 
   // Notification Preferences - تفضيلات الإشعارات
   notificationPreferences NotificationPreference[]
+
+  // Dashboard Preferences - تفضيلات لوحة التحكم
+  dashboardPreferences UserDashboardPreference[]
 
   // Leave Management - إدارة الإجازات
   leaveTypes    LeaveType[]
@@ -2925,6 +2929,25 @@ model NotificationPreference {
 
   @@unique([userId, organizationId])
   @@map("notification_preferences")
+}
+
+// تفضيلات لوحة التحكم (لكل مستخدم داخل كل منظمة)
+model UserDashboardPreference {
+  id             String       @id @default(cuid())
+  userId         String       @map("user_id")
+  user           User         @relation("UserDashboardPreferences", fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // مفتاح البطاقة الرئيسية المختارة في الداشبورد (finance | projects | cashflow | zatca)
+  heroCardKey String @default("finance") @map("hero_card_key")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("user_dashboard_preferences")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

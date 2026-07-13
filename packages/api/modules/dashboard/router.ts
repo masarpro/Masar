@@ -3,6 +3,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../../orpc/procedures";
 import { verifyOrganizationMembership } from "../organizations/lib/membership";
 import {
+	getCachedUserPermissions,
 	getCachedUserProjectScope,
 	verifyOrganizationAccess,
 } from "../../lib/permissions";
@@ -23,6 +24,9 @@ import {
 	getPendingSubcontractClaimsCount,
 	getInvoiceTotals,
 	getFieldActivitySummary,
+	getHeroCardMetrics,
+	getUserDashboardPreference,
+	upsertUserDashboardPreference,
 } from "@repo/database";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -237,13 +241,21 @@ const getAll = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		const membership = await verifyOrganizationMembership(
-			input.organizationId,
-			context.user.id,
-		);
+		const [membership, permissions] = await Promise.all([
+			verifyOrganizationMembership(input.organizationId, context.user.id),
+			getCachedUserPermissions(context.user.id, input.organizationId),
+		]);
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
+
+		// Hero-carousel gating (RBAC): financial cards need finance.view, the
+		// projects-pulse card needs any projects permission — mirrors the
+		// showFinance/showProjects gating the Dashboard client applies.
+		const canViewFinance = permissions.finance?.view ?? false;
+		const canViewProjects = Object.values(permissions.projects ?? {}).some(
+			Boolean,
+		);
 
 		const [
 			stats,
@@ -257,6 +269,7 @@ const getAll = protectedProcedure
 			pendingSubcontractClaims,
 			invoiceTotals,
 			fieldActivity,
+			heroCardMetrics,
 		] = await Promise.all([
 			getDashboardStats(input.organizationId),
 			getRecentActivities(input.organizationId, input.activitiesLimit),
@@ -269,7 +282,22 @@ const getAll = protectedProcedure
 			getPendingSubcontractClaimsCount(input.organizationId),
 			getInvoiceTotals(input.organizationId),
 			getFieldActivitySummary(input.organizationId),
+			canViewFinance || canViewProjects
+				? getHeroCardMetrics(input.organizationId)
+				: Promise.resolve(null),
 		]);
+
+		// Never ship numbers the member has no permission to see — the finance
+		// sections are stripped server-side, not just hidden in the UI.
+		const heroMetrics = heroCardMetrics
+			? {
+					projectsPulse: canViewProjects
+						? heroCardMetrics.projectsPulse
+						: null,
+					receivables: canViewFinance ? heroCardMetrics.receivables : null,
+					zatca: canViewFinance ? heroCardMetrics.zatca : null,
+				}
+			: null;
 
 		// Computed fields
 		const netProfit = invoiceTotals.totalCollected - stats.financials.totalExpenses;
@@ -291,9 +319,51 @@ const getAll = protectedProcedure
 			pendingSubcontractClaims,
 			invoiceTotals,
 			fieldActivity,
+			heroMetrics,
 			netProfit,
 			profitMargin,
 		};
+	});
+
+// مفاتيح بطاقات الـ Hero Carousel — تُطابق القائمة في BotlyHero.tsx
+const heroCardKeySchema = z.enum(["finance", "projects", "cashflow", "zatca"]);
+
+/**
+ * Get the caller's saved hero-card selection for this organization.
+ * Personal UI preference — membership is the only requirement.
+ */
+const getHeroCardPreference = protectedProcedure
+	.input(organizationInput)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id);
+
+		const preference = await getUserDashboardPreference(
+			context.user.id,
+			input.organizationId,
+		);
+		return { heroCardKey: preference?.heroCardKey ?? null };
+	});
+
+/**
+ * Save the caller's hero-card selection (upsert, per user per organization).
+ * protectedProcedure on purpose: this is a personal UI preference, not
+ * organization data — FREE-plan members must be able to keep their choice.
+ */
+const setHeroCardPreference = protectedProcedure
+	.input(
+		organizationInput.extend({
+			heroCardKey: heroCardKeySchema,
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id);
+
+		const preference = await upsertUserDashboardPreference(
+			context.user.id,
+			input.organizationId,
+			input.heroCardKey,
+		);
+		return { heroCardKey: preference.heroCardKey };
 	});
 
 export const dashboardRouter = {
@@ -307,4 +377,6 @@ export const dashboardRouter = {
 	getFinancialTrend,
 	activeProjects,
 	getAll,
+	getHeroCardPreference,
+	setHeroCardPreference,
 };

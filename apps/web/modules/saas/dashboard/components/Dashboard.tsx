@@ -120,6 +120,7 @@ export function Dashboard({
 								sectionSkeleton
 							) : (
 								<BotlyHero
+									organizationId={organizationId}
 									organizationSlug={organizationSlug}
 									orgName={activeOrganization?.name ?? ""}
 									activeProjects={
@@ -137,6 +138,16 @@ export function Dashboard({
 									}
 									showFinance={showFinance}
 									showProjects={showProjects}
+									heroMetrics={dashboardData?.heroMetrics ?? null}
+									clientReceivables={
+										showFinance
+											? (dashboardData?.invoiceTotals?.totalOutstanding ?? 0)
+											: null
+									}
+									fieldUpdatedToday={
+										dashboardData?.fieldActivity?.siteUpdates
+											?.updatedTodayCount ?? 0
+									}
 								/>
 							)}
 						</div>

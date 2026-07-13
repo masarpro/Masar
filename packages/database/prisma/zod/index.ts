@@ -335,6 +335,12 @@ export const NotificationPreferenceScalarFieldEnumSchema = z.enum(['id', 'userId
 
 export type NotificationPreferenceScalarFieldEnum = z.infer<typeof NotificationPreferenceScalarFieldEnumSchema>;
 
+// File: UserDashboardPreferenceScalarFieldEnum.schema.ts
+
+export const UserDashboardPreferenceScalarFieldEnumSchema = z.enum(['id', 'userId', 'organizationId', 'heroCardKey', 'createdAt', 'updatedAt'])
+
+export type UserDashboardPreferenceScalarFieldEnum = z.infer<typeof UserDashboardPreferenceScalarFieldEnumSchema>;
+
 // File: ProjectOwnerAccessScalarFieldEnum.schema.ts
 
 export const ProjectOwnerAccessScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'token', 'label', 'expiresAt', 'isRevoked', 'createdById', 'createdAt'])
@@ -3003,6 +3009,20 @@ export const NotificationPreferenceSchema = z.object({
 });
 
 export type NotificationPreferenceType = z.infer<typeof NotificationPreferenceSchema>;
+
+
+// File: UserDashboardPreference.schema.ts
+
+export const UserDashboardPreferenceSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  organizationId: z.string(),
+  heroCardKey: z.string().default("finance"),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type UserDashboardPreferenceType = z.infer<typeof UserDashboardPreferenceSchema>;
 
 
 // File: ProjectOwnerAccess.schema.ts

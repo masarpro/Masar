@@ -71,6 +71,13 @@ async function OrganizationPageContent({
 					input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
 				}),
 			),
+			// Hero-carousel saved card: hydrated here so the dashboard paints the
+			// member's chosen card on first load instead of flashing the default.
+			queryClient.prefetchQuery(
+				orpcServer.dashboard.getHeroCardPreference.queryOptions({
+					input: { organizationId },
+				}),
+			),
 		);
 	}
 	if (showFinance) {

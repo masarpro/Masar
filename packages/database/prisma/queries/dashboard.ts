@@ -1,3 +1,4 @@
+import type { Prisma } from "../generated/client";
 import { db } from "../client";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -578,6 +579,221 @@ export async function getMonthlyFinancialTrend(organizationId: string) {
 			claims: data.claims,
 		}))
 		.sort((a, b) => a.month.localeCompare(b.month));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Hero Card Metrics - مقاييس بطاقات الداشبورد الرئيسية (Carousel)
+// تغذي بطاقات: نبض المشاريع | التدفقات المستحقة | الامتثال والفوترة (ZATCA).
+// ذمم العملاء تأتي من getInvoiceTotals الموجودة، فلا تُحسب هنا مرة ثانية.
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getHeroCardMetrics(organizationId: string) {
+	const now = new Date();
+	const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+	const DAY_MS = 24 * 60 * 60 * 1000;
+
+	// Real (non-draft, non-cancelled) invoices — same predicate as getInvoiceTotals
+	// plus the drafts-staging flag so edit drafts never count.
+	const realInvoiceWhere = {
+		organizationId,
+		isDraft: false,
+		status: { notIn: ["DRAFT", "CANCELLED"] },
+	} satisfies Prisma.FinanceInvoiceWhereInput;
+
+	const [
+		delayedProjects,
+		activeProgress,
+		subcontractDuesAgg,
+		retentionContracts,
+		invoicesThisMonth,
+		zatcaStatusGroups,
+		vatThisMonth,
+		lastInvoice,
+	] = await Promise.all([
+		// المشاريع النشطة المتأخرة عن تاريخ نهايتها المخطط
+		db.project.aggregate({
+			where: { organizationId, status: "ACTIVE", endDate: { lt: now } },
+			_count: { id: true },
+			_min: { endDate: true },
+		}),
+		// متوسط نسبة الإنجاز عبر المشاريع النشطة
+		db.project.aggregate({
+			where: { organizationId, status: "ACTIVE" },
+			_avg: { progress: true },
+		}),
+		// المستحق لمقاولي الباطن = صافي المستخلصات المعتمدة/المدفوعة جزئياً − المدفوع
+		db.subcontractClaim.aggregate({
+			where: {
+				organizationId,
+				status: { in: ["APPROVED", "PARTIALLY_PAID"] },
+			},
+			_sum: { netAmount: true, paidAmount: true },
+		}),
+		// عقود المشاريع التي تنص على نسبة محتجزات (لتقدير المحتجزات لدى العملاء)
+		db.projectContract.findMany({
+			where: { organizationId, retentionPercent: { gt: 0 } },
+			select: {
+				projectId: true,
+				retentionPercent: true,
+				retentionCap: true,
+			},
+		}),
+		db.financeInvoice.count({
+			where: { ...realInvoiceWhere, issueDate: { gte: startOfMonth } },
+		}),
+		// حالة الامتثال مع زاتكا لفواتير الشهر (Phase 2 فقط)
+		db.financeInvoice.groupBy({
+			by: ["zatcaSubmissionStatus"],
+			where: {
+				...realInvoiceWhere,
+				issueDate: { gte: startOfMonth },
+				zatcaSubmissionStatus: { not: "NOT_APPLICABLE" },
+			},
+			_count: { id: true },
+		}),
+		db.financeInvoice.aggregate({
+			where: { ...realInvoiceWhere, issueDate: { gte: startOfMonth } },
+			_sum: { vatAmount: true },
+		}),
+		db.financeInvoice.findFirst({
+			where: realInvoiceWhere,
+			select: { invoiceNo: true, issueDate: true, issuedAt: true },
+			orderBy: [{ issueDate: "desc" }, { createdAt: "desc" }],
+		}),
+	]);
+
+	// ── نبض المشاريع ──
+	const minEndDate = delayedProjects._min.endDate;
+	const projectsPulse = {
+		delayedCount: delayedProjects._count.id,
+		maxDelayDays: minEndDate
+			? Math.max(
+					0,
+					Math.floor((now.getTime() - new Date(minEndDate).getTime()) / DAY_MS),
+				)
+			: 0,
+		avgProgress: activeProgress._avg.progress
+			? Math.round(Number(activeProgress._avg.progress))
+			: 0,
+	};
+
+	// ── المحتجزات المتوقع تحصيلها (تقدير من عقد المشروع) ──
+	// نسبة الاحتجاز × المستخلصات المعتمدة/المدفوعة، بسقف retentionCap إن وجد،
+	// ناقص ما أُفرج عنه في محاضر الاستلام النهائية المكتملة.
+	let retentionExpected = 0;
+	if (retentionContracts.length > 0) {
+		const projectIds = retentionContracts.map((c) => c.projectId);
+		const [claimedByProject, releasedByProject] = await Promise.all([
+			db.projectClaim.groupBy({
+				by: ["projectId"],
+				where: {
+					organizationId,
+					projectId: { in: projectIds },
+					status: { in: ["APPROVED", "PAID"] },
+				},
+				_sum: { amount: true },
+			}),
+			db.handoverProtocol.groupBy({
+				by: ["projectId"],
+				where: {
+					organizationId,
+					projectId: { in: projectIds },
+					type: "FINAL",
+					status: { in: ["COMPLETED", "ARCHIVED"] },
+					retentionReleaseAmount: { not: null },
+				},
+				_sum: { retentionReleaseAmount: true },
+			}),
+		]);
+
+		const claimedMap = new Map(
+			claimedByProject.map((c) => [c.projectId, Number(c._sum.amount ?? 0)]),
+		);
+		const releasedMap = new Map(
+			releasedByProject.map((r) => [
+				r.projectId,
+				Number(r._sum.retentionReleaseAmount ?? 0),
+			]),
+		);
+
+		for (const contract of retentionContracts) {
+			const claimed = claimedMap.get(contract.projectId) ?? 0;
+			if (claimed <= 0) continue;
+			let retained = claimed * (Number(contract.retentionPercent) / 100);
+			if (contract.retentionCap) {
+				retained = Math.min(retained, Number(contract.retentionCap));
+			}
+			retained -= releasedMap.get(contract.projectId) ?? 0;
+			if (retained > 0) retentionExpected += retained;
+		}
+	}
+
+	// ── المستحق لمقاولي الباطن ──
+	const subcontractorDues = Math.max(
+		0,
+		Number(subcontractDuesAgg._sum.netAmount ?? 0) -
+			Number(subcontractDuesAgg._sum.paidAmount ?? 0),
+	);
+
+	// ── الامتثال والفوترة (ZATCA) ──
+	let zatcaCleared = 0;
+	let zatcaTotal = 0;
+	for (const group of zatcaStatusGroups) {
+		zatcaTotal += group._count.id;
+		if (
+			group.zatcaSubmissionStatus === "CLEARED" ||
+			group.zatcaSubmissionStatus === "REPORTED"
+		) {
+			zatcaCleared += group._count.id;
+		}
+	}
+
+	return {
+		projectsPulse,
+		receivables: {
+			retentionExpected,
+			subcontractorDues,
+		},
+		zatca: {
+			invoicesThisMonth,
+			// null = لا فواتير Phase 2 هذا الشهر (منظمة على Phase 1)
+			compliance: zatcaTotal > 0 ? { cleared: zatcaCleared, total: zatcaTotal } : null,
+			vatThisMonth: Number(vatThisMonth._sum.vatAmount ?? 0),
+			lastInvoice: lastInvoice
+				? {
+						invoiceNo: lastInvoice.invoiceNo,
+						date: lastInvoice.issuedAt ?? lastInvoice.issueDate,
+					}
+				: null,
+		},
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Dashboard Preferences - تفضيلات لوحة التحكم (لكل مستخدم داخل المنظمة)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getUserDashboardPreference(
+	userId: string,
+	organizationId: string,
+) {
+	return db.userDashboardPreference.findUnique({
+		where: { userId_organizationId: { userId, organizationId } },
+		select: { heroCardKey: true },
+	});
+}
+
+export async function upsertUserDashboardPreference(
+	userId: string,
+	organizationId: string,
+	heroCardKey: string,
+) {
+	return db.userDashboardPreference.upsert({
+		where: { userId_organizationId: { userId, organizationId } },
+		create: { userId, organizationId, heroCardKey },
+		update: { heroCardKey },
+		select: { heroCardKey: true },
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

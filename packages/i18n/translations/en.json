@@ -1962,6 +1962,32 @@
         "MIXED": "Mixed"
       }
     },
+    "hero": {
+      "cards": {
+        "finance": "Financial Overview",
+        "projects": "Projects Pulse",
+        "cashflow": "Due Cash Flows",
+        "zatca": "Compliance & Invoicing"
+      },
+      "stats": {
+        "delayedProjects": "Projects behind schedule",
+        "delayedProjectsWithMax": "Behind schedule (max {days} days)",
+        "avgProgress": "Average progress",
+        "sitesUpdatedToday": "Sites updated today",
+        "clientReceivables": "Client receivables",
+        "retentionExpected": "Expected retention",
+        "subcontractorDues": "Due to subcontractors",
+        "invoicesThisMonth": "Invoices this month",
+        "zatcaCompliance": "ZATCA compliance",
+        "vatDue": "VAT (this month)",
+        "lastInvoice": "Last invoice",
+        "lastInvoiceAt": "Last invoice — {date}"
+      },
+      "goToProjects": "Projects",
+      "goToInvoices": "Invoices",
+      "previousCard": "Previous card",
+      "nextCard": "Next card"
+    },
     "cashFlow": {
       "title": "Cash Flow — Last 7 Days",
       "goToFinance": "Finance",
@@ -12616,6 +12642,32 @@
     }
   },
   "landingVisuals": {
+    "replica": {
+      "org": "Modern Construction Co.",
+      "sar": "SAR",
+      "projects": {
+        "1": {
+          "name": "Yasmin District Villa",
+          "phase": "Finishing works · 12 days on phase"
+        },
+        "2": {
+          "name": "Narjis Residential Building",
+          "phase": "Structural frame · 5 days on phase"
+        },
+        "3": {
+          "name": "Rawabi Commercial Complex",
+          "phase": "Foundation works · 3 days on phase"
+        }
+      },
+      "months": {
+        "1": "Feb",
+        "2": "Mar",
+        "3": "Apr",
+        "4": "May",
+        "5": "Jun",
+        "6": "Jul"
+      }
+    },
     "tower": {
       "active": "Active projects",
       "done": "Completed",
