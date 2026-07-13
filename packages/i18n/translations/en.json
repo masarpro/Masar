@@ -1853,6 +1853,9 @@
     "projectCard": {
       "payments": "Project Payments",
       "receipts": "Project Receipts",
+      "paymentsShort": "Payments",
+      "receiptsShort": "Receipts",
+      "photos": "Photos",
       "daysOnPhase": "{days} day(s) on phase",
       "noPhase": "No active phase"
     },

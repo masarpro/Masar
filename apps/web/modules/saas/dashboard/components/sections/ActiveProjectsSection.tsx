@@ -86,7 +86,7 @@ export function ActiveProjectsSection({
 		);
 	}
 
-	const MAX_VISIBLE = 3;
+	const MAX_VISIBLE = 4;
 	const visibleProjects = projects.slice(0, MAX_VISIBLE);
 	const hasMore = projects.length > MAX_VISIBLE;
 
@@ -108,11 +108,11 @@ export function ActiveProjectsSection({
 
 			{/* Column labels (single-line table title row) */}
 			<div className="mt-3 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto] items-center gap-3 border-b-2 pb-2 text-xs font-medium text-muted-foreground sm:grid">
-				<span>{t("dashboard.activeProjects")}</span>
-				<span>{t("projects.overview.progress")}</span>
-				<span>{t("dashboard.projectCard.payments")}</span>
-				<span>{t("dashboard.projectCard.receipts")}</span>
-				<span className="text-end">{t("dashboard.projectCard.photos")}</span>
+				<span className="truncate">{t("dashboard.activeProjects")}</span>
+				<span className="truncate">{t("projects.overview.progress")}</span>
+				<span className="truncate">{t("dashboard.projectCard.paymentsShort")}</span>
+				<span className="truncate">{t("dashboard.projectCard.receiptsShort")}</span>
+				<span className="truncate text-end">{t("dashboard.projectCard.photos")}</span>
 			</div>
 
 			{/* Rows — one project per line */}

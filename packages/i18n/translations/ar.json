@@ -1853,6 +1853,9 @@
     "projectCard": {
       "payments": "مدفوعات المشروع",
       "receipts": "مقبوضات المشروع",
+      "paymentsShort": "المدفوعات",
+      "receiptsShort": "المقبوضات",
+      "photos": "صور",
       "daysOnPhase": "{days} يوم على المرحلة",
       "noPhase": "لا توجد مرحلة نشطة"
     },
