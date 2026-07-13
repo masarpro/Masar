@@ -10,6 +10,7 @@ import {
 	Info,
 	Mail,
 	MessageCircle,
+	Plus,
 	Receipt,
 	SearchIcon,
 	ShieldCheck,
@@ -38,6 +39,19 @@ const CATEGORY_ICONS: Record<FaqCategory, typeof Info> = {
 	security: ShieldCheck,
 };
 
+// Botly brand hues rotate across category chips (chart tokens)
+const CATEGORY_CHIPS: Record<FaqCategory, string> = {
+	general: "bg-chart-4/15 text-chart-4",
+	plans: "bg-chart-1/25 text-foreground",
+	projects: "bg-chart-3/20 text-chart-3",
+	finance: "bg-success/15 text-success",
+	quantities: "bg-chart-2/15 text-chart-2",
+	subcontractors: "bg-chart-1/25 text-foreground",
+	hr: "bg-chart-4/15 text-chart-4",
+	assistant: "bg-chart-3/20 text-chart-3",
+	security: "bg-success/15 text-success",
+};
+
 /** تطبيع النص العربي للبحث — إزالة التشكيل وتوحيد الألف والتاء المربوطة */
 function normalize(text: string): string {
 	return text
@@ -61,11 +75,11 @@ function FaqAccordionItem({
 	onToggle: () => void;
 }) {
 	return (
-		<div className="border-b border-border/60 last:border-b-0">
+		<div className="border-b-2 last:border-b-0">
 			<button
 				type="button"
 				onClick={onToggle}
-				className="flex w-full items-center justify-between gap-4 bg-transparent py-5 text-start cursor-pointer"
+				className="flex w-full cursor-pointer items-center justify-between gap-4 bg-transparent py-5 text-start"
 				aria-expanded={isOpen}
 			>
 				<span className="flex-1 font-semibold text-[16px] text-foreground">
@@ -73,13 +87,13 @@ function FaqAccordionItem({
 				</span>
 				<span
 					className={cn(
-						"flex size-8 shrink-0 items-center justify-center rounded-[10px] text-lg transition-all duration-300",
+						"grid size-8 shrink-0 place-items-center rounded-lg border-2 transition-all duration-300",
 						isOpen
-							? "rotate-45 bg-gradient-to-br from-sky-500 to-cyan-500 text-white"
-							: "bg-muted text-muted-foreground",
+							? "rotate-45 border-transparent bg-primary text-primary-foreground"
+							: "text-muted-foreground",
 					)}
 				>
-					+
+					<Plus className="size-4" />
 				</span>
 			</button>
 			<div
@@ -172,7 +186,7 @@ export function FaqPageContent() {
 						setOpenId(null);
 					}}
 					placeholder={t("faqPage.searchPlaceholder")}
-					className="w-full rounded-2xl border border-border bg-card py-4 ps-12 pe-12 text-[15px] shadow-sm outline-none transition-all focus:border-sky-400 focus:ring-4 focus:ring-sky-500/10"
+					className="w-full rounded-2xl border-2 bg-card py-4 ps-12 pe-12 text-[15px] outline-none transition-colors focus:border-ring"
 				/>
 				{query && (
 					<button
@@ -192,10 +206,10 @@ export function FaqPageContent() {
 					type="button"
 					onClick={() => setActiveCategory("all")}
 					className={cn(
-						"rounded-full border px-4 py-2 font-medium text-[13px] transition-all",
+						"rounded-full border-2 px-4 py-2 font-medium text-[13px] transition-colors",
 						activeCategory === "all"
-							? "border-transparent bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/20"
-							: "border-border bg-card text-muted-foreground hover:border-sky-300 hover:text-foreground",
+							? "border-transparent bg-primary text-primary-foreground"
+							: "bg-card text-muted-foreground hover:text-foreground",
 					)}
 				>
 					{t("faqPage.allCategories")}
@@ -208,16 +222,14 @@ export function FaqPageContent() {
 							type="button"
 							onClick={() =>
 								setActiveCategory(
-									activeCategory === category
-										? "all"
-										: category,
+									activeCategory === category ? "all" : category,
 								)
 							}
 							className={cn(
-								"flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium text-[13px] transition-all",
+								"flex items-center gap-1.5 rounded-full border-2 px-4 py-2 font-medium text-[13px] transition-colors",
 								activeCategory === category
-									? "border-transparent bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/20"
-									: "border-border bg-card text-muted-foreground hover:border-sky-300 hover:text-foreground",
+									? "border-transparent bg-primary text-primary-foreground"
+									: "bg-card text-muted-foreground hover:text-foreground",
 							)}
 						>
 							<Icon className="size-3.5" />
@@ -229,7 +241,7 @@ export function FaqPageContent() {
 
 			{/* النتائج */}
 			{filtered.length === 0 ? (
-				<div className="rounded-3xl border border-border bg-card px-8 py-16 text-center">
+				<div className="rounded-[var(--botly-radius-card)] border-2 bg-card px-8 py-16 text-center">
 					<p className="mb-2 font-semibold text-lg">
 						{t("faqPage.noResults")}
 					</p>
@@ -238,7 +250,7 @@ export function FaqPageContent() {
 					</p>
 				</div>
 			) : isSearching ? (
-				<div className="rounded-3xl border border-border bg-card px-6 py-1 sm:px-9">
+				<div className="rounded-[var(--botly-radius-card)] border-2 bg-card px-6 py-1 sm:px-9">
 					{filtered.map((item) => (
 						<FaqAccordionItem
 							key={item.id}
@@ -257,13 +269,18 @@ export function FaqPageContent() {
 						const Icon = CATEGORY_ICONS[group.category];
 						return (
 							<section key={group.category}>
-								<h2 className="mb-4 flex items-center gap-2 font-bold text-xl">
-									<span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/10 to-cyan-500/10 text-sky-600 dark:text-sky-400">
+								<h2 className="mb-4 flex items-center gap-2.5 font-bold text-xl">
+									<span
+										className={cn(
+											"grid size-9 place-items-center rounded-xl",
+											CATEGORY_CHIPS[group.category],
+										)}
+									>
 										<Icon className="size-4.5" />
 									</span>
 									{t(`faqPage.categories.${group.category}`)}
 								</h2>
-								<div className="rounded-3xl border border-border bg-card px-6 py-1 sm:px-9">
+								<div className="rounded-[var(--botly-radius-card)] border-2 bg-card px-6 py-1 sm:px-9">
 									{group.items.map((item) => (
 										<FaqAccordionItem
 											key={item.id}
@@ -272,9 +289,7 @@ export function FaqPageContent() {
 											isOpen={openId === item.id}
 											onToggle={() =>
 												setOpenId(
-													openId === item.id
-														? null
-														: item.id,
+													openId === item.id ? null : item.id,
 												)
 											}
 										/>
@@ -286,12 +301,12 @@ export function FaqPageContent() {
 				</div>
 			)}
 
-			{/* لم تجد ما تبحث عنه؟ */}
-			<div className="mt-16 rounded-3xl border border-sky-500/15 bg-gradient-to-br from-sky-500/5 to-cyan-500/5 px-8 py-12 text-center">
+			{/* لم تجد ما تبحث عنه؟ — Botly inverted band */}
+			<div className="mt-16 rounded-[var(--botly-radius-card)] bg-primary px-8 py-12 text-center text-primary-foreground">
 				<h2 className="mb-2 font-bold text-2xl">
 					{t("faqPage.contact.title")}
 				</h2>
-				<p className="mx-auto mb-8 max-w-md text-balance text-muted-foreground text-sm">
+				<p className="mx-auto mb-8 max-w-md text-balance text-primary-foreground/65 text-sm">
 					{t("faqPage.contact.description")}
 				</p>
 				<div className="flex flex-wrap items-center justify-center gap-3">
@@ -300,7 +315,7 @@ export function FaqPageContent() {
 							href={whatsAppHref}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-6 py-3 font-bold text-sm text-white shadow-md shadow-[#25D366]/25 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+							className="flex items-center gap-2 rounded-[12px] bg-[#25D366] px-6 py-3 font-bold text-sm text-white transition-opacity hover:opacity-90"
 						>
 							<MessageCircle className="size-4.5" />
 							{t("faqPage.contact.whatsapp")}
@@ -308,7 +323,7 @@ export function FaqPageContent() {
 					)}
 					<LocaleLink
 						href="/contact"
-						className="flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3 font-bold text-foreground text-sm transition-all hover:-translate-y-0.5 hover:border-sky-300"
+						className="flex items-center gap-2 rounded-[12px] bg-primary-foreground px-6 py-3 font-bold text-primary text-sm transition-opacity hover:opacity-90"
 					>
 						<Mail className="size-4.5" />
 						{t("faqPage.contact.contactUs")}

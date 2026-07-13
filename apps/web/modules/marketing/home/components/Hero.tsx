@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { BotlyPathStrip } from "./BotlyPathStrip";
 import { LandingDashboardReplica } from "./LandingDashboardReplica";
 
 /**
@@ -12,14 +13,6 @@ import { LandingDashboardReplica } from "./LandingDashboardReplica";
  * The section is dark in BOTH themes (like Botly's landing).
  */
 
-const STATION_KEYS = [
-	"pricing",
-	"contract",
-	"execution",
-	"invoicing",
-	"handover",
-] as const;
-
 export function Hero() {
 	const t = useTranslations();
 
@@ -27,15 +20,37 @@ export function Hero() {
 		<section
 			id="top"
 			className="relative overflow-hidden px-4 pt-32 pb-20 md:px-6 md:pt-40 md:pb-28"
-			style={{ background: "#131313" }}
+			style={{ background: "#0f0b1d" }}
 		>
-			{/* Botly gradient atmosphere — Brand/04 + Brand/01 glows */}
+			{/* Botly gradient atmosphere (Figma 226:1340/1343): purple
+			    color-dodge glow + grain texture over #0f0b1d */}
 			<div className="pointer-events-none absolute inset-0" aria-hidden="true">
+				<div dir="ltr" className="absolute inset-0">
+					<img
+						src="/images/botly-hero-glow.svg"
+						alt=""
+						className="absolute opacity-50 mix-blend-color-dodge"
+						style={{
+							left: "34%",
+							top: "-10%",
+							width: "1200px",
+							height: "1160px",
+							transform: "rotate(-32.63deg)",
+						}}
+					/>
+				</div>
+				<div
+					className="absolute inset-0 opacity-10 mix-blend-color-dodge"
+					style={{
+						backgroundImage: "url(/images/botly-noise-512.png)",
+						backgroundSize: "512px 512px",
+					}}
+				/>
 				<div
 					className="absolute inset-x-0 top-0 h-[720px]"
 					style={{
 						background:
-							"radial-gradient(58% 55% at 50% 0%, rgba(93,116,241,0.16), transparent 70%), radial-gradient(32% 32% at 82% 12%, rgba(255,204,111,0.07), transparent 70%), radial-gradient(28% 30% at 14% 22%, rgba(142,201,219,0.06), transparent 70%)",
+							"radial-gradient(40% 45% at 18% 10%, rgba(93,116,241,0.1), transparent 70%)",
 					}}
 				/>
 				{/* floating confetti (Botly floating elements, CSS-only) */}
@@ -73,36 +88,24 @@ export function Hero() {
 						{t("hero.subtitle")}
 					</p>
 
-					{/* CTAs — Botly: white pill + quiet secondary line */}
-					<div className="mt-9 flex flex-col items-center gap-4">
-						<div className="flex flex-col items-center gap-3 sm:flex-row">
-							<Link
-								href="/auth/signup"
-								className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-white px-10 py-4 text-[16px] font-bold text-[#1d1d1d] transition-opacity hover:opacity-90"
-							>
-								{t("hero.cta")}
-							</Link>
-							<a
-								href="#features"
-								className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-white/10 px-8 py-4 text-[15px] font-semibold text-[#eceaf0] transition-colors hover:bg-white/15"
-							>
-								{t("hero.secondary")}
-							</a>
-						</div>
-						<p className="text-[13px] text-white opacity-50">
-							{t("finalCta.note")}
-						</p>
+					{/* CTAs — Botly: white pill + quiet secondary */}
+					<div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+						<Link
+							href="/auth/signup"
+							className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-white px-10 py-4 text-[16px] font-bold text-[#1d1d1d] transition-opacity hover:opacity-90"
+						>
+							{t("hero.cta")}
+						</Link>
+						<a
+							href="#features"
+							className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-white/10 px-8 py-4 text-[15px] font-semibold text-[#eceaf0] transition-colors hover:bg-white/15"
+						>
+							{t("hero.secondary")}
+						</a>
 					</div>
 
 					{/* Trust row */}
 					<div className="mt-9 flex flex-col items-center gap-4">
-						<span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[12.5px] font-semibold text-[#8ec9db]">
-							<span
-								className="size-2 rounded-full bg-[#349264]"
-								aria-hidden="true"
-							/>
-							{t("hero.zatcaChip")}
-						</span>
 						<div className="flex flex-wrap items-center justify-center gap-3">
 							<span className="flex" aria-hidden="true">
 								{["#ffcc6f", "#ea7465", "#8ec9db", "#5d74f1"].map(
@@ -112,7 +115,7 @@ export function Hero() {
 											className="grid h-8 w-8 place-items-center rounded-full text-[12px] font-bold not-italic text-[#1d1d1d]"
 											style={{
 												background: color,
-												border: "2px solid #131313",
+												border: "2px solid #0f0b1d",
 												marginInlineStart: i > 0 ? -9 : 0,
 											}}
 										>
@@ -134,27 +137,10 @@ export function Hero() {
 					</div>
 				</div>
 
-				{/* Journey strip — the 5 project stations as Botly pills */}
-				<div
-					className="mt-14 flex flex-wrap items-center justify-center gap-2 md:gap-0"
-					aria-label={t("hero.stations.aria")}
-				>
-					{STATION_KEYS.map((key, i) => (
-						<div key={key} className="flex items-center">
-							<span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[13px] font-semibold text-white/75">
-								<b className="text-[11px] font-bold text-[#ffcc6f]">
-									0{i + 1}
-								</b>
-								{t(`hero.stations.${key}`)}
-							</span>
-							{i < STATION_KEYS.length - 1 && (
-								<span
-									className="mx-1 hidden h-px w-6 bg-white/15 md:block"
-									aria-hidden="true"
-								/>
-							)}
-						</div>
-					))}
+				{/* Journey diagram — the classic curved path with 5 numbered
+				    stations, in Botly colors */}
+				<div className="mt-12 md:mt-16">
+					<BotlyPathStrip />
 				</div>
 
 				{/* Product frame — Botly's bordered gradient frame, holding the

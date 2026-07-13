@@ -89,7 +89,7 @@ export function NavBar() {
 				"fixed top-0 left-0 z-50 w-full transition-all duration-500",
 				!isTop || isDocsPage
 					? isHomePage
-						? "border-b border-white/10 bg-[#131313]/85 backdrop-blur-2xl"
+						? "border-b border-white/10 bg-[#0f0b1d]/85 backdrop-blur-2xl"
 						: "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
 					: "bg-transparent",
 			)}

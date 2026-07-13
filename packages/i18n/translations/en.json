@@ -12645,6 +12645,14 @@
     "replica": {
       "org": "Modern Construction Co.",
       "sar": "SAR",
+      "nav": {
+        "home": "Home",
+        "projects": "Projects",
+        "finance": "Finance",
+        "pricing": "Pricing",
+        "company": "Company",
+        "settings": "Settings"
+      },
       "projects": {
         "1": {
           "name": "Yasmin District Villa",

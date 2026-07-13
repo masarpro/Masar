@@ -2,16 +2,21 @@
 
 import {
 	AlertTriangle,
+	Building2,
 	Calculator,
 	CalendarClock,
 	ChevronLeft,
 	FileText,
+	FolderKanban,
 	FolderOpen,
+	Home,
 	MapPin,
 	Plus,
 	Receipt,
+	Settings,
 	TrendingDown,
 	TrendingUp,
+	Wallet,
 	Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -160,13 +165,66 @@ export function LandingDashboardReplica() {
 		},
 	];
 
+	const sidebarNav = [
+		{ icon: Home, label: v("nav.home"), active: true },
+		{ icon: FolderKanban, label: v("nav.projects") },
+		{ icon: Wallet, label: v("nav.finance") },
+		{ icon: Calculator, label: v("nav.pricing") },
+		{ icon: Building2, label: v("nav.company") },
+		{ icon: Settings, label: v("nav.settings") },
+	];
+
 	return (
 		<div
-			className="pointer-events-none select-none rounded-[24px] bg-white p-3 md:p-4"
+			className="pointer-events-none flex select-none gap-3 rounded-[24px] bg-white p-3 md:p-4"
 			aria-hidden="true"
 			style={{ color: INK }}
 		>
-			<div className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
+			{/* Sidebar — the app's Botly inverted floating panel, expanded.
+			    inline-start so it sits on the right in RTL, like the real app. */}
+			<div
+				className="hidden w-40 shrink-0 flex-col rounded-[20px] p-3 md:flex"
+				style={{ background: INK }}
+			>
+				<div className="flex items-center gap-2 px-2 pt-1 pb-4">
+					<span className="grid size-7 place-items-center rounded-lg bg-white text-xs font-black" style={{ color: INK }}>
+						م
+					</span>
+					<span className="text-sm font-bold text-white">مسار</span>
+				</div>
+				<div className="flex flex-col gap-1">
+					{sidebarNav.map((item) => {
+						const Icon = item.icon;
+						return (
+							<div
+								key={item.label}
+								className="flex items-center gap-2.5 rounded-xl px-2.5 py-2"
+								style={
+									item.active
+										? {
+												background: "#323232",
+												border: "1px solid rgba(255,255,255,0.1)",
+											}
+										: undefined
+								}
+							>
+								<Icon
+									className="size-3.5 shrink-0"
+									style={{ color: item.active ? "#ffffff" : "#a0a5a9" }}
+								/>
+								<span
+									className="truncate text-xs font-semibold"
+									style={{ color: item.active ? "#ffffff" : "#a0a5a9" }}
+								>
+									{item.label}
+								</span>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+
+			<div className="grid min-w-0 flex-1 grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
 				{/* ── Left 2/3 ── */}
 				<div className="flex min-w-0 flex-col gap-3 md:col-span-2 md:gap-4">
 					{/* BotlyHero gradient card + glass stats strip */}

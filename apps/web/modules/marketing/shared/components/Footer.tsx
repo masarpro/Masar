@@ -60,7 +60,7 @@ export function Footer() {
 			className={cn(
 				"border-t py-14 text-sm",
 				isHomePage
-					? "border-white/10 bg-[#131313] text-white/70"
+					? "border-white/10 bg-[#0f0b1d] text-white/70"
 					: "border-border/50 bg-muted/50 text-foreground/70",
 			)}
 		>

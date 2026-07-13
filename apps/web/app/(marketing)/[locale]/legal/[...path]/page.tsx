@@ -53,12 +53,15 @@ export default async function BlogPostPage(props: { params: Promise<Params> }) {
 	const { title, body } = page;
 
 	return (
-		<div className="container max-w-6xl pt-32 pb-24">
-			<div className="mx-auto mb-12 max-w-2xl">
-				<h1 className="text-center font-bold text-4xl">{title}</h1>
+		<div className="container max-w-4xl pt-32 pb-24">
+			<div className="mx-auto mb-10 max-w-2xl text-center">
+				<h1 className="font-extrabold text-4xl sm:text-5xl">{title}</h1>
 			</div>
 
-			<PostContent content={body} />
+			{/* Botly widget card around the document body */}
+			<div className="rounded-[var(--botly-radius-card)] border-2 bg-card p-6 md:p-10">
+				<PostContent content={body} />
+			</div>
 		</div>
 	);
 }

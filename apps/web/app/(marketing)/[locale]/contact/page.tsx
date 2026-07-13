@@ -17,17 +17,20 @@ export default async function ContactPage() {
 
 	const t = await getTranslations();
 	return (
-		<div className="container max-w-xl pt-32 pb-16">
-			<div className="mb-12 pt-8 text-center">
-				<h1 className="mb-2 font-bold text-5xl">
+		<div className="container max-w-xl pt-32 pb-20">
+			<div className="mb-10 pt-8 text-center">
+				<h1 className="mb-3 font-extrabold text-4xl sm:text-5xl">
 					{t("contact.title")}
 				</h1>
-				<p className="text-balance text-lg opacity-50">
+				<p className="text-balance text-muted-foreground">
 					{t("contact.description")}
 				</p>
 			</div>
 
-			<ContactForm />
+			{/* Botly widget card around the form */}
+			<div className="rounded-[var(--botly-radius-card)] border-2 bg-card p-6 md:p-8">
+				<ContactForm />
+			</div>
 		</div>
 	);
 }

@@ -10,7 +10,7 @@ export function FinalCTA() {
 	return (
 		<section
 			className="relative overflow-hidden px-6 py-28 text-center md:py-36"
-			style={{ background: "#131313" }}
+			style={{ background: "#0f0b1d" }}
 		>
 			<div
 				className="pointer-events-none absolute inset-0"

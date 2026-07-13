@@ -16,7 +16,7 @@ export function AiFeatureSection() {
 		<section
 			id="ai"
 			className="relative scroll-mt-16 overflow-hidden px-6 py-24 md:py-32"
-			style={{ background: "#131313" }}
+			style={{ background: "#0f0b1d" }}
 		>
 			<div
 				className="pointer-events-none absolute inset-0"

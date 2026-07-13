@@ -117,7 +117,10 @@ function Station({
 	// Alternate visual side on desktop, Botly-landing style
 	const flip = index % 2 === 0;
 	return (
-		<article className="bl-rv grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-14">
+		<article
+			id={`st-${index}`}
+			className="bl-rv grid scroll-mt-24 grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-14"
+		>
 			<div className={flip ? "md:order-2" : undefined}>
 				<StationCopy
 					index={index}
