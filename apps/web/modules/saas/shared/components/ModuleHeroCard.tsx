@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@ui/lib";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -13,6 +14,8 @@ interface ModuleHeroCardProps {
 	stats: Array<{ label: string; value: ReactNode }>;
 	/** Primary Botly button in the top-trailing corner. */
 	cta?: { label: string; href: string };
+	/** Fill the parent's height (title top, strip bottom) — for side-by-side rows. */
+	fill?: boolean;
 }
 
 /**
@@ -28,10 +31,14 @@ export function ModuleHeroCard({
 	subtitle,
 	stats,
 	cta,
+	fill,
 }: ModuleHeroCardProps) {
 	return (
 		<div
-			className="relative overflow-hidden rounded-[32px] p-3"
+			className={cn(
+				"relative overflow-hidden rounded-[32px] p-3",
+				fill && "flex h-full flex-col justify-between",
+			)}
 			style={{
 				backgroundImage:
 					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",

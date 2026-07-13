@@ -2937,6 +2937,8 @@
         "templatesNew": "New Template",
         "clients": "Clients",
         "clientsNew": "New Client",
+        "banks": "Banks",
+        "banksNew": "New Bank",
         "reports": "Reports",
         "reportsNew": "New Report",
         "settings": "Settings"

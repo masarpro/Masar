@@ -4,20 +4,13 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
-import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
-import { DeadlinesCard } from "./DeadlinesCard";
+import { FinanceShortcutsCard } from "./FinanceShortcutsCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { ModuleHeroCard } from "@saas/shared/components/ModuleHeroCard";
-import { Skeleton } from "@ui/components/skeleton";
+import { FinancePanel } from "@saas/dashboard/components/sections/FinancePanel";
 import { Currency } from "../shared/Currency";
-
-const CashFlowCard = dynamic(
-	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
-	{ loading: () => <Skeleton className="h-[300px] w-full rounded-lg" />, ssr: false },
-);
 
 interface FinanceDashboardProps {
 	organizationId: string;
@@ -44,6 +37,14 @@ export function FinanceDashboard({
 		}),
 	);
 
+	// Monthly revenue/expenses trend — feeds the same cash-flow card the home
+	// dashboard uses (member-gated getAll; financialTrend = monthly claims/expenses).
+	const { data: trendData } = useQuery(
+		orpc.dashboard.getAll.queryOptions({
+			input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
+		}),
+	);
+
 	if (isLoading) {
 		return <DashboardSkeleton />;
 	}
@@ -54,56 +55,57 @@ export function FinanceDashboard({
 	const cashBalance = orgData?.balances.totalCashBalance ?? 0;
 	const bankBalance = orgData?.balances.totalBankBalance ?? 0;
 	const netProfit = (orgData?.payments.total ?? 0) - (orgData?.totalMoneyOut ?? 0);
+	const financialTrend = trendData?.financialTrend ?? [];
 
 	return (
 		<div className="space-y-6">
-			{/* 0. Botly module hero — page name + primary action + balance strip */}
-			<ModuleHeroCard
-				title={t("finance.title")}
-				subtitle={`${t("finance.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
-				cta={{
-					label: t("finance.pages.accountingDashboard"),
-					href: `/app/${orgSlug}/finance/accounting-dashboard`,
-				}}
-				stats={[
-					{
-						label: t("finance.dashboard.overview.cashBalance"),
-						value: <Currency amount={cashBalance} />,
-					},
-					{
-						label: t("finance.dashboard.overview.bankBalance"),
-						value: <Currency amount={bankBalance} />,
-					},
-					{
-						label: t("finance.dashboard.overview.netProfit"),
-						value: <Currency amount={netProfit} />,
-					},
-				]}
-			/>
-
-			{/* 3. Cash Flow Chart */}
-			<CashFlowCard organizationId={organizationId} />
-
-			{/* 4. Quick Action Cards (Invoices, Expenses, Payments) */}
-			<ActionCards organizationSlug={orgSlug} />
-
-			<hr className="border-border" />
-
-			{/* 5. Stats Cards (Invoices, Outstanding, Clients) */}
-			<StatsCards stats={stats} />
-
-			{/* 6. Bottom Section (Recent Documents + Deadlines) */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				<div className="lg:col-span-2">
-					<RecentDocumentsTable
-						invoices={recentInvoices}
-						organizationSlug={orgSlug}
+			{/* Row 1 — Botly hero (65%) beside the home-dashboard cash-flow card (35%) */}
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-[65fr_35fr]">
+				<div className="lg:h-[300px]">
+					<ModuleHeroCard
+						fill
+						title={t("finance.title")}
+						subtitle={`${t("finance.dashboard.hello")}${userName ? ` ${userName}` : ""}`}
+						cta={{
+							label: t("finance.pages.accountingDashboard"),
+							href: `/app/${orgSlug}/finance/accounting-dashboard`,
+						}}
+						stats={[
+							{
+								label: t("finance.dashboard.overview.cashBalance"),
+								value: <Currency amount={cashBalance} />,
+							},
+							{
+								label: t("finance.dashboard.overview.bankBalance"),
+								value: <Currency amount={bankBalance} />,
+							},
+							{
+								label: t("finance.dashboard.overview.netProfit"),
+								value: <Currency amount={netProfit} />,
+							},
+						]}
 					/>
 				</div>
-				<DeadlinesCard
-					organizationId={organizationId}
+				<div className="lg:h-[300px]">
+					<FinancePanel
+						financialTrend={financialTrend}
+						organizationSlug={orgSlug}
+						bankBalance={bankBalance}
+						cashBalance={cashBalance}
+					/>
+				</div>
+			</div>
+
+			{/* Row 2 — stat cards in one line (Invoices, Outstanding, Clients) */}
+			<StatsCards stats={stats} />
+
+			{/* Row 3 — recent documents (65%) beside finance shortcuts (35%) */}
+			<div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[65fr_35fr]">
+				<RecentDocumentsTable
+					invoices={recentInvoices}
 					organizationSlug={orgSlug}
 				/>
+				<FinanceShortcutsCard organizationSlug={orgSlug} />
 			</div>
 		</div>
 	);
