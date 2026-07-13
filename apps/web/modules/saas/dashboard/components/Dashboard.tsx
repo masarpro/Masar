@@ -103,7 +103,7 @@ export function Dashboard({
 	// Left 2/3: hero → shortcut tiles → projects table (same width as hero).
 	// Right 1/3: cash-flow bars → portfolio pulse → attention + latest docs.
 	return (
-		<div className="flex flex-col gap-4 p-3 sm:p-4 xl:h-[calc(100dvh-11.25rem)] xl:min-h-[620px] xl:flex-row xl:overflow-hidden xl:p-0">
+		<div className="flex flex-col gap-6 p-3 sm:p-4 xl:h-[calc(100dvh-11.25rem)] xl:min-h-[620px] xl:flex-row xl:overflow-hidden xl:p-0">
 			{/* Fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
 				<div className="flex-1">
@@ -114,7 +114,7 @@ export function Dashboard({
 			{(showFinance || showProjects) && (
 				<>
 					{/* Left column — 2/3 */}
-					<div className="flex min-h-0 min-w-0 flex-col gap-4 xl:w-2/3">
+					<div className="flex min-h-0 min-w-0 flex-col gap-6 xl:w-2/3">
 						<div className="min-h-0 xl:flex-[4]">
 							{finLoading || statsLoading ? (
 								sectionSkeleton
@@ -160,7 +160,7 @@ export function Dashboard({
 					</div>
 
 					{/* Right column — 1/3 */}
-					<div className="flex min-h-0 min-w-0 flex-col gap-4 xl:w-1/3">
+					<div className="flex min-h-0 min-w-0 flex-col gap-6 xl:w-1/3">
 						{showFinance && (
 							<div className="min-h-0 xl:flex-[4]">
 								{finLoading || statsLoading ? (

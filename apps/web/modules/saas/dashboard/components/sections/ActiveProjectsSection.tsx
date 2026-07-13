@@ -96,7 +96,7 @@ export function ActiveProjectsSection({
 		<div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--botly-radius-card)] border-2 bg-card px-8 py-6">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between">
-				<p className="text-xl font-semibold text-card-foreground">
+				<p className="text-base font-semibold text-card-foreground">
 					{t("dashboard.activeProjects")}
 				</p>
 				<Link
@@ -109,7 +109,7 @@ export function ActiveProjectsSection({
 			</div>
 
 			{/* Column labels (single-line table title row) */}
-			<div className="mt-4 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto] items-center gap-3 border-b-2 pb-4 text-sm font-medium text-muted-foreground sm:grid">
+			<div className="mt-4 hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.9fr)] items-center gap-3 border-b-2 pb-4 text-sm font-medium text-muted-foreground sm:grid">
 				<span className="truncate">{t("dashboard.activeProjects")}</span>
 				<span className="truncate">{t("projects.overview.progress")}</span>
 				<span className="truncate">{t("dashboard.projectCard.paymentsShort")}</span>
@@ -136,7 +136,7 @@ export function ActiveProjectsSection({
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-center gap-3 border-b-2 py-3.5 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]"
+							className="group grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-center gap-3 border-b-2 py-3.5 transition-colors last:border-0 hover:bg-accent/40 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]"
 						>
 							{/* Project: cover + name + milestone·days subline */}
 							<div className="flex min-w-0 items-center gap-3">

@@ -92,7 +92,11 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 		// Botly Top bar (69:1786): flat, no divider, big bold title + nav chevrons
 		// on the leading side; icon buttons + avatar on the trailing side. Padding
 		// aligns with the content cards below it.
-		<header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 bg-background px-3 xl:h-20 xl:px-8">
+		<header className="sticky top-0 z-30 flex h-16 shrink-0 items-center bg-background px-3 xl:h-20 xl:px-8">
+			{/* Inner box shares the cards' max-w-[1400px] content column so the
+			    title + icons line up exactly with the card borders (Figma 69:1786:
+			    the top bar is the same 1144px-wide column as the cards). */}
+			<div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3">
 			{/* Leading side: mobile hamburger + page title + back/forward chevrons */}
 			<div className="flex min-w-0 items-center gap-2 xl:gap-6">
 				{isMobile && (
@@ -130,7 +134,7 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 			</div>
 
 			{/* Trailing side (Botly 267:4701): quick-add → bell → search → avatar */}
-			<div className="flex items-center gap-2 xl:gap-3">
+			<div className="flex items-center gap-2 xl:gap-4">
 				<HeaderQuickAdd />
 
 				{activeOrganization?.id && (
@@ -220,6 +224,7 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 						</div>
 					</DropdownMenuContent>
 				</DropdownMenu>
+			</div>
 			</div>
 		</header>
 	);
