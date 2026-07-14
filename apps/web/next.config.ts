@@ -12,7 +12,17 @@ const withAnalyzer = withBundleAnalyzer({
 const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-	serverExternalPackages: ["pg", "@prisma/client", "@prisma/adapter-pg", "pdfkit", "puppeteer-core", "@sparticuz/chromium"],
+	serverExternalPackages: [
+		"pg",
+		"pg-pool",
+		"pg-protocol",
+		"pg-connection-string",
+		"@prisma/client",
+		"@prisma/adapter-pg",
+		"pdfkit",
+		"puppeteer-core",
+		"@sparticuz/chromium",
+	],
 	experimental: {
 		// Client router cache: reuse RSC payloads briefly so back/forward and
 		// repeat navigations don't re-run the full layout chain on the server.
