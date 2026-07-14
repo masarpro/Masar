@@ -443,18 +443,18 @@ export function LandingDashboardReplica() {
 				<p className="truncate text-sm font-semibold">
 					{t("dashboard.fieldActivity.title")}
 				</p>
-				<p className="shrink-0 text-2xl font-bold tabular-nums">3</p>
+				<p className="shrink-0 text-lg font-bold tabular-nums">3</p>
 			</div>
-			<p className="shrink-0 text-[11px] font-medium" style={{ color: MUTED }}>
+			<p className="shrink-0 text-[10px] font-medium" style={{ color: MUTED }}>
 				{t("dashboard.fieldActivity.siteUpdates")}
 			</p>
-			<div className="mt-2 flex min-h-0 flex-1 flex-col justify-center gap-2">
+			<div className="mt-1.5 flex min-h-0 flex-1 flex-col justify-between">
 				<div className="flex items-center gap-2.5">
 					<span
-						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						className="flex size-6 shrink-0 items-center justify-center rounded-lg"
 						style={{ background: "rgba(255,204,111,0.25)", color: INK }}
 					>
-						<MapPin className="size-4" />
+						<MapPin className="size-3.5" />
 					</span>
 					<span className="min-w-0 flex-1 truncate text-xs">
 						{t("dashboard.fieldActivity.updatedToday", { count: 3 })}
@@ -462,10 +462,10 @@ export function LandingDashboardReplica() {
 				</div>
 				<div className="flex items-center gap-2.5">
 					<span
-						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						className="flex size-6 shrink-0 items-center justify-center rounded-lg"
 						style={{ background: "rgba(93,116,241,0.15)", color: BRAND_4 }}
 					>
-						<Camera className="size-4" />
+						<Camera className="size-3.5" />
 					</span>
 					<span className="min-w-0 flex-1 truncate text-xs">
 						{t("dashboard.fieldActivity.newMedia", { photos: 14, reports: 2 })}
@@ -473,10 +473,10 @@ export function LandingDashboardReplica() {
 				</div>
 				<div className="flex items-center gap-2.5">
 					<span
-						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						className="flex size-6 shrink-0 items-center justify-center rounded-lg"
 						style={{ background: "rgba(142,201,219,0.2)", color: BRAND_3 }}
 					>
-						<CalendarClock className="size-4" />
+						<CalendarClock className="size-3.5" />
 					</span>
 					<span className="min-w-0 flex-1 truncate text-xs">
 						{t("dashboard.fieldActivity.stale", {
@@ -573,9 +573,9 @@ export function LandingDashboardReplica() {
 			<p className="shrink-0 text-sm font-semibold">
 				{t("dashboard.alerts.needsAttention")}
 			</p>
-			<div className="mt-2 flex flex-col gap-1.5">
+			<div className="mt-2.5 flex flex-col gap-2">
 				{attention.map((a) => (
-					<div key={a.label} className="flex items-center gap-2 p-1">
+					<div key={a.label} className="flex items-center gap-2">
 						<StatChip icon={a.icon} bg={a.bg} color={a.color} />
 						<span className="min-w-0 flex-1 truncate text-xs">{a.label}</span>
 						<span
@@ -588,15 +588,15 @@ export function LandingDashboardReplica() {
 				))}
 			</div>
 			<div
-				className="mt-auto pt-3"
+				className="mt-auto pt-2.5"
 				style={{ borderTop: `2px solid ${STROKE}` }}
 			>
 				<p className="text-xs font-semibold" style={{ color: MUTED }}>
 					{t("dashboard.recentDocs.title")}
 				</p>
-				<div className="mt-1.5 flex flex-col gap-1">
+				<div className="mt-1.5 flex flex-col gap-1.5">
 					{["1024", "1023"].map((no) => (
-						<div key={no} className="flex items-center gap-2 p-1">
+						<div key={no} className="flex items-center gap-2">
 							<span
 								className="flex size-6 shrink-0 items-center justify-center rounded-lg"
 								style={{ background: "rgba(93,116,241,0.15)" }}
