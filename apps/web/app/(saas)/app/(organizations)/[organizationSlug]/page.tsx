@@ -51,9 +51,9 @@ async function OrganizationPageContent({
 
 	const organizationId = activeOrganization.id;
 
-	// Server-prefetch the three dashboard queries with the SAME permission
-	// gating and inputs the client Dashboard uses, so it paints with data on
-	// first load instead of a full-page skeleton → content swap.
+	// Server-prefetch the dashboard queries with the SAME permission gating and
+	// inputs the client Dashboard uses, so it paints with data on first load
+	// instead of a full-page skeleton → content swap.
 	const myPermissions = await cachedGetMyPermissions(organizationId);
 	const { permissions, isOwner } = myPermissions;
 	const showFinance = isOwner || (permissions?.finance?.view ?? false);
@@ -87,36 +87,24 @@ async function OrganizationPageContent({
 					input: { organizationId },
 				}),
 			),
-		);
-	}
-	if (showProjects) {
-		prefetches.push(
-			queryClient.prefetchQuery(
-				orpcServer.projects.list.queryOptions({
-					input: { organizationId, status: "ACTIVE" as const },
-				}),
-			),
-		);
-		// RecentDocumentsCard renders under showProjects and fires these three
-		// queries client-side; prefetching them here (inputs MUST match the
-		// card's exactly) turns three cold client round-trips into hydrated
-		// data at first paint. prefetchQuery swallows errors, so a member
-		// without finance/pricing view simply falls back to the client query —
-		// same behavior as before.
-		prefetches.push(
+			// AttentionCard's recent-invoices list (finance-gated, see FE-03).
+			// Input MUST match the card's query exactly so it hydrates instead of
+			// re-fetching on the client.
 			queryClient.prefetchQuery(
 				orpcServer.finance.invoices.list.queryOptions({
 					input: { organizationId, limit: 3 },
 				}),
 			),
+		);
+	}
+	if (showProjects) {
+		// ActiveProjectsSection reads dashboard.activeProjects (limit 4) — the
+		// input MUST match the client Dashboard query so it hydrates at first
+		// paint instead of a cold client round-trip.
+		prefetches.push(
 			queryClient.prefetchQuery(
-				orpcServer.pricing.quotations.list.queryOptions({
-					input: { organizationId },
-				}),
-			),
-			queryClient.prefetchQuery(
-				orpcServer.pricing.studies.list.queryOptions({
-					input: { organizationId },
+				orpcServer.dashboard.activeProjects.queryOptions({
+					input: { organizationId, limit: 4 },
 				}),
 			),
 		);

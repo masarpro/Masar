@@ -85,8 +85,14 @@ export const upsertSpace = subscriptionProcedure
 
 		let space;
 		if (input.id) {
+			// Tie to this study's context (not just the org) so a space can't be
+			// moved between studies via a foreign id.
 			const existing = await db.quantityContextSpace.findFirst({
-				where: { id: input.id, organizationId: input.organizationId },
+				where: {
+					id: input.id,
+					organizationId: input.organizationId,
+					contextId: ctx.id,
+				},
 			});
 			if (!existing) {
 				throw new ORPCError("NOT_FOUND", { message: "المساحة غير موجودة" });

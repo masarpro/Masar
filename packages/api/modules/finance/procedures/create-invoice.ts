@@ -73,19 +73,6 @@ export const createInvoiceProcedure = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// === DEBUG: log validated input (only fires if Zod passed) ===
-		console.log("[INVOICE_BACKEND_DEBUG] === Zod validation PASSED ===");
-		console.log("[INVOICE_BACKEND_DEBUG] items count:", input.items.length);
-		input.items.forEach((item, idx) => {
-			console.log(`[INVOICE_BACKEND_DEBUG] Item ${idx}:`, {
-				description: JSON.stringify(item.description),
-				descriptionLength: item.description.length,
-				quantity: item.quantity,
-				unitPrice: item.unitPrice,
-			});
-		});
-		console.log("[INVOICE_BACKEND_DEBUG] === end validated input ===");
-
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
 			action: "invoices",
@@ -384,54 +371,81 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			});
 		}
 
-		// Credit notes must not be cancelled through the generic status path:
-		// they carry their own reversal + paidAmount side-effects on the original
-		// invoice, which this path does not handle. Block to avoid double-crediting.
-		if (
-			input.status === "CANCELLED" &&
-			currentInvoice.invoiceType === "CREDIT_NOTE"
-		) {
-			throw new ORPCError("BAD_REQUEST", {
-				message: "لا يمكن إلغاء إشعار دائن من هذا المسار",
-			});
-		}
-
+		// Pass the status we validated the transition against so the write is an
+		// optimistic guard — a concurrent transition (e.g. cancel racing a payment)
+		// matches zero rows and aborts instead of clobbering the newer state.
 		const invoice = await updateInvoiceStatus(
 			input.id,
 			input.organizationId,
 			input.status,
+			currentInvoice.status as never,
 		);
 
 		// Cancelling an issued invoice must reverse its posted journal entries,
 		// otherwise revenue + VAT + receivable linger in the ledger forever.
 		if (input.status === "CANCELLED") {
+			const payments = await db.financeInvoicePayment.findMany({
+				where: { invoiceId: input.id },
+				select: { id: true, amount: true, sourceAccountId: true },
+			});
+
+			// Reverse the OPERATIONAL side of recorded payments: return the money to
+			// the bank, zero the invoice's paidAmount, and cancel the auto receipt
+			// vouchers — otherwise a cancelled-but-paid invoice leaves phantom bank
+			// balance and live vouchers documenting money that no longer exists.
+			if (payments.length > 0) {
+				await db.$transaction(async (tx) => {
+					for (const p of payments) {
+						if (p.sourceAccountId) {
+							await tx.organizationBank.updateMany({
+								where: {
+									id: p.sourceAccountId,
+									organizationId: input.organizationId,
+								},
+								data: { balance: { decrement: Number(p.amount) } },
+							});
+						}
+					}
+					await tx.receiptVoucher.updateMany({
+						where: {
+							organizationId: input.organizationId,
+							invoicePaymentId: { in: payments.map((p) => p.id) },
+							status: { not: "CANCELLED" },
+						},
+						data: { status: "CANCELLED" },
+					});
+					await tx.financeInvoice.updateMany({
+						where: { id: input.id, organizationId: input.organizationId },
+						data: { paidAmount: 0 },
+					});
+				});
+			}
+
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
 				);
-				// Reverse the main invoice entry (INV-JE)
+				// Reverse the main invoice entry (INV-JE) + each collection entry
+				// (RCV-JE). Reversals are independent, so run them concurrently.
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "INVOICE",
 					referenceId: input.id,
 					userId: context.user.id,
 				});
-				// Reverse any collection entries (RCV-JE) for this invoice's payments
-				const payments = await db.financeInvoicePayment.findMany({
-					where: { invoiceId: input.id },
-					select: { id: true },
-				});
-				for (const p of payments) {
-					await reverseAutoJournalEntry(db, {
-						organizationId: input.organizationId,
-						referenceType: "INVOICE_PAYMENT",
-						referenceId: p.id,
-						userId: context.user.id,
-					});
-				}
+				await Promise.all(
+					payments.map((p) =>
+						reverseAutoJournalEntry(db, {
+							organizationId: input.organizationId,
+							referenceType: "INVOICE_PAYMENT",
+							referenceId: p.id,
+							userId: context.user.id,
+						}),
+					),
+				);
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse cancelled invoice:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -621,7 +635,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for invoice payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -656,7 +670,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from invoice payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -707,18 +721,9 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
-		// Cancel the auto-created receipt voucher first — once the payment is
-		// deleted its SetNull link is severed and the voucher would linger ISSUED,
-		// documenting money that no longer exists.
-		await db.receiptVoucher.updateMany({
-			where: {
-				invoicePaymentId: input.paymentId,
-				organizationId: input.organizationId,
-				status: { not: "CANCELLED" },
-			},
-			data: { status: "CANCELLED" },
-		});
-
+		// deleteInvoicePayment cancels the linked receipt voucher, deletes the
+		// payment, restores the invoice paidAmount/status and the bank balance —
+		// all inside one transaction (EH-2).
 		await deleteInvoicePayment(
 			input.paymentId,
 			input.invoiceId,
@@ -745,7 +750,7 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted invoice payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -803,7 +808,7 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted invoice:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -1007,7 +1012,7 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for invoice issue:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -1252,7 +1257,7 @@ export const createCreditNoteProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for credit note:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

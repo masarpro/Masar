@@ -742,6 +742,20 @@
       "orContinueWith": "Or continue with",
       "backToPassword": "Sign in with password instead"
     },
+    "changePassword": {
+      "title": "Change Password",
+      "subtitle": "You must change your password before continuing",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Change password",
+      "success": "Password changed successfully! Redirecting...",
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordMin": "New password must be at least 8 characters",
+      "confirmPasswordRequired": "Password confirmation is required",
+      "passwordsMismatch": "Passwords do not match",
+      "genericError": "An error occurred while changing the password"
+    },
     "resetPassword": {
       "backToSignin": "Back to signin",
       "hints": {
@@ -1934,7 +1948,12 @@
       "pendingClaims": "Pending Claims",
       "upcomingPayments": "Upcoming Payments",
       "daysOverdue": "days overdue",
-      "daysRemaining": "days remaining"
+      "daysRemaining": "days remaining",
+      "empty": "No items need attention",
+      "dueOn": "Due on: {date}",
+      "remaining": "remaining",
+      "inProject": "Project: {project}",
+      "claimsDesc": "Subcontractor claims awaiting review and approval"
     },
     "financial": {
       "title": "Financial Overview",
@@ -9601,7 +9620,8 @@
       "section": "Section",
       "actions": "Actions",
       "noPrice": "No price",
-      "total": "Total"
+      "total": "Total",
+      "pageTotal": "Page total"
     },
     "source": {
       "MANUAL": "Manual",
@@ -11637,6 +11657,89 @@
       "toastSubscribed": "Subscribed to digest",
       "toastUnsubscribed": "Unsubscribed from digest",
       "toastError": "Error updating subscription"
+    },
+    "permissions": {
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "customized": "Custom",
+      "customizedHint": "Custom — differs from the role's permissions",
+      "sections": {
+        "projects": "Projects",
+        "quantities": "Quantities",
+        "pricing": "Pricing",
+        "finance": "Finance",
+        "employees": "Employees",
+        "company": "Company",
+        "settings": "Settings",
+        "reports": "Reports"
+      },
+      "actions": {
+        "projects": {
+          "view": "View projects",
+          "create": "Create project",
+          "edit": "Edit projects",
+          "delete": "Delete projects",
+          "viewFinance": "View project finance",
+          "manageTeam": "Manage project team"
+        },
+        "quantities": {
+          "view": "View quantity studies",
+          "create": "Create study",
+          "edit": "Edit studies",
+          "delete": "Delete studies",
+          "pricing": "Price quantities"
+        },
+        "pricing": {
+          "view": "View pricing section",
+          "studies": "Manage studies",
+          "quotations": "Quotations",
+          "pricing": "Manage pricing",
+          "leads": "Leads",
+          "editQuantities": "Edit quantities",
+          "approveQuantities": "Approve quantities",
+          "editSpecs": "Edit specifications",
+          "approveSpecs": "Approve specifications",
+          "editCosting": "Edit costing",
+          "approveCosting": "Approve costing",
+          "editSellingPrice": "Edit selling price",
+          "generateQuotation": "Generate quotation",
+          "convertToProject": "Convert study to project"
+        },
+        "finance": {
+          "view": "View financial data",
+          "quotations": "Quotations",
+          "invoices": "Invoices",
+          "payments": "Payments and receipts",
+          "reports": "Financial reports",
+          "settings": "Accounting settings"
+        },
+        "employees": {
+          "view": "View employees",
+          "create": "Add employees",
+          "edit": "Edit employee data",
+          "delete": "Delete employees",
+          "payroll": "Manage payroll",
+          "attendance": "Manage attendance"
+        },
+        "company": {
+          "view": "View company data",
+          "expenses": "Company expenses",
+          "assets": "Company assets",
+          "reports": "Company reports"
+        },
+        "settings": {
+          "organization": "Organization settings",
+          "users": "Manage users",
+          "roles": "Manage roles",
+          "billing": "Billing and subscription",
+          "integrations": "Integrations"
+        },
+        "reports": {
+          "view": "View reports",
+          "create": "Create reports",
+          "approve": "Approve reports"
+        }
+      }
     }
   },
   "share": {

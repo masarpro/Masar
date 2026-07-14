@@ -1,3 +1,4 @@
+import { Prisma } from "../generated/client";
 import { db } from "../client";
 import type {
 	ActivityStatus,
@@ -340,6 +341,9 @@ export async function bulkUpdateProgress(
 			existingActivities.map((a) => [a.id, a]),
 		);
 
+		// Build one VALUES-join row per valid update, then apply them all in a
+		// single batched UPDATE instead of N sequential round-trips inside the tx.
+		const rows: Prisma.Sql[] = [];
 		for (const update of updates) {
 			const existing = existingById.get(update.activityId);
 
@@ -361,21 +365,31 @@ export async function bulkUpdateProgress(
 					newStatus = "IN_PROGRESS";
 			}
 
-			await tx.projectActivity.update({
-				where: { id: update.activityId },
-				data: { progress: clampedProgress, status: newStatus },
-			});
+			rows.push(
+				Prisma.sql`(${update.activityId}::text, ${clampedProgress}::numeric, ${newStatus}::"ActivityStatus")`,
+			);
+		}
+
+		if (rows.length > 0) {
+			await tx.$executeRaw`
+				UPDATE project_activities AS t
+				SET progress = v.progress,
+					status = v.status,
+					updated_at = NOW()
+				FROM (VALUES ${Prisma.join(rows)}) AS v(id, progress, status)
+				WHERE t.id = v.id
+					AND t.organization_id = ${organizationId}
+					AND t.project_id = ${projectId}
+			`;
 		}
 	});
 
-	// Recalculate all affected milestones
-	for (const milestoneId of milestoneIds) {
-		await recalculateMilestoneProgress(
-			organizationId,
-			projectId,
-			milestoneId,
-		);
-	}
+	// Recalculate all affected milestones (independent → run concurrently)
+	await Promise.all(
+		[...milestoneIds].map((milestoneId) =>
+			recalculateMilestoneProgress(organizationId, projectId, milestoneId),
+		),
+	);
 }
 
 // ─── Dependencies ────────────────────────────────────────────────────────

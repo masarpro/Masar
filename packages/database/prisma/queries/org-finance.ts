@@ -862,36 +862,6 @@ export async function payExpense(data: {
 	referenceNo?: string;
 	amount?: number; // if not provided, pays the full remaining amount
 }) {
-	const expense = await db.financeExpense.findFirst({
-		where: { id: data.expenseId, organizationId: data.organizationId },
-		select: { id: true, amount: true, paidAmount: true, status: true, sourceAccountId: true },
-	});
-
-	if (!expense) {
-		throw new Error("Expense not found");
-	}
-
-	if (expense.status === "COMPLETED") {
-		throw new Error("Expense is already fully paid");
-	}
-
-	if (expense.status === "CANCELLED") {
-		throw new Error("Cannot pay a cancelled expense");
-	}
-
-	const totalAmount = Number(expense.amount);
-	const currentPaid = Number(expense.paidAmount);
-	const remaining = totalAmount - currentPaid;
-	const payAmount = data.amount ?? remaining;
-
-	if (payAmount <= 0) {
-		throw new Error("Payment amount must be positive");
-	}
-
-	if (payAmount > remaining) {
-		throw new Error(`Payment amount (${payAmount}) exceeds remaining (${remaining})`);
-	}
-
 	// Layer 1: Early balance check (UX — fast fail before transaction)
 	const sourceAccount = await db.organizationBank.findFirst({
 		where: { id: data.sourceAccountId, organizationId: data.organizationId },
@@ -900,14 +870,43 @@ export async function payExpense(data: {
 	if (!sourceAccount) {
 		throw new Error("الحساب المصدر غير موجود");
 	}
-	if (Number(sourceAccount.balance) < payAmount) {
-		throw new Error("الرصيد غير كافي في الحساب المصدر");
-	}
-
-	const newPaidAmount = currentPaid + payAmount;
-	const isFullyPaid = newPaidAmount >= totalAmount;
 
 	return db.$transaction(async (tx) => {
+		// Lock the expense row and read its fresh paidAmount INSIDE the transaction
+		// so two concurrent partial payments can't both read the same stale
+		// paidAmount and lose one of them (the bank was decremented twice while
+		// paidAmount was written once).
+		await tx.$queryRaw`SELECT id FROM finance_expenses WHERE id = ${data.expenseId} AND organization_id = ${data.organizationId} FOR UPDATE`;
+
+		const expense = await tx.financeExpense.findFirst({
+			where: { id: data.expenseId, organizationId: data.organizationId },
+			select: { id: true, amount: true, paidAmount: true, status: true },
+		});
+		if (!expense) {
+			throw new Error("Expense not found");
+		}
+		if (expense.status === "COMPLETED") {
+			throw new Error("Expense is already fully paid");
+		}
+		if (expense.status === "CANCELLED") {
+			throw new Error("Cannot pay a cancelled expense");
+		}
+
+		const totalAmount = Number(expense.amount);
+		const currentPaid = Number(expense.paidAmount);
+		const remaining = totalAmount - currentPaid;
+		const payAmount = data.amount ?? remaining;
+
+		if (payAmount <= 0) {
+			throw new Error("Payment amount must be positive");
+		}
+		if (payAmount > remaining) {
+			throw new Error(`Payment amount (${payAmount}) exceeds remaining (${remaining})`);
+		}
+
+		const newPaidAmount = currentPaid + payAmount;
+		const isFullyPaid = newPaidAmount >= totalAmount;
+
 		// Update the expense
 		const updated = await tx.financeExpense.update({
 			where: { id: data.expenseId },
@@ -920,9 +919,14 @@ export async function payExpense(data: {
 			},
 		});
 
-		// Layer 2: Atomic guard — prevents negative balance under concurrency
+		// Layer 2: Atomic guard — prevents negative balance under concurrency AND
+		// scopes the write by organizationId (cross-tenant balance protection).
 		const balanceUpdate = await tx.organizationBank.updateMany({
-			where: { id: data.sourceAccountId, balance: { gte: payAmount } },
+			where: {
+				id: data.sourceAccountId,
+				organizationId: data.organizationId,
+				balance: { gte: payAmount },
+			},
 			data: { balance: { decrement: payAmount } },
 		});
 		if (balanceUpdate.count === 0) {
@@ -939,7 +943,7 @@ export async function payExpense(data: {
 export async function cancelExpense(id: string, organizationId: string) {
 	const existing = await db.financeExpense.findFirst({
 		where: { id, organizationId },
-		select: { id: true, status: true, paidAmount: true, sourceAccountId: true },
+		select: { id: true, status: true, paidAmount: true, sourceAccountId: true, sourceType: true },
 	});
 
 	if (!existing) {
@@ -948,6 +952,17 @@ export async function cancelExpense(id: string, organizationId: string) {
 
 	if (existing.status === "CANCELLED") {
 		throw new Error("Expense is already cancelled");
+	}
+
+	// Payroll / recurring expenses are owned by their run — cancelling one here
+	// would desync the run and its PAY-JE/GL entry. Reverse the run instead.
+	if (
+		existing.sourceType === "FACILITY_PAYROLL" ||
+		existing.sourceType === "FACILITY_RECURRING"
+	) {
+		throw new Error(
+			"لا يمكن إلغاء مصروف رواتب/مصروف متكرر مباشرة — اعكس دورة الرواتب/المصروفات",
+		);
 	}
 
 	// If there were partial payments, restore them to the account
@@ -1322,6 +1337,18 @@ export async function getOrganizationPayments(
 		];
 	}
 
+	// Server-side KPI aggregates (this-month + completed) over the FULL filtered
+	// set — previously the frontend summed only the current page (limit) so the
+	// cards under-reported once an org passed the page size.
+	const now = new Date();
+	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+	const financeMonthWhere = { ...financeWhere, date: { gte: monthStart } };
+	const projectMonthWhere = { ...projectWhere, date: { gte: monthStart } };
+	const financeCompletedWhere = {
+		...financeWhere,
+		status: "COMPLETED" as FinanceTransactionStatus,
+	};
+
 	// ── Query both tables in parallel ──
 	const [
 		financePayments,
@@ -1330,6 +1357,9 @@ export async function getOrganizationPayments(
 		projectTotal,
 		financeSum,
 		projectSum,
+		financeMonthSum,
+		projectMonthSum,
+		financeCompletedSum,
 	] = await Promise.all([
 			db.financePayment.findMany({
 				where: financeWhere,
@@ -1377,6 +1407,20 @@ export async function getOrganizationPayments(
 						_sum: { amount: true },
 					})
 				: Promise.resolve(null),
+			db.financePayment.aggregate({
+				where: financeMonthWhere,
+				_sum: { amount: true },
+			}),
+			includeProjectPayments
+				? db.projectPayment.aggregate({
+						where: projectMonthWhere,
+						_sum: { amount: true },
+					})
+				: Promise.resolve(null),
+			db.financePayment.aggregate({
+				where: financeCompletedWhere,
+				_sum: { amount: true },
+			}),
 		]);
 
 	// ── Normalize FinancePayment records ──
@@ -1435,8 +1479,16 @@ export async function getOrganizationPayments(
 	const totalAmount =
 		Number(financeSum._sum.amount ?? 0) +
 		Number(projectSum?._sum.amount ?? 0);
+	// ProjectPayments are always COMPLETED, so projectSum already = their completed
+	// total; project month sum covers the project side of this-month.
+	const monthTotal =
+		Number(financeMonthSum._sum.amount ?? 0) +
+		Number(projectMonthSum?._sum.amount ?? 0);
+	const completedTotal =
+		Number(financeCompletedSum._sum.amount ?? 0) +
+		Number(projectSum?._sum.amount ?? 0);
 
-	return { payments, total, totalAmount };
+	return { payments, total, totalAmount, monthTotal, completedTotal };
 }
 
 /**
@@ -1499,13 +1551,17 @@ export async function createPayment(data: {
 			},
 		});
 
-		// Add to account balance
-		await tx.organizationBank.update({
-			where: { id: data.destinationAccountId },
+		// Add to account balance — scope by organizationId so a client-supplied
+		// destination bank id belonging to another tenant can't be mutated.
+		const bankUpdate = await tx.organizationBank.updateMany({
+			where: { id: data.destinationAccountId, organizationId: data.organizationId },
 			data: {
 				balance: { increment: data.amount },
 			},
 		});
+		if (bankUpdate.count === 0) {
+			throw new Error("الحساب البنكي غير موجود");
+		}
 
 		return payment;
 	});

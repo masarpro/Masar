@@ -123,7 +123,14 @@ export async function backfillJournalEntries(
 				description: exp.description || exp.category, sourceAccountId: exp.sourceAccountId,
 				projectId: exp.projectId, sourceType: exp.sourceType,
 			});
-			r.expenses++;
+			// The hook returns void and silently skips when accounts are missing or
+			// the period is closed — verify an entry actually landed before counting
+			// it as backfilled, so the summary can't overstate completeness.
+			if (await hasEntry("EXPENSE", exp.id)) {
+				r.expenses++;
+			} else {
+				r.errors.push({ type: "EXPENSE", id: exp.id, error: "skipped — missing accounts or closed period" });
+			}
 		} catch (e: any) { r.errors.push({ type: "EXPENSE", id: exp.id, error: e.message }); }
 	}
 

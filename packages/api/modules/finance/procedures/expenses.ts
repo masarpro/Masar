@@ -9,6 +9,7 @@ import {
 	getExpensesSummaryByCategory,
 	getOrganizationSubcontractPayments,
 	orgAuditLog,
+	isPeriodClosed,
 	db,
 } from "@repo/database";
 import { z } from "zod";
@@ -334,7 +335,7 @@ export const createExpenseProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for expense:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -370,7 +371,7 @@ export const createExpenseProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[PaymentVoucher] Failed to create auto voucher from expense:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -475,6 +476,30 @@ export const updateExpenseProcedure = subscriptionProcedure
 			select: { status: true, category: true, categoryId: true, date: true, projectId: true },
 		});
 
+		// Closed-period guard BEFORE any write: when a posted expense's
+		// journal-affecting fields change we reverse+recreate its entry. If either
+		// the existing entry's date OR the new date lands in a closed period, the
+		// recreate silently returns null and the ledger diverges. Reject up front.
+		if (before?.status === "COMPLETED") {
+			const willRebuildJournal =
+				(data.category !== undefined && data.category !== before.category) ||
+				(resolvedCategoryId !== undefined && resolvedCategoryId !== before.categoryId) ||
+				(data.date !== undefined && data.date.getTime() !== before.date.getTime()) ||
+				(rest.projectId !== undefined && rest.projectId !== before.projectId);
+			if (willRebuildJournal) {
+				const newDate = data.date ?? before.date;
+				if (
+					(await isPeriodClosed(db, organizationId, before.date)) ||
+					(await isPeriodClosed(db, organizationId, newDate))
+				) {
+					throw new ORPCError("BAD_REQUEST", {
+						message:
+							"لا يمكن تعديل مصروف يقع في فترة محاسبية مغلقة أو نقله إلى فترة مغلقة",
+					});
+				}
+			}
+		}
+
 		const expense = await updateExpense(id, organizationId, data);
 
 		// If the expense is already posted and a journal-affecting field changed,
@@ -516,7 +541,7 @@ export const updateExpenseProcedure = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to rebuild entry for updated expense:", e);
-					orgAuditLog({
+					await orgAuditLog({
 						organizationId,
 						actorId: context.user.id,
 						action: "JOURNAL_ENTRY_FAILED",
@@ -583,7 +608,7 @@ export const deleteExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted expense:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -670,7 +695,7 @@ export const payExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for expense payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -706,7 +731,7 @@ export const payExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from expense payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -762,7 +787,7 @@ export const cancelExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for cancelled expense:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

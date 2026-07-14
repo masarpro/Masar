@@ -238,14 +238,21 @@ export const createContributionProcedure = subscriptionProcedure
 				},
 			});
 
-			// Increment bank balance atomically (capital comes IN)
+			// Increment bank balance atomically (capital comes IN). Scope by
+			// organizationId so a client-supplied bank id from another tenant
+			// can't be mutated (cross-tenant balance IDOR).
 			if (input.bankAccountId) {
-				await tx.organizationBank.update({
-					where: { id: input.bankAccountId },
+				const bankUpdate = await tx.organizationBank.updateMany({
+					where: { id: input.bankAccountId, organizationId: input.organizationId },
 					data: {
 						balance: { increment: input.amount },
 					},
 				});
+				if (bankUpdate.count === 0) {
+					throw new ORPCError("NOT_FOUND", {
+						message: "الحساب البنكي غير موجود",
+					});
+				}
 			}
 
 			return created;
@@ -273,7 +280,7 @@ export const createContributionProcedure = subscriptionProcedure
 				"[AutoJournal] Failed to generate entry for capital contribution:",
 				e,
 			);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -380,8 +387,8 @@ export const cancelContributionProcedure = subscriptionProcedure
 		// Transaction: restore bank balance + update status
 		await db.$transaction(async (tx) => {
 			if (contribution.bankAccountId) {
-				await tx.organizationBank.update({
-					where: { id: contribution.bankAccountId },
+				await tx.organizationBank.updateMany({
+					where: { id: contribution.bankAccountId, organizationId: input.organizationId },
 					data: {
 						balance: { decrement: Number(contribution.amount) },
 					},
@@ -414,7 +421,7 @@ export const cancelContributionProcedure = subscriptionProcedure
 				"[AutoJournal] Failed to reverse entry for cancelled capital contribution:",
 				e,
 			);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

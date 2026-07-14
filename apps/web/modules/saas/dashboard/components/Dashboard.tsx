@@ -178,8 +178,6 @@ export function Dashboard({
 									cardSkeleton
 								) : (
 									<FinancePanel
-										bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
-										cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
 										financialTrend={dashboardData?.financialTrend ?? []}
 										organizationSlug={organizationSlug}
 									/>
@@ -205,6 +203,7 @@ export function Dashboard({
 								<AttentionCard
 									organizationId={organizationId}
 									organizationSlug={organizationSlug}
+									showFinance={showFinance}
 									overdueInvoices={
 										showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
 									}

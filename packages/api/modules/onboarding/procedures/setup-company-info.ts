@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { db } from "@repo/database";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
-export const setupCompanyInfo = protectedProcedure
+export const setupCompanyInfo = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/onboarding/company-info",

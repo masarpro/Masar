@@ -420,12 +420,16 @@ async function allocateAndCreatePayments(
 			}
 		}
 
-		// Add to destination bank account balance if provided
+		// Add to destination bank account balance if provided. Scope by org so a
+		// client-supplied bank id from another tenant can't be mutated.
 		if (data.destinationAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.destinationAccountId },
+			const bankUpdate = await tx.organizationBank.updateMany({
+				where: { id: data.destinationAccountId, organizationId: data.organizationId },
 				data: { balance: { increment: alloc.amount } },
 			});
+			if (bankUpdate.count === 0) {
+				throw new Error("الحساب البنكي غير موجود");
+			}
 		}
 	}
 
@@ -438,6 +442,7 @@ async function allocateAndCreatePayments(
 async function reversePaymentEffects(
 	tx: Prisma.TransactionClient,
 	row: { amount: Prisma.Decimal; contractTermId: string | null; destinationAccountId: string | null },
+	organizationId: string,
 ) {
 	const amount = Number(row.amount);
 
@@ -462,8 +467,8 @@ async function reversePaymentEffects(
 	}
 
 	if (row.destinationAccountId) {
-		await tx.organizationBank.update({
-			where: { id: row.destinationAccountId },
+		await tx.organizationBank.updateMany({
+			where: { id: row.destinationAccountId, organizationId },
 			data: { balance: { decrement: amount } },
 		});
 	}
@@ -546,7 +551,7 @@ export async function replaceProjectPaymentGroup(
 				startSort = row.contractTerm.sortOrder;
 				startTermId = row.contractTermId;
 			}
-			await reversePaymentEffects(tx, row);
+			await reversePaymentEffects(tx, row, organizationId);
 		}
 
 		// The old group's total is being replaced by the new amount — exclude it
@@ -679,8 +684,8 @@ export async function updateProjectPayment(
 			// Handle old destination account
 			if (existing.destinationAccountId && data.destinationAccountId === undefined) {
 				// Same account, adjust diff
-				await tx.organizationBank.update({
-					where: { id: existing.destinationAccountId },
+				await tx.organizationBank.updateMany({
+					where: { id: existing.destinationAccountId, organizationId },
 					data: { balance: { increment: amountDiff } },
 				});
 			}
@@ -691,17 +696,20 @@ export async function updateProjectPayment(
 		if (data.destinationAccountId !== undefined && data.destinationAccountId !== existing.destinationAccountId) {
 			// Reverse old account
 			if (existing.destinationAccountId) {
-				await tx.organizationBank.update({
-					where: { id: existing.destinationAccountId },
+				await tx.organizationBank.updateMany({
+					where: { id: existing.destinationAccountId, organizationId },
 					data: { balance: { decrement: oldAmount } },
 				});
 			}
-			// Credit new account
+			// Credit new account (client-supplied — scope by org)
 			if (data.destinationAccountId) {
-				await tx.organizationBank.update({
-					where: { id: data.destinationAccountId },
+				const bankUpdate = await tx.organizationBank.updateMany({
+					where: { id: data.destinationAccountId, organizationId },
 					data: { balance: { increment: newAmount } },
 				});
+				if (bankUpdate.count === 0) {
+					throw new Error("الحساب البنكي غير موجود");
+				}
 			}
 		}
 
@@ -733,7 +741,7 @@ export async function deleteProjectPayment(
 			: [existing];
 
 		for (const row of rows) {
-			await reversePaymentEffects(tx, row);
+			await reversePaymentEffects(tx, row, organizationId);
 		}
 
 		const deletedIds = rows.map((r) => r.id);

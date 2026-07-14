@@ -5,9 +5,11 @@ import {
 	updatePayment,
 	deletePayment,
 	orgAuditLog,
+	isPeriodClosed,
 	db,
 } from "@repo/database";
 import { z } from "zod";
+import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import {
@@ -180,7 +182,7 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -214,7 +216,7 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -278,6 +280,29 @@ export const updateOrgPaymentProcedure = subscriptionProcedure
 			where: { id, organizationId },
 			select: { date: true, projectId: true },
 		});
+
+		// Closed-period guard BEFORE any write: changing date/project rebuilds the
+		// ORG_PAYMENT entry (reverse+recreate). If either the existing entry's date
+		// OR the new date lands in a closed period the recreate silently returns
+		// null, leaving the ledger stale. Reject up front.
+		if (before) {
+			const willRebuildJournal =
+				(input.date !== undefined &&
+					new Date(input.date).getTime() !== before.date.getTime()) ||
+				(input.projectId !== undefined && input.projectId !== before.projectId);
+			if (willRebuildJournal) {
+				const newDate = input.date ?? before.date;
+				if (
+					(await isPeriodClosed(db, organizationId, before.date)) ||
+					(await isPeriodClosed(db, organizationId, newDate))
+				) {
+					throw new ORPCError("BAD_REQUEST", {
+						message:
+							"لا يمكن تعديل دفعة تقع في فترة محاسبية مغلقة أو نقلها إلى فترة مغلقة",
+					});
+				}
+			}
+		}
 
 		const payment = await updatePayment(id, organizationId, data);
 
@@ -371,6 +396,18 @@ export const deleteOrgPaymentProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// Cancel the auto-generated receipt voucher first. Its paymentId FK is
+		// onDelete: SetNull, so once the payment row is gone the link is lost and
+		// the voucher would otherwise stay ISSUED forever.
+		await db.receiptVoucher.updateMany({
+			where: {
+				paymentId: input.id,
+				organizationId: input.organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		const result = await deletePayment(input.id, input.organizationId);
 
 		orgAuditLog({
@@ -392,7 +429,7 @@ export const deleteOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

@@ -3,6 +3,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
+import { verifyProjectAccess } from "../../../lib/permissions";
 import { generateICS, generateEventUID, type ICSEvent } from "../lib/ics-generator";
 
 export const generateCalendarICSProcedure = subscriptionProcedure
@@ -30,6 +31,14 @@ export const generateCalendarICSProcedure = subscriptionProcedure
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN");
 		}
+
+		// Project-scoped permission check (membership alone is not enough).
+		await verifyProjectAccess(
+			input.projectId,
+			input.organizationId,
+			context.user.id,
+			{ section: "projects", action: "view" },
+		);
 
 		// Get project
 		const project = await db.project.findFirst({

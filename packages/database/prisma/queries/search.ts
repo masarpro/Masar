@@ -39,6 +39,12 @@ interface GlobalSearchOptions {
 	sections: GlobalSearchSections;
 	/** Max rows per entity type. */
 	perTypeLimit?: number;
+	/**
+	 * Per-member project visibility. When provided, the projects section only
+	 * returns projects whose id is in this list (mirrors projects.list scoping).
+	 * When undefined the member sees every project in the organization.
+	 */
+	restrictToProjectIds?: string[];
 }
 
 /**
@@ -51,6 +57,7 @@ export async function globalOrganizationSearch({
 	query,
 	sections,
 	perTypeLimit = 5,
+	restrictToProjectIds,
 }: GlobalSearchOptions): Promise<GlobalSearchResult[]> {
 	const q = query.trim();
 	// Guard: a 1-char query would scan almost everything for no value.
@@ -68,6 +75,9 @@ export async function globalOrganizationSearch({
 				.findMany({
 					where: {
 						organizationId,
+						...(restrictToProjectIds
+							? { id: { in: restrictToProjectIds } }
+							: {}),
 						OR: [
 							{ name: contains },
 							{ projectNo: contains },

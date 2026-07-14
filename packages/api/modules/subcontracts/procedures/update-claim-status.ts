@@ -86,7 +86,7 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed for SubcontractClaim approval:", e);
-					orgAuditLog({
+					await orgAuditLog({
 						organizationId: input.organizationId,
 						actorId: context.user.id,
 						action: "JOURNAL_ENTRY_FAILED",
@@ -109,7 +109,7 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to reverse entry for rejected/cancelled subcontract claim:", e);
-					orgAuditLog({
+					await orgAuditLog({
 						organizationId: input.organizationId,
 						actorId: context.user.id,
 						action: "JOURNAL_ENTRY_FAILED",

@@ -506,7 +506,15 @@ export async function onPayrollApproved(db: PrismaClient, payroll: {
 		bankAccId = await getAccountByCode(db, payroll.organizationId, "1110");
 	}
 
-	if (!salaryAccId || !bankAccId) return;
+	if (!salaryAccId || !bankAccId) {
+		// Don't fail silently — a missing salary/bank account means the payroll is
+		// approved with no ledger entry; leave an auditable trace like every other hook.
+		console.error(`[AutoJournal] Payroll ${payroll.id}: salary (6100) or bank account missing — entry skipped`);
+		if (payroll.userId) {
+			await orgAuditLog({ organizationId: payroll.organizationId, actorId: payroll.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payroll.id, metadata: { referenceType: "PAYROLL", reason: "missing_salary_or_bank_account", month: payroll.month, year: payroll.year } });
+		}
+		return;
+	}
 
 	// Missing 2170 while GOSI > 0 would build an unbalanced entry (debit includes
 	// GOSI, credit doesn't) — record the failure and skip instead

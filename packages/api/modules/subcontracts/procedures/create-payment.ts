@@ -115,7 +115,7 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for subcontract payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -152,7 +152,7 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from subcontract payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

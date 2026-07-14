@@ -1276,6 +1276,8 @@ model UserInvitation {
   createdAt  DateTime  @default(now())
   acceptedAt DateTime?
 
+  @@index([organizationId, status])
+  @@index([roleId])
   @@map("user_invitation")
 }
 
@@ -1299,6 +1301,7 @@ model Purchase {
   updatedAt      DateTime      @updatedAt
 
   @@index([subscriptionId])
+  @@index([organizationId])
   @@map("purchase")
 }
 
@@ -5040,9 +5043,9 @@ model CompanyAsset {
   description  String? @db.Text
 
   // التكاليف
-  purchasePrice Decimal? @map("purchase_price") @db.Decimal(12, 2) // سعر الشراء
-  monthlyRent   Decimal? @map("monthly_rent") @db.Decimal(12, 2) // الإيجار الشهري (إذا مستأجر)
-  currentValue  Decimal? @map("current_value") @db.Decimal(12, 2) // القيمة الحالية
+  purchasePrice Decimal? @map("purchase_price") @db.Decimal(15, 2) // سعر الشراء
+  monthlyRent   Decimal? @map("monthly_rent") @db.Decimal(15, 2) // الإيجار الشهري (إذا مستأجر)
+  currentValue  Decimal? @map("current_value") @db.Decimal(15, 2) // القيمة الحالية
 
   // التواريخ
   purchaseDate    DateTime? @map("purchase_date") @db.Date

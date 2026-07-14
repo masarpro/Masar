@@ -19,28 +19,38 @@ import {
 	EyeIcon,
 	EyeOffIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z
-	.object({
-		currentPassword: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
-		newPassword: z.string().min(8, "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل"),
-		confirmPassword: z.string().min(1, "تأكيد كلمة المرور مطلوب"),
-	})
-	.refine((data) => data.newPassword === data.confirmPassword, {
-		message: "كلمتا المرور غير متطابقتين",
-		path: ["confirmPassword"],
-	});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = {
+	currentPassword: string;
+	newPassword: string;
+	confirmPassword: string;
+};
 
 export function ChangePasswordForm() {
+	const t = useTranslations("auth.changePassword");
 	const router = useRouter();
 	const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 	const [showNewPassword, setShowNewPassword] = useState(false);
+
+	const formSchema = useMemo(
+		() =>
+			z
+				.object({
+					currentPassword: z.string().min(1, t("currentPasswordRequired")),
+					newPassword: z.string().min(8, t("newPasswordMin")),
+					confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+				})
+				.refine((data) => data.newPassword === data.confirmPassword, {
+					message: t("passwordsMismatch"),
+					path: ["confirmPassword"],
+				}),
+		[t],
+	);
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -76,7 +86,7 @@ export function ChangePasswordForm() {
 				message:
 					e && typeof e === "object" && "message" in e
 						? (e.message as string)
-						: "حدث خطأ أثناء تغيير كلمة المرور",
+						: t("genericError"),
 			});
 		}
 	};
@@ -84,17 +94,17 @@ export function ChangePasswordForm() {
 	return (
 		<div dir="rtl">
 			<h1 className="font-bold text-xl md:text-2xl">
-				تغيير كلمة المرور
+				{t("title")}
 			</h1>
 			<p className="mt-1 mb-6 text-foreground/60">
-				يجب تغيير كلمة المرور قبل المتابعة
+				{t("subtitle")}
 			</p>
 
 			{form.formState.isSubmitSuccessful ? (
 				<Alert variant="success">
 					<CheckCircle2Icon />
 					<AlertTitle>
-						تم تغيير كلمة المرور بنجاح! جارٍ التوجيه...
+						{t("success")}
 					</AlertTitle>
 				</Alert>
 			) : (
@@ -117,7 +127,7 @@ export function ChangePasswordForm() {
 							name="currentPassword"
 							render={({ field }: any) => (
 								<FormItem>
-									<FormLabel>كلمة المرور الحالية</FormLabel>
+									<FormLabel>{t("currentPassword")}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input
@@ -156,7 +166,7 @@ export function ChangePasswordForm() {
 							name="newPassword"
 							render={({ field }: any) => (
 								<FormItem>
-									<FormLabel>كلمة المرور الجديدة</FormLabel>
+									<FormLabel>{t("newPassword")}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input
@@ -200,7 +210,7 @@ export function ChangePasswordForm() {
 							name="confirmPassword"
 							render={({ field }: any) => (
 								<FormItem>
-									<FormLabel>تأكيد كلمة المرور الجديدة</FormLabel>
+									<FormLabel>{t("confirmPassword")}</FormLabel>
 									<FormControl>
 										<Input
 											type="password"
@@ -223,7 +233,7 @@ export function ChangePasswordForm() {
 							variant="secondary"
 							loading={form.formState.isSubmitting}
 						>
-							تغيير كلمة المرور
+							{t("submit")}
 						</Button>
 					</form>
 				</Form>

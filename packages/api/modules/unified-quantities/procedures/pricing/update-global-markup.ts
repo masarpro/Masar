@@ -20,13 +20,7 @@ export const updateGlobalMarkup = subscriptionProcedure
 		await requireStudyAccess(input.organizationId, context.user.id);
 		await loadStudy(input.costStudyId, input.organizationId);
 
-		// 1. حدِّث الدراسة
-		const study = await db.costStudy.update({
-			where: { id: input.costStudyId },
-			data: { globalMarkupPercent: input.globalMarkupPercent },
-		});
-
-		// 2. اختر البنود المتأثّرة
+		// 1. اختر البنود المتأثّرة
 		const items = await db.quantityItem.findMany({
 			where: {
 				costStudyId: input.costStudyId,
@@ -37,8 +31,8 @@ export const updateGlobalMarkup = subscriptionProcedure
 			},
 		});
 
-		let updatedCount = 0;
-		for (const item of items) {
+		// 2. جهّز تحديثات البنود
+		const itemUpdateOps = items.map((item) => {
 			const r = calculatePricing({
 				effectiveQuantity: item.effectiveQuantity.toString(),
 				materialUnitPrice: item.materialUnitPrice?.toString(),
@@ -49,7 +43,7 @@ export const updateGlobalMarkup = subscriptionProcedure
 				hasCustomMarkup: false, // نُجبر اتباع الـ Global
 			});
 
-			await db.quantityItem.update({
+			return db.quantityItem.update({
 				where: { id: item.id },
 				data: {
 					markupMethod: "percentage",
@@ -67,8 +61,18 @@ export const updateGlobalMarkup = subscriptionProcedure
 					updatedById: context.user.id,
 				},
 			});
-			updatedCount++;
-		}
+		});
+
+		// 3. حدِّث الدراسة + كل البنود ذرّياً في transaction واحدة
+		// (كان تحديث الدراسة ثم loop خارج transaction → حالة غير متّسقة عند الفشل).
+		const [study] = await db.$transaction([
+			db.costStudy.update({
+				where: { id: input.costStudyId },
+				data: { globalMarkupPercent: input.globalMarkupPercent },
+			}),
+			...itemUpdateOps,
+		]);
+		const updatedCount = itemUpdateOps.length;
 
 		const totals = await aggregateStudyTotals(input.costStudyId, input.organizationId);
 

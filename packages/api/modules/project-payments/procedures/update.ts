@@ -122,7 +122,7 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 						});
 					} catch (e) {
 						console.error("[AutoJournal] Failed to reverse ProjectPayment entry:", e);
-						orgAuditLog({
+						await orgAuditLog({
 							organizationId: input.organizationId,
 							actorId: context.user.id,
 							action: "JOURNAL_ENTRY_FAILED",
@@ -169,12 +169,6 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			// (closed-period guard already enforced above, before any write)
 			try {
 				const { reverseAutoJournalEntry, onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
-				const { isPeriodClosed } = await import("@repo/database");
-				// Guard: if the new date lands in a closed period the re-create would
-				// silently skip, leaving the payment REVERSED with no active entry.
-				if (await isPeriodClosed(db, input.organizationId, payment.date)) {
-					throw new Error("لا يمكن تعديل دفعة إلى تاريخ في فترة محاسبية مغلقة");
-				}
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "PROJECT_PAYMENT",
@@ -193,7 +187,7 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to update ProjectPayment entry:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",

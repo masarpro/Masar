@@ -100,7 +100,7 @@ export function BOQItemsTable({
 	const totalPages = Math.ceil(total / limit);
 	const currentPage = Math.floor(offset / limit) + 1;
 
-	// Calculate grand total for visible items
+	// Sum of the current page's visible items only (limit-bound), not the grand total
 	const visibleTotal = items.reduce((sum, item) => sum + (item.totalPrice ?? 0), 0);
 
 	const SortHeader = ({ field, children }: { field: string; children: React.ReactNode }) => (
@@ -245,7 +245,7 @@ export function BOQItemsTable({
 				{items.length > 0 && (
 					<div className="flex items-center justify-between border-t-2 bg-muted px-4 py-3">
 						<div className="text-sm font-semibold text-foreground">
-							{t("table.total")}: {formatNumber(visibleTotal, 2)} {tCommon("sar")}
+							{t("table.pageTotal")}: {formatNumber(visibleTotal, 2)} {tCommon("sar")}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
 							<span>{currentPage} / {totalPages}</span>

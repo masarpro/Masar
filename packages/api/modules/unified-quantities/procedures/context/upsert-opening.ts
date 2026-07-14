@@ -39,8 +39,14 @@ export const upsertOpening = subscriptionProcedure
 
 		let opening;
 		if (input.id) {
+			// Tie to this study's context (not just the org) so an opening can't be
+			// moved between studies via a foreign id.
 			const existing = await db.quantityContextOpening.findFirst({
-				where: { id: input.id, organizationId: input.organizationId },
+				where: {
+					id: input.id,
+					organizationId: input.organizationId,
+					contextId: ctx.id,
+				},
 			});
 			if (!existing) {
 				throw new ORPCError("NOT_FOUND", { message: "الفتحة غير موجودة" });

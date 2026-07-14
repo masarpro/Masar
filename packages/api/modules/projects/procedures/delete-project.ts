@@ -35,6 +35,8 @@ export const deleteProjectProcedure = subscriptionProcedure
 			subcontractCount,
 			invoiceCount,
 			paymentCount,
+			changeOrderCount,
+			allocationCount,
 		] = await Promise.all([
 			db.financeExpense.count({
 				where: { organizationId: input.organizationId, projectId: input.id },
@@ -56,6 +58,15 @@ export const deleteProjectProcedure = subscriptionProcedure
 			db.projectPayment.count({
 				where: { organizationId: input.organizationId, projectId: input.id },
 			}),
+			// Change orders (contract value adjustments) and company-expense
+			// allocations also cascade-delete with the project — silently wiping
+			// contractual/financial data and skewing the 100% allocation split.
+			db.projectChangeOrder.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			db.companyExpenseAllocation.count({
+				where: { projectId: input.id, expense: { organizationId: input.organizationId } },
+			}),
 		]);
 
 		const totalRecords =
@@ -64,7 +75,9 @@ export const deleteProjectProcedure = subscriptionProcedure
 			claimCount +
 			subcontractCount +
 			invoiceCount +
-			paymentCount;
+			paymentCount +
+			changeOrderCount +
+			allocationCount;
 
 		if (totalRecords > 0) {
 			throw new ORPCError("BAD_REQUEST", {

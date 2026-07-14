@@ -310,7 +310,7 @@ export const deleteBankAccountProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[Accounting] Failed to deactivate chart account:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

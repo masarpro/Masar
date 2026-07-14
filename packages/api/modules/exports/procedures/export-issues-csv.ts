@@ -3,6 +3,7 @@ import { db, type IssueStatus, type IssueSeverity } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
+import { verifyProjectAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateIssuesCsv } from "../lib/csv-generator";
 
@@ -31,6 +32,14 @@ export const exportIssuesCsvProcedure = subscriptionProcedure
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN");
 		}
+
+		// Project-scoped permission check (membership alone is not enough).
+		await verifyProjectAccess(
+			input.projectId,
+			input.organizationId,
+			context.user.id,
+			{ section: "projects", action: "view" },
+		);
 
 		await enforceFeatureAccess(input.organizationId, "export.pdf", context.user);
 

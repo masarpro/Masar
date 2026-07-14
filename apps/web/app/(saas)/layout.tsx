@@ -8,8 +8,6 @@ import { PermissionsProvider } from "@saas/permissions/components/PermissionsPro
 import { ConfirmationAlertProvider } from "@saas/shared/components/ConfirmationAlertProvider";
 import { ConsentBanner } from "@shared/components/ConsentBanner";
 import { Document } from "@shared/components/Document";
-import { cachedListPurchases } from "@shared/lib/cached-queries";
-import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
@@ -47,17 +45,9 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 		);
 	}
 
-	if (config.users.enableBilling) {
-		prefetchPromises.push(
-			queryClient.prefetchQuery({
-				queryKey: orpc.payments.listPurchases.queryKey({
-					input: {},
-				}),
-				// Direct DB read (React-cached) — avoids a self-HTTP call to /api/rpc
-				queryFn: () => cachedListPurchases(),
-			}),
-		);
-	}
+	// Purchases are prefetched org-scoped by the [organizationSlug] layout and
+	// self-prefetched by the account billing page. A user-level prefetch here
+	// was an extra DB round-trip on every /app page that nothing consumed.
 
 	try {
 		await Promise.all(prefetchPromises);

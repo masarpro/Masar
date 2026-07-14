@@ -148,7 +148,7 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for company expense payment:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -192,7 +192,7 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from company expense:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

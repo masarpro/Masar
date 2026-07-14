@@ -1,4 +1,5 @@
-import { getProjectById, getProjectMemberRole, getEffectivePermissions, getUserProjectScope } from "@repo/database";
+import { getProjectById, getProjectMemberRole } from "@repo/database";
+import { getCachedUserPermissions, getCachedUserProjectScope } from "@repo/api/lib/permissions";
 import { hasPermission } from "@repo/database/prisma/permissions";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { ProjectShell } from "@saas/projects/components/shell";
@@ -29,8 +30,8 @@ export default async function ProjectLayout({
 	const [project, projectMemberRole, permissions, scope] = await Promise.all([
 		getProjectById(projectId, organization.id),
 		getProjectMemberRole(projectId, session.user.id),
-		getEffectivePermissions(session.user.id, organization.id),
-		getUserProjectScope(session.user.id, organization.id),
+		getCachedUserPermissions(session.user.id, organization.id),
+		getCachedUserProjectScope(session.user.id, organization.id),
 	]);
 
 	if (!project) {

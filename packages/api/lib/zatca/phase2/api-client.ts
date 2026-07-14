@@ -59,10 +59,8 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 
 	const bodyJson = options.body ? JSON.stringify(options.body) : undefined;
 
-	// DEBUG — log full request for ZATCA troubleshooting
+	// Log method + URL only — never headers (Authorization Basic) / OTP / body.
 	console.log("[ZATCA API] Request:", options.method, url);
-	console.log("[ZATCA API] Headers:", JSON.stringify(headers));
-	if (bodyJson) console.log("[ZATCA API] Body:", bodyJson.substring(0, 200));
 
 	const response = await fetch(url, {
 		method: options.method,
@@ -144,7 +142,7 @@ export async function requestComplianceCSID(
 	console.log("[ZATCA] Inner PEM has END:", decodedPem.includes("-----END CERTIFICATE REQUEST-----"));
 	console.log("[ZATCA] Inner PEM has newlines:", /\n|\r/.test(decodedPem));
 	console.log("[ZATCA] Inner PEM length:", decodedPem.length);
-	console.log("[ZATCA] OTP:", otp);
+	// OTP intentionally NOT logged — it is a secret.
 
 	const result = await zatcaFetch(ZATCA_PATHS.complianceCSID, {
 		method: "POST",

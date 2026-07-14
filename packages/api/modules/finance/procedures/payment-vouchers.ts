@@ -442,30 +442,48 @@ export const approvePaymentVoucher = subscriptionProcedure
 		// BEFORE issuing, so an insufficient balance blocks approval cleanly and
 		// the voucher stays PENDING_APPROVAL. Auto vouchers skip this (their source
 		// expense/payment already moved the balance).
+		// Both the bank move and the status flip run in ONE transaction so a failed
+		// balance guard or a losing status race rolls back atomically.
 		const isManual = !voucher.expenseId && !voucher.subcontractPaymentId;
-		if (isManual && voucher.sourceAccountId) {
-			const dec = await db.organizationBank.updateMany({
+		const updated = await db.$transaction(async (tx) => {
+			if (isManual && voucher.sourceAccountId) {
+				const dec = await tx.organizationBank.updateMany({
+					where: {
+						id: voucher.sourceAccountId,
+						organizationId: input.organizationId,
+						balance: { gte: Number(voucher.amount) },
+					},
+					data: { balance: { decrement: Number(voucher.amount) } },
+				});
+				if (dec.count === 0) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "الرصيد غير كافي في الحساب المصدر",
+					});
+				}
+			}
+
+			// Optimistic status flip — only if the row is STILL PENDING_APPROVAL.
+			const flip = await tx.paymentVoucher.updateMany({
 				where: {
-					id: voucher.sourceAccountId,
+					id: input.id,
 					organizationId: input.organizationId,
-					balance: { gte: Number(voucher.amount) },
+					status: "PENDING_APPROVAL",
 				},
-				data: { balance: { decrement: Number(voucher.amount) } },
+				data: {
+					status: "ISSUED",
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+				},
 			});
-			if (dec.count === 0) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: "الرصيد غير كافي في الحساب المصدر",
+			if (flip.count === 0) {
+				throw new ORPCError("CONFLICT", {
+					message: "يمكن اعتماد السندات المعلّقة فقط",
 				});
 			}
-		}
 
-		const updated = await db.paymentVoucher.update({
-			where: { id: input.id },
-			data: {
-				status: "ISSUED",
-				approvedById: context.user.id,
-				approvedAt: new Date(),
-			},
+			return tx.paymentVoucher.findFirstOrThrow({
+				where: { id: input.id, organizationId: input.organizationId },
+			});
 		});
 
 		// Generate accounting entry ONLY for manual (standalone) vouchers
@@ -488,7 +506,7 @@ export const approvePaymentVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for payment voucher:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -635,21 +653,31 @@ export const cancelPaymentVoucher = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن إلغاء هذا السند" });
 		}
 
-		const updated = await db.paymentVoucher.update({
-			where: { id: input.id },
-			data: {
-				status: "CANCELLED",
-				cancelledAt: new Date(),
-				cancelReason: input.cancelReason,
-			},
-		});
-
-		// Reverse accounting entry if voucher was ISSUED and is manual
 		const isManual = !voucher.expenseId && !voucher.subcontractPaymentId;
-		if (voucher.status === "ISSUED" && isManual) {
+		const wasIssued = voucher.status === "ISSUED";
+
+		// Status flip + balance refund run in ONE transaction with an optimistic
+		// guard, so a losing cancel race rolls back and can't double-refund.
+		const updated = await db.$transaction(async (tx) => {
+			const flip = await tx.paymentVoucher.updateMany({
+				where: {
+					id: input.id,
+					organizationId: input.organizationId,
+					status: voucher.status,
+				},
+				data: {
+					status: "CANCELLED",
+					cancelledAt: new Date(),
+					cancelReason: input.cancelReason,
+				},
+			});
+			if (flip.count === 0) {
+				throw new ORPCError("CONFLICT", { message: "لا يمكن إلغاء هذا السند" });
+			}
+
 			// Refund the balance decrement applied at approval time.
-			if (voucher.sourceAccountId) {
-				await db.organizationBank.updateMany({
+			if (wasIssued && isManual && voucher.sourceAccountId) {
+				await tx.organizationBank.updateMany({
 					where: {
 						id: voucher.sourceAccountId,
 						organizationId: input.organizationId,
@@ -657,6 +685,14 @@ export const cancelPaymentVoucher = subscriptionProcedure
 					data: { balance: { increment: Number(voucher.amount) } },
 				});
 			}
+
+			return tx.paymentVoucher.findFirstOrThrow({
+				where: { id: input.id, organizationId: input.organizationId },
+			});
+		});
+
+		// Reverse accounting entry if voucher was ISSUED and is manual
+		if (wasIssued && isManual) {
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
@@ -669,7 +705,7 @@ export const cancelPaymentVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for cancelled payment voucher:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",

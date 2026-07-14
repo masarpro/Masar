@@ -90,8 +90,6 @@ export function FinanceDashboard({
 					<FinancePanel
 						financialTrend={financialTrend}
 						organizationSlug={orgSlug}
-						bankBalance={bankBalance}
-						cashBalance={cashBalance}
 					/>
 				</div>
 			</div>

@@ -360,20 +360,29 @@ export const issueReceiptVoucher = subscriptionProcedure
 			});
 		}
 
-		const updated = await db.receiptVoucher.update({
-			where: { id: input.id },
-			data: { status: "ISSUED" },
-		});
-
-		// Generate accounting entry ONLY for manual (standalone) vouchers.
-		// Auto vouchers are created already-ISSUED and never reach this handler,
-		// so moving the balance here can't double-count their source payment.
 		const isManual = !voucher.paymentId && !voucher.invoicePaymentId && !voucher.projectPaymentId;
-		if (isManual) {
+
+		// Status flip + bank move run in ONE transaction with an optimistic guard,
+		// so a losing issue race rolls back and can't double-credit the balance.
+		const updated = await db.$transaction(async (tx) => {
+			const flip = await tx.receiptVoucher.updateMany({
+				where: {
+					id: input.id,
+					organizationId: input.organizationId,
+					status: "DRAFT",
+				},
+				data: { status: "ISSUED" },
+			});
+			if (flip.count === 0) {
+				throw new ORPCError("CONFLICT", {
+					message: "يمكن إصدار السندات بحالة مسودة فقط",
+				});
+			}
+
 			// Money received in → increase the destination bank balance so the
 			// operational balance matches the GL entry onReceiptVoucherIssued posts.
-			if (voucher.destinationAccountId) {
-				await db.organizationBank.updateMany({
+			if (isManual && voucher.destinationAccountId) {
+				await tx.organizationBank.updateMany({
 					where: {
 						id: voucher.destinationAccountId,
 						organizationId: input.organizationId,
@@ -381,6 +390,16 @@ export const issueReceiptVoucher = subscriptionProcedure
 					data: { balance: { increment: Number(voucher.amount) } },
 				});
 			}
+
+			return tx.receiptVoucher.findFirstOrThrow({
+				where: { id: input.id, organizationId: input.organizationId },
+			});
+		});
+
+		// Generate accounting entry ONLY for manual (standalone) vouchers.
+		// Auto vouchers are created already-ISSUED and never reach this handler,
+		// so moving the balance here can't double-count their source payment.
+		if (isManual) {
 			try {
 				const { onReceiptVoucherIssued } = await import(
 					"../../../lib/accounting/auto-journal"
@@ -398,7 +417,7 @@ export const issueReceiptVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for receipt voucher:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -467,21 +486,31 @@ export const cancelReceiptVoucher = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: "السند ملغي بالفعل" });
 		}
 
-		const updated = await db.receiptVoucher.update({
-			where: { id: input.id },
-			data: {
-				status: "CANCELLED",
-				cancelledAt: new Date(),
-				cancelReason: input.cancelReason,
-			},
-		});
-
-		// Reverse accounting entry if voucher was ISSUED and is manual
 		const isManual = !voucher.paymentId && !voucher.invoicePaymentId && !voucher.projectPaymentId;
-		if (voucher.status === "ISSUED" && isManual) {
+		const wasIssued = voucher.status === "ISSUED";
+
+		// Status flip + balance reversal run in ONE transaction with an optimistic
+		// guard, so a losing cancel race rolls back and can't double-reverse.
+		const updated = await db.$transaction(async (tx) => {
+			const flip = await tx.receiptVoucher.updateMany({
+				where: {
+					id: input.id,
+					organizationId: input.organizationId,
+					status: voucher.status,
+				},
+				data: {
+					status: "CANCELLED",
+					cancelledAt: new Date(),
+					cancelReason: input.cancelReason,
+				},
+			});
+			if (flip.count === 0) {
+				throw new ORPCError("CONFLICT", { message: "السند ملغي بالفعل" });
+			}
+
 			// Reverse the balance increment applied at issue time.
-			if (voucher.destinationAccountId) {
-				await db.organizationBank.updateMany({
+			if (wasIssued && isManual && voucher.destinationAccountId) {
+				await tx.organizationBank.updateMany({
 					where: {
 						id: voucher.destinationAccountId,
 						organizationId: input.organizationId,
@@ -489,6 +518,14 @@ export const cancelReceiptVoucher = subscriptionProcedure
 					data: { balance: { decrement: Number(voucher.amount) } },
 				});
 			}
+
+			return tx.receiptVoucher.findFirstOrThrow({
+				where: { id: input.id, organizationId: input.organizationId },
+			});
+		});
+
+		// Reverse accounting entry if voucher was ISSUED and is manual
+		if (wasIssued && isManual) {
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
@@ -501,7 +538,7 @@ export const cancelReceiptVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for cancelled receipt voucher:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",

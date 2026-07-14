@@ -164,7 +164,7 @@ export const signHandoverProtocol = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to create retention release entry:", e);
-					orgAuditLog({
+					await orgAuditLog({
 						organizationId: input.organizationId,
 						actorId: context.user.id,
 						action: "JOURNAL_ENTRY_FAILED",
@@ -274,7 +274,7 @@ export const completeHandoverProtocol = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to create retention release entry:", e);
-					orgAuditLog({
+					await orgAuditLog({
 						organizationId: input.organizationId,
 						actorId: context.user.id,
 						action: "JOURNAL_ENTRY_FAILED",

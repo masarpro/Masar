@@ -360,24 +360,23 @@ export async function getQuotationStatsByStatus(organizationId: string) {
 		"CONVERTED",
 	];
 
-	const results = await Promise.all(
-		statuses.map(async (status) => {
-			const [count, sum] = await Promise.all([
-				db.quotation.count({ where: { organizationId, status } }),
-				db.quotation.aggregate({
-					where: { organizationId, status },
-					_sum: { totalAmount: true },
-				}),
-			]);
-			return {
-				status,
-				count,
-				totalValue: Number(sum._sum.totalAmount ?? 0),
-			};
-		}),
-	);
+	// قروب واحد بدل عدّ + تجميع لكل حالة (كان ~14 استعلاماً)
+	const grouped = await db.quotation.groupBy({
+		by: ["status"],
+		where: { organizationId },
+		_count: { _all: true },
+		_sum: { totalAmount: true },
+	});
+	const byStatus = new Map(grouped.map((g) => [g.status, g]));
 
-	return results;
+	return statuses.map((status) => {
+		const g = byStatus.get(status);
+		return {
+			status,
+			count: g?._count._all ?? 0,
+			totalValue: Number(g?._sum.totalAmount ?? 0),
+		};
+	});
 }
 
 /**
@@ -394,25 +393,24 @@ export async function getInvoiceStatsByStatus(organizationId: string) {
 		"CANCELLED",
 	];
 
-	const results = await Promise.all(
-		statuses.map(async (status) => {
-			const [count, sum] = await Promise.all([
-				db.financeInvoice.count({ where: { organizationId, status } }),
-				db.financeInvoice.aggregate({
-					where: { organizationId, status },
-					_sum: { totalAmount: true, paidAmount: true },
-				}),
-			]);
-			return {
-				status,
-				count,
-				totalValue: Number(sum._sum.totalAmount ?? 0),
-				paidValue: Number(sum._sum.paidAmount ?? 0),
-			};
-		}),
-	);
+	// قروب واحد بدل عدّ + تجميع لكل حالة (كان ~14 استعلاماً)
+	const grouped = await db.financeInvoice.groupBy({
+		by: ["status"],
+		where: { organizationId },
+		_count: { _all: true },
+		_sum: { totalAmount: true, paidAmount: true },
+	});
+	const byStatus = new Map(grouped.map((g) => [g.status, g]));
 
-	return results;
+	return statuses.map((status) => {
+		const g = byStatus.get(status);
+		return {
+			status,
+			count: g?._count._all ?? 0,
+			totalValue: Number(g?._sum.totalAmount ?? 0),
+			paidValue: Number(g?._sum.paidAmount ?? 0),
+		};
+	});
 }
 
 /**

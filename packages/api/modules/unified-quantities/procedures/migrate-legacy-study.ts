@@ -156,10 +156,36 @@ export const migrateLegacyStudy = subscriptionProcedure
 			};
 		}
 
-		let spacesCreated = 0;
-		let openingsCreated = 0;
+		const migrationResult = await db.$transaction(async (tx) => {
+			// اقفل صف الدراسة (FOR UPDATE) لمنع ترحيلين متزامنين من إدراج
+			// البنود مرتين — كلاهما كان يقرأ count=0 قبل بدء المعاملة فيُضاعف.
+			await tx.$queryRaw`
+				SELECT id FROM cost_studies
+				WHERE id = ${input.costStudyId}
+				  AND organization_id = ${input.organizationId}
+				FOR UPDATE
+			`;
 
-		await db.$transaction(async (tx) => {
+			// أعد فحص العدّاد داخل القفل: لو رُحّلت الدراسة بالفعل (أو بالتوازي)
+			// → تخطٍّ كامل بلا تكرار.
+			const lockedCount = await tx.quantityItem.count({
+				where: {
+					costStudyId: input.costStudyId,
+					organizationId: input.organizationId,
+				},
+			});
+			if (lockedCount > 0) {
+				return {
+					alreadyMigrated: true as const,
+					existingItems: lockedCount,
+					spacesCreated: 0,
+					openingsCreated: 0,
+				};
+			}
+
+			let spacesCreated = 0;
+			let openingsCreated = 0;
+
 			// 1. السياق المشترك من buildingConfig (فقط لو غير موجود)
 			if (plan.context) {
 				const ctx = await tx.quantityItemContext.create({
@@ -260,7 +286,33 @@ export const migrateLegacyStudy = subscriptionProcedure
 					})),
 				});
 			}
+
+			return {
+				alreadyMigrated: false as const,
+				existingItems: 0,
+				spacesCreated,
+				openingsCreated,
+			};
 		});
+
+		// لو خسر هذا الاستدعاء السباق (ترحيل متزامن سبقه داخل القفل) → أرجع
+		// استجابة "مُرحَّل مسبقاً" بلا إعادة تجميع أو audit.
+		if (migrationResult.alreadyMigrated) {
+			return {
+				alreadyMigrated: true,
+				existingItems: migrationResult.existingItems,
+				migratedFinishing: 0,
+				migratedMep: 0,
+				skipped: 0,
+				unmatchedToManual: 0,
+				spacesCreated: 0,
+				openingsCreated: 0,
+				legacyFinishingCount: finishingRows.length,
+				legacyMepCount: mepRows.length,
+			};
+		}
+
+		const { spacesCreated, openingsCreated } = migrationResult;
 
 		// 3. تحديث إجماليات الدراسة الـ cached (خارج الـ transaction — كباقي
 		//    procedures الوحدة)

@@ -33,11 +33,19 @@ const pageContextSchema = z
 		currentRoute: z.string().max(500),
 		pageDescription: z.string().max(500),
 		visibleStats: z
-			.record(z.string(), z.union([z.string(), z.number()]))
+			.record(z.string().max(100), z.union([z.string().max(500), z.number()]))
+			.refine((obj) => Object.keys(obj).length <= 50, {
+				message: "Too many stats",
+			})
 			.optional(),
-		activeFilters: z.record(z.string(), z.any()).optional(),
+		activeFilters: z
+			.record(z.string().max(100), z.any())
+			.refine((obj) => Object.keys(obj).length <= 50, {
+				message: "Too many filters",
+			})
+			.optional(),
 		itemCount: z.number().optional(),
-		tableColumns: z.array(z.string()).optional(),
+		tableColumns: z.array(z.string().max(100)).max(50).optional(),
 		formState: z
 			.object({
 				isOpen: z.boolean(),

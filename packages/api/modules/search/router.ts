@@ -1,9 +1,10 @@
 import { ORPCError } from "@orpc/server";
-import { globalOrganizationSearch } from "@repo/database";
+import { getProjectsForUser, globalOrganizationSearch } from "@repo/database";
 import { z } from "zod";
 import {
 	getCachedOrganizationMembership,
 	getCachedUserPermissions,
+	getCachedUserProjectScope,
 } from "../../lib/permissions";
 import { protectedProcedure } from "../../orpc/procedures";
 
@@ -34,10 +35,10 @@ const global = protectedProcedure
 			return { results: [] };
 		}
 
-		const permissions = await getCachedUserPermissions(
-			context.user.id,
-			input.organizationId,
-		);
+		const [permissions, scope] = await Promise.all([
+			getCachedUserPermissions(context.user.id, input.organizationId),
+			getCachedUserProjectScope(context.user.id, input.organizationId),
+		]);
 
 		const sections = {
 			projects: permissions?.projects?.view ?? false,
@@ -46,10 +47,25 @@ const global = protectedProcedure
 			company: permissions?.company?.view ?? false,
 		};
 
+		// Per-member project visibility: unless the member can see all projects,
+		// restrict the projects section to their assigned projects — mirrors
+		// projects.list so search never leaks unassigned project data. Only the
+		// projects entity is project-scoped; the other sections are org-level and
+		// already gated by their section permission above.
+		let restrictToProjectIds: string[] | undefined;
+		if (sections.projects && !scope.allProjects) {
+			const assigned = await getProjectsForUser(
+				context.user.id,
+				input.organizationId,
+			);
+			restrictToProjectIds = assigned.map((p) => p.id);
+		}
+
 		const results = await globalOrganizationSearch({
 			organizationId: input.organizationId,
 			query,
 			sections,
+			restrictToProjectIds,
 		});
 
 		return { results };

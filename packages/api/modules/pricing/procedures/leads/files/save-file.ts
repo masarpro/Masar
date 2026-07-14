@@ -41,6 +41,16 @@ export const saveFile = subscriptionProcedure
 			});
 		}
 
+		// The storagePath must match the server-issued prefix from get-upload-url
+		// (leads/{organizationId}/{leadId}/…). Reject anything else so a client
+		// can't point a lead file at another org/lead's storage key.
+		const expectedPrefix = `leads/${input.organizationId}/${input.leadId}/`;
+		if (!input.storagePath.startsWith(expectedPrefix)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "مسار الملف غير صالح",
+			});
+		}
+
 		const file = await db.leadFile.create({
 			data: {
 				leadId: input.leadId,

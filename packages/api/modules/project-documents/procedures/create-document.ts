@@ -70,41 +70,48 @@ export const createDocumentProcedure = subscriptionProcedure
 			}
 		}
 
-		// Create document
-		const document = await createDocument(
-			input.organizationId,
-			input.projectId,
-			{
-				folder: input.folder,
-				folderId: input.folderId,
-				title: input.title,
-				description: input.description,
-				fileUrl: input.fileUrl || null,
-				uploadType: input.uploadType,
-				fileName: input.fileName,
-				fileSize: input.fileSize,
-				mimeType: input.mimeType,
-				storagePath: input.storagePath,
-				thumbnailPath: input.thumbnailPath,
-				createdById: context.user.id,
-			},
-		);
-
-		// Create initial version record for FILE uploads
-		if (input.uploadType === "FILE" && input.storagePath && input.fileName) {
-			db.documentVersion.create({
-				data: {
-					documentId: document.id,
-					versionNumber: 1,
+		// Create document + initial version record atomically. The first version
+		// row must not be fire-and-forget: a failed create previously left the
+		// document with no version history and swallowed the error.
+		const document = await db.$transaction(async (tx) => {
+			const created = await createDocument(
+				input.organizationId,
+				input.projectId,
+				{
+					folder: input.folder,
+					folderId: input.folderId,
+					title: input.title,
+					description: input.description,
+					fileUrl: input.fileUrl || null,
+					uploadType: input.uploadType,
 					fileName: input.fileName,
-					fileSize: input.fileSize ?? 0,
-					fileType: input.mimeType ?? "",
+					fileSize: input.fileSize,
+					mimeType: input.mimeType,
 					storagePath: input.storagePath,
-					uploadedBy: context.user.id,
-					changeNotes: null,
+					thumbnailPath: input.thumbnailPath,
+					createdById: context.user.id,
 				},
-			}).catch(() => {}); // fire-and-forget
-		}
+				tx,
+			);
+
+			// Create initial version record for FILE uploads
+			if (input.uploadType === "FILE" && input.storagePath && input.fileName) {
+				await tx.documentVersion.create({
+					data: {
+						documentId: created.id,
+						versionNumber: 1,
+						fileName: input.fileName,
+						fileSize: input.fileSize ?? 0,
+						fileType: input.mimeType ?? "",
+						storagePath: input.storagePath,
+						uploadedBy: context.user.id,
+						changeNotes: null,
+					},
+				});
+			}
+
+			return created;
+		});
 
 		// Log audit event
 		logAuditEvent(input.organizationId, input.projectId, {

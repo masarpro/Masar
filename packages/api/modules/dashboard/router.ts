@@ -20,7 +20,6 @@ import {
 	getRecentActivities,
 	getMonthlyFinancialTrend,
 	getDashboardOverdueInvoices,
-	getLeadsPipeline,
 	getPendingSubcontractClaimsCount,
 	getInvoiceTotals,
 	getFieldActivitySummary,
@@ -259,26 +258,20 @@ const getAll = protectedProcedure
 
 		const [
 			stats,
-			activities,
 			upcoming,
 			overdueMilestones,
 			overdueInvoices,
 			financialTrend,
-			typeDistribution,
-			leadsPipeline,
 			pendingSubcontractClaims,
 			invoiceTotals,
 			fieldActivity,
 			heroCardMetrics,
 		] = await Promise.all([
 			getDashboardStats(input.organizationId),
-			getRecentActivities(input.organizationId, input.activitiesLimit),
 			getUpcomingMilestones(input.organizationId, input.upcomingLimit),
 			getOverdueMilestones(input.organizationId, 10),
 			getDashboardOverdueInvoices(input.organizationId),
 			getMonthlyFinancialTrend(input.organizationId),
-			getProjectTypeDistribution(input.organizationId),
-			getLeadsPipeline(input.organizationId),
 			getPendingSubcontractClaimsCount(input.organizationId),
 			getInvoiceTotals(input.organizationId),
 			getFieldActivitySummary(input.organizationId),
@@ -299,29 +292,18 @@ const getAll = protectedProcedure
 				}
 			: null;
 
-		// Computed fields
-		const netProfit = invoiceTotals.totalCollected - stats.financials.totalExpenses;
-		const profitMargin = invoiceTotals.totalCollected > 0
-			? Number(((netProfit / invoiceTotals.totalCollected) * 100).toFixed(1))
-			: 0;
-
 		return {
 			stats,
-			activities,
 			upcoming,
 			overdue: {
 				milestones: overdueMilestones,
 				invoices: overdueInvoices,
 			},
 			financialTrend,
-			typeDistribution,
-			leadsPipeline,
 			pendingSubcontractClaims,
 			invoiceTotals,
 			fieldActivity,
 			heroMetrics,
-			netProfit,
-			profitMargin,
 		};
 	});
 

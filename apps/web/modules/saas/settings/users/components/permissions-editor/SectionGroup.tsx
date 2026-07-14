@@ -3,7 +3,8 @@
 import type { Permissions } from "@repo/database/prisma/permissions";
 import { Button } from "@ui/components/button";
 import { Switch } from "@ui/components/switch";
-import { ACTION_LABELS_AR, SECTION_LABELS_AR } from "./permission-labels";
+import { useTranslations } from "next-intl";
+import { SECTION_ACTIONS } from "./permission-labels";
 
 /**
  * قسم واحد في مصفوفة الصلاحيات: عنوان + تحديد/إلغاء الكل + مفاتيح
@@ -20,8 +21,8 @@ export function SectionGroup({
 	baseValues: Record<string, boolean>;
 	onChange: (action: string, value: boolean) => void;
 }) {
-	const actionLabels = ACTION_LABELS_AR[section];
-	const actions = Object.keys(actionLabels);
+	const t = useTranslations("settings.permissions");
+	const actions = SECTION_ACTIONS[section];
 	const enabledCount = actions.filter((action) => values[action]).length;
 	const allEnabled = enabledCount === actions.length;
 
@@ -36,7 +37,7 @@ export function SectionGroup({
 			<div className="flex items-center justify-between border-b border-border px-4 py-2.5">
 				<div className="flex items-center gap-2">
 					<h4 className="font-semibold text-sm">
-						{SECTION_LABELS_AR[section]}
+						{t(`sections.${section}`)}
 					</h4>
 					<span className="text-muted-foreground text-xs">
 						{enabledCount}/{actions.length}
@@ -49,7 +50,7 @@ export function SectionGroup({
 					className="h-7 text-xs"
 					onClick={() => setAll(!allEnabled)}
 				>
-					{allEnabled ? "إلغاء الكل" : "تحديد الكل"}
+					{allEnabled ? t("deselectAll") : t("selectAll")}
 				</Button>
 			</div>
 			<div className="grid grid-cols-1 gap-x-6 gap-y-1 p-3 sm:grid-cols-2">
@@ -65,13 +66,13 @@ export function SectionGroup({
 							className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-muted/50"
 						>
 							<span className="flex items-center gap-2 text-sm">
-								{actionLabels[action]}
+								{t(`actions.${section}.${action}`)}
 								{isCustomized && (
 									<span
 										className="inline-flex items-center rounded-full bg-chart-1/15 px-1.5 py-0.5 text-[10px] text-chart-1"
-										title="مخصص — يختلف عن صلاحيات الدور"
+										title={t("customizedHint")}
 									>
-										مخصص
+										{t("customized")}
 									</span>
 								)}
 							</span>

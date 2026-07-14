@@ -66,7 +66,7 @@ export async function emitProjectPaymentCreated(
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: ctx.organizationId,
 				actorId: ctx.userId,
 				action: "JOURNAL_ENTRY_FAILED",

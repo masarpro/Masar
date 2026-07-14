@@ -260,6 +260,22 @@ export async function approvePayrollRun(
 	);
 
 	return db.$transaction(async (tx) => {
+		// Optimistic approval guard FIRST: flip DRAFT→APPROVED conditionally. Two
+		// concurrent approvals both passed the DRAFT read above; without this only
+		// one matches a row here, the other aborts — preventing a doubled set of
+		// payroll expenses (there is no unique on sourceType/sourceId).
+		const flipped = await tx.payrollRun.updateMany({
+			where: { id: runId, organizationId: data.organizationId, status: "DRAFT" },
+			data: {
+				status: "APPROVED",
+				approvedById: data.approvedById,
+				approvedAt: new Date(),
+			},
+		});
+		if (flipped.count === 0) {
+			throw new Error("تم اعتماد دورة الرواتب بالفعل أو أنها ليست مسودة");
+		}
+
 		// Pre-generate expense ids in JS so all expenses can be batch-created
 		// AND linked back to their payroll items without a per-employee
 		// round-trip (2N queries → 2 queries; matters at ~25ms/query latency).
@@ -301,14 +317,10 @@ export async function approvePayrollRun(
 			...linkParams,
 		);
 
-		// Update run status
-		return tx.payrollRun.update({
+		// Status already flipped by the optimistic guard above — just return the
+		// fully-hydrated run.
+		return tx.payrollRun.findFirstOrThrow({
 			where: { id: runId },
-			data: {
-				status: "APPROVED",
-				approvedById: data.approvedById,
-				approvedAt: new Date(),
-			},
 			include: {
 				items: {
 					include: {

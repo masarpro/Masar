@@ -75,6 +75,28 @@ export const auth = betterAuth({
 			maxAge: 5 * 60,
 		},
 	},
+	rateLimit: {
+		// Explicit rate limiting for auth endpoints. Global default is 20 req/min
+		// per client, with stricter limits on credential-sensitive paths.
+		//
+		// ⚠️ PRODUCTION: the default storage is in-memory, which does NOT survive
+		// serverless cold starts and is not shared across instances — each Vercel
+		// function keeps its own counter, so limits are far weaker than intended.
+		// Before production, wire `secondaryStorage` (Redis) at the top level of
+		// this betterAuth() config so the limiter is backed by shared storage.
+		// The Redis client already used elsewhere lives in
+		// packages/api/lib/rate-limit.ts and can back a { get, set, delete }
+		// secondaryStorage adapter here.
+		enabled: true,
+		window: 60,
+		max: 20,
+		customRules: {
+			"/sign-in/email": { window: 60, max: 5 },
+			"/sign-up/email": { window: 60, max: 5 },
+			"/forget-password": { window: 60, max: 3 },
+			"/two-factor/verify": { window: 60, max: 5 },
+		},
+	},
 	account: {
 		accountLinking: {
 			enabled: true,

@@ -678,19 +678,33 @@ export async function updateSubcontractClaimStatus(
 				claim.contractId,
 			);
 
-			// Re-validate each item's cumulative qty against contract qty
-			for (const item of claim.items) {
-				const approvedQtyResult = await tx.subcontractClaimItem.aggregate({
-					where: {
-						contractItemId: item.contractItemId,
-						claim: {
-							contractId: claim.contractId,
-							status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
-						},
+			// Re-validate each item's cumulative qty against contract qty.
+			// One groupBy over all this claim's contract items, then look up each
+			// item's already-approved cumulative qty from an in-memory Map — avoids
+			// running N aggregates while holding the contract FOR UPDATE lock.
+			const contractItemIds = claim.items.map((i) => i.contractItemId);
+			const approvedGroups = await tx.subcontractClaimItem.groupBy({
+				by: ["contractItemId"],
+				where: {
+					contractItemId: { in: contractItemIds },
+					claim: {
+						contractId: claim.contractId,
+						status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
 					},
-					_sum: { thisQty: true },
-				});
-				const approvedCumQty = approvedQtyResult._sum.thisQty ?? new Prisma.Decimal(0);
+				},
+				_sum: { thisQty: true },
+			});
+			const approvedQtyMap = new Map<string, Prisma.Decimal>();
+			for (const g of approvedGroups) {
+				approvedQtyMap.set(
+					g.contractItemId,
+					g._sum.thisQty ?? new Prisma.Decimal(0),
+				);
+			}
+
+			for (const item of claim.items) {
+				const approvedCumQty =
+					approvedQtyMap.get(item.contractItemId) ?? new Prisma.Decimal(0);
 				const newCumQty = approvedCumQty.add(item.thisQty);
 
 				if (newCumQty.gt(item.contractQty)) {

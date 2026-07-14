@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { db } from "@repo/database";
+import { db, validateFileName } from "@repo/database";
 import { getSignedUploadUrl } from "@repo/storage";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../../lib/permissions";
@@ -37,6 +37,15 @@ export const getUploadUrl = subscriptionProcedure
 		if (!lead) {
 			throw new ORPCError("NOT_FOUND", {
 				message: "العميل المحتمل غير موجود",
+			});
+		}
+
+		// Reject dangerous / double extensions (exe, js, svg, html, …) using the
+		// shared attachment validator instead of accepting any file blindly.
+		const nameCheck = validateFileName(input.fileName);
+		if (!nameCheck.valid) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: nameCheck.error ?? "نوع الملف غير مسموح",
 			});
 		}
 

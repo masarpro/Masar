@@ -1,3 +1,4 @@
+import { Prisma } from "../generated/client";
 import { db } from "../client";
 
 // Type definitions for document enums
@@ -126,8 +127,10 @@ export async function createDocument(
 		thumbnailPath?: string;
 		createdById: string;
 	},
+	tx?: Prisma.TransactionClient,
 ) {
-	return db.projectDocument.create({
+	const client = tx ?? db;
+	return client.projectDocument.create({
 		data: {
 			organizationId,
 			projectId,

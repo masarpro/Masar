@@ -16,6 +16,9 @@ export function AssistantWrapper({
     <AssistantProvider organizationName={organizationName}>
       {children}
       <FloatingAssistantButton />
+      {/* fallback={null} is deliberate: the assistant panel is a floating,
+          lazily-loaded overlay with no layout slot to reserve — there is
+          nothing to skeleton, so rendering nothing until it loads is correct. */}
       <Suspense fallback={null}>
         <AssistantPanel />
       </Suspense>

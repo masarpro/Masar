@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
-export const setDefaultTemplate = protectedProcedure
+export const setDefaultTemplate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/onboarding/default-template",

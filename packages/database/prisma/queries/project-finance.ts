@@ -496,7 +496,18 @@ export async function createProjectClaim(data: {
 	note?: string;
 }) {
 	return db.$transaction(async (tx) => {
-		// Lock the project contract row to prevent concurrent claims from racing
+		// Lock the project row itself first — it always exists, so claimNo
+		// generation serializes even when the project has no contract row. A lock
+		// on project_contracts alone is a no-op for contract-less projects, letting
+		// concurrent creates read the same MAX(claimNo) and collide on the
+		// @@unique([projectId, claimNo]) constraint (P2002 → raw 500).
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM projects WHERE id = $1 FOR UPDATE`,
+			data.projectId,
+		);
+
+		// Lock the project contract row (if any) to keep ceiling validation
+		// consistent with concurrent contract edits.
 		await tx.$queryRawUnsafe(
 			`SELECT id FROM project_contracts WHERE project_id = $1 FOR UPDATE`,
 			data.projectId,

@@ -30,8 +30,9 @@ export const bulkUpdatePricing = subscriptionProcedure
 			throw new Error("بعض البنود لا تنتمي للدراسة المحدّدة");
 		}
 
-		let updatedCount = 0;
-		for (const item of items) {
+		// اجمع كل تحديثات البنود ثم نفّذها ذرّياً في transaction واحدة
+		// (كانت update متسلسلة لكل بند خارج transaction → تحديث جزئي عند الفشل).
+		const updateOps = items.map((item) => {
 			const r = solvePricing({
 				changedField: input.changedField,
 				newValue: input.newValue,
@@ -46,7 +47,7 @@ export const bulkUpdatePricing = subscriptionProcedure
 				globalMarkupPercent: study.globalMarkupPercent.toString(),
 			});
 
-			await db.quantityItem.update({
+			return db.quantityItem.update({
 				where: { id: item.id },
 				data: {
 					materialUnitPrice: r.materialUnitPrice,
@@ -68,8 +69,10 @@ export const bulkUpdatePricing = subscriptionProcedure
 					updatedById: context.user.id,
 				},
 			});
-			updatedCount++;
-		}
+		});
+
+		await db.$transaction(updateOps);
+		const updatedCount = updateOps.length;
 
 		const totals = await aggregateStudyTotals(input.costStudyId, input.organizationId);
 

@@ -1,4 +1,5 @@
-import { copySubcontractItems, logAuditEvent } from "@repo/database";
+import { copySubcontractItems, getSubcontractById, logAuditEvent } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -26,6 +27,26 @@ export const copySubcontractItemsProcedure = subscriptionProcedure
 			context.user.id,
 			{ section: "finance", action: "payments" },
 		);
+
+		// Both contracts must belong to the verified project + organization,
+		// otherwise items could be copied across projects/organizations.
+		const [sourceContract, targetContract] = await Promise.all([
+			getSubcontractById(
+				input.sourceContractId,
+				input.organizationId,
+				input.projectId,
+			),
+			getSubcontractById(
+				input.targetContractId,
+				input.organizationId,
+				input.projectId,
+			),
+		]);
+		if (!(sourceContract && targetContract)) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "عقد الباطن غير موجود",
+			});
+		}
 
 		const items = await copySubcontractItems(
 			input.sourceContractId,

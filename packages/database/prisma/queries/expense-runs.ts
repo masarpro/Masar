@@ -246,6 +246,21 @@ export async function postExpenseRun(
 	);
 
 	return db.$transaction(async (tx) => {
+		// Optimistic post guard FIRST: flip DRAFT→POSTED conditionally so two
+		// concurrent posts can't both create the recurring expenses (no unique on
+		// sourceType/sourceId to catch the double otherwise).
+		const flipped = await tx.companyExpenseRun.updateMany({
+			where: { id: runId, organizationId: data.organizationId, status: "DRAFT" },
+			data: {
+				status: "POSTED",
+				postedById: data.postedById,
+				postedAt: new Date(),
+			},
+		});
+		if (flipped.count === 0) {
+			throw new Error("تم ترحيل دورة المصروفات بالفعل أو أنها ليست مسودة");
+		}
+
 		// Pre-generate expense ids in JS so all expenses can be batch-created
 		// AND linked back to their run items without a per-item round-trip
 		// (2N queries → 2 queries; matters at ~25ms/query latency).
@@ -291,14 +306,9 @@ export async function postExpenseRun(
 			...linkParams,
 		);
 
-		// Update run status
-		return tx.companyExpenseRun.update({
+		// Status already flipped by the optimistic guard above — return hydrated run.
+		return tx.companyExpenseRun.findFirstOrThrow({
 			where: { id: runId },
-			data: {
-				status: "POSTED",
-				postedById: data.postedById,
-				postedAt: new Date(),
-			},
 			include: {
 				items: {
 					include: {

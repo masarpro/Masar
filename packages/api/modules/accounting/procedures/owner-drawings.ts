@@ -10,6 +10,7 @@ import {
 	getCostCenterByProject,
 	createOwnerDrawingAccount,
 	ensureOwnerDrawingsSystem,
+	isPeriodClosed,
 } from "@repo/database";
 import { z } from "zod";
 import {
@@ -593,7 +594,7 @@ export const createDrawingProcedure = subscriptionProcedure
 				"[AutoJournal] Failed to generate entry for owner drawing:",
 				e,
 			);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",
@@ -701,6 +702,7 @@ export const cancelDrawingProcedure = subscriptionProcedure
 				status: true,
 				drawingNo: true,
 				amount: true,
+				date: true,
 				bankAccountId: true,
 				journalEntryId: true,
 				createdById: true,
@@ -715,6 +717,16 @@ export const cancelDrawingProcedure = subscriptionProcedure
 		if (drawing.status !== "APPROVED") {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "يمكن إلغاء السحوبات المعتمدة فقط",
+			});
+		}
+
+		// Block cancellation when the drawing's entry sits in a closed period —
+		// otherwise the bank balance is restored below but reverseJournalEntry
+		// (called via onOwnerDrawingCancelled) throws and is swallowed, leaving the
+		// OWD-JE POSTED: a silent bank↔ledger divergence.
+		if (drawing.date && (await isPeriodClosed(db, input.organizationId, drawing.date))) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء سحب في فترة محاسبية مغلقة",
 			});
 		}
 
@@ -751,7 +763,7 @@ export const cancelDrawingProcedure = subscriptionProcedure
 				"[AutoJournal] Failed to reverse entry for cancelled owner drawing:",
 				e,
 			);
-			orgAuditLog({
+			await orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
 				action: "JOURNAL_ENTRY_FAILED",

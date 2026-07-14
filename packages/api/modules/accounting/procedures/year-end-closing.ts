@@ -605,15 +605,21 @@ export const executeYearEndProcedure = subscriptionProcedure
 
 			const distributionDetails = owners.map((owner) => {
 				const ownershipPercent = Number(owner.ownershipPercent);
-				const shareOfProfit = netProfit * (ownershipPercent / 100);
-				const drawings = drawingsPerOwner[owner.id] ?? 0;
+				// Decimal math for the profit split — derived from the exact rounded
+				// netProfitDecimal (the same figure the closing entry balances on),
+				// not a float, so stored shares reconcile with the ledger.
+				const shareDec = netProfitDecimal
+					.mul(owner.ownershipPercent)
+					.div(100)
+					.toDecimalPlaces(2);
+				const drawingsDec = new Prisma.Decimal(drawingsPerOwner[owner.id] ?? 0);
 				return {
 					ownerId: owner.id,
 					ownerName: owner.name,
 					ownershipPercent,
-					shareOfProfit: Math.round(shareOfProfit * 100) / 100,
-					drawings,
-					netToRetained: Math.round((shareOfProfit - drawings) * 100) / 100,
+					shareOfProfit: shareDec.toNumber(),
+					drawings: drawingsDec.toNumber(),
+					netToRetained: shareDec.sub(drawingsDec).toDecimalPlaces(2).toNumber(),
 				};
 			});
 
@@ -768,33 +774,41 @@ export const reverseYearEndProcedure = subscriptionProcedure
 			});
 		}
 
-		// Reverse both journal entries if they exist
-		if (closing.closingJournalEntryId) {
-			await reverseJournalEntry(
-				db,
-				closing.closingJournalEntryId,
-				context.user.id,
-				new Date(),
-			);
-		}
+		// Reverse both journal entries + flip the closing status atomically. A crash
+		// between the two reversals used to leave one entry REVERSED and the other
+		// POSTED with the record still COMPLETED — an unrecoverable half-state.
+		// The reversal is dated to the closing date (31 Dec of the closed year),
+		// NOT today, so the reversal lands in the same fiscal year it undoes and
+		// doesn't inflate next year's income statement.
+		await db.$transaction(async (tx) => {
+			if (closing.closingJournalEntryId) {
+				await reverseJournalEntry(
+					db,
+					closing.closingJournalEntryId,
+					context.user.id,
+					closing.closingDate,
+					tx,
+				);
+			}
 
-		if (closing.drawingsClosingEntryId) {
-			await reverseJournalEntry(
-				db,
-				closing.drawingsClosingEntryId,
-				context.user.id,
-				new Date(),
-			);
-		}
+			if (closing.drawingsClosingEntryId) {
+				await reverseJournalEntry(
+					db,
+					closing.drawingsClosingEntryId,
+					context.user.id,
+					closing.closingDate,
+					tx,
+				);
+			}
 
-		// Update YearEndClosing status
-		await db.yearEndClosing.update({
-			where: { id: closing.id },
-			data: {
-				status: "REVERSED",
-				reversedAt: new Date(),
-				reversedById: context.user.id,
-			},
+			await tx.yearEndClosing.update({
+				where: { id: closing.id },
+				data: {
+					status: "REVERSED",
+					reversedAt: new Date(),
+					reversedById: context.user.id,
+				},
+			});
 		});
 
 		// Audit log

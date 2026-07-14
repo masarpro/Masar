@@ -3,7 +3,7 @@ import { auth } from "@repo/auth";
 
 type ResolvedSession = Awaited<ReturnType<typeof auth.api.getSession>>;
 
-export const publicProcedure = os.$context<{
+const baseProcedure = os.$context<{
 	headers: Headers;
 	/**
 	 * Set ONLY by the in-process server client (SSR prefetch). Never derived
@@ -19,6 +19,24 @@ export const publicProcedure = os.$context<{
 	 */
 	resolvedSession?: ResolvedSession;
 }>();
+
+// Outermost middleware on every procedure: turn business-rule errors thrown as
+// a plain `Error` with a user-facing (Arabic) message into a proper
+// `ORPCError("BAD_REQUEST")`, so the client sees the reason instead of an opaque
+// 500. Already-typed ORPCErrors pass through untouched; English/internal errors
+// (Prisma, network, bugs) are re-thrown as-is so they still reach Sentry as 500s.
+export const publicProcedure = baseProcedure.use(async ({ next }) => {
+	try {
+		return await next();
+	} catch (err) {
+		if (err instanceof ORPCError) throw err;
+		const message = err instanceof Error ? err.message : "";
+		if (message && /[؀-ۿ]/.test(message)) {
+			throw new ORPCError("BAD_REQUEST", { message });
+		}
+		throw err;
+	}
+});
 
 export const protectedProcedure = publicProcedure.use(
 	async ({ context, next }) => {

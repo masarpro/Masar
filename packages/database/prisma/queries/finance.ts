@@ -1250,6 +1250,7 @@ export async function updateInvoiceStatus(
 	id: string,
 	organizationId: string,
 	status: FinanceInvoiceStatus,
+	expectedStatus?: FinanceInvoiceStatus,
 ) {
 	const existing = await db.financeInvoice.findFirst({
 		where: { id, organizationId },
@@ -1270,6 +1271,21 @@ export async function updateInvoiceStatus(
 		updateData.sentAt = new Date();
 	} else if (status === "VIEWED") {
 		updateData.viewedAt = new Date();
+	}
+
+	// Optimistic status guard: when the caller passes the status it validated the
+	// transition against, only write if the row still holds that status — a
+	// concurrent transition (e.g. two cancels, or cancel racing a payment) then
+	// matches zero rows instead of clobbering the newer state.
+	if (expectedStatus !== undefined) {
+		const result = await db.financeInvoice.updateMany({
+			where: { id, organizationId, status: expectedStatus },
+			data: updateData,
+		});
+		if (result.count === 0) {
+			throw new Error("تعذّر تحديث حالة الفاتورة — تغيّرت الحالة بالتزامن");
+		}
+		return db.financeInvoice.findFirstOrThrow({ where: { id, organizationId } });
 	}
 
 	return db.financeInvoice.update({
@@ -1363,12 +1379,17 @@ export async function addInvoicePayment(
 			},
 		});
 
-		// Increment bank balance when payment is received into a bank account
+		// Increment bank balance when payment is received into a bank account.
+		// Scope by organizationId so a client-supplied bank id belonging to
+		// another tenant can never be mutated (cross-tenant balance IDOR).
 		if (data.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.sourceAccountId },
+			const bankUpdate = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, organizationId },
 				data: { balance: { increment: data.amount } },
 			});
+			if (bankUpdate.count === 0) {
+				throw new Error("الحساب البنكي غير موجود");
+			}
 		}
 
 		return payment;
@@ -1421,6 +1442,19 @@ export async function deleteInvoicePayment(
 				? "PARTIALLY_PAID"
 				: "ISSUED";
 
+		// Cancel the auto-created receipt voucher inside the same transaction, so a
+		// failure here rolls the whole delete back together (previously the voucher
+		// was cancelled in a separate write before the delete — a mid-way failure
+		// left a cancelled voucher on a still-live payment).
+		await tx.receiptVoucher.updateMany({
+			where: {
+				invoicePaymentId: paymentId,
+				organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		await tx.financeInvoicePayment.delete({ where: { id: paymentId } });
 
 		await tx.financeInvoice.update({
@@ -1431,10 +1465,11 @@ export async function deleteInvoicePayment(
 			},
 		});
 
-		// Decrement bank balance when payment is reversed
+		// Decrement bank balance when payment is reversed (scope by org — the
+		// sourceAccountId is derived from the payment row but stay defensive).
 		if (payment.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: payment.sourceAccountId },
+			await tx.organizationBank.updateMany({
+				where: { id: payment.sourceAccountId, organizationId },
 				data: { balance: { decrement: Number(payment.amount) } },
 			});
 		}
@@ -1575,12 +1610,20 @@ export async function issueInvoice(
 			invoice.vatPercent,
 		);
 
-		// Update item totals
-		for (let idx = 0; idx < invoice.items.length; idx++) {
-			await tx.financeInvoiceItem.update({
-				where: { id: invoice.items[idx].id },
-				data: { totalPrice: totals.itemTotals[idx] },
-			});
+		// Update item totals in a single batched statement (VALUES join) instead
+		// of N sequential UPDATEs inside the transaction — a large invoice used to
+		// cost one round-trip per line item on the hot issue path.
+		if (invoice.items.length > 0) {
+			const rows = invoice.items.map(
+				(item, idx) =>
+					Prisma.sql`(${item.id}::text, ${totals.itemTotals[idx].toFixed(2)}::numeric)`,
+			);
+			await tx.$executeRaw`
+				UPDATE finance_invoice_items AS t
+				SET total_price = v.total_price
+				FROM (VALUES ${Prisma.join(rows)}) AS v(id, total_price)
+				WHERE t.id = v.id
+			`;
 		}
 
 		// Update invoice with frozen totals, seller snapshot, and ZATCA data
@@ -1717,20 +1760,10 @@ export async function createCreditNote(data: {
 	// remaining. Compare like-for-like: the credit note's FULL total (after
 	// discount + VAT) against the original's VAT-inclusive total — not the raw
 	// pre-VAT item sum, which previously let a credit note slip past the ceiling.
+	// NOTE: the ceiling aggregate + paidAmount read are performed INSIDE the
+	// transaction below, under a FOR UPDATE lock on the original invoice, so two
+	// concurrent credit notes can't both slip past the ceiling (race).
 	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
-	const existingCreditNotes = await db.financeInvoice.aggregate({
-		where: {
-			relatedInvoiceId: data.originalInvoiceId,
-			invoiceType: "CREDIT_NOTE",
-			status: { not: "CANCELLED" },
-		},
-		_sum: { totalAmount: true },
-	});
-	// Credit note totalAmounts are negative, so abs() to get the credited total
-	const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
-	if (totalAlreadyCredited.add(totals.totalAmount).greaterThan(D(original.totalAmount))) {
-		throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
-	}
 
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
 
@@ -1751,6 +1784,33 @@ export async function createCreditNote(data: {
 
 	// Create credit note and update original invoice in a transaction
 	return db.$transaction(async (tx) => {
+		// Lock the original invoice, then read its fresh paidAmount and the sum of
+		// existing credit notes INSIDE the lock so two concurrent credit notes are
+		// serialized and neither can exceed the invoice total.
+		await tx.$queryRaw`SELECT id FROM finance_invoices WHERE id = ${data.originalInvoiceId} AND organization_id = ${data.organizationId} FOR UPDATE`;
+
+		const lockedOriginal = await tx.financeInvoice.findFirst({
+			where: { id: data.originalInvoiceId, organizationId: data.organizationId },
+			select: { totalAmount: true, paidAmount: true },
+		});
+		if (!lockedOriginal) {
+			throw new Error("الفاتورة الأصلية غير موجودة");
+		}
+
+		const existingCreditNotes = await tx.financeInvoice.aggregate({
+			where: {
+				relatedInvoiceId: data.originalInvoiceId,
+				invoiceType: "CREDIT_NOTE",
+				status: { not: "CANCELLED" },
+			},
+			_sum: { totalAmount: true },
+		});
+		// Credit note totalAmounts are negative, so abs() to get the credited total
+		const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
+		if (totalAlreadyCredited.add(totals.totalAmount).greaterThan(D(lockedOriginal.totalAmount))) {
+			throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
+		}
+
 		const creditNote = await tx.financeInvoice.create({
 			data: {
 				organizationId: data.organizationId,
@@ -1795,8 +1855,8 @@ export async function createCreditNote(data: {
 		// Bug #8 fix: update original invoice — credit note reduces outstanding amount
 		// Decimal math throughout: float rounding here can flip the >= comparison.
 		const creditAmount = totals.totalAmount; // positive Decimal
-		const newPaid = new Prisma.Decimal(original.paidAmount).add(creditAmount);
-		const total = new Prisma.Decimal(original.totalAmount);
+		const newPaid = new Prisma.Decimal(lockedOriginal.paidAmount).add(creditAmount);
+		const total = new Prisma.Decimal(lockedOriginal.totalAmount);
 		const newStatus = newPaid.greaterThanOrEqualTo(total)
 			? ("PAID" as const)
 			: newPaid.greaterThan(0)

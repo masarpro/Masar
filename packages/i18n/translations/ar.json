@@ -742,6 +742,20 @@
       "orContinueWith": "أو تابع بـ",
       "backToPassword": "الدخول بكلمة المرور بدلاً من ذلك"
     },
+    "changePassword": {
+      "title": "تغيير كلمة المرور",
+      "subtitle": "يجب تغيير كلمة المرور قبل المتابعة",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "submit": "تغيير كلمة المرور",
+      "success": "تم تغيير كلمة المرور بنجاح! جارٍ التوجيه...",
+      "currentPasswordRequired": "كلمة المرور الحالية مطلوبة",
+      "newPasswordMin": "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل",
+      "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+      "passwordsMismatch": "كلمتا المرور غير متطابقتين",
+      "genericError": "حدث خطأ أثناء تغيير كلمة المرور"
+    },
     "resetPassword": {
       "backToSignin": "العودة لتسجيل الدخول",
       "hints": {
@@ -9606,7 +9620,8 @@
       "section": "القسم",
       "actions": "إجراءات",
       "noPrice": "بدون سعر",
-      "total": "المجموع"
+      "total": "المجموع",
+      "pageTotal": "إجمالي الصفحة"
     },
     "source": {
       "MANUAL": "يدوي",
@@ -11642,6 +11657,89 @@
       "toastSubscribed": "تم الاشتراك في الملخص",
       "toastUnsubscribed": "تم إلغاء الاشتراك من الملخص",
       "toastError": "حدث خطأ في تحديث الاشتراك"
+    },
+    "permissions": {
+      "selectAll": "تحديد الكل",
+      "deselectAll": "إلغاء الكل",
+      "customized": "مخصص",
+      "customizedHint": "مخصص — يختلف عن صلاحيات الدور",
+      "sections": {
+        "projects": "المشاريع",
+        "quantities": "الكميات",
+        "pricing": "التسعير",
+        "finance": "المالية",
+        "employees": "الموظفون",
+        "company": "المنشأة",
+        "settings": "الإعدادات",
+        "reports": "التقارير"
+      },
+      "actions": {
+        "projects": {
+          "view": "عرض المشاريع",
+          "create": "إنشاء مشروع",
+          "edit": "تعديل المشاريع",
+          "delete": "حذف المشاريع",
+          "viewFinance": "عرض مالية المشروع",
+          "manageTeam": "إدارة فريق المشروع"
+        },
+        "quantities": {
+          "view": "عرض دراسات الكميات",
+          "create": "إنشاء دراسة",
+          "edit": "تعديل الدراسات",
+          "delete": "حذف الدراسات",
+          "pricing": "تسعير الكميات"
+        },
+        "pricing": {
+          "view": "عرض قسم التسعير",
+          "studies": "إدارة الدراسات",
+          "quotations": "عروض الأسعار",
+          "pricing": "إدارة التسعير",
+          "leads": "العملاء المحتملون",
+          "editQuantities": "تعديل الكميات",
+          "approveQuantities": "اعتماد الكميات",
+          "editSpecs": "تعديل المواصفات",
+          "approveSpecs": "اعتماد المواصفات",
+          "editCosting": "تعديل التكاليف",
+          "approveCosting": "اعتماد التكاليف",
+          "editSellingPrice": "تعديل سعر البيع",
+          "generateQuotation": "إنشاء عرض السعر",
+          "convertToProject": "تحويل الدراسة لمشروع"
+        },
+        "finance": {
+          "view": "عرض البيانات المالية",
+          "quotations": "عروض الأسعار",
+          "invoices": "الفواتير",
+          "payments": "المدفوعات والمقبوضات",
+          "reports": "التقارير المالية",
+          "settings": "الإعدادات المحاسبية"
+        },
+        "employees": {
+          "view": "عرض الموظفين",
+          "create": "إضافة موظفين",
+          "edit": "تعديل بيانات الموظفين",
+          "delete": "حذف الموظفين",
+          "payroll": "إدارة الرواتب",
+          "attendance": "إدارة الحضور"
+        },
+        "company": {
+          "view": "عرض بيانات المنشأة",
+          "expenses": "مصروفات المنشأة",
+          "assets": "أصول المنشأة",
+          "reports": "تقارير المنشأة"
+        },
+        "settings": {
+          "organization": "إعدادات المنشأة",
+          "users": "إدارة المستخدمين",
+          "roles": "إدارة الأدوار",
+          "billing": "الفوترة والاشتراك",
+          "integrations": "التكاملات"
+        },
+        "reports": {
+          "view": "عرض التقارير",
+          "create": "إنشاء التقارير",
+          "approve": "اعتماد التقارير"
+        }
+      }
     }
   },
   "share": {

@@ -15,8 +15,6 @@ const FinancePanelChart = dynamic(() => import("./FinancePanelChart"), {
 });
 
 interface FinancePanelProps {
-	bankBalance: number;
-	cashBalance: number;
 	financialTrend: Array<{ month: string; expenses: number; claims: number }>;
 	organizationSlug: string;
 }

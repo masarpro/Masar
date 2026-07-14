@@ -212,25 +212,10 @@ export function PaymentsList({
 		[payments],
 	);
 
-	// مؤشرات محسوبة من النتائج الحالية
-	const monthTotal = useMemo(() => {
-		const now = new Date();
-		const start = new Date(now.getFullYear(), now.getMonth(), 1);
-		return rawPayments
-			.filter((p: any) => new Date(p.date) >= start)
-			.reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0);
-	}, [rawPayments]);
-
-	const completedTotal = useMemo(
-		() =>
-			rawPayments
-				.filter((p: any) => p.status === "COMPLETED")
-				.reduce(
-					(sum: number, p: any) => sum + Number(p.amount ?? 0),
-					0,
-				),
-		[rawPayments],
-	);
+	// KPI totals come from the server aggregate (over ALL filtered rows), not the
+	// current page — summing rawPayments here under-reported past the page limit.
+	const monthTotal = data?.monthTotal ?? 0;
+	const completedTotal = data?.completedTotal ?? 0;
 
 	const paymentsCount = data?.total ?? rawPayments.length;
 

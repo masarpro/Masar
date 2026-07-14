@@ -5,6 +5,7 @@ import { Calculator, FileSpreadsheet, Plus, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { CreateCostStudyDialog } from "@saas/pricing/components/studies/CreateCostStudyForm";
 
 interface PricingShortcutsCardProps {
@@ -24,9 +25,12 @@ export function PricingShortcutsCard({
 	organizationId,
 }: PricingShortcutsCardProps) {
 	const t = useTranslations();
+	const { can, isOwner } = usePermission();
 	const basePath = `/app/${organizationSlug}/pricing`;
 	const [studyDialogOpen, setStudyDialogOpen] = useState(false);
 
+	// Each create shortcut requires the same permission as its section — mirrors
+	// QuickActionsGrid so the card never offers an action the member can't do.
 	const shortcuts: Array<{
 		key: string;
 		icon: LucideIcon;
@@ -36,6 +40,7 @@ export function PricingShortcutsCard({
 		createPath?: string;
 		onCreateClick?: () => void;
 		chip: string;
+		visible: boolean;
 	}> = [
 		{
 			key: "studies",
@@ -45,6 +50,7 @@ export function PricingShortcutsCard({
 			browsePath: `${basePath}/studies`,
 			onCreateClick: () => setStudyDialogOpen(true),
 			chip: "bg-chart-4/15 text-chart-4",
+			visible: isOwner || can("pricing", "studies"),
 		},
 		{
 			key: "quotations",
@@ -54,6 +60,7 @@ export function PricingShortcutsCard({
 			browsePath: `${basePath}/quotations`,
 			createPath: `${basePath}/quotations/new`,
 			chip: "bg-chart-3/20 text-chart-3",
+			visible: isOwner || can("pricing", "quotations"),
 		},
 		{
 			key: "leads",
@@ -63,8 +70,9 @@ export function PricingShortcutsCard({
 			browsePath: `${basePath}/leads`,
 			createPath: `${basePath}/leads/new`,
 			chip: "bg-primary/10 text-primary",
+			visible: isOwner || can("pricing", "leads"),
 		},
-	];
+	].filter((s) => s.visible);
 
 	const createChip =
 		"flex size-7 shrink-0 items-center justify-center rounded-lg border-2 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground";

@@ -24,6 +24,7 @@ export function AttentionCard({
 	overdueMilestones,
 	pendingSubcontractClaims,
 	upcomingPayments,
+	showFinance,
 }: {
 	organizationId: string;
 	organizationSlug: string;
@@ -31,14 +32,17 @@ export function AttentionCard({
 	overdueMilestones: unknown[];
 	pendingSubcontractClaims: number;
 	upcomingPayments: unknown[];
+	showFinance: boolean;
 }) {
 	const t = useTranslations();
 
+	// finance.invoices.list requires finance.view — only fire it (and show the
+	// recent-invoices section) when the member can see finance, otherwise it 403s.
 	const { data: invoicesData } = useQuery({
 		...orpc.finance.invoices.list.queryOptions({
 			input: { organizationId, limit: 3 },
 		}),
-		enabled: !!organizationId,
+		enabled: !!organizationId && showFinance,
 	});
 
 	const attention = [
@@ -115,7 +119,7 @@ export function AttentionCard({
 				)}
 			</div>
 
-			{recentInvoices.length > 0 && (
+			{showFinance && recentInvoices.length > 0 && (
 				<div className="mt-3 shrink-0 border-t-2 pt-3">
 					<p className="text-sm font-semibold text-muted-foreground">
 						{t("dashboard.recentDocs.title")}

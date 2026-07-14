@@ -658,7 +658,7 @@ export const costingGetSummary = protectedProcedure
 		});
 
 		const study = await db.costStudy.findFirst({
-			where: { id: input.studyId },
+			where: { id: input.studyId, organizationId: input.organizationId },
 			select: { overheadPercent: true },
 		});
 
