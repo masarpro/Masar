@@ -22,7 +22,7 @@ export function AssistantContextBadge({
     : sectionLabel;
 
   return (
-    <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg bg-chart-4/15 px-3 py-1.5 text-xs text-chart-4 dark:bg-chart-4/20 dark:text-chart-4">
+    <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg bg-chart-2/15 px-3 py-1.5 text-xs text-chart-2 dark:bg-chart-2/20 dark:text-chart-2">
       <MapPin size={14} className="shrink-0" />
       <span className="truncate">{label}</span>
     </div>

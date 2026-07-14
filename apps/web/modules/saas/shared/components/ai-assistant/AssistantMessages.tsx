@@ -62,7 +62,7 @@ const MessageBubble = memo(function MessageBubble({
 
   if (msg.role === "user") {
     return (
-      <div className="ms-auto max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-ee-sm bg-chart-4 p-3 text-sm leading-relaxed text-white">
+      <div className="ms-auto max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-ee-sm bg-chart-2 p-3 text-sm leading-relaxed text-white">
         {msg.content}
       </div>
     );
@@ -72,8 +72,8 @@ const MessageBubble = memo(function MessageBubble({
     <div className="group relative max-w-[85%] rounded-2xl rounded-es-sm bg-muted p-3 text-sm leading-relaxed">
       {/* Tool call indicator */}
       {pendingTools && pendingTools.length > 0 && !msg.content && (
-        <div className="flex items-center gap-2 rounded-lg bg-chart-4/15 px-3 py-2 text-xs text-muted-foreground dark:bg-chart-4/20">
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-chart-4" />
+        <div className="flex items-center gap-2 rounded-lg bg-chart-2/15 px-3 py-2 text-xs text-muted-foreground dark:bg-chart-2/20">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-chart-2" />
           <span>
             {pendingTools
               .map((ti) => {
@@ -96,7 +96,7 @@ const MessageBubble = memo(function MessageBubble({
                     <button
                       type="button"
                       onClick={() => router.push(href)}
-                      className="text-chart-4 underline hover:text-chart-4 dark:text-chart-4"
+                      className="text-chart-2 underline hover:text-chart-2 dark:text-chart-2"
                     >
                       {children}
                     </button>
@@ -107,7 +107,7 @@ const MessageBubble = memo(function MessageBubble({
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-chart-4 underline dark:text-chart-4"
+                    className="text-chart-2 underline dark:text-chart-2"
                   >
                     {children}
                   </a>

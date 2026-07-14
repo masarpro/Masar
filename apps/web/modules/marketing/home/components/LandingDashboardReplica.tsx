@@ -710,11 +710,11 @@ export function LandingDashboardReplica() {
 								);
 							})}
 						</div>
-						{/* floating AI assistant button, like the real app */}
+						{/* floating AI assistant button, like the real app (Brand/02 red) */}
 						<div className="mt-auto flex justify-end pt-6">
 							<span
 								className="grid size-9 place-items-center rounded-full"
-								style={{ background: BRAND_4 }}
+								style={{ background: BRAND_2 }}
 							>
 								<Sparkles className="size-4 text-white" />
 							</span>

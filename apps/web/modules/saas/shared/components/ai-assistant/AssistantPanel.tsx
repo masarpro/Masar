@@ -338,7 +338,7 @@ export function AssistantPanel() {
         {/* Header — Botly chat identity: branded bot chip + title */}
         <div className="flex items-center justify-between border-b p-3">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-chart-2/15 text-chart-2">
               <Sparkles size={18} />
             </span>
             <span className="truncate text-sm font-semibold text-foreground">
@@ -366,7 +366,7 @@ export function AssistantPanel() {
             >
               <History size={16} />
               {savedChats.length > 0 && (
-                <span className="absolute -top-0.5 -end-0.5 w-2 h-2 rounded-full bg-chart-4" />
+                <span className="absolute -top-0.5 -end-0.5 w-2 h-2 rounded-full bg-chart-2" />
               )}
             </button>
             {/* Expand/Collapse — desktop only */}

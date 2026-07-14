@@ -22,8 +22,8 @@ export function FloatingAssistantButton() {
       aria-haspopup="dialog"
       title={`${t("title")} (${t("shortcut")})`}
       className={cn(
-        // Botly floating action (Brand/04 blue) with a soft branded glow
-        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-chart-4 text-white ring-1 ring-white/15 shadow-[0_10px_30px_-4px_rgba(93,116,241,0.5)] transition-all duration-300 hover:scale-105 active:scale-95",
+        // Botly floating action (Brand/02 red) with a soft branded glow
+        "fixed bottom-20 md:bottom-6 start-6 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-chart-2 text-white ring-1 ring-white/15 shadow-[0_10px_30px_-4px_rgba(234,116,101,0.5)] transition-all duration-300 hover:scale-105 active:scale-95",
       )}
     >
       <span
@@ -37,7 +37,7 @@ export function FloatingAssistantButton() {
 
       {/* Unread badge */}
       {unreadCount > 0 && !isOpen && (
-        <span className="absolute -end-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-in zoom-in-50">
+        <span className="absolute -end-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background ring-2 ring-background animate-in zoom-in-50">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       )}
