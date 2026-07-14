@@ -56,7 +56,7 @@ import { useEffect, useRef, useState } from "react";
 const INK = "#1d1d1d";
 const MUTED = "#a0a5a9";
 const STROKE = "#f2f2f2";
-const APP_BG = "#f7f7f8"; // app background behind the white cards
+const APP_BG = "#ffffff"; // app background behind the cards (white, like the app)
 const BRAND_1 = "#ffcc6f"; // chart-1
 const BRAND_2 = "#ea7465"; // chart-2 / destructive
 const BRAND_3 = "#8ec9db"; // chart-3
@@ -384,30 +384,67 @@ export function LandingDashboardReplica() {
 							<div className="col-span-2 flex min-h-0 min-w-0 flex-col gap-5">
 								{/* BotlyHero gradient card + glass stats strip (flex-4) */}
 								<div
-									className="relative flex-[4] overflow-hidden rounded-3xl"
+									className="relative flex-[4] overflow-hidden rounded-[32px]"
 									style={{
 										backgroundImage:
 											"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
 									}}
 								>
-									<div className="flex items-center gap-3 px-7 pt-6">
+									{/* greeting + contextual CTA + carousel arrows (BotlyHero) */}
+									<div className="flex items-center gap-2.5 px-7 pt-6">
 										<p
-											className="min-w-0 flex-1 truncate text-lg font-bold"
+											className="min-w-0 flex-1 truncate text-xl font-bold leading-tight"
 											style={{ color: INK }}
 										>
 											{t("dashboard.welcome.greeting", { name: v("org") })}
 										</p>
 										<span
-											className="flex shrink-0 items-center gap-1.5 rounded-[10px] px-3.5 py-2 text-xs font-semibold text-white"
+											className="flex shrink-0 items-center gap-2 rounded-[12px] px-4 py-2.5 text-sm font-semibold text-white"
 											style={{ background: INK }}
 										>
 											{t("dashboard.cashFlow.goToFinance")}
-											<ChevronLeft className="size-3 rtl-flip" />
+											<ChevronLeft className="size-4 rtl-flip" />
 										</span>
+										<div className="flex shrink-0 items-center">
+											<span
+												className="flex size-9 items-center justify-center rounded-xl"
+												style={{ color: INK }}
+											>
+												<ChevronLeft className="size-4 rtl-flip" />
+											</span>
+											<span
+												className="flex size-9 items-center justify-center rounded-xl"
+												style={{ color: INK }}
+											>
+												<ChevronRight className="size-4 rtl-flip" />
+											</span>
+										</div>
 									</div>
-									<div className="absolute inset-x-3 bottom-3">
+
+									{/* bottom block — card title + dots, then the glass strip */}
+									<div className="absolute inset-x-3 bottom-3 flex flex-col gap-1.5">
+										<div className="flex items-center justify-between px-3">
+											<span
+												className="truncate text-xs font-semibold"
+												style={{ color: "rgba(29,29,29,0.6)" }}
+											>
+												{t("dashboard.hero.cards.finance")}
+											</span>
+											<div className="flex shrink-0 items-center gap-1.5">
+												{[0, 1, 2, 3].map((i) => (
+													<span
+														key={i}
+														className={`h-1.5 rounded-full ${i === 0 ? "w-5" : "w-1.5"}`}
+														style={{
+															background:
+																i === 0 ? INK : "rgba(29,29,29,0.25)",
+														}}
+													/>
+												))}
+											</div>
+										</div>
 										<div
-											className="flex w-full gap-5 rounded-[18px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-7 py-4 backdrop-blur-[24px]"
+											className="flex w-full gap-6 rounded-[24px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-9 py-4 backdrop-blur-[24px]"
 											style={{ borderColor: "rgba(255,255,255,0.7)" }}
 										>
 											{[
@@ -424,16 +461,19 @@ export function LandingDashboardReplica() {
 													value: `86,500 ${v("sar")}`,
 												},
 											].map((s) => (
-												<div key={s.label} className="min-w-0 flex-1">
+												<div
+													key={s.label}
+													className="flex min-w-0 flex-1 flex-col gap-1"
+												>
 													<p
-														className="truncate text-[13px] font-semibold"
+														className="truncate text-sm font-semibold leading-6"
 														style={{ color: INK }}
 													>
 														{s.label}
 													</p>
 													<p
-														className="truncate text-xl font-bold tabular-nums"
-														style={{ color: INK }}
+														className="truncate text-2xl font-bold tabular-nums leading-none"
+														style={{ color: INK, letterSpacing: "-0.84px" }}
 													>
 														{s.value}
 													</p>
