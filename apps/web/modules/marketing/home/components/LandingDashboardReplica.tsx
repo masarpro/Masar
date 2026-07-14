@@ -40,10 +40,10 @@ import { useEffect, useRef, useState } from "react";
  * queries. It is dressed in a light browser chrome so it reads as a real
  * screenshot of app-masar.com.
  *
- * Layout parity with the real Dashboard: a FIXED-HEIGHT board whose two
- * columns share matched flex ratios (hero↔cash-flow = 4, quick↔field = 3,
- * projects↔attention = 5) so every card aligns row-for-row and fills the
- * board, exactly like the app's xl:h-[calc(100dvh-…)] flex columns.
+ * Layout parity: ONE CSS grid — columns 2fr / 1fr, rows 4fr / 3fr / 5fr —
+ * so all six cards snap to shared row boundaries and can never drift out of
+ * alignment (hero↔cash-flow, quick↔field, projects↔attention line up
+ * row-for-row), exactly like the app's matched flex columns.
  *
  * It ALWAYS renders the desktop layout at a fixed design width and scales
  * down to fit its container (like a screenshot would), so phones see the
@@ -64,8 +64,8 @@ const BRAND_4 = "#5d74f1"; // chart-4
 const BRAND_5 = "#349264"; // chart-5 / success
 
 // Fixed desktop design width + board height the replica is authored at.
-const BASE_WIDTH = 1180;
-const BOARD_HEIGHT = 560; // the flex-column grid (matches the app's tall board)
+const BASE_WIDTH = 1200;
+const BOARD_HEIGHT = 648; // the 2×3 card grid (matches the app's tall board)
 
 const card = "rounded-3xl border-2 bg-white";
 const cardStyle = { borderColor: STROKE, color: INK };
@@ -237,6 +237,382 @@ export function LandingDashboardReplica() {
 		},
 	];
 
+	// ── Cards (authored once, placed into the grid in row-major order) ──
+
+	const heroCard = (
+		<div
+			className="relative min-h-0 overflow-hidden rounded-[32px]"
+			style={{
+				backgroundImage:
+					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
+			}}
+		>
+			{/* greeting + contextual CTA + carousel arrows (BotlyHero) */}
+			<div className="flex items-center gap-2.5 px-7 pt-6">
+				<p
+					className="min-w-0 flex-1 truncate text-xl font-bold leading-tight"
+					style={{ color: INK }}
+				>
+					{t("dashboard.welcome.greeting", { name: v("org") })}
+				</p>
+				<span
+					className="flex shrink-0 items-center gap-2 rounded-[12px] px-4 py-2.5 text-sm font-semibold text-white"
+					style={{ background: INK }}
+				>
+					{t("dashboard.cashFlow.goToFinance")}
+					<ChevronLeft className="size-4 rtl-flip" />
+				</span>
+				<div className="flex shrink-0 items-center">
+					<span
+						className="flex size-9 items-center justify-center rounded-xl"
+						style={{ color: INK }}
+					>
+						<ChevronLeft className="size-4 rtl-flip" />
+					</span>
+					<span
+						className="flex size-9 items-center justify-center rounded-xl"
+						style={{ color: INK }}
+					>
+						<ChevronRight className="size-4 rtl-flip" />
+					</span>
+				</div>
+			</div>
+
+			{/* bottom block — card title + dots, then the glass strip */}
+			<div className="absolute inset-x-3 bottom-3 flex flex-col gap-1.5">
+				<div className="flex items-center justify-between px-3">
+					<span
+						className="truncate text-xs font-semibold"
+						style={{ color: "rgba(29,29,29,0.6)" }}
+					>
+						{t("dashboard.hero.cards.finance")}
+					</span>
+					<div className="flex shrink-0 items-center gap-1.5">
+						{[0, 1, 2, 3].map((i) => (
+							<span
+								key={i}
+								className={`h-1.5 rounded-full ${i === 0 ? "w-5" : "w-1.5"}`}
+								style={{
+									background: i === 0 ? INK : "rgba(29,29,29,0.25)",
+								}}
+							/>
+						))}
+					</div>
+				</div>
+				<div
+					className="flex w-full gap-6 rounded-[24px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-9 py-4 backdrop-blur-[24px]"
+					style={{ borderColor: "rgba(255,255,255,0.7)" }}
+				>
+					{[
+						{
+							label: t("dashboard.operational.activeProjects"),
+							value: "4",
+						},
+						{
+							label: t("dashboard.kpi.bankBalance"),
+							value: `1,245,300 ${v("sar")}`,
+						},
+						{
+							label: t("dashboard.kpi.cashBalance"),
+							value: `86,500 ${v("sar")}`,
+						},
+					].map((s) => (
+						<div key={s.label} className="flex min-w-0 flex-1 flex-col gap-1">
+							<p
+								className="truncate text-sm font-semibold leading-6"
+								style={{ color: INK }}
+							>
+								{s.label}
+							</p>
+							<p
+								className="truncate text-2xl font-bold tabular-nums leading-none"
+								style={{ color: INK, letterSpacing: "-0.84px" }}
+							>
+								{s.value}
+							</p>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+
+	const cashFlowCard = (
+		<div className={`${card} flex min-h-0 flex-col p-4`} style={cardStyle}>
+			<div className="flex shrink-0 items-center justify-between">
+				<p className="text-sm font-semibold">
+					{t("dashboard.financePanel.cashFlowTitle")}
+				</p>
+				<ChevronLeft className="size-3.5 rtl-flip" style={{ color: MUTED }} />
+			</div>
+			<div className="mt-2 flex shrink-0 items-center gap-3 text-[11px]">
+				<span className="flex items-center gap-1">
+					<i
+						className="size-2 rounded-[3px]"
+						style={{ background: BRAND_1 }}
+					/>
+					<span style={{ color: MUTED }}>
+						{t("dashboard.financial.revenueLabel")}
+					</span>
+					<b className="font-semibold tabular-nums">2.4M</b>
+				</span>
+				<span className="flex items-center gap-1">
+					<i
+						className="size-2 rounded-[3px]"
+						style={{ background: BRAND_2 }}
+					/>
+					<span style={{ color: MUTED }}>
+						{t("dashboard.financial.expensesLabel")}
+					</span>
+					<b className="font-semibold tabular-nums">1.8M</b>
+				</span>
+			</div>
+			{/* chart: y-axis (start/right) + bars fill remaining height */}
+			<div className="mt-3 flex min-h-0 flex-1 gap-2">
+				<div
+					className="flex shrink-0 flex-col justify-between py-0.5 text-[9px] tabular-nums"
+					style={{ color: MUTED }}
+				>
+					<span>800K</span>
+					<span>400K</span>
+					<span>0</span>
+				</div>
+				<div className="flex min-h-0 flex-1 items-end gap-2">
+					{bars.map((b, i) => (
+						<div
+							key={i}
+							className="flex h-full min-w-0 flex-1 items-end justify-center gap-1"
+						>
+							<div
+								className="w-3 rounded-[5px]"
+								style={{ height: `${b.a}%`, background: BRAND_1 }}
+							/>
+							<div
+								className="w-3 rounded-[5px]"
+								style={{ height: `${b.b}%`, background: BRAND_2 }}
+							/>
+						</div>
+					))}
+				</div>
+			</div>
+			<div className="mt-1.5 flex shrink-0 gap-2 ps-7">
+				{bars.map((_, i) => (
+					<p
+						key={i}
+						className="flex-1 text-center text-[10px]"
+						style={{ color: MUTED }}
+					>
+						{v(`months.${i + 1}`)}
+					</p>
+				))}
+			</div>
+		</div>
+	);
+
+	const quickActionsCard = (
+		<div className={`${card} flex min-h-0 flex-col p-4`} style={cardStyle}>
+			<p className="mb-2.5 shrink-0 text-sm font-semibold">
+				{t("dashboard.quickActions")}
+			</p>
+			<div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-2 gap-2.5">
+				{quickActions.map((a) => (
+					<div
+						key={a.label}
+						className="flex items-center gap-2 rounded-2xl border-2 px-2.5"
+						style={{ borderColor: STROKE }}
+					>
+						<StatChip icon={a.icon} bg={a.bg} color={a.color} />
+						<span className="min-w-0 flex-1 truncate text-xs font-semibold">
+							{a.label}
+						</span>
+						<span
+							className="flex size-5 shrink-0 items-center justify-center rounded-md border-2"
+							style={{ borderColor: STROKE, color: MUTED }}
+						>
+							<Plus className="size-3" />
+						</span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+
+	const fieldActivityCard = (
+		<div className={`${card} flex min-h-0 flex-col p-4`} style={cardStyle}>
+			<div className="flex shrink-0 items-baseline justify-between gap-2">
+				<p className="truncate text-sm font-semibold">
+					{t("dashboard.fieldActivity.title")}
+				</p>
+				<p className="shrink-0 text-2xl font-bold tabular-nums">3</p>
+			</div>
+			<p className="shrink-0 text-[11px] font-medium" style={{ color: MUTED }}>
+				{t("dashboard.fieldActivity.siteUpdates")}
+			</p>
+			<div className="mt-2 flex min-h-0 flex-1 flex-col justify-center gap-2">
+				<div className="flex items-center gap-2.5">
+					<span
+						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						style={{ background: "rgba(255,204,111,0.25)", color: INK }}
+					>
+						<MapPin className="size-4" />
+					</span>
+					<span className="min-w-0 flex-1 truncate text-xs">
+						{t("dashboard.fieldActivity.updatedToday", { count: 3 })}
+					</span>
+				</div>
+				<div className="flex items-center gap-2.5">
+					<span
+						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						style={{ background: "rgba(93,116,241,0.15)", color: BRAND_4 }}
+					>
+						<Camera className="size-4" />
+					</span>
+					<span className="min-w-0 flex-1 truncate text-xs">
+						{t("dashboard.fieldActivity.newMedia", { photos: 14, reports: 2 })}
+					</span>
+				</div>
+				<div className="flex items-center gap-2.5">
+					<span
+						className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+						style={{ background: "rgba(142,201,219,0.2)", color: BRAND_3 }}
+					>
+						<CalendarClock className="size-4" />
+					</span>
+					<span className="min-w-0 flex-1 truncate text-xs">
+						{t("dashboard.fieldActivity.stale", {
+							name: v("projects.3.name"),
+							days: 4,
+						})}
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+
+	const projectsCard = (
+		<div className={`${card} flex min-h-0 flex-col px-5 py-4`} style={cardStyle}>
+			<div className="flex shrink-0 items-center justify-between">
+				<p className="text-sm font-semibold">
+					{t("dashboard.activeProjects")}
+				</p>
+				<span
+					className="flex items-center gap-1 text-[11px] font-medium"
+					style={{ color: MUTED }}
+				>
+					{t("dashboard.viewAll")}
+					<ChevronLeft className="size-3 rtl-flip" />
+				</span>
+			</div>
+			<div className="mt-1 flex min-h-0 flex-1 flex-col">
+				{projects.map((p, i) => (
+					<div
+						key={p.name}
+						className="grid flex-1 grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] items-center gap-3"
+						style={
+							i < projects.length - 1
+								? { borderBottom: `2px solid ${STROKE}` }
+								: undefined
+						}
+					>
+						<div className="flex min-w-0 items-center gap-2.5">
+							<span
+								className="flex size-10 shrink-0 items-center justify-center rounded-xl"
+								style={{ background: "rgba(93,116,241,0.15)" }}
+							>
+								<FolderOpen className="size-4" style={{ color: BRAND_4 }} />
+							</span>
+							<div className="min-w-0">
+								<p className="truncate text-xs font-semibold">{p.name}</p>
+								<p
+									className="flex items-center gap-1 truncate text-[10px]"
+									style={{ color: MUTED }}
+								>
+									<MapPin
+										className="size-2.5 shrink-0"
+										style={{ color: BRAND_3 }}
+									/>
+									<span className="truncate">{p.phase}</span>
+								</p>
+							</div>
+						</div>
+						<div className="flex items-center gap-1.5">
+							<div
+								className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-[3px]"
+								style={{ background: STROKE }}
+							>
+								<div
+									className="h-full rounded-[3px]"
+									style={{ width: `${p.progress}%`, background: BRAND_1 }}
+								/>
+							</div>
+							<span className="shrink-0 text-[11px] font-semibold tabular-nums">
+								{p.progress}
+								<span style={{ color: MUTED }}>%</span>
+							</span>
+						</div>
+						<p
+							className="truncate text-[11px] font-semibold tabular-nums"
+							style={{ color: BRAND_2 }}
+						>
+							{p.out}
+						</p>
+						<p
+							className="truncate text-[11px] font-semibold tabular-nums"
+							style={{ color: BRAND_5 }}
+						>
+							{p.in}
+						</p>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+
+	const attentionCard = (
+		<div className={`${card} flex min-h-0 flex-col p-4`} style={cardStyle}>
+			<p className="shrink-0 text-sm font-semibold">
+				{t("dashboard.alerts.needsAttention")}
+			</p>
+			<div className="mt-2 flex flex-col gap-1.5">
+				{attention.map((a) => (
+					<div key={a.label} className="flex items-center gap-2 p-1">
+						<StatChip icon={a.icon} bg={a.bg} color={a.color} />
+						<span className="min-w-0 flex-1 truncate text-xs">{a.label}</span>
+						<span
+							className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums text-white"
+							style={{ background: INK }}
+						>
+							{a.count}
+						</span>
+					</div>
+				))}
+			</div>
+			<div
+				className="mt-auto pt-3"
+				style={{ borderTop: `2px solid ${STROKE}` }}
+			>
+				<p className="text-xs font-semibold" style={{ color: MUTED }}>
+					{t("dashboard.recentDocs.title")}
+				</p>
+				<div className="mt-1.5 flex flex-col gap-1">
+					{["1024", "1023"].map((no) => (
+						<div key={no} className="flex items-center gap-2 p-1">
+							<span
+								className="flex size-6 shrink-0 items-center justify-center rounded-lg"
+								style={{ background: "rgba(93,116,241,0.15)" }}
+							>
+								<Receipt className="size-3" style={{ color: BRAND_4 }} />
+							</span>
+							<span className="min-w-0 flex-1 truncate text-[11px] font-medium">
+								{t("dashboard.recentDocs.invoice")} #{no}
+							</span>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+
 	return (
 		<div
 			ref={outerRef}
@@ -345,7 +721,7 @@ export function LandingDashboardReplica() {
 						</div>
 					</div>
 
-					{/* Content column — header + fixed-height dashboard grid */}
+					{/* Content column — header + the aligned card grid */}
 					<div className="flex min-w-0 flex-1 flex-col gap-4">
 						{/* Global header (GlobalHeader): page title + back/forward
 						    chevrons on the leading side; quick-add → bell → search →
@@ -376,445 +752,23 @@ export function LandingDashboardReplica() {
 							</div>
 						</div>
 
+						{/* One grid, explicit rows — every card snaps to a shared
+						    boundary so the two columns can never drift. Row-major
+						    order: hero, cash-flow, quick, field, projects, attention. */}
 						<div
-							className="grid min-w-0 grid-cols-3 gap-5"
-							style={{ height: BOARD_HEIGHT }}
+							className="grid min-w-0 gap-5"
+							style={{
+								height: BOARD_HEIGHT,
+								gridTemplateColumns: "2fr 1fr",
+								gridTemplateRows: "4fr 3fr 5fr",
+							}}
 						>
-							{/* ── Left 2/3 ── */}
-							<div className="col-span-2 flex min-h-0 min-w-0 flex-col gap-5">
-								{/* BotlyHero gradient card + glass stats strip (flex-4) */}
-								<div
-									className="relative flex-[4] overflow-hidden rounded-[32px]"
-									style={{
-										backgroundImage:
-											"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
-									}}
-								>
-									{/* greeting + contextual CTA + carousel arrows (BotlyHero) */}
-									<div className="flex items-center gap-2.5 px-7 pt-6">
-										<p
-											className="min-w-0 flex-1 truncate text-xl font-bold leading-tight"
-											style={{ color: INK }}
-										>
-											{t("dashboard.welcome.greeting", { name: v("org") })}
-										</p>
-										<span
-											className="flex shrink-0 items-center gap-2 rounded-[12px] px-4 py-2.5 text-sm font-semibold text-white"
-											style={{ background: INK }}
-										>
-											{t("dashboard.cashFlow.goToFinance")}
-											<ChevronLeft className="size-4 rtl-flip" />
-										</span>
-										<div className="flex shrink-0 items-center">
-											<span
-												className="flex size-9 items-center justify-center rounded-xl"
-												style={{ color: INK }}
-											>
-												<ChevronLeft className="size-4 rtl-flip" />
-											</span>
-											<span
-												className="flex size-9 items-center justify-center rounded-xl"
-												style={{ color: INK }}
-											>
-												<ChevronRight className="size-4 rtl-flip" />
-											</span>
-										</div>
-									</div>
-
-									{/* bottom block — card title + dots, then the glass strip */}
-									<div className="absolute inset-x-3 bottom-3 flex flex-col gap-1.5">
-										<div className="flex items-center justify-between px-3">
-											<span
-												className="truncate text-xs font-semibold"
-												style={{ color: "rgba(29,29,29,0.6)" }}
-											>
-												{t("dashboard.hero.cards.finance")}
-											</span>
-											<div className="flex shrink-0 items-center gap-1.5">
-												{[0, 1, 2, 3].map((i) => (
-													<span
-														key={i}
-														className={`h-1.5 rounded-full ${i === 0 ? "w-5" : "w-1.5"}`}
-														style={{
-															background:
-																i === 0 ? INK : "rgba(29,29,29,0.25)",
-														}}
-													/>
-												))}
-											</div>
-										</div>
-										<div
-											className="flex w-full gap-6 rounded-[24px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-9 py-4 backdrop-blur-[24px]"
-											style={{ borderColor: "rgba(255,255,255,0.7)" }}
-										>
-											{[
-												{
-													label: t("dashboard.operational.activeProjects"),
-													value: "4",
-												},
-												{
-													label: t("dashboard.kpi.bankBalance"),
-													value: `1,245,300 ${v("sar")}`,
-												},
-												{
-													label: t("dashboard.kpi.cashBalance"),
-													value: `86,500 ${v("sar")}`,
-												},
-											].map((s) => (
-												<div
-													key={s.label}
-													className="flex min-w-0 flex-1 flex-col gap-1"
-												>
-													<p
-														className="truncate text-sm font-semibold leading-6"
-														style={{ color: INK }}
-													>
-														{s.label}
-													</p>
-													<p
-														className="truncate text-2xl font-bold tabular-nums leading-none"
-														style={{ color: INK, letterSpacing: "-0.84px" }}
-													>
-														{s.value}
-													</p>
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-
-								{/* Quick actions (flex-3) */}
-								<div
-									className={`${card} flex flex-[3] flex-col p-4`}
-									style={cardStyle}
-								>
-									<p className="mb-2.5 shrink-0 text-sm font-semibold">
-										{t("dashboard.quickActions")}
-									</p>
-									<div className="grid flex-1 grid-cols-3 grid-rows-2 gap-2.5">
-										{quickActions.map((a) => (
-											<div
-												key={a.label}
-												className="flex items-center gap-2 rounded-2xl border-2 px-2.5"
-												style={{ borderColor: STROKE }}
-											>
-												<StatChip icon={a.icon} bg={a.bg} color={a.color} />
-												<span className="min-w-0 flex-1 truncate text-xs font-semibold">
-													{a.label}
-												</span>
-												<span
-													className="flex size-5 shrink-0 items-center justify-center rounded-md border-2"
-													style={{ borderColor: STROKE, color: MUTED }}
-												>
-													<Plus className="size-3" />
-												</span>
-											</div>
-										))}
-									</div>
-								</div>
-
-								{/* Active projects table (flex-5) */}
-								<div
-									className={`${card} flex flex-[5] flex-col px-5 py-4`}
-									style={cardStyle}
-								>
-									<div className="flex shrink-0 items-center justify-between">
-										<p className="text-sm font-semibold">
-											{t("dashboard.activeProjects")}
-										</p>
-										<span
-											className="flex items-center gap-1 text-[11px] font-medium"
-											style={{ color: MUTED }}
-										>
-											{t("dashboard.viewAll")}
-											<ChevronLeft className="size-3 rtl-flip" />
-										</span>
-									</div>
-									<div className="mt-1 flex min-h-0 flex-1 flex-col">
-										{projects.map((p, i) => (
-											<div
-												key={p.name}
-												className="grid flex-1 grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] items-center gap-3"
-												style={
-													i < projects.length - 1
-														? { borderBottom: `2px solid ${STROKE}` }
-														: undefined
-												}
-											>
-												<div className="flex min-w-0 items-center gap-2.5">
-													<span
-														className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-														style={{ background: "rgba(93,116,241,0.15)" }}
-													>
-														<FolderOpen
-															className="size-4"
-															style={{ color: BRAND_4 }}
-														/>
-													</span>
-													<div className="min-w-0">
-														<p className="truncate text-xs font-semibold">
-															{p.name}
-														</p>
-														<p
-															className="flex items-center gap-1 truncate text-[10px]"
-															style={{ color: MUTED }}
-														>
-															<MapPin
-																className="size-2.5 shrink-0"
-																style={{ color: BRAND_3 }}
-															/>
-															<span className="truncate">{p.phase}</span>
-														</p>
-													</div>
-												</div>
-												<div className="flex items-center gap-1.5">
-													<div
-														className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-[3px]"
-														style={{ background: STROKE }}
-													>
-														<div
-															className="h-full rounded-[3px]"
-															style={{
-																width: `${p.progress}%`,
-																background: BRAND_1,
-															}}
-														/>
-													</div>
-													<span className="shrink-0 text-[11px] font-semibold tabular-nums">
-														{p.progress}
-														<span style={{ color: MUTED }}>%</span>
-													</span>
-												</div>
-												<p
-													className="truncate text-[11px] font-semibold tabular-nums"
-													style={{ color: BRAND_2 }}
-												>
-													{p.out}
-												</p>
-												<p
-													className="truncate text-[11px] font-semibold tabular-nums"
-													style={{ color: BRAND_5 }}
-												>
-													{p.in}
-												</p>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
-
-							{/* ── Right 1/3 ── */}
-							<div className="flex min-h-0 min-w-0 flex-col gap-5">
-								{/* Cash-flow bars (Botly Membership widget, flex-4) */}
-								<div
-									className={`${card} flex flex-[4] flex-col p-4`}
-									style={cardStyle}
-								>
-									<div className="flex shrink-0 items-center justify-between">
-										<p className="text-sm font-semibold">
-											{t("dashboard.financePanel.cashFlowTitle")}
-										</p>
-										<ChevronLeft
-											className="size-3.5 rtl-flip"
-											style={{ color: MUTED }}
-										/>
-									</div>
-									<div className="mt-2 flex shrink-0 items-center gap-3 text-[11px]">
-										<span className="flex items-center gap-1">
-											<i
-												className="size-2 rounded-[3px]"
-												style={{ background: BRAND_1 }}
-											/>
-											<span style={{ color: MUTED }}>
-												{t("dashboard.financial.revenueLabel")}
-											</span>
-											<b className="font-semibold tabular-nums">2.4M</b>
-										</span>
-										<span className="flex items-center gap-1">
-											<i
-												className="size-2 rounded-[3px]"
-												style={{ background: BRAND_2 }}
-											/>
-											<span style={{ color: MUTED }}>
-												{t("dashboard.financial.expensesLabel")}
-											</span>
-											<b className="font-semibold tabular-nums">1.8M</b>
-										</span>
-									</div>
-									{/* chart: y-axis (start/right) + bars fill remaining height */}
-									<div className="mt-3 flex min-h-0 flex-1 gap-2">
-										<div
-											className="flex shrink-0 flex-col justify-between py-0.5 text-[9px] tabular-nums"
-											style={{ color: MUTED }}
-										>
-											<span>800K</span>
-											<span>400K</span>
-											<span>0</span>
-										</div>
-										<div className="flex min-h-0 flex-1 items-end gap-2">
-											{bars.map((b, i) => (
-												<div
-													key={i}
-													className="flex h-full min-w-0 flex-1 items-end justify-center gap-1"
-												>
-													<div
-														className="w-3 rounded-[5px]"
-														style={{ height: `${b.a}%`, background: BRAND_1 }}
-													/>
-													<div
-														className="w-3 rounded-[5px]"
-														style={{ height: `${b.b}%`, background: BRAND_2 }}
-													/>
-												</div>
-											))}
-										</div>
-									</div>
-									<div className="mt-1.5 flex shrink-0 gap-2 ps-7">
-										{bars.map((_, i) => (
-											<p
-												key={i}
-												className="flex-1 text-center text-[10px]"
-												style={{ color: MUTED }}
-											>
-												{v(`months.${i + 1}`)}
-											</p>
-										))}
-									</div>
-								</div>
-
-								{/* Field activity (FieldActivityCard, flex-3): projects
-								    touched today headline + new media + stalest site. */}
-								<div
-									className={`${card} flex flex-[3] flex-col p-4`}
-									style={cardStyle}
-								>
-									<div className="flex shrink-0 items-baseline justify-between gap-2">
-										<p className="truncate text-sm font-semibold">
-											{t("dashboard.fieldActivity.title")}
-										</p>
-										<p className="shrink-0 text-2xl font-bold tabular-nums">3</p>
-									</div>
-									<p
-										className="shrink-0 text-[11px] font-medium"
-										style={{ color: MUTED }}
-									>
-										{t("dashboard.fieldActivity.siteUpdates")}
-									</p>
-									<div className="mt-2 flex min-h-0 flex-1 flex-col justify-center gap-2">
-										<div className="flex items-center gap-2.5">
-											<span
-												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
-												style={{
-													background: "rgba(255,204,111,0.25)",
-													color: INK,
-												}}
-											>
-												<MapPin className="size-4" />
-											</span>
-											<span className="min-w-0 flex-1 truncate text-xs">
-												{t("dashboard.fieldActivity.updatedToday", {
-													count: 3,
-												})}
-											</span>
-										</div>
-										<div className="flex items-center gap-2.5">
-											<span
-												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
-												style={{
-													background: "rgba(93,116,241,0.15)",
-													color: BRAND_4,
-												}}
-											>
-												<Camera className="size-4" />
-											</span>
-											<span className="min-w-0 flex-1 truncate text-xs">
-												{t("dashboard.fieldActivity.newMedia", {
-													photos: 14,
-													reports: 2,
-												})}
-											</span>
-										</div>
-										<div className="flex items-center gap-2.5">
-											<span
-												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
-												style={{
-													background: "rgba(142,201,219,0.2)",
-													color: BRAND_3,
-												}}
-											>
-												<CalendarClock className="size-4" />
-											</span>
-											<span className="min-w-0 flex-1 truncate text-xs">
-												{t("dashboard.fieldActivity.stale", {
-													name: v("projects.3.name"),
-													days: 4,
-												})}
-											</span>
-										</div>
-									</div>
-								</div>
-
-								{/* Needs attention + latest docs (flex-5) */}
-								<div
-									className={`${card} flex flex-[5] flex-col p-4`}
-									style={cardStyle}
-								>
-									<p className="shrink-0 text-sm font-semibold">
-										{t("dashboard.alerts.needsAttention")}
-									</p>
-									<div className="mt-2 flex flex-col gap-1.5">
-										{attention.map((a) => (
-											<div
-												key={a.label}
-												className="flex items-center gap-2 p-1"
-											>
-												<StatChip icon={a.icon} bg={a.bg} color={a.color} />
-												<span className="min-w-0 flex-1 truncate text-xs">
-													{a.label}
-												</span>
-												<span
-													className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums text-white"
-													style={{ background: INK }}
-												>
-													{a.count}
-												</span>
-											</div>
-										))}
-									</div>
-									<div
-										className="mt-auto pt-3"
-										style={{ borderTop: `2px solid ${STROKE}` }}
-									>
-										<p
-											className="text-xs font-semibold"
-											style={{ color: MUTED }}
-										>
-											{t("dashboard.recentDocs.title")}
-										</p>
-										<div className="mt-1.5 flex flex-col gap-1">
-											{["1024", "1023"].map((no) => (
-												<div
-													key={no}
-													className="flex items-center gap-2 p-1"
-												>
-													<span
-														className="flex size-6 shrink-0 items-center justify-center rounded-lg"
-														style={{ background: "rgba(93,116,241,0.15)" }}
-													>
-														<Receipt
-															className="size-3"
-															style={{ color: BRAND_4 }}
-														/>
-													</span>
-													<span className="min-w-0 flex-1 truncate text-[11px] font-medium">
-														{t("dashboard.recentDocs.invoice")} #{no}
-													</span>
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-							</div>
+							{heroCard}
+							{cashFlowCard}
+							{quickActionsCard}
+							{fieldActivityCard}
+							{projectsCard}
+							{attentionCard}
 						</div>
 					</div>
 				</div>
