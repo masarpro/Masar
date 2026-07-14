@@ -33,6 +33,10 @@ export function ModuleHeroCard({
 	cta,
 	fill,
 }: ModuleHeroCardProps) {
+	// With more than 3 KPIs the strip wraps and uses smaller type so long
+	// currency values stay readable instead of truncating.
+	const compact = stats.length > 3;
+
 	return (
 		<div
 			className={cn(
@@ -70,16 +74,38 @@ export function ModuleHeroCard({
 
 			{/* Glass KPI strip — Figma 45:4463 */}
 			{stats.length > 0 && (
-				<div className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5">
+				<div
+					className={cn(
+						"flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5",
+						compact && "flex-wrap gap-y-3 xl:gap-y-4",
+					)}
+				>
 					{stats.map((s) => (
 						<div
 							key={s.label}
-							className="flex min-w-0 flex-1 flex-col gap-1 xl:gap-1.5"
+							className={cn(
+								"flex min-w-0 flex-1 flex-col gap-1 xl:gap-1.5",
+								compact && "min-w-[140px] basis-[28%]",
+							)}
 						>
-							<p className="truncate text-xs font-semibold leading-tight text-[#1d1d1d] xl:text-[17px] xl:leading-6">
+							<p
+								className={cn(
+									"truncate text-xs font-semibold leading-tight text-[#1d1d1d]",
+									compact
+										? "xl:text-sm xl:leading-5"
+										: "xl:text-[17px] xl:leading-6",
+								)}
+							>
 								{s.label}
 							</p>
-							<p className="truncate text-xl font-bold tabular-nums leading-none tracking-[-0.5px] text-[#1d1d1d] xl:text-4xl xl:leading-[1.1]">
+							<p
+								className={cn(
+									"truncate font-bold tabular-nums leading-none tracking-[-0.5px] text-[#1d1d1d]",
+									compact
+										? "text-lg xl:text-2xl xl:leading-[1.1]"
+										: "text-xl xl:text-4xl xl:leading-[1.1]",
+								)}
+							>
 								{s.value}
 							</p>
 						</div>

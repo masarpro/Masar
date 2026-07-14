@@ -6,7 +6,6 @@ import { useActiveOrganization } from "@saas/organizations/hooks/use-active-orga
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Currency } from "@saas/finance/components/shared/Currency";
-import { PricingStatsCards } from "./PricingStatsCards";
 import { PricingRecentDocsTable } from "./PricingRecentDocsTable";
 import { PricingShortcutsCard } from "./PricingShortcutsCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
@@ -43,17 +42,17 @@ export function PricingDashboard({
 
 	const studies = data?.studies;
 	const quotations = data?.quotations;
-	const leads = data?.leads;
 	const clients = data?.clients;
 	const pipeline = data?.pipeline;
-	const recentDocuments = data?.recentDocuments ?? [];
+	// Hero + query both cap at 5; slice guards against stale cached payloads.
+	const recentDocuments = (data?.recentDocuments ?? []).slice(0, 5);
 
 	return (
-		// One grid: mobile stacks in DOM order (hero → shortcuts → chart → stats →
+		// One grid: mobile stacks in DOM order (hero → shortcuts → chart →
 		// recent docs); on lg, explicit placement rebuilds the 65/35 rows
-		// (hero|chart · stats · recent-docs|shortcuts) so desktop is unchanged.
+		// (hero|chart · recent-docs|shortcuts).
 		<div
-			className="grid grid-cols-1 gap-6 lg:grid-cols-[65fr_35fr] lg:grid-rows-[300px_auto_auto]"
+			className="grid grid-cols-1 gap-6 lg:grid-cols-[65fr_35fr] lg:grid-rows-[minmax(300px,auto)_auto]"
 			dir="rtl"
 		>
 			{/* Hero — mobile 1st · desktop col 1 / row 1 */}
@@ -76,15 +75,23 @@ export function PricingDashboard({
 							value: <Currency amount={quotations?.activeValue ?? 0} />,
 						},
 						{
-							label: t("pricing.dashboard.overview.leadsPipeline"),
-							value: <Currency amount={leads?.openEstimatedValue ?? 0} />,
+							label: t("pricing.dashboard.stats.activeClients"),
+							value: clients?.total ?? 0,
+						},
+						{
+							label: t("pricing.dashboard.stats.expiringQuotations"),
+							value: quotations?.expiringCount ?? 0,
+						},
+						{
+							label: t("pricing.dashboard.stats.conversionRate"),
+							value: `${quotations?.conversionRate ?? 0}%`,
 						},
 					]}
 				/>
 			</div>
 
-			{/* Shortcuts — mobile directly under the hero · desktop col 2 / row 3 */}
-			<div className="lg:col-start-2 lg:row-start-3">
+			{/* Shortcuts — mobile directly under the hero · desktop col 2 / row 2 */}
+			<div className="lg:col-start-2 lg:row-start-2">
 				<PricingShortcutsCard
 					organizationSlug={orgSlug}
 					organizationId={organizationId}
@@ -102,17 +109,8 @@ export function PricingDashboard({
 				)}
 			</div>
 
-			{/* Stats — mobile 4th · desktop spans both cols / row 2 */}
-			<div className="lg:col-span-2 lg:row-start-2">
-				<PricingStatsCards
-					activeClients={clients?.total ?? 0}
-					expiringQuotations={quotations?.expiringCount ?? 0}
-					conversionRate={quotations?.conversionRate ?? 0}
-				/>
-			</div>
-
-			{/* Recent documents — mobile 5th · desktop col 1 / row 3 */}
-			<div className="lg:col-start-1 lg:row-start-3">
+			{/* Recent documents — mobile 4th · desktop col 1 / row 2 */}
+			<div className="lg:col-start-1 lg:row-start-2">
 				<PricingRecentDocsTable
 					documents={recentDocuments}
 					organizationSlug={orgSlug}

@@ -173,7 +173,7 @@ export async function getPricingDashboardStats(organizationId: string) {
 		})),
 	]
 		.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-		.slice(0, 10);
+		.slice(0, 5);
 
 	// Count leads won
 	const leadsWon = leadStatusMap.WON ?? 0;
