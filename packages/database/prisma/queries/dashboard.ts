@@ -798,7 +798,8 @@ export async function upsertUserDashboardPreference(
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Active Projects (dashboard card) - المشاريع النشطة (بطاقة لوحة القيادة)
-// Enriched per-project cards: progress (from the project itself), مدفوعات
+// Enriched per-project cards: progress (derived from milestones like the
+// project overview card, falling back to Project.progress), مدفوعات
 // (ProjectExpense sum), مقبوضات (ProjectPayment sum), current milestone + days
 // on it, and the latest published photos — all scoped to the organization.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -848,7 +849,7 @@ export async function getActiveProjectsForDashboard(
 
 	const projectIds = projects.map((p) => p.id);
 
-	const [expenseSums, paymentSums] = await Promise.all([
+	const [expenseSums, paymentSums, milestoneProgressAvgs] = await Promise.all([
 		projectIds.length
 			? db.projectExpense.groupBy({
 					by: ["projectId"],
@@ -867,6 +868,15 @@ export async function getActiveProjectsForDashboard(
 			: Promise.resolve(
 					[] as { projectId: string; _sum: { amount: unknown } }[],
 				),
+		projectIds.length
+			? db.projectMilestone.groupBy({
+					by: ["projectId"],
+					where: { projectId: { in: projectIds } },
+					_avg: { progress: true },
+				})
+			: Promise.resolve(
+					[] as { projectId: string; _avg: { progress: unknown } }[],
+				),
 	]);
 
 	const expenseMap = new Map(
@@ -874,6 +884,15 @@ export async function getActiveProjectsForDashboard(
 	);
 	const paymentMap = new Map(
 		paymentSums.map((p) => [p.projectId, Number(p._sum.amount ?? 0)]),
+	);
+	// Same derivation as the project-overview card: when milestones exist the
+	// project's progress is their average; Project.progress (manual field
+	// updates) is only the fallback for projects with no milestones.
+	const progressMap = new Map(
+		milestoneProgressAvgs.map((m) => [
+			m.projectId,
+			Math.round(Number(m._avg.progress ?? 0)),
+		]),
 	);
 
 	const now = new Date();
@@ -903,7 +922,7 @@ export async function getActiveProjectsForDashboard(
 			id: p.id,
 			name: p.name,
 			clientName: p.clientName,
-			progress: Number(p.progress),
+			progress: progressMap.get(p.id) ?? Number(p.progress),
 			coverPhoto: p.coverPhoto,
 			photos: p.photos,
 			expensesTotal: expenseMap.get(p.id) ?? 0,
