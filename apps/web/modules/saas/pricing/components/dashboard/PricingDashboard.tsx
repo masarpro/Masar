@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { Currency } from "@saas/finance/components/shared/Currency";
 import { PricingRecentDocsTable } from "./PricingRecentDocsTable";
 import { PricingShortcutsCard } from "./PricingShortcutsCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
@@ -40,7 +39,6 @@ export function PricingDashboard({
 		return <DashboardSkeleton />;
 	}
 
-	const studies = data?.studies;
 	const quotations = data?.quotations;
 	const clients = data?.clients;
 	const pipeline = data?.pipeline;
@@ -66,14 +64,6 @@ export function PricingDashboard({
 						href: `/app/${orgSlug}/pricing/studies?new=1`,
 					}}
 					stats={[
-						{
-							label: t("pricing.dashboard.overview.studiesValue"),
-							value: <Currency amount={studies?.totalValue ?? 0} />,
-						},
-						{
-							label: t("pricing.dashboard.overview.activeQuotations"),
-							value: <Currency amount={quotations?.activeValue ?? 0} />,
-						},
 						{
 							label: t("pricing.dashboard.stats.activeClients"),
 							value: clients?.total ?? 0,
