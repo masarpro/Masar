@@ -40,6 +40,11 @@ import { useEffect, useRef, useState } from "react";
  * queries. It is dressed in a light browser chrome so it reads as a real
  * screenshot of app-masar.com.
  *
+ * Layout parity with the real Dashboard: a FIXED-HEIGHT board whose two
+ * columns share matched flex ratios (hero↔cash-flow = 4, quick↔field = 3,
+ * projects↔attention = 5) so every card aligns row-for-row and fills the
+ * board, exactly like the app's xl:h-[calc(100dvh-…)] flex columns.
+ *
  * It ALWAYS renders the desktop layout at a fixed design width and scales
  * down to fit its container (like a screenshot would), so phones see the
  * exact same computer view. Colors are light-locked hex (Botly light tokens)
@@ -58,8 +63,9 @@ const BRAND_3 = "#8ec9db"; // chart-3
 const BRAND_4 = "#5d74f1"; // chart-4
 const BRAND_5 = "#349264"; // chart-5 / success
 
-// Fixed desktop design width the replica is authored at
+// Fixed desktop design width + board height the replica is authored at.
 const BASE_WIDTH = 1180;
+const BOARD_HEIGHT = 560; // the flex-column grid (matches the app's tall board)
 
 const card = "rounded-3xl border-2 bg-white";
 const cardStyle = { borderColor: STROKE, color: INK };
@@ -277,10 +283,7 @@ export function LandingDashboardReplica() {
 				</div>
 
 				{/* ── App viewport ── */}
-				<div
-					className="flex gap-4 p-4"
-					style={{ background: APP_BG }}
-				>
+				<div className="flex gap-4 p-4" style={{ background: APP_BG }}>
 					{/* Sidebar — mirrors the real app's inverted floating panel
 					    (AppSidebar): مسار wordmark + burger, expandable sections with
 					    chevrons, active الرئيسية pill, AI button at the bottom.
@@ -342,14 +345,17 @@ export function LandingDashboardReplica() {
 						</div>
 					</div>
 
-					{/* Content column — header + dashboard grid */}
+					{/* Content column — header + fixed-height dashboard grid */}
 					<div className="flex min-w-0 flex-1 flex-col gap-4">
 						{/* Global header (GlobalHeader): page title + back/forward
 						    chevrons on the leading side; quick-add → bell → search →
 						    avatar on the trailing side. */}
 						<div className="flex items-center justify-between gap-3 px-1">
 							<div className="flex min-w-0 items-center gap-4">
-								<h1 className="truncate text-2xl font-bold" style={{ color: INK }}>
+								<h1
+									className="truncate text-2xl font-bold"
+									style={{ color: INK }}
+								>
 									{v("nav.home")}
 								</h1>
 								<div className="flex items-center">
@@ -370,35 +376,38 @@ export function LandingDashboardReplica() {
 							</div>
 						</div>
 
-						<div className="grid min-w-0 flex-1 grid-cols-3 gap-4">
+						<div
+							className="grid min-w-0 grid-cols-3 gap-5"
+							style={{ height: BOARD_HEIGHT }}
+						>
 							{/* ── Left 2/3 ── */}
-							<div className="col-span-2 flex min-w-0 flex-col gap-4">
-								{/* BotlyHero gradient card + glass stats strip */}
+							<div className="col-span-2 flex min-h-0 min-w-0 flex-col gap-5">
+								{/* BotlyHero gradient card + glass stats strip (flex-4) */}
 								<div
-									className="relative overflow-hidden rounded-3xl"
+									className="relative flex-[4] overflow-hidden rounded-3xl"
 									style={{
 										backgroundImage:
 											"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
 									}}
 								>
-									<div className="flex items-center gap-3 px-6 pt-5 pb-20">
+									<div className="flex items-center gap-3 px-7 pt-6">
 										<p
-											className="min-w-0 flex-1 truncate text-base font-bold"
+											className="min-w-0 flex-1 truncate text-lg font-bold"
 											style={{ color: INK }}
 										>
 											{t("dashboard.welcome.greeting", { name: v("org") })}
 										</p>
 										<span
-											className="flex shrink-0 items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[11px] font-semibold text-white"
+											className="flex shrink-0 items-center gap-1.5 rounded-[10px] px-3.5 py-2 text-xs font-semibold text-white"
 											style={{ background: INK }}
 										>
 											{t("dashboard.cashFlow.goToFinance")}
 											<ChevronLeft className="size-3 rtl-flip" />
 										</span>
 									</div>
-									<div className="absolute inset-x-2 bottom-2">
+									<div className="absolute inset-x-3 bottom-3">
 										<div
-											className="flex w-full gap-5 rounded-[18px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3 backdrop-blur-[24px]"
+											className="flex w-full gap-5 rounded-[18px] border bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-7 py-4 backdrop-blur-[24px]"
 											style={{ borderColor: "rgba(255,255,255,0.7)" }}
 										>
 											{[
@@ -417,13 +426,13 @@ export function LandingDashboardReplica() {
 											].map((s) => (
 												<div key={s.label} className="min-w-0 flex-1">
 													<p
-														className="truncate text-xs font-semibold"
+														className="truncate text-[13px] font-semibold"
 														style={{ color: INK }}
 													>
 														{s.label}
 													</p>
 													<p
-														className="truncate text-lg font-bold tabular-nums"
+														className="truncate text-xl font-bold tabular-nums"
 														style={{ color: INK }}
 													>
 														{s.value}
@@ -434,16 +443,19 @@ export function LandingDashboardReplica() {
 									</div>
 								</div>
 
-								{/* Quick actions */}
-								<div className={`${card} p-4`} style={cardStyle}>
-									<p className="mb-2.5 text-sm font-semibold">
+								{/* Quick actions (flex-3) */}
+								<div
+									className={`${card} flex flex-[3] flex-col p-4`}
+									style={cardStyle}
+								>
+									<p className="mb-2.5 shrink-0 text-sm font-semibold">
 										{t("dashboard.quickActions")}
 									</p>
-									<div className="grid grid-cols-3 gap-2">
+									<div className="grid flex-1 grid-cols-3 grid-rows-2 gap-2.5">
 										{quickActions.map((a) => (
 											<div
 												key={a.label}
-												className="flex items-center gap-2 rounded-2xl border-2 p-2"
+												className="flex items-center gap-2 rounded-2xl border-2 px-2.5"
 												style={{ borderColor: STROKE }}
 											>
 												<StatChip icon={a.icon} bg={a.bg} color={a.color} />
@@ -461,9 +473,12 @@ export function LandingDashboardReplica() {
 									</div>
 								</div>
 
-								{/* Active projects table */}
-								<div className={`${card} px-5 py-4`} style={cardStyle}>
-									<div className="flex items-center justify-between">
+								{/* Active projects table (flex-5) */}
+								<div
+									className={`${card} flex flex-[5] flex-col px-5 py-4`}
+									style={cardStyle}
+								>
+									<div className="flex shrink-0 items-center justify-between">
 										<p className="text-sm font-semibold">
 											{t("dashboard.activeProjects")}
 										</p>
@@ -475,11 +490,11 @@ export function LandingDashboardReplica() {
 											<ChevronLeft className="size-3 rtl-flip" />
 										</span>
 									</div>
-									<div className="mt-2">
+									<div className="mt-1 flex min-h-0 flex-1 flex-col">
 										{projects.map((p, i) => (
 											<div
 												key={p.name}
-												className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] items-center gap-3 py-2.5"
+												className="grid flex-1 grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] items-center gap-3"
 												style={
 													i < projects.length - 1
 														? { borderBottom: `2px solid ${STROKE}` }
@@ -488,11 +503,11 @@ export function LandingDashboardReplica() {
 											>
 												<div className="flex min-w-0 items-center gap-2.5">
 													<span
-														className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+														className="flex size-10 shrink-0 items-center justify-center rounded-xl"
 														style={{ background: "rgba(93,116,241,0.15)" }}
 													>
 														<FolderOpen
-															className="size-3.5"
+															className="size-4"
 															style={{ color: BRAND_4 }}
 														/>
 													</span>
@@ -549,13 +564,22 @@ export function LandingDashboardReplica() {
 							</div>
 
 							{/* ── Right 1/3 ── */}
-							<div className="flex min-w-0 flex-col gap-4">
-								{/* Cash-flow bars (Botly Membership widget) */}
-								<div className={`${card} p-4`} style={cardStyle}>
-									<p className="text-sm font-semibold">
-										{t("dashboard.financePanel.cashFlowTitle")}
-									</p>
-									<div className="mt-2 flex items-center gap-3 text-[11px]">
+							<div className="flex min-h-0 min-w-0 flex-col gap-5">
+								{/* Cash-flow bars (Botly Membership widget, flex-4) */}
+								<div
+									className={`${card} flex flex-[4] flex-col p-4`}
+									style={cardStyle}
+								>
+									<div className="flex shrink-0 items-center justify-between">
+										<p className="text-sm font-semibold">
+											{t("dashboard.financePanel.cashFlowTitle")}
+										</p>
+										<ChevronLeft
+											className="size-3.5 rtl-flip"
+											style={{ color: MUTED }}
+										/>
+									</div>
+									<div className="mt-2 flex shrink-0 items-center gap-3 text-[11px]">
 										<span className="flex items-center gap-1">
 											<i
 												className="size-2 rounded-[3px]"
@@ -577,24 +601,35 @@ export function LandingDashboardReplica() {
 											<b className="font-semibold tabular-nums">1.8M</b>
 										</span>
 									</div>
-									<div className="mt-3 flex h-24 items-end gap-2">
-										{bars.map((b, i) => (
-											<div
-												key={i}
-												className="flex h-full min-w-0 flex-1 items-end justify-center gap-1"
-											>
+									{/* chart: y-axis (start/right) + bars fill remaining height */}
+									<div className="mt-3 flex min-h-0 flex-1 gap-2">
+										<div
+											className="flex shrink-0 flex-col justify-between py-0.5 text-[9px] tabular-nums"
+											style={{ color: MUTED }}
+										>
+											<span>800K</span>
+											<span>400K</span>
+											<span>0</span>
+										</div>
+										<div className="flex min-h-0 flex-1 items-end gap-2">
+											{bars.map((b, i) => (
 												<div
-													className="w-3 rounded-[5px]"
-													style={{ height: `${b.a}%`, background: BRAND_1 }}
-												/>
-												<div
-													className="w-3 rounded-[5px]"
-													style={{ height: `${b.b}%`, background: BRAND_2 }}
-												/>
-											</div>
-										))}
+													key={i}
+													className="flex h-full min-w-0 flex-1 items-end justify-center gap-1"
+												>
+													<div
+														className="w-3 rounded-[5px]"
+														style={{ height: `${b.a}%`, background: BRAND_1 }}
+													/>
+													<div
+														className="w-3 rounded-[5px]"
+														style={{ height: `${b.b}%`, background: BRAND_2 }}
+													/>
+												</div>
+											))}
+										</div>
 									</div>
-									<div className="mt-1.5 flex gap-2">
+									<div className="mt-1.5 flex shrink-0 gap-2 ps-7">
 										{bars.map((_, i) => (
 											<p
 												key={i}
@@ -607,31 +642,34 @@ export function LandingDashboardReplica() {
 									</div>
 								</div>
 
-								{/* Field activity (FieldActivityCard): projects touched today
-								    headline + new media + stalest site. */}
-								<div className={`${card} p-4`} style={cardStyle}>
-									<div className="flex items-baseline justify-between gap-2">
+								{/* Field activity (FieldActivityCard, flex-3): projects
+								    touched today headline + new media + stalest site. */}
+								<div
+									className={`${card} flex flex-[3] flex-col p-4`}
+									style={cardStyle}
+								>
+									<div className="flex shrink-0 items-baseline justify-between gap-2">
 										<p className="truncate text-sm font-semibold">
 											{t("dashboard.fieldActivity.title")}
 										</p>
-										<p className="shrink-0 text-xl font-bold tabular-nums">3</p>
+										<p className="shrink-0 text-2xl font-bold tabular-nums">3</p>
 									</div>
 									<p
-										className="text-[11px] font-medium"
+										className="shrink-0 text-[11px] font-medium"
 										style={{ color: MUTED }}
 									>
 										{t("dashboard.fieldActivity.siteUpdates")}
 									</p>
-									<div className="mt-2.5 space-y-1.5">
+									<div className="mt-2 flex min-h-0 flex-1 flex-col justify-center gap-2">
 										<div className="flex items-center gap-2.5">
 											<span
-												className="flex size-7 shrink-0 items-center justify-center rounded-lg"
+												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
 												style={{
 													background: "rgba(255,204,111,0.25)",
 													color: INK,
 												}}
 											>
-												<MapPin className="size-3.5" />
+												<MapPin className="size-4" />
 											</span>
 											<span className="min-w-0 flex-1 truncate text-xs">
 												{t("dashboard.fieldActivity.updatedToday", {
@@ -641,13 +679,13 @@ export function LandingDashboardReplica() {
 										</div>
 										<div className="flex items-center gap-2.5">
 											<span
-												className="flex size-7 shrink-0 items-center justify-center rounded-lg"
+												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
 												style={{
 													background: "rgba(93,116,241,0.15)",
 													color: BRAND_4,
 												}}
 											>
-												<Camera className="size-3.5" />
+												<Camera className="size-4" />
 											</span>
 											<span className="min-w-0 flex-1 truncate text-xs">
 												{t("dashboard.fieldActivity.newMedia", {
@@ -658,13 +696,13 @@ export function LandingDashboardReplica() {
 										</div>
 										<div className="flex items-center gap-2.5">
 											<span
-												className="flex size-7 shrink-0 items-center justify-center rounded-lg"
+												className="flex size-8 shrink-0 items-center justify-center rounded-lg"
 												style={{
 													background: "rgba(142,201,219,0.2)",
 													color: BRAND_3,
 												}}
 											>
-												<CalendarClock className="size-3.5" />
+												<CalendarClock className="size-4" />
 											</span>
 											<span className="min-w-0 flex-1 truncate text-xs">
 												{t("dashboard.fieldActivity.stale", {
@@ -676,14 +714,20 @@ export function LandingDashboardReplica() {
 									</div>
 								</div>
 
-								{/* Needs attention + latest docs */}
-								<div className={`${card} flex-1 p-4`} style={cardStyle}>
-									<p className="text-sm font-semibold">
+								{/* Needs attention + latest docs (flex-5) */}
+								<div
+									className={`${card} flex flex-[5] flex-col p-4`}
+									style={cardStyle}
+								>
+									<p className="shrink-0 text-sm font-semibold">
 										{t("dashboard.alerts.needsAttention")}
 									</p>
-									<div className="mt-2 space-y-1.5">
+									<div className="mt-2 flex flex-col gap-1.5">
 										{attention.map((a) => (
-											<div key={a.label} className="flex items-center gap-2 p-1">
+											<div
+												key={a.label}
+												className="flex items-center gap-2 p-1"
+											>
 												<StatChip icon={a.icon} bg={a.bg} color={a.color} />
 												<span className="min-w-0 flex-1 truncate text-xs">
 													{a.label}
@@ -698,7 +742,7 @@ export function LandingDashboardReplica() {
 										))}
 									</div>
 									<div
-										className="mt-3 pt-2.5"
+										className="mt-auto pt-3"
 										style={{ borderTop: `2px solid ${STROKE}` }}
 									>
 										<p
@@ -707,9 +751,12 @@ export function LandingDashboardReplica() {
 										>
 											{t("dashboard.recentDocs.title")}
 										</p>
-										<div className="mt-1.5 space-y-1">
+										<div className="mt-1.5 flex flex-col gap-1">
 											{["1024", "1023"].map((no) => (
-												<div key={no} className="flex items-center gap-2 p-1">
+												<div
+													key={no}
+													className="flex items-center gap-2 p-1"
+												>
 													<span
 														className="flex size-6 shrink-0 items-center justify-center rounded-lg"
 														style={{ background: "rgba(93,116,241,0.15)" }}
