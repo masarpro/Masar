@@ -19,9 +19,6 @@ import {
 	Plus,
 	Search,
 	FolderKanban,
-	TrendingUp,
-	CheckCircle2,
-	Clock,
 	MapPin,
 	User,
 	Users,
@@ -32,10 +29,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
-import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { CardGridSkeleton } from "@saas/shared/components/skeletons";
-import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { ProjectsHero } from "@saas/projects/components/ProjectsHero";
 import { formatSAR } from "@shared/lib/formatters";
 interface ProjectsListProps {
 	organizationId: string;
@@ -102,118 +98,8 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 
 	return (
 		<div className="space-y-4 sm:space-y-6" dir="rtl">
-			{/* الجوال: شريط إحصائيات مضغوط */}
-			<CompactStatGrid
-				className="sm:hidden"
-				items={[
-					{
-						label: t("projects.stats.total"),
-						value: stats.total,
-						icon: FolderKanban,
-					},
-					{
-						label: t("projects.stats.active"),
-						value: stats.active,
-						icon: Clock,
-						iconClassName: "text-chart-4",
-						iconBgClassName: "bg-chart-4/15",
-						hint:
-							stats.total > 0
-								? `${Math.round((stats.active / stats.total) * 100)}%`
-								: undefined,
-					},
-					{
-						label: t("projects.stats.completed"),
-						value: stats.completed,
-						icon: CheckCircle2,
-						iconClassName: "text-chart-4",
-						iconBgClassName: "bg-chart-4/15",
-					},
-					{
-						label: t("projects.stats.totalValue"),
-						value: formatSAR(stats.totalValue),
-						icon: Banknote,
-						iconClassName: "text-chart-4",
-						iconBgClassName: "bg-chart-4/15",
-						valueClassName: "text-chart-4",
-					},
-				]}
-			/>
-
-			{/* Statistics Cards (الديسكتوب كما هو) */}
-			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
-				{/* Total Projects */}
-				<div className="rounded-2xl border-2 bg-card p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-							<FolderKanban className="h-5 w-5" />
-						</div>
-					</div>
-					<p className="text-xs font-medium text-muted-foreground mb-1">
-						{t("projects.stats.total")}
-					</p>
-					<p className="text-2xl font-bold text-card-foreground">
-						{stats.total}
-					</p>
-				</div>
-
-				{/* Active Projects */}
-				<div className="rounded-2xl border-2 bg-card p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
-							<Clock className="h-5 w-5" />
-						</div>
-						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-chart-4">
-								<TrendingUp className="h-3 w-3" />
-								<span>{Math.round((stats.active / stats.total) * 100)}%</span>
-							</div>
-						)}
-					</div>
-					<p className="text-xs font-medium text-muted-foreground mb-1">
-						{t("projects.stats.active")}
-					</p>
-					<p className="text-2xl font-bold text-chart-4">
-						{stats.active}
-					</p>
-				</div>
-
-				{/* Completed Projects */}
-				<div className="rounded-2xl border-2 bg-card p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
-							<CheckCircle2 className="h-5 w-5" />
-						</div>
-						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-chart-4">
-								<CheckCircle2 className="h-3 w-3" />
-								<span>{Math.round((stats.completed / stats.total) * 100)}%</span>
-							</div>
-						)}
-					</div>
-					<p className="text-xs font-medium text-muted-foreground mb-1">
-						{t("projects.stats.completed")}
-					</p>
-					<p className="text-2xl font-bold text-chart-4">
-						{stats.completed}
-					</p>
-				</div>
-
-				{/* Total Value */}
-				<div className="rounded-2xl border-2 bg-card p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex size-9 items-center justify-center rounded-xl bg-chart-4/15 text-chart-4">
-							<Banknote className="h-5 w-5" />
-						</div>
-					</div>
-					<p className="text-xs font-medium text-muted-foreground mb-1">
-						{t("projects.stats.totalValue")}
-					</p>
-					<p className="text-xl font-bold text-chart-4">
-						{formatSAR(stats.totalValue)}
-					</p>
-				</div>
-			</div>
+			{/* بطاقة ملوّنة واحدة تجمع المؤشرات الأربعة (على غرار بطاقة الداشبورد) */}
+			<ProjectsHero newProjectHref={`${basePath}/new`} stats={stats} />
 
 			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
 			<div className="flex items-center gap-2 sm:hidden">
@@ -248,18 +134,6 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						</SelectContent>
 					</Select>
 				</MobileFilterSheet>
-				<UpgradeGate feature="projects.create">
-					<Button
-						asChild
-						size="icon"
-						aria-label={t("projects.newProject")}
-						className="h-10 w-10 shrink-0 rounded-xl"
-					>
-						<Link href={`${basePath}/new`}>
-							<Plus className="h-5 w-5" />
-						</Link>
-					</Button>
-				</UpgradeGate>
 			</div>
 
 			{/* Search and Filter Bar (الديسكتوب كما هو) */}
@@ -295,17 +169,6 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						</SelectContent>
 					</Select>
 				</div>
-				<UpgradeGate feature="projects.create">
-					<Button
-						asChild
-						className="rounded-xl"
-					>
-						<Link href={`${basePath}/new`}>
-							<Plus className="me-2 h-4 w-4" />
-							{t("projects.newProject")}
-						</Link>
-					</Button>
-				</UpgradeGate>
 			</div>
 
 			{/* Grid of Projects */}
