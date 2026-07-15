@@ -21,6 +21,10 @@ import {
 } from "lucide-react";
 import { formatDate } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
+import {
+	MobileDocList,
+	MobileDocRow,
+} from "@saas/shared/components/mobile/MobileDocRow";
 
 interface RecentDocumentsTableProps {
 	invoices: Array<{
@@ -75,7 +79,42 @@ export function RecentDocumentsTable({
 			</CardHeader>
 			<CardContent>
 				{documents.length > 0 ? (
-					<div className="overflow-x-auto">
+					<>
+						{/* الجوال: صفوف مستندات بسطرين بدل الجدول */}
+						<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent -mx-2">
+							{documents.map((doc) => {
+								const statusConfig =
+									invoiceStatusConfig[doc.status] ?? invoiceStatusConfig.DRAFT;
+								return (
+									<MobileDocRow
+										key={doc.id}
+										href={`${basePath}/invoices/${doc.id}`}
+										title={doc.clientName}
+										subtitle={
+											<>
+												<span dir="ltr" className="whitespace-nowrap">
+													{doc.invoiceNo}
+												</span>
+												{" · "}
+												{formatDate(doc.createdAt)}
+											</>
+										}
+										amount={<Currency amount={doc.totalAmount} />}
+										badge={
+											<span
+												className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] ${statusConfig.bg} ${statusConfig.text}`}
+											>
+												{t(`finance.invoices.status.${doc.status.toLowerCase()}`)}
+											</span>
+										}
+										className="px-2"
+									/>
+								);
+							})}
+						</MobileDocList>
+
+						{/* الديسكتوب: الجدول كما هو */}
+						<div className="hidden sm:block overflow-x-auto">
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -168,7 +207,8 @@ export function RecentDocumentsTable({
 								})}
 							</TableBody>
 						</Table>
-					</div>
+						</div>
+					</>
 				) : (
 					<p className="text-center text-muted-foreground py-8">
 						{t("finance.dashboard.noRecentDocuments")}

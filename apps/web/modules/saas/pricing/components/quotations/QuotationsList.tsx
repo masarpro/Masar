@@ -55,6 +55,10 @@ import { Currency } from "@saas/finance/components/shared/Currency";
 import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import {
+	MobileDocList,
+	MobileDocRow,
+} from "@saas/shared/components/mobile/MobileDocRow";
 
 interface QuotationsListProps {
 	organizationId: string;
@@ -87,6 +91,46 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 	if (isLoading) {
 		return <ListTableSkeleton />;
 	}
+
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (quotation: any) => (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+					<MoreHorizontal className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="rounded-xl">
+				<DropdownMenuItem asChild>
+					<Link href={`${basePath}/${quotation.id}/preview`}>
+						<Eye className="h-4 w-4 me-2" />
+						{t("finance.actions.preview")}
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem asChild>
+					<Link href={`${basePath}/${quotation.id}`}>
+						<Edit className="h-4 w-4 me-2" />
+						{t("finance.actions.edit")}
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<Send className="h-4 w-4 me-2" />
+					{t("finance.actions.send")}
+				</DropdownMenuItem>
+				<DropdownMenuItem asChild>
+					<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotation.id}`}>
+						<ArrowRightLeft className="h-4 w-4 me-2" />
+						{t("finance.actions.convertToInvoice")}
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem className="text-destructive">
+					<Trash2 className="h-4 w-4 me-2" />
+					{t("finance.actions.delete")}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 
 	return (
 		<div className="space-y-6">
@@ -177,9 +221,34 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 				</div>
 			</div>
 
-			{/* Quotations Table */}
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{quotations.length > 0 && (
+				<MobileDocList className="sm:hidden">
+					{quotations.map((quotation: any) => (
+						<MobileDocRow
+							key={quotation.id}
+							href={`${basePath}/${quotation.id}`}
+							title={quotation.clientName}
+							subtitle={
+								<>
+									<span dir="ltr" className="whitespace-nowrap">
+										{quotation.quotationNo}
+									</span>
+									{" · "}
+									{formatDate(quotation.createdAt)}
+								</>
+							}
+							amount={<Currency amount={quotation.totalAmount} />}
+							badge={<StatusBadge status={quotation.status} type="quotation" />}
+							actions={renderRowMenu(quotation)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
+			{/* Quotations Table (الديسكتوب كما هو) */}
 			{quotations.length > 0 ? (
-				<div className="rounded-2xl border border-border overflow-x-auto">
+				<div className="hidden sm:block rounded-2xl border border-border overflow-x-auto">
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/30">
@@ -275,44 +344,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 											)}
 										</div>
 									</TableCell>
-									<TableCell>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
-													<MoreHorizontal className="h-4 w-4" />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="rounded-xl">
-												<DropdownMenuItem asChild>
-													<Link href={`${basePath}/${quotation.id}/preview`}>
-														<Eye className="h-4 w-4 me-2" />
-														{t("finance.actions.preview")}
-													</Link>
-												</DropdownMenuItem>
-												<DropdownMenuItem asChild>
-													<Link href={`${basePath}/${quotation.id}`}>
-														<Edit className="h-4 w-4 me-2" />
-														{t("finance.actions.edit")}
-													</Link>
-												</DropdownMenuItem>
-												<DropdownMenuItem>
-													<Send className="h-4 w-4 me-2" />
-													{t("finance.actions.send")}
-												</DropdownMenuItem>
-												<DropdownMenuItem asChild>
-													<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotation.id}`}>
-														<ArrowRightLeft className="h-4 w-4 me-2" />
-														{t("finance.actions.convertToInvoice")}
-													</Link>
-												</DropdownMenuItem>
-												<DropdownMenuSeparator />
-												<DropdownMenuItem className="text-destructive">
-													<Trash2 className="h-4 w-4 me-2" />
-													{t("finance.actions.delete")}
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</TableCell>
+									<TableCell>{renderRowMenu(quotation)}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>

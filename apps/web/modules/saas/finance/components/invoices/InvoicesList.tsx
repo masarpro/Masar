@@ -63,6 +63,10 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import {
+	MobileDocList,
+	MobileDocRow,
+} from "@saas/shared/components/mobile/MobileDocRow";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
 
@@ -195,6 +199,106 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 		return <ListTableSkeleton />;
 	}
 
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وصفوف الجوال
+	const renderRowMenu = (invoice: any) => {
+		const isDraft = invoice.status === "DRAFT";
+		const isPaid = invoice.status === "PAID";
+		const isCancelled = invoice.status === "CANCELLED";
+		const canAddPayment = !isDraft && !isPaid && !isCancelled;
+		const canCreditNote = !isDraft && !isCancelled;
+
+		return (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="خيارات">
+						<MoreHorizontal className="h-4 w-4" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" className="rounded-xl">
+					{/* View — always */}
+					<DropdownMenuItem asChild>
+						<Link href={`${basePath}/${invoice.id}`}>
+							<Eye className="h-4 w-4 me-2" />
+							{t("finance.actions.preview")}
+						</Link>
+					</DropdownMenuItem>
+
+					{/* Edit — only DRAFT */}
+					{isDraft && (
+						<DropdownMenuItem asChild>
+							<Link href={`${basePath}/${invoice.id}/edit`}>
+								<Edit className="h-4 w-4 me-2" />
+								{t("finance.actions.edit")}
+							</Link>
+						</DropdownMenuItem>
+					)}
+
+					{/* Print — يفتح المعاينة ويُطلق الطباعة فوراً */}
+					<DropdownMenuItem asChild>
+						<Link href={`${basePath}/${invoice.id}/preview?print=1`}>
+							<Printer className="h-4 w-4 me-2" />
+							{t("finance.actions.print")}
+						</Link>
+					</DropdownMenuItem>
+
+					<DropdownMenuSeparator />
+
+					{/* Add Payment — only non-DRAFT, non-PAID, non-CANCELLED */}
+					{canAddPayment && (
+						<DropdownMenuItem
+							onClick={() => router.push(`${basePath}/${invoice.id}`)}
+						>
+							<CreditCard className="h-4 w-4 me-2" />
+							{t("finance.actions.addPayment")}
+						</DropdownMenuItem>
+					)}
+
+					{/* Issue — only DRAFT */}
+					{isDraft && (
+						<DropdownMenuItem
+							onClick={() => setIssueInvoiceId(invoice.id)}
+						>
+							<FileCheck className="h-4 w-4 me-2" />
+							{t("finance.actions.issue")}
+						</DropdownMenuItem>
+					)}
+
+					{/* Credit Note — only non-DRAFT, non-CANCELLED */}
+					{canCreditNote && (
+						<DropdownMenuItem
+							onClick={() => router.push(`${basePath}/${invoice.id}/credit-note`)}
+						>
+							<FileMinus className="h-4 w-4 me-2" />
+							{t("finance.actions.creditNote")}
+						</DropdownMenuItem>
+					)}
+
+					{/* Duplicate — always */}
+					<DropdownMenuItem
+						onClick={() => duplicateMutation.mutate(invoice.id)}
+						disabled={duplicateMutation.isPending}
+					>
+						<Copy className="h-4 w-4 me-2" />
+						{t("finance.actions.duplicate")}
+					</DropdownMenuItem>
+
+					<DropdownMenuSeparator />
+
+					{/* Delete — only DRAFT */}
+					{isDraft && (
+						<DropdownMenuItem
+							className="text-destructive"
+							onClick={() => setDeleteInvoiceId(invoice.id)}
+						>
+							<Trash2 className="h-4 w-4 me-2" />
+							{t("finance.actions.delete")}
+						</DropdownMenuItem>
+					)}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	};
+
 	return (
 		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-background">
 			<div className="space-y-5 max-w-6xl mx-auto">
@@ -285,7 +389,46 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 								<span className="text-sm font-semibold text-card-foreground">{t("finance.invoices.title")}</span>
 								<span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">{totalCount}</span>
 							</div>
-							<div className="overflow-x-auto">
+
+							{/* الجوال: صفوف مستندات بسطرين — التحديد الجماعي يبقى ديسكتوب فقط */}
+							<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+								{invoices.map((invoice: any) => {
+									const overdue = isOverdue(invoice.dueDate) &&
+										invoice.status !== "PAID" &&
+										invoice.status !== "CANCELLED";
+									return (
+										<MobileDocRow
+											key={invoice.id}
+											href={`${basePath}/${invoice.id}`}
+											title={invoice.clientName}
+											subtitle={
+												<>
+													<span dir="ltr" className="whitespace-nowrap">
+														{invoice.invoiceNo}
+													</span>
+													{invoice.invoiceType === "CREDIT_NOTE" && (
+														<span className="ms-1 inline-flex items-center rounded bg-destructive/15 px-1 py-0.5 text-[10px] font-semibold text-destructive">
+															{t("finance.invoices.types.credit_note")}
+														</span>
+													)}
+													{" · "}
+													{formatDate(invoice.issueDate)}
+												</>
+											}
+											amount={<Currency amount={invoice.totalAmount} />}
+											badge={
+												<StatusBadge
+													status={overdue && invoice.status !== "PAID" ? "OVERDUE" : invoice.status}
+													type="invoice"
+												/>
+											}
+											actions={renderRowMenu(invoice)}
+										/>
+									);
+								})}
+							</MobileDocList>
+
+							<div className="hidden sm:block overflow-x-auto">
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b-2 border-border">
@@ -373,96 +516,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 													<td className="p-3 text-center hidden lg:table-cell">
 														<ZatcaStatusIcon status={(invoice as any).zatcaSubmissionStatus} />
 													</td>
-													<td className="p-3">
-														<DropdownMenu>
-															<DropdownMenuTrigger asChild>
-																<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="خيارات">
-																	<MoreHorizontal className="h-4 w-4" />
-																</Button>
-															</DropdownMenuTrigger>
-															<DropdownMenuContent align="end" className="rounded-xl">
-																{/* View — always */}
-																<DropdownMenuItem asChild>
-																	<Link href={`${basePath}/${invoice.id}`}>
-																		<Eye className="h-4 w-4 me-2" />
-																		{t("finance.actions.preview")}
-																	</Link>
-																</DropdownMenuItem>
-
-																{/* Edit — only DRAFT */}
-																{isDraft && (
-																	<DropdownMenuItem asChild>
-																		<Link href={`${basePath}/${invoice.id}/edit`}>
-																			<Edit className="h-4 w-4 me-2" />
-																			{t("finance.actions.edit")}
-																		</Link>
-																	</DropdownMenuItem>
-																)}
-
-																{/* Print — يفتح المعاينة ويُطلق الطباعة فوراً */}
-																<DropdownMenuItem asChild>
-																	<Link href={`${basePath}/${invoice.id}/preview?print=1`}>
-																		<Printer className="h-4 w-4 me-2" />
-																		{t("finance.actions.print")}
-																	</Link>
-																</DropdownMenuItem>
-
-																<DropdownMenuSeparator />
-
-																{/* Add Payment — only non-DRAFT, non-PAID, non-CANCELLED */}
-																{canAddPayment && (
-																	<DropdownMenuItem
-																		onClick={() => router.push(`${basePath}/${invoice.id}`)}
-																	>
-																		<CreditCard className="h-4 w-4 me-2" />
-																		{t("finance.actions.addPayment")}
-																	</DropdownMenuItem>
-																)}
-
-																{/* Issue — only DRAFT */}
-																{isDraft && (
-																	<DropdownMenuItem
-																		onClick={() => setIssueInvoiceId(invoice.id)}
-																	>
-																		<FileCheck className="h-4 w-4 me-2" />
-																		{t("finance.actions.issue")}
-																	</DropdownMenuItem>
-																)}
-
-																{/* Credit Note — only non-DRAFT, non-CANCELLED */}
-																{canCreditNote && (
-																	<DropdownMenuItem
-																		onClick={() => router.push(`${basePath}/${invoice.id}/credit-note`)}
-																	>
-																		<FileMinus className="h-4 w-4 me-2" />
-																		{t("finance.actions.creditNote")}
-																	</DropdownMenuItem>
-																)}
-
-																{/* Duplicate — always */}
-																<DropdownMenuItem
-																	onClick={() => duplicateMutation.mutate(invoice.id)}
-																	disabled={duplicateMutation.isPending}
-																>
-																	<Copy className="h-4 w-4 me-2" />
-																	{t("finance.actions.duplicate")}
-																</DropdownMenuItem>
-
-																<DropdownMenuSeparator />
-
-																{/* Delete — only DRAFT */}
-																{isDraft && (
-																	<DropdownMenuItem
-																		className="text-destructive"
-																		onClick={() => setDeleteInvoiceId(invoice.id)}
-																	>
-																		<Trash2 className="h-4 w-4 me-2" />
-																		{t("finance.actions.delete")}
-																	</DropdownMenuItem>
-																)}
-															</DropdownMenuContent>
-														</DropdownMenu>
-													</td>
+													<td className="p-3">{renderRowMenu(invoice)}</td>
 												</tr>
 											);
 										})}
