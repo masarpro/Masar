@@ -33,7 +33,8 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 			)}
 		>
 			<GlobalHeader />
-			<div className="flex-1 overflow-y-auto min-h-0 py-2 xl:py-4">
+			{/* max-md padding: يفسح للمحتوى فوق الشريط السفلي الثابت للجوال */}
+			<div className="flex-1 overflow-y-auto min-h-0 py-2 xl:py-4 max-md:pb-[calc(4.75rem+env(safe-area-inset-bottom))]">
 				<main
 					className={cn(
 						"rounded-3xl bg-background min-h-full w-full overflow-x-hidden",

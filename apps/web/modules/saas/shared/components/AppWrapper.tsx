@@ -2,6 +2,7 @@
 
 import { config } from "@repo/config";
 import { OrganzationSelect } from "@saas/organizations/components/OrganizationSelect";
+import { AppBottomNav } from "@saas/shared/components/AppBottomNav";
 import {
 	AppSidebar,
 	SidebarInset,
@@ -28,6 +29,7 @@ export function AppWrapper({
 					<SkipNavTarget />
 					{children}
 				</SidebarInset>
+				<AppBottomNav />
 			</div>
 		</SidebarProvider>
 	);
