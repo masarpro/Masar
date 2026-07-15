@@ -27,6 +27,7 @@ import {
 import { Label } from "@ui/components/label";
 import { Plus, Pencil, Trash2, Sparkles, Settings } from "lucide-react";
 import { toast } from "sonner";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface LeaveTypeListProps {
 	organizationId: string;
@@ -154,6 +155,32 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 
 	const types = (leaveTypes as Array<{ id: string; name: string; nameEn: string | null; daysPerYear: number; isPaid: boolean; requiresApproval: boolean; color: string | null }>) ?? [];
 
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (lt: any) => (
+		<div className="flex items-center gap-1 justify-end">
+			<Button
+				variant="ghost"
+				size="icon"
+				className="rounded-lg hover:bg-accent h-8 w-8"
+				onClick={() => openEdit(lt)}
+			>
+				<Pencil className="h-4 w-4 text-muted-foreground" />
+			</Button>
+			<Button
+				variant="ghost"
+				size="icon"
+				className="rounded-xl hover:bg-destructive/10 h-8 w-8"
+				onClick={() => {
+					if (confirm(t("company.leaves.types.confirmDelete"))) {
+						deleteMutation.mutate(lt.id);
+					}
+				}}
+			>
+				<Trash2 className="h-4 w-4 text-destructive" />
+			</Button>
+		</div>
+	);
+
 	return (
 		<div className="space-y-6">
 			{/* Header — صف واحد مضغوط على الجوال، الديسكتوب كما هو */}
@@ -180,8 +207,41 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{types.length > 0 && (
+				<MobileDocList className="sm:hidden">
+					{types.map((lt) => (
+						<MobileDocRow
+							key={lt.id}
+							title={
+								<span className="inline-flex items-center gap-2">
+									{lt.color && (
+										<span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: lt.color }} />
+									)}
+									{lt.name}
+								</span>
+							}
+							subtitle={
+								lt.nameEn ? (
+									<span dir="ltr" className="whitespace-nowrap">
+										{lt.nameEn}
+									</span>
+								) : undefined
+							}
+							amount={`${lt.daysPerYear} ${t("company.leaves.days")}`}
+							badge={
+								<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.isPaid ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}`}>
+									{lt.isPaid ? t("company.leaves.types.paid") : t("company.leaves.types.unpaid")}
+								</Badge>
+							}
+							actions={renderRowMenu(lt)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[700px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">
@@ -236,28 +296,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 										</Badge>
 									</TableCell>
 									<TableCell className="text-end">
-										<div className="flex items-center gap-1 justify-end">
-											<Button
-												variant="ghost"
-												size="icon"
-												className="rounded-lg hover:bg-accent h-8 w-8"
-												onClick={() => openEdit(lt)}
-											>
-												<Pencil className="h-4 w-4 text-muted-foreground" />
-											</Button>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="rounded-xl hover:bg-destructive/10 h-8 w-8"
-												onClick={() => {
-													if (confirm(t("company.leaves.types.confirmDelete"))) {
-														deleteMutation.mutate(lt.id);
-													}
-												}}
-											>
-												<Trash2 className="h-4 w-4 text-destructive" />
-											</Button>
-										</div>
+										{renderRowMenu(lt)}
 									</TableCell>
 								</TableRow>
 							))

@@ -71,6 +71,7 @@ import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface BanksListProps {
 	organizationId: string;
@@ -202,6 +203,55 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 		e.preventDefault();
 		quickCreateMutation.mutate();
 	};
+
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وصفوف الجوال
+	const renderRowMenu = (account: any) => (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+					<MoreVertical className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="rounded-xl">
+				<DropdownMenuItem
+					onClick={() =>
+						router.push(
+							`/app/${organizationSlug}/finance/banks/${account.id}`,
+						)
+					}
+				>
+					<Eye className="h-4 w-4 me-2" />
+					{t("common.view")}
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() =>
+						router.push(
+							`/app/${organizationSlug}/finance/banks/${account.id}`,
+						)
+					}
+				>
+					<Pencil className="h-4 w-4 me-2" />
+					{t("common.edit")}
+				</DropdownMenuItem>
+				{!account.isDefault && (
+					<DropdownMenuItem
+						onClick={() => setDefaultMutation.mutate(account.id)}
+					>
+						<Star className="h-4 w-4 me-2" />
+						{t("finance.banks.setAsDefault")}
+					</DropdownMenuItem>
+				)}
+				<DropdownMenuSeparator />
+				<DropdownMenuItem
+					onClick={() => setDeleteAccountId(account.id)}
+					className="text-destructive"
+				>
+					<Trash2 className="h-4 w-4 me-2" />
+					{t("common.delete")}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 
 	return (
 		<div className="space-y-6">
@@ -388,7 +438,65 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 							</p>
 						</div>
 					) : (
-						<Table>
+						<>
+							{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+							<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+								{accounts.map((account: any) => (
+									<MobileDocRow
+										key={account.id}
+										href={`/app/${organizationSlug}/finance/banks/${account.id}`}
+										title={
+											<>
+												{account.name}
+												{account.isDefault && (
+													<Star className="ms-1 inline h-3.5 w-3.5 fill-chart-1 text-chart-1" />
+												)}
+											</>
+										}
+										subtitle={
+											account.bankName || account.accountNumber ? (
+												<>
+													{account.bankName}
+													{account.bankName && account.accountNumber && " · "}
+													{account.accountNumber && (
+														<span dir="ltr" className="whitespace-nowrap">
+															{account.accountNumber}
+														</span>
+													)}
+												</>
+											) : account.accountType === "BANK" ? (
+												t("finance.banks.types.bank")
+											) : (
+												t("finance.banks.types.cashBox")
+											)
+										}
+										amount={
+											<span className={
+												Number(account.balance) >= 0
+													? "text-success"
+													: "text-destructive"
+											}>
+												<Currency amount={Number(account.balance)} />
+											</span>
+										}
+										badge={
+											<Badge
+												variant={account.accountType === "BANK" ? "secondary" : "outline"}
+												className="rounded-lg"
+											>
+												{account.accountType === "BANK"
+													? t("finance.banks.types.bank")
+													: t("finance.banks.types.cashBox")}
+											</Badge>
+										}
+										actions={renderRowMenu(account)}
+									/>
+								))}
+							</MobileDocList>
+
+							{/* الديسكتوب: الجدول كما هو */}
+							<div className="hidden sm:block">
+							<Table>
 							<TableHeader>
 								<TableRow>
 									<TableHead>{t("finance.banks.accountName")}</TableHead>
@@ -463,56 +571,14 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 											</span>
 										</TableCell>
 										<TableCell onClick={(e: any) => e.stopPropagation()}>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-														<MoreVertical className="h-4 w-4" />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align="end" className="rounded-xl">
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`/app/${organizationSlug}/finance/banks/${account.id}`,
-															)
-														}
-													>
-														<Eye className="h-4 w-4 me-2" />
-														{t("common.view")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`/app/${organizationSlug}/finance/banks/${account.id}`,
-															)
-														}
-													>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("common.edit")}
-													</DropdownMenuItem>
-													{!account.isDefault && (
-														<DropdownMenuItem
-															onClick={() => setDefaultMutation.mutate(account.id)}
-														>
-															<Star className="h-4 w-4 me-2" />
-															{t("finance.banks.setAsDefault")}
-														</DropdownMenuItem>
-													)}
-													<DropdownMenuSeparator />
-													<DropdownMenuItem
-														onClick={() => setDeleteAccountId(account.id)}
-														className="text-destructive"
-													>
-														<Trash2 className="h-4 w-4 me-2" />
-														{t("common.delete")}
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
+											{renderRowMenu(account)}
 										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
 						</Table>
+						</div>
+						</>
 					)}
 				</CardContent>
 			</Card>

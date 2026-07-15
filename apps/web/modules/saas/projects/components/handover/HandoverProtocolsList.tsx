@@ -19,6 +19,7 @@ import {
 import { Search, Plus, ClipboardCheck, Eye } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface HandoverProtocolsListProps {
 	organizationId: string;
@@ -124,7 +125,33 @@ export function HandoverProtocolsList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card>
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{protocols.map((p: any) => (
+							<MobileDocRow
+								key={p.id}
+								href={`${basePath}/${p.id}`}
+								title={p.title}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">
+											{p.protocolNo}
+										</span>
+										{" · "}
+										{formatDate(p.date)}
+									</>
+								}
+								badge={
+									<StatusChip status={p.status}>
+										{t(`handover.statuses.${p.status}`)}
+									</StatusChip>
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					<Card className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -165,7 +192,8 @@ export function HandoverProtocolsList({
 							))}
 						</TableBody>
 					</Table>
-				</Card>
+					</Card>
+				</>
 			)}
 
 			<div className="text-sm text-muted-foreground">

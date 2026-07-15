@@ -34,6 +34,7 @@ import { Label } from "@ui/components/label";
 import { Pencil, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface LeaveBalanceListProps {
 	organizationId: string;
@@ -139,8 +140,43 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{(balances?.balances?.length ?? 0) > 0 && (
+				<MobileDocList className="sm:hidden">
+					{balances?.balances?.map((bal: any) => (
+						<MobileDocRow
+							key={bal.id}
+							title={bal.employee.name}
+							subtitle={
+								<>
+									{bal.employee.employeeNo && (
+										<>
+											<span dir="ltr" className="whitespace-nowrap">
+												{bal.employee.employeeNo}
+											</span>
+											{" · "}
+										</>
+									)}
+									{bal.leaveType.name}
+								</>
+							}
+							amount={`${bal.usedDays} / ${bal.totalDays} ${t("company.leaves.days")}`}
+							badge={
+								<Badge className={`border-0 text-[10px] px-2 py-0.5 ${
+									bal.remainingDays <= 3
+										? "bg-destructive/15 text-destructive"
+										: "bg-success/15 text-success"
+								}`}>
+									{bal.remainingDays} {t("company.leaves.days")}
+								</Badge>
+							}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[640px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">

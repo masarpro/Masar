@@ -29,6 +29,7 @@ import { Plus, Search, Package, CheckCircle2, Banknote, Wrench } from "lucide-re
 import { Pagination } from "@saas/shared/components/Pagination";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { AddAssetDialog } from "./AddAssetDialog";
 
 interface AssetListProps {
@@ -292,8 +293,36 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{(data?.assets?.length ?? 0) > 0 && (
+				<MobileDocList className="sm:hidden">
+					{data?.assets?.map((asset: any) => (
+						<MobileDocRow
+							key={asset.id}
+							href={`/app/${organizationSlug}/company/assets/${asset.id}`}
+							title={asset.name}
+							subtitle={
+								<>
+									{asset.assetNo && (
+										<>
+											<span dir="ltr" className="whitespace-nowrap">
+												{asset.assetNo}
+											</span>
+											{" · "}
+										</>
+									)}
+									{t(`company.assets.categories.${asset.category}`)}
+								</>
+							}
+							amount={formatCurrency(Number(asset.currentValue ?? asset.purchasePrice))}
+							badge={getStatusBadge(asset.status)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table - Glass Morphism */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[760px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">

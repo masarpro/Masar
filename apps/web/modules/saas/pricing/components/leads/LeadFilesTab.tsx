@@ -26,6 +26,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatDate } from "@saas/finance/lib/utils";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { LeadFileUploadZone } from "./LeadFileUploadZone";
 
 interface LeadFile {
@@ -86,6 +87,18 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 		});
 	};
 
+	// زر إجراءات الصف — مشترك بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowActions = (file: LeadFile) => (
+		<Button
+			variant="ghost"
+			size="icon"
+			className="h-8 w-8 rounded-lg text-destructive"
+			onClick={() => setDeleteId(file.id)}
+		>
+			<Trash2 className="h-4 w-4" />
+		</Button>
+	);
+
 	return (
 		<div className="space-y-4">
 			{/* Upload Zone */}
@@ -123,7 +136,33 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 							{t("pricing.leads.detail.noFiles")}
 						</p>
 					) : (
-						<div className="overflow-hidden rounded-xl border-2">
+						<>
+						{/* الجوال: صفوف بسطرين بدل الجدول متعدد الأعمدة */}
+						<MobileDocList className="sm:hidden rounded-xl border-2">
+							{files.map((file) => (
+								<MobileDocRow
+									key={file.id}
+									title={file.name}
+									subtitle={
+										<>
+											{formatFileSize(file.fileSize)}
+											{" · "}
+											{formatDate(file.createdAt)}
+										</>
+									}
+									badge={
+										file.category ? (
+											<span className="inline-flex rounded-md bg-muted/50 px-2 py-0.5 text-xs font-medium">
+												{t(`pricing.leads.detail.categories.${file.category}`)}
+											</span>
+										) : undefined
+									}
+									actions={renderRowActions(file)}
+								/>
+							))}
+						</MobileDocList>
+						{/* الجدول (الديسكتوب كما هو) */}
+						<div className="hidden sm:block overflow-hidden rounded-xl border-2">
 							<Table>
 								<TableHeader>
 									<TableRow>
@@ -162,14 +201,7 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 											</TableCell>
 											<TableCell>
 												<div className="flex gap-1">
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 rounded-lg text-destructive"
-														onClick={() => setDeleteId(file.id)}
-													>
-														<Trash2 className="h-4 w-4" />
-													</Button>
+													{renderRowActions(file)}
 												</div>
 											</TableCell>
 										</TableRow>
@@ -177,6 +209,7 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 								</TableBody>
 							</Table>
 						</div>
+						</>
 					)}
 				</div>
 			</div>

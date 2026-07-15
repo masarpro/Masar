@@ -53,6 +53,7 @@ import {
 } from "lucide-react";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface ClientsListProps {
 	organizationId: string;
@@ -124,6 +125,67 @@ export function ClientsList({
 			toast.error(error.message || t("finance.clients.statusUpdateError"));
 		},
 	});
+
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وصفوف الجوال
+	const renderRowMenu = (client: any) => (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+					<MoreVertical className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="rounded-xl">
+				<DropdownMenuItem
+					onClick={() =>
+						router.push(
+							`/app/${organizationSlug}/finance/clients/${client.id}`,
+						)
+					}
+				>
+					<Eye className="h-4 w-4 me-2" />
+					{t("common.view")}
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() =>
+						router.push(
+							`/app/${organizationSlug}/finance/clients/${client.id}/edit`,
+						)
+					}
+				>
+					<Pencil className="h-4 w-4 me-2" />
+					{t("common.edit")}
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem
+					onClick={() =>
+						toggleActiveMutation.mutate({
+							id: client.id,
+							isActive: !client.isActive,
+						})
+					}
+				>
+					{client.isActive ? (
+						<>
+							<XCircle className="h-4 w-4 me-2" />
+							{t("finance.clients.deactivate")}
+						</>
+					) : (
+						<>
+							<CheckCircle className="h-4 w-4 me-2" />
+							{t("finance.clients.activate")}
+						</>
+					)}
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => setDeleteClientId(client.id)}
+					className="text-destructive"
+				>
+					<Trash2 className="h-4 w-4 me-2" />
+					{t("common.delete")}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 
 	return (
 		<div className="space-y-6">
@@ -223,7 +285,46 @@ export function ClientsList({
 							</p>
 						</div>
 					) : (
-						<Table>
+						<>
+							{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+							<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+								{clients.map((client: any) => (
+									<MobileDocRow
+										key={client.id}
+										href={`/app/${organizationSlug}/finance/clients/${client.id}`}
+										title={client.name}
+										subtitle={
+											client.mobile || client.phone || client.email ? (
+												<span dir="ltr" className="whitespace-nowrap">
+													{client.mobile || client.phone || client.email}
+												</span>
+											) : client.clientType === "COMMERCIAL" ? (
+												t("finance.clients.types.commercial")
+											) : (
+												t("finance.clients.types.individual")
+											)
+										}
+										badge={
+											client.isActive ? (
+												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-success/15 text-success">
+													<CheckCircle className="h-3 w-3" />
+													{t("finance.clients.active")}
+												</span>
+											) : (
+												<span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+													<XCircle className="h-3 w-3" />
+													{t("finance.clients.inactive")}
+												</span>
+											)
+										}
+										actions={renderRowMenu(client)}
+									/>
+								))}
+							</MobileDocList>
+
+							{/* الديسكتوب: الجدول كما هو */}
+							<div className="hidden sm:block">
+							<Table>
 							<TableHeader>
 								<TableRow>
 									<TableHead>{t("finance.clients.code")}</TableHead>
@@ -330,68 +431,14 @@ export function ClientsList({
 											)}
 										</TableCell>
 										<TableCell onClick={(e: any) => e.stopPropagation()}>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-														<MoreVertical className="h-4 w-4" />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align="end" className="rounded-xl">
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`/app/${organizationSlug}/finance/clients/${client.id}`,
-															)
-														}
-													>
-														<Eye className="h-4 w-4 me-2" />
-														{t("common.view")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`/app/${organizationSlug}/finance/clients/${client.id}/edit`,
-															)
-														}
-													>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("common.edit")}
-													</DropdownMenuItem>
-													<DropdownMenuSeparator />
-													<DropdownMenuItem
-														onClick={() =>
-															toggleActiveMutation.mutate({
-																id: client.id,
-																isActive: !client.isActive,
-															})
-														}
-													>
-														{client.isActive ? (
-															<>
-																<XCircle className="h-4 w-4 me-2" />
-																{t("finance.clients.deactivate")}
-															</>
-														) : (
-															<>
-																<CheckCircle className="h-4 w-4 me-2" />
-																{t("finance.clients.activate")}
-															</>
-														)}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() => setDeleteClientId(client.id)}
-														className="text-destructive"
-													>
-														<Trash2 className="h-4 w-4 me-2" />
-														{t("common.delete")}
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
+											{renderRowMenu(client)}
 										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
 						</Table>
+						</div>
+						</>
 					)}
 				</CardContent>
 			</Card>

@@ -20,6 +20,7 @@ import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface PaymentVouchersListProps {
 	organizationId: string;
@@ -179,7 +180,33 @@ export function PaymentVouchersList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card>
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{vouchers.map((v: any) => (
+							<MobileDocRow
+								key={v.id}
+								href={`${basePath}/${v.id}`}
+								title={v.payeeName}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">{v.voucherNo}</span>
+										{" · "}
+										{formatDate(v.date)}
+									</>
+								}
+								amount={<Currency amount={Number(v.amount)} />}
+								badge={
+									<StatusChip status={v.status}>
+										{t(`finance.paymentVouchers.statuses.${v.status}`)}
+									</StatusChip>
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					{/* الديسكتوب: الجدول كما هو */}
+					<Card className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -216,7 +243,8 @@ export function PaymentVouchersList({
 							))}
 						</TableBody>
 					</Table>
-				</Card>
+					</Card>
+				</>
 			)}
 
 			<div className="text-sm text-muted-foreground">

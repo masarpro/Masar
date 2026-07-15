@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@saas/finance/lib/utils";
 import { Currency } from "@saas/finance/components/shared/Currency";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface RecentDocument {
 	id: string;
@@ -86,7 +87,46 @@ export function PricingRecentDocsTable({
 			</CardHeader>
 			<CardContent>
 				{documents.length > 0 ? (
-					<div className="overflow-x-auto">
+					<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+						{documents.map((doc) => {
+							const isStudy = doc.type === "study";
+							const statusConfig = isStudy
+								? (studyStatusConfig[doc.status] ?? studyStatusConfig.draft)
+								: (quotationStatusConfig[doc.status] ?? quotationStatusConfig.DRAFT);
+							const detailPath = isStudy
+								? `${basePath}/studies/${doc.id}`
+								: `${basePath}/quotations/${doc.id}`;
+							const statusLabel = isStudy
+								? t(`pricing.studies.status.${studyStatusTranslationKey[doc.status] ?? doc.status}`)
+								: t(`pricing.quotations.status.${doc.status.toLowerCase()}`);
+							return (
+								<MobileDocRow
+									key={`${doc.type}-${doc.id}`}
+									href={detailPath}
+									title={doc.title}
+									subtitle={
+										<>
+											{doc.clientName || "—"}
+											{" · "}
+											{formatDate(doc.createdAt)}
+										</>
+									}
+									amount={<Currency amount={doc.amount} />}
+									badge={
+										<span
+											className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusConfig.bg} ${statusConfig.text}`}
+										>
+											{statusLabel}
+										</span>
+									}
+								/>
+							);
+						})}
+					</MobileDocList>
+					{/* الجدول (الديسكتوب كما هو) */}
+					<div className="hidden sm:block overflow-x-auto">
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -181,6 +221,7 @@ export function PricingRecentDocsTable({
 							</TableBody>
 						</Table>
 					</div>
+					</>
 				) : (
 					<p className="text-center text-muted-foreground py-8">
 						{t("pricing.dashboard.noRecentDocuments")}

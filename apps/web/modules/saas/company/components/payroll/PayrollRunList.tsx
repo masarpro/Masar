@@ -36,6 +36,7 @@ import { Plus, CalendarRange, Banknote, FileText, Loader2, Save } from "lucide-r
 import { toast } from "sonner";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { Currency } from "../../../finance/components/shared/Currency";
 
 interface PayrollRunListProps {
@@ -245,8 +246,28 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{runs.length > 0 && (
+				<MobileDocList className="sm:hidden">
+					{runs.map((run: any) => (
+						<MobileDocRow
+							key={run.id}
+							href={`/app/${organizationSlug}/company/payroll/${run.id}`}
+							title={
+								<span dir="ltr" className="whitespace-nowrap">
+									{getRunNo(run)}
+								</span>
+							}
+							subtitle={`${run.month} / ${run.year}`}
+							amount={<Currency amount={Number(run.totalNetSalary)} />}
+							badge={getStatusBadge(run.status)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table - Glass Morphism */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[760px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">

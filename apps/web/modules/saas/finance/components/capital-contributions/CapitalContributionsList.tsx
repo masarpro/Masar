@@ -21,6 +21,7 @@ import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface CapitalContributionsListProps {
 	organizationId: string;
@@ -180,7 +181,33 @@ export function CapitalContributionsList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card>
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{contributions.map((c: any) => (
+							<MobileDocRow
+								key={c.id}
+								href={`${basePath}/${c.id}`}
+								title={c.owner?.name ?? "-"}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">{c.contributionNo}</span>
+										{" · "}
+										{formatDate(c.date)}
+									</>
+								}
+								amount={<Currency amount={Number(c.amount)} />}
+								badge={
+									<StatusChip status={c.status}>
+										{t(`finance.capitalContributions.statuses.${c.status}`)}
+									</StatusChip>
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					{/* الديسكتوب: الجدول كما هو */}
+					<Card className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -221,7 +248,8 @@ export function CapitalContributionsList({
 							))}
 						</TableBody>
 					</Table>
-				</Card>
+					</Card>
+				</>
 			)}
 
 			<div className="text-sm text-muted-foreground">

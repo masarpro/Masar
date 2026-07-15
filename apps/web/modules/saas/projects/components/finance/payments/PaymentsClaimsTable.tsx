@@ -34,6 +34,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { toast } from "sonner";
 import {
 	PaymentsClaimsFilters,
@@ -197,6 +198,43 @@ export function PaymentsClaimsTable({
 		});
 	};
 
+	// حالة الصف — عنصر مشترك بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderStatusControl = (item: any) =>
+		item.type === "claim" ? (
+			<Select
+				value={item.status}
+				onValueChange={(value: any) =>
+					handleClaimStatusChange(item.id, value as any)
+				}
+				disabled={updateClaimStatusMutation.isPending}
+			>
+				<SelectTrigger className="h-8 w-28 border-0 bg-transparent p-0">
+					<SelectValue>
+						{getStatusBadge(item.status, item.type, t)}
+					</SelectValue>
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="DRAFT">
+						{t("finance.status.DRAFT")}
+					</SelectItem>
+					<SelectItem value="SUBMITTED">
+						{t("finance.status.SUBMITTED")}
+					</SelectItem>
+					<SelectItem value="APPROVED">
+						{t("finance.status.APPROVED")}
+					</SelectItem>
+					<SelectItem value="PAID">
+						{t("finance.status.PAID")}
+					</SelectItem>
+					<SelectItem value="REJECTED">
+						{t("finance.status.REJECTED")}
+					</SelectItem>
+				</SelectContent>
+			</Select>
+		) : (
+			getStatusBadge(item.status, item.type, t)
+		);
+
 	const handleFiltersChange = (newFilters: TimelineFilters) => {
 		setFilters(newFilters);
 		setPage(0); // Reset page on filter change
@@ -225,7 +263,34 @@ export function PaymentsClaimsTable({
 				/>
 			) : (
 				<>
-					<div className="overflow-x-auto rounded-xl border-2">
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{items.map((item: any) => (
+							<MobileDocRow
+								key={`${item.type}-${item.id}`}
+								title={
+									item.type === "payment"
+										? t("paymentsHub.typePayment")
+										: t("paymentsHub.typeClaim")
+								}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">
+											{item.referenceNo}
+										</span>
+										{" · "}
+										{format(new Date(item.date), "dd/MM/yyyy", {
+											locale: ar,
+										})}
+									</>
+								}
+								amount={formatSAR(Number(item.amount))}
+								badge={renderStatusControl(item)}
+							/>
+						))}
+					</MobileDocList>
+
+					<div className="hidden sm:block overflow-x-auto rounded-xl border-2">
 						<Table>
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
@@ -302,65 +367,7 @@ export function PaymentsClaimsTable({
 
 										{/* Status */}
 										<TableCell>
-											{item.type === "claim" ? (
-												<Select
-													value={item.status}
-													onValueChange={(
-														value: any,
-													) =>
-														handleClaimStatusChange(
-															item.id,
-															value as any,
-														)
-													}
-													disabled={
-														updateClaimStatusMutation.isPending
-													}
-												>
-													<SelectTrigger className="h-8 w-28 border-0 bg-transparent p-0">
-														<SelectValue>
-															{getStatusBadge(
-																item.status,
-																item.type,
-																t,
-															)}
-														</SelectValue>
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value="DRAFT">
-															{t(
-																"finance.status.DRAFT",
-															)}
-														</SelectItem>
-														<SelectItem value="SUBMITTED">
-															{t(
-																"finance.status.SUBMITTED",
-															)}
-														</SelectItem>
-														<SelectItem value="APPROVED">
-															{t(
-																"finance.status.APPROVED",
-															)}
-														</SelectItem>
-														<SelectItem value="PAID">
-															{t(
-																"finance.status.PAID",
-															)}
-														</SelectItem>
-														<SelectItem value="REJECTED">
-															{t(
-																"finance.status.REJECTED",
-															)}
-														</SelectItem>
-													</SelectContent>
-												</Select>
-											) : (
-												getStatusBadge(
-													item.status,
-													item.type,
-													t,
-												)
-											)}
+											{renderStatusControl(item)}
 										</TableCell>
 									</TableRow>
 								))}

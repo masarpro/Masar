@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { SubcontractTabs } from "./SubcontractTabs";
 
 interface SubcontractClaimsListViewProps {
@@ -206,7 +207,49 @@ export function SubcontractClaimsListView({
 					</Link>
 				</div>
 			) : (
-				<div className="rounded-xl border overflow-hidden">
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{claims.map((claim: any) => (
+							<MobileDocRow
+								key={claim.id}
+								href={`${basePath}/claims/${claim.id}`}
+								title={claim.title}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">
+											#{claim.claimNo}
+										</span>
+										{" · "}
+										{formatDate(claim.periodStart, "ar-SA", { year: "numeric", month: "short", day: undefined })}
+									</>
+								}
+								amount={formatSAR(claim.netAmount)}
+								badge={
+									<Badge
+										variant="outline"
+										className={`text-xs ${statusToneClasses(claim.status)}`}
+									>
+										{t(`statuses.${claim.status}`)}
+									</Badge>
+								}
+								actions={
+									claim.status === "DRAFT" ? (
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-7 w-7 text-destructive"
+											onClick={() => setDeleteClaimId(claim.id)}
+										>
+											<Trash2 className="h-3.5 w-3.5" />
+										</Button>
+									) : undefined
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					<div className="hidden sm:block rounded-xl border overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/50">
@@ -288,7 +331,8 @@ export function SubcontractClaimsListView({
 							))}
 						</TableBody>
 					</Table>
-				</div>
+					</div>
+				</>
 			)}
 
 			{/* Delete Confirmation */}

@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import { formatDate } from "@saas/finance/lib/utils";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface DraftsTableProps {
 	kind: "invoice" | "quotation";
@@ -83,9 +84,63 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 		);
 	}
 
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (draft: any) => (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+					<MoreHorizontal className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="rounded-xl">
+				<DropdownMenuItem asChild>
+					<Link href={`${editBasePath}/${draft.id}`}>
+						<Pencil className="h-4 w-4 me-2" />
+						{t("drafts.continueEditing")}
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setDeleteId(draft.id)} className="text-destructive focus:text-destructive">
+					<Trash2 className="h-4 w-4 me-2" />
+					{t("drafts.discard")}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+
 	return (
 		<>
-			<div className="overflow-x-auto rounded-2xl border-2 border-border bg-card">
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			<MobileDocList className="sm:hidden">
+				{drafts.map((draft) => {
+					const source = isInvoice ? draft.sourceInvoice : draft.sourceQuotation;
+					const sourceNo = source?.invoiceNo ?? source?.quotationNo ?? null;
+					return (
+						<MobileDocRow
+							key={draft.id}
+							href={`${editBasePath}/${draft.id}`}
+							title={draft.clientName?.trim() || t("drafts.provisional")}
+							subtitle={
+								<>
+									{sourceNo && (
+										<>
+											<span dir="ltr" className="whitespace-nowrap">
+												{sourceNo}
+											</span>
+											{" · "}
+										</>
+									)}
+									{formatDate(draft.updatedAt)}
+								</>
+							}
+							amount={<Currency amount={Number(draft.totalAmount) || 0} />}
+							actions={renderRowMenu(draft)}
+						/>
+					);
+				})}
+			</MobileDocList>
+
+			{/* الجدول (الديسكتوب كما هو) */}
+			<div className="hidden sm:block overflow-x-auto rounded-2xl border-2 border-border bg-card">
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="border-b-2 border-border">
@@ -112,27 +167,7 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 									<td className="p-3">{draft.clientName?.trim() || "—"}</td>
 									<td className="p-3 text-center text-muted-foreground text-xs">{formatDate(draft.updatedAt)}</td>
 									<td className="p-3 text-center"><Currency amount={Number(draft.totalAmount) || 0} /></td>
-									<td className="p-3">
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
-													<MoreHorizontal className="h-4 w-4" />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="rounded-xl">
-												<DropdownMenuItem asChild>
-													<Link href={`${editBasePath}/${draft.id}`}>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("drafts.continueEditing")}
-													</Link>
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => setDeleteId(draft.id)} className="text-destructive focus:text-destructive">
-													<Trash2 className="h-4 w-4 me-2" />
-													{t("drafts.discard")}
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</td>
+									<td className="p-3">{renderRowMenu(draft)}</td>
 								</tr>
 							);
 						})}

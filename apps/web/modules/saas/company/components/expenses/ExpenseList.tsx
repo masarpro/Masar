@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
@@ -149,6 +150,25 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			</Badge>
 		);
 	};
+
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (expense: any) =>
+		expense.isActive && (
+			<Button
+				variant="ghost"
+				size="icon"
+				className="rounded-xl hover:bg-destructive/10"
+				aria-label={t("company.expenses.deactivate")}
+				onClick={(e: any) => {
+					e.stopPropagation();
+					if (confirm(t("company.expenses.confirmDeactivate"))) {
+						deactivateMutation.mutate(expense.id);
+					}
+				}}
+			>
+				<XCircle className="h-4 w-4 text-destructive" />
+			</Button>
+		);
 
 	return (
 		<div className="space-y-6">
@@ -342,8 +362,25 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				</div>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{expenses.length > 0 && (
+				<MobileDocList className="sm:hidden">
+					{expenses.map((expense: any) => (
+						<MobileDocRow
+							key={expense.id}
+							href={`/app/${organizationSlug}/company/expenses/${expense.id}`}
+							title={expense.name}
+							subtitle={t(`company.expenses.categories.${expense.category}`)}
+							amount={formatCurrency(Number(expense.amount))}
+							badge={getStatusBadge(expense.isActive)}
+							actions={renderRowMenu(expense)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table - Glass Morphism */}
-			<div className="bg-card border-2 rounded-2xl overflow-hidden overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-hidden overflow-x-auto">
 				<Table className="w-full">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">
@@ -408,22 +445,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 									</TableCell>
 									<TableCell className="text-end hidden sm:table-cell">{getStatusBadge(expense.isActive)}</TableCell>
 									<TableCell className="text-end">
-										{expense.isActive && (
-											<Button
-												variant="ghost"
-												size="icon"
-												className="rounded-xl hover:bg-destructive/10"
-												aria-label={t("company.expenses.deactivate")}
-												onClick={(e: any) => {
-													e.stopPropagation();
-													if (confirm(t("company.expenses.confirmDeactivate"))) {
-														deactivateMutation.mutate(expense.id);
-													}
-												}}
-											>
-												<XCircle className="h-4 w-4 text-destructive" />
-											</Button>
-										)}
+										{renderRowMenu(expense)}
 									</TableCell>
 								</TableRow>
 							))

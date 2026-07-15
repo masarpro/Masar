@@ -21,6 +21,7 @@ import {
 } from "@ui/components/table";
 import { Badge } from "@ui/components/badge";
 import { Skeleton } from "@ui/components/skeleton";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import {
 	UsersRound,
 	Plus,
@@ -187,6 +188,49 @@ export function OwnersList({
 			) : (
 				<Card>
 					<CardContent className="p-0">
+						{/* الجوال: صفوف بسطرين بدل الجدول متعدد الأعمدة */}
+						<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+							{owners.map((owner) => (
+								<MobileDocRow
+									key={owner.id}
+									href={`${basePath}/${owner.id}`}
+									title={owner.name}
+									subtitle={
+										owner.drawingsAccount?.code ? (
+											<span
+												dir="ltr"
+												className="whitespace-nowrap"
+											>
+												{owner.drawingsAccount.code}
+											</span>
+										) : (
+											owner.nameEn
+										)
+									}
+									amount={`${owner.ownershipPercent.toFixed(2)}%`}
+									badge={
+										<Badge
+											variant={
+												owner.isActive
+													? "default"
+													: "secondary"
+											}
+											className={
+												owner.isActive
+													? "bg-success/15 text-success"
+													: "bg-muted text-muted-foreground"
+											}
+										>
+											{owner.isActive
+												? t("active")
+												: t("inactive")}
+										</Badge>
+									}
+								/>
+							))}
+						</MobileDocList>
+						{/* الجدول (الديسكتوب كما هو) */}
+						<div className="hidden sm:block">
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -261,6 +305,7 @@ export function OwnersList({
 								))}
 							</TableBody>
 						</Table>
+						</div>
 					</CardContent>
 				</Card>
 			)}

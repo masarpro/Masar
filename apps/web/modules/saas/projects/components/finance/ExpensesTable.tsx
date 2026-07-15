@@ -27,6 +27,7 @@ import { Hammer, Plus, Receipt, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 
 interface Expense {
@@ -241,7 +242,27 @@ export function ExpensesTable({
 						)}
 					</EmptyState>
 				) : (
-					<div className="rounded-xl border-2">
+					<>
+						{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+						<MobileDocList className="sm:hidden">
+							{expenses.map((expense) => (
+								<MobileDocRow
+									key={`${expense._type || "expense"}-${expense.id}`}
+									title={
+										expense.description ||
+										expense.note ||
+										expense.vendorName ||
+										"-"
+									}
+									subtitle={format(new Date(expense.date), "dd/MM/yyyy", {
+										locale: ar,
+									})}
+									amount={formatSAR(expense.amount)}
+									badge={getCategoryBadge(expense.category, expense._type, t)}
+								/>
+							))}
+						</MobileDocList>
+						<div className="hidden sm:block rounded-xl border-2">
 						<Table>
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
@@ -294,7 +315,8 @@ export function ExpensesTable({
 								))}
 							</TableBody>
 						</Table>
-					</div>
+						</div>
+					</>
 				)}
 			</div>
 

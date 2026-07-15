@@ -29,6 +29,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
 
@@ -146,6 +147,43 @@ export function ClaimsTable({
 		});
 	};
 
+	// حالة المستخلص — عنصر مشترك بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderStatusSelect = (claim: Claim) => (
+		<Select
+			value={claim.status}
+			onValueChange={(value: any) =>
+				handleStatusChange(
+					claim.id,
+					value as "DRAFT" | "SUBMITTED" | "APPROVED" | "PAID" | "REJECTED",
+				)
+			}
+			disabled={updateStatusMutation.isPending}
+		>
+			<SelectTrigger className="h-8 w-32 border-0 bg-transparent p-0">
+				<SelectValue>
+					{getStatusBadge(claim.status, t)}
+				</SelectValue>
+			</SelectTrigger>
+			<SelectContent>
+				<SelectItem value="DRAFT">
+					{t("finance.status.DRAFT")}
+				</SelectItem>
+				<SelectItem value="SUBMITTED">
+					{t("finance.status.SUBMITTED")}
+				</SelectItem>
+				<SelectItem value="APPROVED">
+					{t("finance.status.APPROVED")}
+				</SelectItem>
+				<SelectItem value="PAID">
+					{t("finance.status.PAID")}
+				</SelectItem>
+				<SelectItem value="REJECTED">
+					{t("finance.status.REJECTED")}
+				</SelectItem>
+			</SelectContent>
+		</Select>
+	);
+
 	if (claims.length === 0) {
 		return (
 			<EmptyState
@@ -163,7 +201,33 @@ export function ClaimsTable({
 	}
 
 	return (
-		<div className="rounded-xl border-2">
+		<>
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			<MobileDocList className="sm:hidden">
+				{claims.map((claim) => (
+					<MobileDocRow
+						key={claim.id}
+						title={`#${claim.claimNo}`}
+						subtitle={
+							claim.periodStart && claim.periodEnd
+								? `${format(new Date(claim.periodStart), "dd/MM/yyyy", {
+										locale: ar,
+									})} - ${format(new Date(claim.periodEnd), "dd/MM/yyyy", {
+										locale: ar,
+									})}`
+								: claim.dueDate
+									? format(new Date(claim.dueDate), "dd/MM/yyyy", {
+											locale: ar,
+										})
+									: undefined
+						}
+						amount={formatSAR(claim.amount)}
+						badge={renderStatusSelect(claim)}
+					/>
+				))}
+			</MobileDocList>
+
+			<div className="hidden sm:block rounded-xl border-2">
 			<Table>
 				<TableHeader>
 					<TableRow className="hover:bg-transparent">
@@ -225,41 +289,7 @@ export function ClaimsTable({
 									? format(new Date(claim.dueDate), "dd/MM/yyyy", { locale: ar })
 									: "-"}
 							</TableCell>
-							<TableCell>
-								<Select
-									value={claim.status}
-									onValueChange={(value: any) =>
-										handleStatusChange(
-											claim.id,
-											value as "DRAFT" | "SUBMITTED" | "APPROVED" | "PAID" | "REJECTED",
-										)
-									}
-									disabled={updateStatusMutation.isPending}
-								>
-									<SelectTrigger className="h-8 w-32 border-0 bg-transparent p-0">
-										<SelectValue>
-											{getStatusBadge(claim.status, t)}
-										</SelectValue>
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="DRAFT">
-											{t("finance.status.DRAFT")}
-										</SelectItem>
-										<SelectItem value="SUBMITTED">
-											{t("finance.status.SUBMITTED")}
-										</SelectItem>
-										<SelectItem value="APPROVED">
-											{t("finance.status.APPROVED")}
-										</SelectItem>
-										<SelectItem value="PAID">
-											{t("finance.status.PAID")}
-										</SelectItem>
-										<SelectItem value="REJECTED">
-											{t("finance.status.REJECTED")}
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</TableCell>
+							<TableCell>{renderStatusSelect(claim)}</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
@@ -290,6 +320,7 @@ export function ClaimsTable({
 					},
 				]}
 			/>
-		</div>
+			</div>
+		</>
 	);
 }

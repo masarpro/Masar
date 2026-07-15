@@ -29,6 +29,7 @@ import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface ReceiptVouchersListProps {
 	organizationId: string;
@@ -188,7 +189,33 @@ export function ReceiptVouchersList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card>
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{vouchers.map((voucher: any) => (
+							<MobileDocRow
+								key={voucher.id}
+								href={`${basePath}/${voucher.id}`}
+								title={voucher.receivedFrom}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">{voucher.voucherNo}</span>
+										{" · "}
+										{formatDate(voucher.date)}
+									</>
+								}
+								amount={<Currency amount={Number(voucher.amount)} />}
+								badge={
+									<StatusChip status={voucher.status}>
+										{t(`finance.receiptVouchers.statuses.${voucher.status}`)}
+									</StatusChip>
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					{/* الديسكتوب: الجدول كما هو */}
+					<Card className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -233,7 +260,8 @@ export function ReceiptVouchersList({
 							))}
 						</TableBody>
 					</Table>
-				</Card>
+					</Card>
+				</>
 			)}
 
 			{/* Total */}

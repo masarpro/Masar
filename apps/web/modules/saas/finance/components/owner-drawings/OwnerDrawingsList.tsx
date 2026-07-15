@@ -21,6 +21,7 @@ import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface OwnerDrawingsListProps {
 	organizationId: string;
@@ -235,7 +236,33 @@ export function OwnerDrawingsList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card>
+				<>
+					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden">
+						{drawings.map((d: any) => (
+							<MobileDocRow
+								key={d.id}
+								href={`${basePath}/${d.id}`}
+								title={d.owner?.name ?? "-"}
+								subtitle={
+									<>
+										<span dir="ltr" className="whitespace-nowrap">{d.drawingNo}</span>
+										{" · "}
+										{formatDate(d.date)}
+									</>
+								}
+								amount={<Currency amount={Number(d.amount)} />}
+								badge={
+									<StatusChip status={d.status}>
+										{t(`finance.ownerDrawings.statuses.${d.status}`)}
+									</StatusChip>
+								}
+							/>
+						))}
+					</MobileDocList>
+
+					{/* الديسكتوب: الجدول كما هو */}
+					<Card className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -278,7 +305,8 @@ export function OwnerDrawingsList({
 							))}
 						</TableBody>
 					</Table>
-				</Card>
+					</Card>
+				</>
 			)}
 
 			<div className="text-sm text-muted-foreground">

@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
@@ -142,6 +143,25 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 				return null;
 		}
 	};
+
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (employee: any) =>
+		employee.status === "ACTIVE" && (
+			<Button
+				variant="ghost"
+				size="icon"
+				className="rounded-lg hover:bg-destructive/10"
+				aria-label={t("company.employees.terminate")}
+				onClick={(e: any) => {
+					e.stopPropagation();
+					if (confirm(t("company.employees.confirmTerminate"))) {
+						terminateMutation.mutate(employee.id);
+					}
+				}}
+			>
+				<UserX className="h-4 w-4 text-destructive" />
+			</Button>
+		);
 
 	return (
 		<div className="space-y-6">
@@ -339,8 +359,42 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{employees.length > 0 && (
+				<MobileDocList className="sm:hidden">
+					{employees.map((employee: any) => (
+						<MobileDocRow
+							key={employee.id}
+							href={`/app/${organizationSlug}/company/employees/${employee.id}`}
+							title={employee.name}
+							subtitle={
+								<>
+									{employee.employeeNo && (
+										<>
+											<span dir="ltr" className="whitespace-nowrap">
+												{employee.employeeNo}
+											</span>
+											{" · "}
+										</>
+									)}
+									{t(`company.employees.types.${employee.type}`)}
+								</>
+							}
+							amount={formatCurrency(
+								Number(employee.baseSalary) +
+								Number(employee.housingAllowance) +
+								Number(employee.transportAllowance) +
+								Number(employee.otherAllowances)
+							)}
+							badge={getStatusBadge(employee.status)}
+							actions={renderRowMenu(employee)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table - Glass Morphism */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[860px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">
@@ -421,22 +475,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 										)}
 									</TableCell>
 									<TableCell className="text-end">
-										{employee.status === "ACTIVE" && (
-											<Button
-												variant="ghost"
-												size="icon"
-												className="rounded-lg hover:bg-destructive/10"
-												aria-label={t("company.employees.terminate")}
-												onClick={(e: any) => {
-													e.stopPropagation();
-													if (confirm(t("company.employees.confirmTerminate"))) {
-														terminateMutation.mutate(employee.id);
-													}
-												}}
-											>
-												<UserX className="h-4 w-4 text-destructive" />
-											</Button>
-										)}
+										{renderRowMenu(employee)}
 									</TableCell>
 								</TableRow>
 							))

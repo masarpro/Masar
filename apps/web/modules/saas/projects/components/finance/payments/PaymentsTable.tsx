@@ -33,6 +33,7 @@ import {
 } from "@ui/components/alert-dialog";
 import { MoreHorizontal, Pencil, Trash2, Banknote } from "lucide-react";
 import { toast } from "sonner";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { EditPaymentDialog } from "./EditPaymentDialog";
 
 interface Payment {
@@ -91,6 +92,30 @@ export function PaymentsTable({
 		},
 	});
 
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (payment: Payment) => (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="icon" className="h-8 w-8">
+					<MoreHorizontal className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				<DropdownMenuItem onClick={() => setEditPayment(payment)}>
+					<Pencil className="me-2 h-4 w-4" />
+					{t("common.edit")}
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="text-destructive dark:text-destructive"
+					onClick={() => setDeletePaymentId(payment.id)}
+				>
+					<Trash2 className="me-2 h-4 w-4" />
+					{t("common.delete")}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+
 	if (payments.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-10">
@@ -102,7 +127,43 @@ export function PaymentsTable({
 
 	return (
 		<>
-			<div className="overflow-x-auto rounded-xl border-2">
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			<MobileDocList className="sm:hidden">
+				{payments.map((payment) => (
+					<MobileDocRow
+						key={payment.id}
+						title={payment.description ?? payment.note ?? "-"}
+						subtitle={
+							<>
+								<span dir="ltr" className="whitespace-nowrap">
+									{payment.paymentNo}
+								</span>
+								{" · "}
+								{formatDate(payment.date, "ar-SA", {
+									year: "numeric",
+									month: "short",
+									day: "numeric",
+								})}
+							</>
+						}
+						amount={formatSARPrecise(payment.amount)}
+						badge={
+							<Badge
+								variant="secondary"
+								className={
+									PAYMENT_METHOD_COLORS[payment.paymentMethod] ??
+									PAYMENT_METHOD_COLORS.OTHER
+								}
+							>
+								{t(`projectPayments.paymentMethods.${payment.paymentMethod}`)}
+							</Badge>
+						}
+						actions={renderRowMenu(payment)}
+					/>
+				))}
+			</MobileDocList>
+
+			<div className="hidden sm:block overflow-x-auto rounded-xl border-2">
 				<Table>
 					<TableHeader>
 						<TableRow className="hover:bg-transparent">
@@ -160,28 +221,7 @@ export function PaymentsTable({
 									<TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
 										{payment.description ?? payment.note ?? "-"}
 									</TableCell>
-									<TableCell>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button variant="ghost" size="icon" className="h-8 w-8">
-													<MoreHorizontal className="h-4 w-4" />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem onClick={() => setEditPayment(payment)}>
-													<Pencil className="me-2 h-4 w-4" />
-													{t("common.edit")}
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													className="text-destructive dark:text-destructive"
-													onClick={() => setDeletePaymentId(payment.id)}
-												>
-													<Trash2 className="me-2 h-4 w-4" />
-													{t("common.delete")}
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</TableCell>
+									<TableCell>{renderRowMenu(payment)}</TableCell>
 								</TableRow>
 							);
 						})}

@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 import { AddUserDialog } from "./AddUserDialog";
 import { PermissionsEditorDialog } from "./permissions-editor/PermissionsEditorDialog";
 
@@ -111,6 +112,56 @@ export function UsersListPage() {
 		}
 	};
 
+	// أزرار إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowActions = (user: any) =>
+		user.accountType !== "OWNER" ? (
+			<div className="flex gap-2">
+				{user.id !== currentUser?.id && (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => setPermissionsUser(user)}
+						title="تحرير الصلاحيات"
+					>
+						<KeyRoundIcon className="size-4" />
+					</Button>
+				)}
+				{!user.isActive && (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => handleResendInvitation(user.id)}
+						disabled={resendInvitationMutation.isPending}
+						title="إعادة إرسال الدعوة"
+					>
+						<MailIcon className="size-4" />
+					</Button>
+				)}
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => handleToggleActive(user.id)}
+					disabled={toggleActiveMutation.isPending}
+					title={user.isActive ? "تعطيل" : "تفعيل"}
+				>
+					{user.isActive ? (
+						<ShieldOffIcon className="size-4" />
+					) : (
+						<ShieldCheckIcon className="size-4" />
+					)}
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => handleDeleteUser(user.id)}
+					disabled={deleteUserMutation.isPending}
+					title="حذف"
+				>
+					<Trash2Icon className="size-4 text-destructive" />
+				</Button>
+			</div>
+		) : null;
+
 	if (!activeOrganization) return null;
 
 	return (
@@ -135,6 +186,40 @@ export function UsersListPage() {
 						لا يوجد مستخدمين
 					</div>
 				) : (
+					<>
+					{/* الجوال: صفوف بسطرين بدل الجدول متعدد الأعمدة */}
+					<MobileDocList className="sm:hidden rounded-none border-0 bg-transparent">
+						{users.map((user: any) => (
+							<MobileDocRow
+								key={user.id}
+								title={user.name}
+								subtitle={
+									<>
+										{user.email}
+										{" · "}
+										{user.organizationRole?.name ??
+											(user.accountType === "OWNER"
+												? "مالك"
+												: "-")}
+									</>
+								}
+								badge={
+									<Badge
+										status={
+											user.isActive
+												? "success"
+												: "error"
+										}
+									>
+										{user.isActive ? "نشط" : "معطل"}
+									</Badge>
+								}
+								actions={renderRowActions(user)}
+							/>
+						))}
+					</MobileDocList>
+					{/* الجدول (الديسكتوب كما هو) */}
+					<div className="hidden sm:block">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -180,84 +265,14 @@ export function UsersListPage() {
 										</Badge>
 									</TableCell>
 									<TableCell>
-										{user.accountType !== "OWNER" && (
-											<div className="flex gap-2">
-												{user.id !== currentUser?.id && (
-													<Button
-														variant="ghost"
-														size="sm"
-														onClick={() =>
-															setPermissionsUser(
-																user,
-															)
-														}
-														title="تحرير الصلاحيات"
-													>
-														<KeyRoundIcon className="size-4" />
-													</Button>
-												)}
-												{!user.isActive && (
-													<Button
-														variant="ghost"
-														size="sm"
-														onClick={() =>
-															handleResendInvitation(
-																user.id,
-															)
-														}
-														disabled={
-															resendInvitationMutation.isPending
-														}
-														title="إعادة إرسال الدعوة"
-													>
-														<MailIcon className="size-4" />
-													</Button>
-												)}
-												<Button
-													variant="ghost"
-													size="sm"
-													onClick={() =>
-														handleToggleActive(
-															user.id,
-														)
-													}
-													disabled={
-														toggleActiveMutation.isPending
-													}
-													title={
-														user.isActive
-															? "تعطيل"
-															: "تفعيل"
-													}
-												>
-													{user.isActive ? (
-														<ShieldOffIcon className="size-4" />
-													) : (
-														<ShieldCheckIcon className="size-4" />
-													)}
-												</Button>
-												<Button
-													variant="ghost"
-													size="sm"
-													onClick={() =>
-														handleDeleteUser(
-															user.id,
-														)
-													}
-													disabled={
-														deleteUserMutation.isPending
-													}
-													title="حذف"
-												>
-													<Trash2Icon className="size-4 text-destructive" />
-												</Button>
-											</div>
-										)}
+										{renderRowActions(user)}
 									</TableCell>
 								</TableRow>
 							))}
 						</TableBody>
 					</Table>
+					</div>
+					</>
 				)}
 			</Card>
 

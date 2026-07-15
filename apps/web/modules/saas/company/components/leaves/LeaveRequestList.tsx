@@ -37,6 +37,7 @@ import { Plus, Check, X, Ban, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
+import { MobileDocList, MobileDocRow } from "@saas/shared/components/mobile/MobileDocRow";
 
 interface LeaveRequestListProps {
 	organizationId: string;
@@ -165,6 +166,49 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 		}
 	};
 
+	// قائمة إجراءات الصف — مشتركة بين الجدول (ديسكتوب) وبطاقات الجوال
+	const renderRowMenu = (req: any) => (
+		<div className="flex items-center gap-1 justify-end">
+			{req.status === "PENDING" && (
+				<>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="rounded-xl hover:bg-success/10 h-8 w-8"
+						onClick={() => approveMutation.mutate(req.id)}
+						title={t("company.leaves.requests.approve")}
+					>
+						<Check className="h-4 w-4 text-success" />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="rounded-xl hover:bg-destructive/10 h-8 w-8"
+						onClick={() => { setShowRejectDialog(req.id); setRejectionReason(""); }}
+						title={t("company.leaves.requests.reject")}
+					>
+						<X className="h-4 w-4 text-destructive" />
+					</Button>
+				</>
+			)}
+			{(req.status === "PENDING" || req.status === "APPROVED") && (
+				<Button
+					variant="ghost"
+					size="icon"
+					className="rounded-lg hover:bg-accent h-8 w-8"
+					onClick={() => {
+						if (confirm(t("company.leaves.requests.confirmCancel"))) {
+							cancelMutation.mutate(req.id);
+						}
+					}}
+					title={t("company.leaves.requests.cancel")}
+				>
+					<Ban className="h-4 w-4 text-muted-foreground" />
+				</Button>
+			)}
+		</div>
+	);
+
 	return (
 		<div className="space-y-6">
 			{/* الجوال: ورقة فلاتر + زر إنشاء مضغوط في صف واحد */}
@@ -218,8 +262,32 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 				</Button>
 			</div>
 
+			{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
+			{(data?.requests?.length ?? 0) > 0 && (
+				<MobileDocList className="sm:hidden">
+					{data?.requests?.map((req: any) => (
+						<MobileDocRow
+							key={req.id}
+							title={req.employee.name}
+							subtitle={
+								<>
+									{req.leaveType.name}
+									{" · "}
+									{new Date(req.startDate).toLocaleDateString("ar-SA")}
+									{" - "}
+									{new Date(req.endDate).toLocaleDateString("ar-SA")}
+								</>
+							}
+							amount={`${req.totalDays} ${t("company.leaves.days")}`}
+							badge={getStatusBadge(req.status)}
+							actions={renderRowMenu(req)}
+						/>
+					))}
+				</MobileDocList>
+			)}
+
 			{/* Table */}
-			<div className="bg-card border-2 rounded-2xl overflow-x-auto">
+			<div className="hidden sm:block bg-card border-2 rounded-2xl overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[800px]">
 					<TableHeader>
 						<TableRow className="border-b-2 hover:bg-transparent">
@@ -275,45 +343,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 									</TableCell>
 									<TableCell className="text-end">{getStatusBadge(req.status)}</TableCell>
 									<TableCell className="text-end">
-										<div className="flex items-center gap-1 justify-end">
-											{req.status === "PENDING" && (
-												<>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="rounded-xl hover:bg-success/10 h-8 w-8"
-														onClick={() => approveMutation.mutate(req.id)}
-														title={t("company.leaves.requests.approve")}
-													>
-														<Check className="h-4 w-4 text-success" />
-													</Button>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="rounded-xl hover:bg-destructive/10 h-8 w-8"
-														onClick={() => { setShowRejectDialog(req.id); setRejectionReason(""); }}
-														title={t("company.leaves.requests.reject")}
-													>
-														<X className="h-4 w-4 text-destructive" />
-													</Button>
-												</>
-											)}
-											{(req.status === "PENDING" || req.status === "APPROVED") && (
-												<Button
-													variant="ghost"
-													size="icon"
-													className="rounded-lg hover:bg-accent h-8 w-8"
-													onClick={() => {
-														if (confirm(t("company.leaves.requests.confirmCancel"))) {
-															cancelMutation.mutate(req.id);
-														}
-													}}
-													title={t("company.leaves.requests.cancel")}
-												>
-													<Ban className="h-4 w-4 text-muted-foreground" />
-												</Button>
-											)}
-										</div>
+										{renderRowMenu(req)}
 									</TableCell>
 								</TableRow>
 							))
