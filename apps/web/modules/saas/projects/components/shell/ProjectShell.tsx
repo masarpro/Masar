@@ -46,7 +46,8 @@ export function ProjectShell({
 
 				{/* Page Content */}
 				<div className="flex-1 overflow-y-auto h-full">
-					<div className="px-4 py-4 pb-20 md:pb-4 sm:px-6 h-full">
+					{/* max-md padding: يفسح فوق الشريط السفلي العام الثابت للتطبيق */}
+					<div className="px-4 py-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4 sm:px-6 h-full">
 						{children}
 					</div>
 				</div>

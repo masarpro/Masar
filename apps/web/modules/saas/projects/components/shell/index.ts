@@ -4,6 +4,7 @@ export { ContractBar } from "./ContractBar";
 export { ProjectNavigation } from "./ProjectNavigation";
 export { DesktopNavBar } from "./DesktopNavBar";
 export { MobileBottomNav } from "./MobileBottomNav";
+export { ProjectMobileTabs } from "./ProjectMobileTabs";
 export { NavGroupPopover } from "./NavGroupPopover";
 export {
 	NAVIGATION_GROUPS,

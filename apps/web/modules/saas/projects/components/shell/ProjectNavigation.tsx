@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { getVisibleGroups } from "./constants";
 import { useProjectRole } from "../../hooks/use-project-role";
 import { DesktopNavBar } from "./DesktopNavBar";
-import { MobileBottomNav } from "./MobileBottomNav";
+import { ProjectMobileTabs } from "./ProjectMobileTabs";
 
 interface ProjectNavigationProps {
 	organizationSlug: string;
@@ -29,7 +29,8 @@ export function ProjectNavigation({
 				organizationSlug={organizationSlug}
 				projectId={projectId}
 			/>
-			<MobileBottomNav
+			{/* الجوال: تبويبات أفقية تحت الهيدر — الشريط السفلي العام يبقى ثابتاً */}
+			<ProjectMobileTabs
 				groups={visibleGroups}
 				organizationSlug={organizationSlug}
 				projectId={projectId}
