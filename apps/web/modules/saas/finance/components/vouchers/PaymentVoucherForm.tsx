@@ -29,7 +29,9 @@ interface PaymentVoucherFormProps {
 
 const formSchema = z.object({
 	date: z.string().min(1),
-	amount: z.number().positive(),
+	// coerce: the number <Input> passes a string via RHF; without coercion the
+	// schema rejects every value and the form can never submit.
+	amount: z.coerce.number().positive().max(999999999.99),
 	payeeName: z.string().min(1).max(200),
 	payeeType: z.enum(["SUBCONTRACTOR", "SUPPLIER", "EMPLOYEE", "OTHER"]),
 	paymentMethod: z.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"]),
@@ -59,7 +61,8 @@ export function PaymentVoucherForm({
 	const basePath = `/app/${organizationSlug}/finance/payment-vouchers`;
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+		// as any: z.coerce input type is unknown in Zod v4 (same convention as ExpenseForm)
+		resolver: zodResolver(formSchema) as any,
 		defaultValues: {
 			date: new Date().toISOString().split("T")[0],
 			amount: 0,
@@ -201,7 +204,7 @@ export function PaymentVoucherForm({
 											<SelectTrigger><SelectValue placeholder={t("finance.payments.selectAccountPlaceholder")} /></SelectTrigger>
 										</FormControl>
 										<SelectContent>
-											{(banks as any)?.banks?.map((bank: any) => (
+											{(banks as any)?.accounts?.map((bank: any) => (
 												<SelectItem key={bank.id} value={bank.id}>{bank.name}</SelectItem>
 											))}
 										</SelectContent>
