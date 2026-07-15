@@ -570,7 +570,8 @@
       "projects": "Projects",
       "quantities": "Quantities",
       "home": "Home",
-      "mainNavigation": "Main navigation"
+      "mainNavigation": "Main navigation",
+      "more": "More"
     },
     "userMenu": {
       "accountSettings": "Account settings",
