@@ -295,8 +295,19 @@ async function allocateAndCreatePayments(
 	let effectiveTermId: string | null = data.contractTermId ?? null;
 
 	if (data.contractTermId) {
-		const selected = await tx.contractPaymentTerm.findUnique({
-			where: { id: data.contractTermId },
+		// Scope the term to this project's contract. A term id belonging to another
+		// org/project must NOT resolve here — otherwise the spillover loop below
+		// would walk and mutate the FOREIGN contract's terms (cross-tenant write)
+		// and the summary would leak them. A foreign/invalid id degrades to a free
+		// payment on THIS project (effectiveTermId = null), same as a UI sentinel.
+		const selected = await tx.contractPaymentTerm.findFirst({
+			where: {
+				id: data.contractTermId,
+				contract: {
+					organizationId: data.organizationId,
+					projectId: data.projectId,
+				},
+			},
 		});
 
 		if (!selected) {
@@ -565,6 +576,20 @@ export async function replaceProjectPaymentGroup(
 		);
 
 		const deletedIds = rows.map((r) => r.id);
+
+		// Cancel the old group's auto-created receipt vouchers BEFORE deleting the
+		// payments (the FK SetNull would otherwise orphan them ISSUED). The delete
+		// path already does this; the replace path skipped it, so every edit of a
+		// split payment left stale vouchers documenting money that was replaced.
+		await tx.receiptVoucher.updateMany({
+			where: {
+				projectPaymentId: { in: deletedIds },
+				organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
 
 		const created = await allocateAndCreatePayments(tx, {
@@ -681,9 +706,14 @@ export async function updateProjectPayment(
 
 		// Adjust bank balance if amount changed
 		if (amountDiff !== 0) {
-			// Handle old destination account
-			if (existing.destinationAccountId && data.destinationAccountId === undefined) {
-				// Same account, adjust diff
+			// The UI resends destinationAccountId with its current value on an
+			// amount-only edit, so "=== undefined" alone misses that case and
+			// leaves the bank balance stale while the journal is re-created — a
+			// permanent bank↔ledger drift. Treat "not sent" and "sent unchanged" alike.
+			const destUnchanged =
+				data.destinationAccountId === undefined ||
+				data.destinationAccountId === existing.destinationAccountId;
+			if (existing.destinationAccountId && destUnchanged) {
 				await tx.organizationBank.updateMany({
 					where: { id: existing.destinationAccountId, organizationId },
 					data: { balance: { increment: amountDiff } },

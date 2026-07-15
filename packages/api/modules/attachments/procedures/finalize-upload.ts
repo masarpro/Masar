@@ -76,6 +76,18 @@ export const finalizeUploadProcedure = subscriptionProcedure
 			}
 		}
 
+		// Cross-tenant guard: storagePath is client-supplied. It MUST live under
+		// this org's prefix — otherwise a member of org A could finalize an
+		// attachment record whose key points at org B's file, and get-download-url
+		// (which only checks the record's org, not the key) would sign it. Mirrors
+		// the prefix rule already enforced in leads/save-file.ts.
+		const expectedPrefix = `attachments/${input.organizationId}/`;
+		if (!input.storagePath.startsWith(expectedPrefix)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "مسار التخزين غير صالح",
+			});
+		}
+
 		// Create attachment (idempotent via uploadId)
 		const attachment = await createAttachment({
 			organizationId: input.organizationId,

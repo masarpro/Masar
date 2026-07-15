@@ -371,41 +371,48 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			});
 		}
 
-		// Pass the status we validated the transition against so the write is an
-		// optimistic guard — a concurrent transition (e.g. cancel racing a payment)
-		// matches zero rows and aborts instead of clobbering the newer state.
-		const invoice = await updateInvoiceStatus(
-			input.id,
-			input.organizationId,
-			input.status,
-			currentInvoice.status as never,
-		);
+		let invoice: Awaited<ReturnType<typeof updateInvoiceStatus>>;
 
-		// Cancelling an issued invoice must reverse its posted journal entries,
-		// otherwise revenue + VAT + receivable linger in the ledger forever.
 		if (input.status === "CANCELLED") {
+			// Cancelling must reverse the invoice's posted journal entries and the
+			// operational side of any recorded payments (bank refund, voucher
+			// cancellation, paidAmount zeroing). The STATUS FLIP and that reversal
+			// must be ONE transaction: previously the flip ran first and outside the
+			// tx, so a failure mid-reversal left a CANCELLED invoice with phantom
+			// bank balance and live vouchers documenting money that no longer exists.
 			const payments = await db.financeInvoicePayment.findMany({
 				where: { invoiceId: input.id },
 				select: { id: true, amount: true, sourceAccountId: true },
 			});
 
-			// Reverse the OPERATIONAL side of recorded payments: return the money to
-			// the bank, zero the invoice's paidAmount, and cancel the auto receipt
-			// vouchers — otherwise a cancelled-but-paid invoice leaves phantom bank
-			// balance and live vouchers documenting money that no longer exists.
-			if (payments.length > 0) {
-				await db.$transaction(async (tx) => {
-					for (const p of payments) {
-						if (p.sourceAccountId) {
-							await tx.organizationBank.updateMany({
-								where: {
-									id: p.sourceAccountId,
-									organizationId: input.organizationId,
-								},
-								data: { balance: { decrement: Number(p.amount) } },
-							});
-						}
+			invoice = await db.$transaction(async (tx) => {
+				// Optimistic guard: flip only from the status we validated against.
+				const flipped = await tx.financeInvoice.updateMany({
+					where: {
+						id: input.id,
+						organizationId: input.organizationId,
+						status: currentInvoice.status,
+					},
+					data: { status: "CANCELLED" },
+				});
+				if (flipped.count === 0) {
+					throw new ORPCError("CONFLICT", {
+						message: "تغيّرت حالة الفاتورة، أعد المحاولة",
+					});
+				}
+
+				for (const p of payments) {
+					if (p.sourceAccountId) {
+						await tx.organizationBank.updateMany({
+							where: {
+								id: p.sourceAccountId,
+								organizationId: input.organizationId,
+							},
+							data: { balance: { decrement: Number(p.amount) } },
+						});
 					}
+				}
+				if (payments.length > 0) {
 					await tx.receiptVoucher.updateMany({
 						where: {
 							organizationId: input.organizationId,
@@ -414,19 +421,20 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 						},
 						data: { status: "CANCELLED" },
 					});
-					await tx.financeInvoice.updateMany({
-						where: { id: input.id, organizationId: input.organizationId },
-						data: { paidAmount: 0 },
-					});
+				}
+				await tx.financeInvoice.update({
+					where: { id: input.id },
+					data: { paidAmount: 0 },
 				});
-			}
+				return tx.financeInvoice.findUniqueOrThrow({ where: { id: input.id } });
+			});
 
+			// Journal reversal is best-effort (auto-journal must never block the
+			// cancel), so it stays outside the transaction as before.
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
 				);
-				// Reverse the main invoice entry (INV-JE) + each collection entry
-				// (RCV-JE). Reversals are independent, so run them concurrently.
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "INVOICE",
@@ -454,6 +462,16 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 					metadata: { error: String(e), referenceType: "INVOICE_CANCEL" },
 				});
 			}
+		} else {
+			// Pass the status we validated the transition against so the write is an
+			// optimistic guard — a concurrent transition matches zero rows and
+			// aborts instead of clobbering the newer state.
+			invoice = await updateInvoiceStatus(
+				input.id,
+				input.organizationId,
+				input.status,
+				currentInvoice.status as never,
+			);
 		}
 
 		orgAuditLog({

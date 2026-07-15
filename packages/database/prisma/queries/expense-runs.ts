@@ -325,24 +325,29 @@ export async function postExpenseRun(
  * Cancel an expense run + cancel linked PENDING FinanceExpenses
  */
 export async function cancelExpenseRun(runId: string, organizationId: string) {
-	const run = await db.companyExpenseRun.findFirst({
-		where: {
-			id: runId,
-			organizationId,
-			status: { in: ["DRAFT", "POSTED"] },
-		},
-		include: {
-			items: { select: { financeExpenseId: true } },
-		},
-	});
-
-	if (!run) {
-		throw new Error("Expense run not found or cannot be cancelled");
-	}
-
 	return db.$transaction(async (tx) => {
-		// Cancel linked PENDING finance expenses
-		const expenseIds = run.items
+		// Optimistic guard: claim the run only if still DRAFT/POSTED, flipping to
+		// CANCELLED first so a concurrent post can't create new PENDING expenses
+		// under a run we're cancelling, and a double-cancel can't slip through.
+		const claimed = await tx.companyExpenseRun.updateMany({
+			where: {
+				id: runId,
+				organizationId,
+				status: { in: ["DRAFT", "POSTED"] },
+			},
+			data: { status: "CANCELLED" },
+		});
+		if (claimed.count === 0) {
+			throw new Error("Expense run not found or cannot be cancelled");
+		}
+
+		// Re-read linked expenses INSIDE the tx (after the flip) so expenses a
+		// just-committed post linked are still captured and cancelled.
+		const items = await tx.companyExpenseRunItem.findMany({
+			where: { expenseRunId: runId },
+			select: { financeExpenseId: true },
+		});
+		const expenseIds = items
 			.map((item) => item.financeExpenseId)
 			.filter((id): id is string => id !== null);
 
@@ -356,10 +361,7 @@ export async function cancelExpenseRun(runId: string, organizationId: string) {
 			});
 		}
 
-		return tx.companyExpenseRun.update({
-			where: { id: runId },
-			data: { status: "CANCELLED" },
-		});
+		return tx.companyExpenseRun.findUniqueOrThrow({ where: { id: runId } });
 	});
 }
 

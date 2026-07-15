@@ -170,6 +170,11 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 						message: "اعتماد المستخلص سيتجاوز الكمية المتبقية من العقد",
 					});
 				}
+				if (error.message === "CLAIM_HAS_PAYMENTS") {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "لا يمكن إلغاء مستخلص له دفعات مسجّلة — يجب عكس الدفعات أولاً",
+					});
+				}
 			}
 			throw error;
 		}

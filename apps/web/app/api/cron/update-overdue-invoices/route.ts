@@ -1,4 +1,5 @@
 import { db } from "@repo/database";
+import { startOfTodayRiyadhUtc } from "@repo/utils";
 import { NextResponse } from "next/server";
 
 export const maxDuration = 120;
@@ -13,7 +14,9 @@ export async function GET(request: Request) {
 	const result = await db.financeInvoice.updateMany({
 		where: {
 			status: { in: ["ISSUED", "SENT", "PARTIALLY_PAID"] },
-			dueDate: { lt: new Date() },
+			// Only past the due date in Riyadh terms — avoids flipping invoices to
+			// OVERDUE at 03:00 Riyadh on the due date itself (dueDate is @db.Date).
+			dueDate: { lt: startOfTodayRiyadhUtc() },
 		},
 		data: { status: "OVERDUE" },
 	});

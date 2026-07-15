@@ -6358,7 +6358,7 @@ model ZatcaDevice {
 
   // --- عدّاد الفواتير وسلسلة Hash ---
   invoiceCounter      Int    @default(0) @map("invoice_counter")
-  previousInvoiceHash String @default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYmUxYjE3ZTExNzA5") @map("previous_invoice_hash")
+  previousInvoiceHash String @default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==") @map("previous_invoice_hash")
 
   // --- الحالة ---
   status      ZatcaIntegrationStatus @default(DISABLED)

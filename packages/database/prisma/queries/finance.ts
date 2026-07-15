@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { startOfTodayRiyadhUtc } from "@repo/utils";
 import { db } from "../client";
 import { Prisma } from "../generated/client";
 import type {
@@ -928,7 +929,7 @@ export async function getOrganizationInvoices(
 ) {
 	const where: {
 		organizationId: string;
-		status?: FinanceInvoiceStatus;
+		status?: FinanceInvoiceStatus | { in: FinanceInvoiceStatus[] };
 		invoiceType?: InvoiceType;
 		clientId?: string;
 		projectId?: string;
@@ -961,8 +962,12 @@ export async function getOrganizationInvoices(
 	}
 
 	if (options?.overdue) {
-		where.dueDate = { lt: new Date() };
-		where.status = "SENT";
+		where.dueDate = { lt: startOfTodayRiyadhUtc() };
+		// Include OVERDUE (the cron target) plus every other unpaid state — a
+		// SENT-only filter shows nothing once the daily cron has run.
+		where.status = {
+			in: ["ISSUED", "SENT", "VIEWED", "PARTIALLY_PAID", "OVERDUE"],
+		};
 	}
 
 	if (options?.query) {
@@ -1797,17 +1802,18 @@ export async function createCreditNote(data: {
 			throw new Error("الفاتورة الأصلية غير موجودة");
 		}
 
-		const existingCreditNotes = await tx.financeInvoice.aggregate({
-			where: {
-				relatedInvoiceId: data.originalInvoiceId,
-				invoiceType: "CREDIT_NOTE",
-				status: { not: "CANCELLED" },
-			},
-			_sum: { totalAmount: true },
-		});
-		// Credit note totalAmounts are negative, so abs() to get the credited total
-		const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
-		if (totalAlreadyCredited.add(totals.totalAmount).greaterThan(D(lockedOriginal.totalAmount))) {
+		// A credit note settles outstanding balance: it increments the original's
+		// paidAmount (see below). So the ceiling must count EVERYTHING already
+		// settled — cash payments AND prior credit notes — i.e. the fresh
+		// paidAmount, and cap the new credit at (total − paidAmount). Checking
+		// only prior credit notes let a fully-paid invoice take another credit on
+		// top, pushing paidAmount above the total.
+		const alreadySettled = D(lockedOriginal.paidAmount);
+		if (
+			alreadySettled
+				.add(totals.totalAmount)
+				.greaterThan(D(lockedOriginal.totalAmount))
+		) {
 			throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
 		}
 

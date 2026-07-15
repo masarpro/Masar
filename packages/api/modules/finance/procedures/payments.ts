@@ -141,6 +141,14 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// A payment moves the bank and posts an RCV-JE. Reject a closed-period
+		// date so the bank can't move while the journal is silently skipped.
+		if (await isPeriodClosed(db, input.organizationId, input.date)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل عملية بتاريخ داخل فترة محاسبية مغلقة",
+			});
+		}
+
 		const payment = await createPayment({
 			organizationId: input.organizationId,
 			createdById: context.user.id,

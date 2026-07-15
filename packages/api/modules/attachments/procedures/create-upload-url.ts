@@ -5,7 +5,7 @@
 
 import { ORPCError } from "@orpc/server";
 import { validateAttachment, validateFileName, db } from "@repo/database";
-import { getSignedUploadUrl } from "@repo/storage";
+import { getSignedUploadUrl, UPLOAD_URL_EXPIRES_IN } from "@repo/storage";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
@@ -116,6 +116,6 @@ export const createUploadUrlProcedure = subscriptionProcedure
 			storagePath,
 			proxyPath,
 			bucket: ATTACHMENTS_BUCKET,
-			expiresIn: 60, // 60 seconds
+			expiresIn: UPLOAD_URL_EXPIRES_IN,
 		};
 	});

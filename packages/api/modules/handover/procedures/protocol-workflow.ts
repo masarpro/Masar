@@ -112,37 +112,65 @@ export const signHandoverProtocol = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: "المحضر ليس بحالة انتظار التوقيعات" });
 		}
 
-		const parties = (protocol.parties as unknown as HandoverParty[] | null) ?? [];
-		if (input.partyIndex >= parties.length) {
-			throw new ORPCError("BAD_REQUEST", { message: "فهرس الطرف غير صحيح" });
-		}
-		if (parties[input.partyIndex].signed) {
-			throw new ORPCError("BAD_REQUEST", { message: "هذا الطرف وقّع بالفعل" });
-		}
-
-		// Update the party signature
-		parties[input.partyIndex].signed = true;
-		parties[input.partyIndex].signedAt = new Date().toISOString();
-
-		// Check if all parties signed
-		const allSigned = parties.every((p) => p.signed);
-		const newStatus = allSigned ? "COMPLETED" : "PARTIALLY_SIGNED";
-
-		const updateData: Prisma.HandoverProtocolUpdateInput = {
-			parties: parties as unknown as Prisma.InputJsonValue,
-			status: newStatus,
-		};
-
-		if (allSigned) {
-			updateData.completedAt = new Date();
-			if (protocol.type === "PRELIMINARY" && !protocol.warrantyStartDate) {
-				updateData.warrantyStartDate = protocol.date;
+		// The signature is a read-modify-write on the `parties` JSON. Without a
+		// lock, two parties signing concurrently both read the same array and the
+		// last write wins (a lost signature), and both can compute allSigned=true
+		// → onFinalHandoverCompleted (HR-JE) fires twice. Lock the row and re-read
+		// inside the tx so signing is serialized and "all signed" flips exactly once.
+		const { updated, allSigned, newStatus, signerName } =
+			await db.$transaction(async (tx) => {
+				await tx.$queryRawUnsafe(
+					`SELECT id FROM handover_protocols WHERE id = $1 FOR UPDATE`,
+					input.id,
+				);
+			const fresh = await tx.handoverProtocol.findFirst({
+				where: { id: input.id, organizationId: input.organizationId },
+			});
+			if (!fresh) {
+				throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 			}
-		}
+			if (!["PENDING_SIGNATURES", "PARTIALLY_SIGNED"].includes(fresh.status)) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "المحضر ليس بحالة انتظار التوقيعات",
+				});
+			}
 
-		const updated = await db.handoverProtocol.update({
-			where: { id: input.id },
-			data: updateData,
+			const parties =
+				(fresh.parties as unknown as HandoverParty[] | null) ?? [];
+			if (input.partyIndex >= parties.length) {
+				throw new ORPCError("BAD_REQUEST", { message: "فهرس الطرف غير صحيح" });
+			}
+			if (parties[input.partyIndex].signed) {
+				throw new ORPCError("BAD_REQUEST", { message: "هذا الطرف وقّع بالفعل" });
+			}
+
+			parties[input.partyIndex].signed = true;
+			parties[input.partyIndex].signedAt = new Date().toISOString();
+
+			const allSignedNow = parties.every((p) => p.signed);
+			const newStatus = allSignedNow ? "COMPLETED" : "PARTIALLY_SIGNED";
+
+			const updateData: Prisma.HandoverProtocolUpdateInput = {
+				parties: parties as unknown as Prisma.InputJsonValue,
+				status: newStatus,
+			};
+			if (allSignedNow) {
+				updateData.completedAt = new Date();
+				if (fresh.type === "PRELIMINARY" && !fresh.warrantyStartDate) {
+					updateData.warrantyStartDate = fresh.date;
+				}
+			}
+
+			const row = await tx.handoverProtocol.update({
+				where: { id: input.id },
+				data: updateData,
+			});
+			return {
+				updated: row,
+				allSigned: allSignedNow,
+				newStatus,
+				signerName: parties[input.partyIndex].name,
+			};
 		});
 
 		// If FINAL + COMPLETED + has retention → release retention via accounting
@@ -183,6 +211,7 @@ export const signHandoverProtocol = subscriptionProcedure
 			entityType: "handover_protocol",
 			entityId: input.id,
 			metadata: { partyIndex: input.partyIndex, newStatus, protocolNo: protocol.protocolNo },
+			// newStatus + signerName come from the atomic sign transaction above
 		});
 
 		// إشعار بالتوقيع + إشعار الاكتمال إذا اكتملت التوقيعات
@@ -195,7 +224,7 @@ export const signHandoverProtocol = subscriptionProcedure
 			data: {
 				projectName: protocol.project?.name,
 				protocolTitle: protocol.title,
-				signerName: parties[input.partyIndex].name,
+				signerName,
 			},
 		});
 		if (allSigned) {

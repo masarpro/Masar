@@ -1,4 +1,4 @@
-import { createProjectPayment, db } from "@repo/database";
+import { createProjectPayment, db, isPeriodClosed } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -36,6 +36,15 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			context.user.id,
 			{ section: "finance", action: "payments" },
 		);
+
+		// A project payment moves the bank and posts a PRJ-JE. Reject a
+		// closed-period date so the bank can't move while the journal is silently
+		// skipped (matches the guard already on the edit path).
+		if (await isPeriodClosed(db, input.organizationId, input.date)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل دفعة بتاريخ داخل فترة محاسبية مغلقة",
+			});
+		}
 
 		let result: Awaited<ReturnType<typeof createProjectPayment>>;
 		try {

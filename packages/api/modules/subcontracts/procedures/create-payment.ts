@@ -1,4 +1,4 @@
-import { createSubcontractPayment, getSubcontractById, logAuditEvent, orgAuditLog, db } from "@repo/database";
+import { createSubcontractPayment, getSubcontractById, logAuditEvent, orgAuditLog, db, isPeriodClosed } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -50,6 +50,14 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 		if (!contract) {
 			throw new ORPCError("NOT_FOUND", {
 				message: "عقد الباطن غير موجود",
+			});
+		}
+
+		// A subcontract payment moves the bank and posts a SUB-JE. Reject a
+		// closed-period date so the bank can't move while the journal is skipped.
+		if (await isPeriodClosed(db, input.organizationId, input.date)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل دفعة بتاريخ داخل فترة محاسبية مغلقة",
 			});
 		}
 

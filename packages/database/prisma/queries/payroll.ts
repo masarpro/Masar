@@ -337,24 +337,30 @@ export async function approvePayrollRun(
  * Cancel a payroll run + cancel linked PENDING FinanceExpenses
  */
 export async function cancelPayrollRun(runId: string, organizationId: string) {
-	const run = await db.payrollRun.findFirst({
-		where: {
-			id: runId,
-			organizationId,
-			status: { in: ["DRAFT", "APPROVED"] },
-		},
-		include: {
-			items: { select: { financeExpenseId: true } },
-		},
-	});
-
-	if (!run) {
-		throw new Error("Payroll run not found or cannot be cancelled");
-	}
-
 	return db.$transaction(async (tx) => {
-		// Cancel linked PENDING finance expenses
-		const expenseIds = run.items
+		// Optimistic guard: claim the run only if it's still DRAFT/APPROVED, and
+		// flip to CANCELLED first. This blocks a concurrent approve (whose own
+		// DRAFT-guard now fails) from creating new PENDING payroll expenses under
+		// a run we're cancelling, and prevents a double-cancel.
+		const claimed = await tx.payrollRun.updateMany({
+			where: {
+				id: runId,
+				organizationId,
+				status: { in: ["DRAFT", "APPROVED"] },
+			},
+			data: { status: "CANCELLED" },
+		});
+		if (claimed.count === 0) {
+			throw new Error("Payroll run not found or cannot be cancelled");
+		}
+
+		// Re-read linked expenses INSIDE the tx (after the flip) so any expenses a
+		// just-committed approve linked are still captured and cancelled.
+		const items = await tx.payrollRunItem.findMany({
+			where: { payrollRunId: runId },
+			select: { financeExpenseId: true },
+		});
+		const expenseIds = items
 			.map((item) => item.financeExpenseId)
 			.filter((id): id is string => id !== null);
 
@@ -368,10 +374,7 @@ export async function cancelPayrollRun(runId: string, organizationId: string) {
 			});
 		}
 
-		return tx.payrollRun.update({
-			where: { id: runId },
-			data: { status: "CANCELLED" },
-		});
+		return tx.payrollRun.findUniqueOrThrow({ where: { id: runId } });
 	});
 }
 

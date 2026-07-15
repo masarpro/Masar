@@ -63,9 +63,12 @@ export const CSR_CONFIG = {
 export const ZATCA_CSR_OID = "2.16.840.1.114513";
 
 // Initial Previous Invoice Hash (Base64 of SHA-256 of "0")
-// This is the PIH for the very first invoice in the chain
+// This is the PIH for the very first invoice in the chain.
+// Base64 of the 64-char hex "5feceb66...27fb57e9". The previous literal was
+// truncated to 48 hex chars (…c2dbbe1b17e11709) — a corrupt PIH that ZATCA
+// rejects on the first invoice of every device.
 export const INITIAL_PIH =
-	"NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYmUxYjE3ZTExNzA5";
+	"NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
 
 // UBL profile ID for ZATCA
 export const UBL_PROFILE_ID = "reporting:1.0";

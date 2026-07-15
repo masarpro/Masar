@@ -377,6 +377,15 @@ export const createDrawingProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// Reject a drawing dated inside a closed period: the operation would move
+		// the bank balance while createJournalEntry silently skips the OD-JE (a
+		// closed period), leaving bank ≠ ledger with no indicator. Block up front.
+		if (await isPeriodClosed(db, input.organizationId, input.date)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل عملية بتاريخ داخل فترة محاسبية مغلقة",
+			});
+		}
+
 		// Step 1: Verify owner exists and is active
 		const owner = await db.organizationOwner.findFirst({
 			where: {

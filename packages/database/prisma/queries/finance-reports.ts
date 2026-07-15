@@ -1,3 +1,4 @@
+import { startOfTodayRiyadhUtc } from "@repo/utils";
 import { db } from "../client";
 import type { FinanceInvoiceStatus, QuotationStatus } from "../generated/client";
 
@@ -38,8 +39,13 @@ export async function getFinanceDashboardStats(organizationId: string) {
 		db.financeInvoice.count({
 			where: {
 				organizationId,
-				status: { in: ["SENT", "PARTIALLY_PAID"] },
-				dueDate: { lt: new Date() },
+				// Must include OVERDUE: the daily cron flips past-due invoices to
+				// OVERDUE, so a SENT/PARTIALLY_PAID-only filter goes blind to every
+				// overdue receivable after the first cron run.
+				status: {
+					in: ["ISSUED", "SENT", "VIEWED", "PARTIALLY_PAID", "OVERDUE"],
+				},
+				dueDate: { lt: startOfTodayRiyadhUtc() },
 			},
 		}),
 
@@ -48,12 +54,24 @@ export async function getFinanceDashboardStats(organizationId: string) {
 			where: { organizationId },
 			_sum: { totalAmount: true },
 		}),
+		// Invoice value: exclude staging drafts and CANCELLED, and exclude
+		// CREDIT_NOTE — a credit note's negative total AND its increment of the
+		// original's paidAmount would otherwise double-count against outstanding.
 		db.financeInvoice.aggregate({
-			where: { organizationId },
+			where: {
+				organizationId,
+				isDraft: false,
+				status: { not: "CANCELLED" },
+				invoiceType: { not: "CREDIT_NOTE" },
+			},
 			_sum: { totalAmount: true },
 		}),
 		db.financeInvoice.aggregate({
-			where: { organizationId },
+			where: {
+				organizationId,
+				isDraft: false,
+				status: { not: "CANCELLED" },
+			},
 			_sum: { paidAmount: true },
 		}),
 
@@ -148,8 +166,11 @@ export async function getOverdueInvoices(
 	return db.financeInvoice.findMany({
 		where: {
 			organizationId,
-			status: { in: ["SENT", "PARTIALLY_PAID"] },
-			dueDate: { lt: new Date() },
+			// Include OVERDUE (the cron flips past-due invoices to it) plus the
+			// other unpaid states — a SENT/PARTIALLY_PAID-only filter goes blind
+			// once the daily cron has run.
+			status: { in: ["ISSUED", "SENT", "VIEWED", "PARTIALLY_PAID", "OVERDUE"] },
+			dueDate: { lt: startOfTodayRiyadhUtc() },
 		},
 		include: {
 			client: { select: { id: true, name: true, company: true } },

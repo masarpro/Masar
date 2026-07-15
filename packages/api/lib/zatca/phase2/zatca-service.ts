@@ -237,6 +237,32 @@ async function processPhase2(
 	if (invoice.invoiceType === "CREDIT_NOTE") invoiceTypeCode = "381";
 	else if (invoice.invoiceType === "DEBIT_NOTE") invoiceTypeCode = "383";
 
+	// 2b. Credit/debit notes (type 381/383) must reference the ORIGINAL invoice
+	// — not themselves — and carry an adjustment reason (BR-KSA-17 / KSA-10).
+	// The previous code put the note's own number in billingReference and never
+	// set a reason, so ZATCA rejected every real credit/debit note.
+	let billingReference: ZatcaInvoiceData["billingReference"];
+	let noteReason: string | undefined;
+	if (invoice.relatedInvoiceId) {
+		const [original, self] = await Promise.all([
+			db.financeInvoice.findUnique({
+				where: { id: invoice.relatedInvoiceId },
+				select: { invoiceNo: true, zatcaUuid: true },
+			}),
+			db.financeInvoice.findUnique({
+				where: { id: invoice.id },
+				select: { notes: true },
+			}),
+		]);
+		if (original) {
+			billingReference = {
+				invoiceNumber: original.invoiceNo,
+				invoiceUuid: original.zatcaUuid ?? undefined,
+			};
+		}
+		noteReason = self?.notes?.trim() || "Adjustment / تعديل";
+	}
+
 	// 3. Build ZatcaInvoiceData
 	const clientTaxNumber = invoice.client?.taxNumber || invoice.clientTaxNumber;
 	const invoiceData: ZatcaInvoiceData = {
@@ -290,9 +316,8 @@ async function processPhase2(
 			totalWithVat: Number(invoice.totalAmount),
 			payableAmount: Number(invoice.totalAmount) - Number(invoice.paidAmount),
 		},
-		billingReference: invoice.relatedInvoiceId
-			? { invoiceNumber: invoice.invoiceNo }
-			: undefined,
+		billingReference,
+		noteReason,
 		previousInvoiceHash: previousHash,
 		invoiceCounter: counterValue,
 	};
@@ -362,11 +387,16 @@ async function processPhase2(
 		},
 	});
 
-	// 9. Update device PIH
-	await db.zatcaDevice.update({
-		where: { id: device.id },
-		data: { previousInvoiceHash: signed.invoiceHash },
-	});
+	// 9. Advance the device PIH chain ONLY on a successful submission — a
+	// REJECTED/FAILED invoice must not become the previous-hash of the next one.
+	// This mirrors retry-submission.ts / retry-failed.ts (previously this path
+	// advanced the chain unconditionally, contradicting the retry paths).
+	if (zatcaResult.success) {
+		await db.zatcaDevice.update({
+			where: { id: device.id },
+			data: { previousInvoiceHash: signed.invoiceHash },
+		});
+	}
 
 	return {
 		phase: 2,

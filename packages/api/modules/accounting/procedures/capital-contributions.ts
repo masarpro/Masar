@@ -5,6 +5,7 @@ import {
 	db,
 	orgAuditLog,
 	generateAtomicNo,
+	isPeriodClosed,
 } from "@repo/database";
 import { z } from "zod";
 import {
@@ -186,6 +187,15 @@ export const createContributionProcedure = subscriptionProcedure
 			section: "finance",
 			action: "payments",
 		});
+
+		// Reject a contribution dated inside a closed period — the bank would move
+		// while the CC-JE is silently skipped (closed period), diverging bank from
+		// the ledger with no indicator.
+		if (await isPeriodClosed(db, input.organizationId, input.date)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل عملية بتاريخ داخل فترة محاسبية مغلقة",
+			});
+		}
 
 		// Step 1: Verify owner exists and is active
 		const owner = await db.organizationOwner.findFirst({
@@ -370,6 +380,7 @@ export const cancelContributionProcedure = subscriptionProcedure
 				amount: true,
 				bankAccountId: true,
 				journalEntryId: true,
+				date: true,
 			},
 		});
 
@@ -381,6 +392,19 @@ export const cancelContributionProcedure = subscriptionProcedure
 		if (contribution.status !== "ACTIVE") {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "يمكن إلغاء المساهمات النشطة فقط",
+			});
+		}
+
+		// Guard the closed period BEFORE touching the bank: the reversal entry
+		// (reverseAutoJournalEntry) throws for a closed period and is swallowed
+		// below, which would leave the CC-JE POSTED while the bank was already
+		// decremented — a silent bank↔ledger divergence. Mirrors owner-drawings.
+		if (
+			contribution.date &&
+			(await isPeriodClosed(db, input.organizationId, contribution.date))
+		) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء مساهمة في فترة محاسبية مغلقة",
 			});
 		}
 

@@ -236,13 +236,24 @@ export const approveLeaveRequestProcedure = subscriptionProcedure
 
 		// Update request and balance in transaction
 		const approvedRequest = await db.$transaction(async (tx) => {
-			const updated = await tx.leaveRequest.update({
-				where: { id: input.id },
+			// Optimistic guard: flip PENDING→APPROVED only if still PENDING, so two
+			// concurrent approvals can't both pass the pre-tx check and deduct the
+			// leave balance twice. count === 0 → someone else already processed it.
+			const claimed = await tx.leaveRequest.updateMany({
+				where: { id: input.id, status: "PENDING" },
 				data: {
 					status: "APPROVED",
 					approvedBy: context.user.id,
 					approvedAt: new Date(),
 				},
+			});
+			if (claimed.count === 0) {
+				throw new ORPCError("CONFLICT", {
+					message: "تمت معالجة الطلب بالفعل",
+				});
+			}
+			const updated = await tx.leaveRequest.findUniqueOrThrow({
+				where: { id: input.id },
 				include: {
 					employee: { select: { id: true, name: true } },
 					leaveType: { select: { id: true, name: true } },
@@ -406,6 +417,24 @@ export const cancelLeaveRequestProcedure = subscriptionProcedure
 		}
 
 		return db.$transaction(async (tx) => {
+			// Lock the row and re-read its status INSIDE the tx. Whether we restore
+			// the leave balance must key off the status at cancel time, not the
+			// stale pre-tx snapshot: a concurrent approve could deduct the balance
+			// after our first read, and cancelling on the old "PENDING" snapshot
+			// would then never restore it (permanently leaked days).
+			await tx.$queryRawUnsafe(
+				`SELECT id FROM leave_requests WHERE id = $1 FOR UPDATE`,
+				input.id,
+			);
+			const fresh = await tx.leaveRequest.findUnique({
+				where: { id: input.id },
+				select: { status: true },
+			});
+			if (!fresh || fresh.status === "CANCELLED") {
+				throw new ORPCError("BAD_REQUEST", { message: "الطلب ملغي مسبقاً" });
+			}
+			const wasApproved = fresh.status === "APPROVED";
+
 			const updated = await tx.leaveRequest.update({
 				where: { id: input.id },
 				data: { status: "CANCELLED" },
@@ -415,8 +444,8 @@ export const cancelLeaveRequestProcedure = subscriptionProcedure
 				},
 			});
 
-			// If was approved, restore balance
-			if (request.status === "APPROVED") {
+			// If it was approved (checked under the lock), restore balance
+			if (wasApproved) {
 				const year = request.startDate.getFullYear();
 				await tx.leaveBalance.update({
 					where: {

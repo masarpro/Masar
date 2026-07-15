@@ -317,14 +317,53 @@ export async function approveChangeOrder(
 		throw new Error("Can only approve change orders in SUBMITTED status");
 	}
 
-	return db.projectChangeOrder.update({
-		where: { id: changeOrderId },
-		data: {
-			status: "APPROVED",
-			decidedById: actorId,
-			decidedAt: new Date(),
-			decisionNote,
-		},
+	return db.$transaction(async (tx) => {
+		// A negative change order lowers the contract ceiling (value + approved
+		// COs). Ensure the new ceiling stays at/above money already recorded as
+		// project payments — otherwise the ceiling inverts below what's been paid.
+		if (existing.costImpact != null && Number(existing.costImpact) < 0) {
+			const [contract, approvedCOImpact, paymentsAgg] = await Promise.all([
+				tx.projectContract.findFirst({
+					where: { organizationId, projectId },
+					select: { value: true },
+				}),
+				tx.projectChangeOrder.aggregate({
+					where: {
+						organizationId,
+						projectId,
+						status: { in: ["APPROVED", "IMPLEMENTED"] },
+						costImpact: { not: null },
+					},
+					_sum: { costImpact: true },
+				}),
+				tx.projectPayment.aggregate({
+					where: { organizationId, projectId },
+					_sum: { amount: true },
+				}),
+			]);
+			if (contract) {
+				const newAdjusted =
+					Number(contract.value) +
+					Number(approvedCOImpact._sum.costImpact ?? 0) +
+					Number(existing.costImpact);
+				const paymentsTotal = Number(paymentsAgg._sum.amount ?? 0);
+				if (newAdjusted > 0 && paymentsTotal - newAdjusted > 0.01) {
+					throw new Error(
+						`CEILING_BELOW_COMMITTED:${newAdjusted.toFixed(2)}:${paymentsTotal.toFixed(2)}`,
+					);
+				}
+			}
+		}
+
+		return tx.projectChangeOrder.update({
+			where: { id: changeOrderId },
+			data: {
+				status: "APPROVED",
+				decidedById: actorId,
+				decidedAt: new Date(),
+				decisionNote,
+			},
+		});
 	});
 }
 

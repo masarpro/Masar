@@ -666,6 +666,10 @@ export const costingGetSummary = protectedProcedure
 		// كانت تُضاعف تكلفة المواد دون المصنعيات (lump sum على صف واحد)
 		const uniqueItems = dedupeCostingItems(items);
 
-		const overheadPercent = toNum(study?.overheadPercent) || 5;
+		// Distinguish "not set" (null → default 5%) from an explicit 0%. `|| 5`
+		// forced 5% onto a study whose overhead was deliberately set to 0, so the
+		// cost summary showed +5% while the profit analysis / quotation used 0.
+		const overheadPercent =
+			study?.overheadPercent == null ? 5 : toNum(study.overheadPercent);
 		return summarizeCostingItems(uniqueItems, overheadPercent);
 	});

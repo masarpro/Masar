@@ -12,6 +12,14 @@ import type {
 	GetSignedUrlHander,
 } from "../../types";
 
+/**
+ * صلاحية روابط الرفع الموقّعة (PUT). كانت 60 ثانية فكانت رفعات الصور
+ * الكبيرة على شبكات الجوال تموت بتوقيع منتهٍ في منتصف النقل — الصغيرة
+ * تكتمل قبل الانتهاء وتنجو. 15 دقيقة تغطي أبطأ الرفعات الواقعية.
+ * روابط التنزيل (GET) منفصلة في getSignedUrl ويحدد صلاحيتها المستدعي.
+ */
+export const UPLOAD_URL_EXPIRES_IN = 900;
+
 let s3Client: S3Client | null = null;
 
 const getS3Client = () => {
@@ -64,7 +72,7 @@ export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
 				ContentType: contentType || "application/octet-stream",
 			}),
 			{
-				expiresIn: 60,
+				expiresIn: UPLOAD_URL_EXPIRES_IN,
 			},
 		);
 

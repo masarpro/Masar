@@ -640,9 +640,11 @@ export async function getVATReport(
 				categoryRef: { select: { isVatExempt: true } },
 			},
 		}),
-		// Subcontract payments with VAT-inclusive contracts
+		// Subcontract payments with VAT-inclusive contracts — COMPLETED only.
+		// PENDING/CANCELLED rows must not inflate input VAT in the ZATCA return.
 		db.subcontractPayment.findMany({
 			where: {
+				status: "COMPLETED",
 				contract: {
 					organizationId,
 					includesVat: true,
@@ -870,9 +872,11 @@ export async function getIncomeStatement(
 				project: { select: { name: true } },
 			},
 		}),
-		// 5. Subcontract payments
+		// 5. Subcontract payments — COMPLETED only (exclude PENDING/CANCELLED so
+		// the income statement's cost of revenue reflects real cash out).
 		db.subcontractPayment.aggregate({
 			where: {
+				status: "COMPLETED",
 				contract: {
 					organizationId,
 					...(options?.projectId ? { projectId: options.projectId } : {}),

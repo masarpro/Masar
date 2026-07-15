@@ -1,54 +1,19 @@
-import { Suspense } from "react";
-import { getActiveOrganization } from "@saas/auth/lib/server";
-import { CreateExpenseForm } from "@saas/projects/components/finance/CreateExpenseForm";
-import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { redirect } from "next/navigation";
 
-export async function generateMetadata() {
-	const t = await getTranslations();
-
-	return {
-		title: t("finance.expenses.new"),
-	};
-}
-
+/**
+ * Legacy route. `CreateExpenseForm` wrote to the abandoned `projectExpense`
+ * table — those rows never appeared in any list/summary/profitability and never
+ * produced a journal entry (silent financial data loss). The canonical expense
+ * flow is the unified `AddExpenseDialog` on the project expenses page (§19.10).
+ *
+ * No live navigation points here (the "Add Expense" quick action links to
+ * `finance/expenses`); this redirect only catches stale bookmarks/URLs.
+ */
 export default async function NewExpensePage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; projectId: string }>;
 }) {
 	const { organizationSlug, projectId } = await params;
-
-	return (
-		<Suspense fallback={<FormPageSkeleton />}>
-			<NewExpensePageContent organizationSlug={organizationSlug} projectId={projectId} />
-		</Suspense>
-	);
-}
-
-async function NewExpensePageContent({
-	organizationSlug,
-	projectId,
-}: {
-	organizationSlug: string;
-	projectId: string;
-}) {
-	const activeOrganization = await getActiveOrganization(
-		organizationSlug as string,
-	);
-
-	if (!activeOrganization) {
-		return notFound();
-	}
-
-	return (
-		<div>
-			<CreateExpenseForm
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-				projectId={projectId}
-			/>
-		</div>
-	);
+	redirect(`/app/${organizationSlug}/projects/${projectId}/finance/expenses`);
 }

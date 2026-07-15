@@ -638,20 +638,11 @@ export async function markExpensePaymentPaid(
 			},
 		});
 
-		// Deduct from bank balance — guard against overdrawing under concurrency
-		const bankDec = await tx.organizationBank.updateMany({
-			where: { id: data.bankAccountId, balance: { gte: Number(payment.amount) } },
-			data: {
-				balance: { decrement: Number(payment.amount) },
-			},
-		});
-		if (bankDec.count === 0) {
-			throw new Error("الرصيد غير كافي في الحساب المصدر");
-		}
-
-		// Mark the company payment as paid and link it
-		return tx.companyExpensePayment.update({
-			where: { id },
+		// Optimistic guard against double-pay race: only proceed if the payment
+		// is still unpaid. Two concurrent calls both pass the pre-tx isPaid check,
+		// so the guard must live on the write itself (count === 0 → already paid).
+		const claimed = await tx.companyExpensePayment.updateMany({
+			where: { id, isPaid: false },
 			data: {
 				isPaid: true,
 				paidAt: data.paidAt ?? new Date(),
@@ -660,6 +651,27 @@ export async function markExpensePaymentPaid(
 				financeExpenseId: financeExpense.id,
 			},
 		});
+		if (claimed.count === 0) {
+			throw new Error("Payment is already marked as paid");
+		}
+
+		// Deduct from bank balance — scoped to org (cross-tenant guard) and
+		// guarded against overdrawing under concurrency
+		const bankDec = await tx.organizationBank.updateMany({
+			where: {
+				id: data.bankAccountId,
+				organizationId: data.organizationId,
+				balance: { gte: Number(payment.amount) },
+			},
+			data: {
+				balance: { decrement: Number(payment.amount) },
+			},
+		});
+		if (bankDec.count === 0) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
+
+		return tx.companyExpensePayment.findUniqueOrThrow({ where: { id } });
 	});
 }
 

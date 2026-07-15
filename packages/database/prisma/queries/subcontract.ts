@@ -312,17 +312,32 @@ export async function updateSubcontractContract(
 		attachmentUrl: string | null;
 	}>,
 ) {
-	const existing = await db.subcontractContract.findFirst({
-		where: { id, organizationId, projectId },
-	});
-	if (!existing) throw new Error("Subcontract not found");
+	return db.$transaction(async (tx) => {
+		const existing = await tx.subcontractContract.findFirst({
+			where: { id, organizationId, projectId },
+			select: { id: true },
+		});
+		if (!existing) throw new Error("Subcontract not found");
 
-	return db.subcontractContract.update({
-		where: { id },
-		data,
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
+		// Changing the contract value can't drop the ceiling (value + approved
+		// COs) below what's already committed. Lock the row (serialize with
+		// claim/payment/change-order writers) and run the same floor guard those
+		// paths use — previously the value could be edited straight through,
+		// inverting every ceiling built on it.
+		if (data.value !== undefined && data.value !== null) {
+			await lockSubcontractContract(tx, id);
+			const coSum = await getApprovedChangeOrderSum(tx, id);
+			const newCeiling = new Prisma.Decimal(data.value).add(coSum);
+			await assertCeilingAboveCommitted(tx, id, newCeiling);
+		}
+
+		return tx.subcontractContract.update({
+			where: { id },
+			data,
+			include: {
+				createdBy: { select: { id: true, name: true } },
+			},
+		});
 	});
 }
 
@@ -400,11 +415,18 @@ export async function setSubcontractPaymentTerms(
 			};
 
 			if (term.id) {
-				await tx.subcontractPaymentTerm.upsert({
-					where: { id: term.id },
-					update: termData,
-					create: { ...termData, contractId },
+				// Scope the update to THIS contract — a term id belonging to another
+				// contract (even another org) must not be mutated. If the id doesn't
+				// resolve within this contract, fall through to creating a fresh term.
+				const updated = await tx.subcontractPaymentTerm.updateMany({
+					where: { id: term.id, contractId },
+					data: termData,
 				});
+				if (updated.count === 0) {
+					await tx.subcontractPaymentTerm.create({
+						data: { ...termData, contractId },
+					});
+				}
 			} else {
 				await tx.subcontractPaymentTerm.create({
 					data: { ...termData, contractId },
@@ -790,6 +812,16 @@ export async function createSubcontractPayment(data: {
 		});
 		if (!contract) throw new Error("CONTRACT_NOT_FOUND");
 
+		// A supplied term id must belong to THIS contract — otherwise the payment
+		// would attach to (and inflate the progress of) another contract's stage.
+		if (data.termId) {
+			const term = await tx.subcontractPaymentTerm.findFirst({
+				where: { id: data.termId, contractId: data.contractId },
+				select: { id: true },
+			});
+			if (!term) throw new Error("PAYMENT_TERM_NOT_FOUND");
+		}
+
 		// Ceiling = contract value + approved change orders. Direct payments and
 		// claim payments live in the same table, so one aggregate covers both.
 		// Contracts without a set value (ceiling <= 0) skip the check.
@@ -835,7 +867,11 @@ export async function createSubcontractPayment(data: {
 		// Deduct from source bank account if provided — guard against overdrawing
 		if (data.sourceAccountId) {
 			const bankDec = await tx.organizationBank.updateMany({
-				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
+				where: {
+					id: data.sourceAccountId,
+					organizationId: data.organizationId,
+					balance: { gte: data.amount },
+				},
 				data: {
 					balance: { decrement: data.amount },
 				},

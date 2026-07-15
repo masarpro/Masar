@@ -643,6 +643,7 @@ export async function updateSubcontractClaimStatus(
 				status: true,
 				contractId: true,
 				grossAmount: true,
+				paidAmount: true,
 				items: {
 					select: {
 						contractItemId: true,
@@ -654,14 +655,20 @@ export async function updateSubcontractClaimStatus(
 		});
 		if (!claim) throw new Error("CLAIM_NOT_FOUND");
 
-		// Validate workflow transitions
+		// Validate workflow transitions.
+		// - APPROVED can be CANCELLED to correct a mistaken approval (the caller
+		//   reverses the SCL-JE accrual). Without this, an erroneously approved
+		//   claim left a permanent liability with no correction path.
+		// - PARTIALLY_PAID / PAID are reached ONLY through the payments path
+		//   (addClaimPayment updates status + paidAmount together), never set
+		//   manually here — otherwise a claim could be marked "paid" with no cash.
 		const allowedTransitions: Record<string, string[]> = {
 			DRAFT: ["SUBMITTED"],
 			SUBMITTED: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
 			UNDER_REVIEW: ["APPROVED", "REJECTED"],
-			APPROVED: ["PARTIALLY_PAID", "PAID"],
+			APPROVED: ["CANCELLED"],
 			REJECTED: ["DRAFT"],
-			PARTIALLY_PAID: ["PAID"],
+			PARTIALLY_PAID: [],
 			PAID: [],
 			CANCELLED: [],
 		};
@@ -669,6 +676,16 @@ export async function updateSubcontractClaimStatus(
 		const allowed = allowedTransitions[claim.status] ?? [];
 		if (!allowed.includes(newStatus)) {
 			throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
+		}
+
+		// Never cancel a claim that has recorded payments — the money must be
+		// reversed through the payments path first (defensive: APPROVED claims
+		// carry paidAmount 0, since any payment moves them out of APPROVED).
+		if (
+			newStatus === "CANCELLED" &&
+			new Prisma.Decimal(claim.paidAmount).gt(0)
+		) {
+			throw new Error("CLAIM_HAS_PAYMENTS");
 		}
 
 		// If approving, lock the contract and re-validate ceiling
@@ -872,8 +889,12 @@ export async function addSubcontractClaimPayment(data: {
 		// 3. Generate payment number from MAX existing + 1 (never count+1: after a
 		// payment deletion, count regresses and reuses a number → P2002 under
 		// @@unique([contractId, paymentNo]). MAX of surviving rows can't collide.
+		// IMPORTANT: filter to the PAY- series only. Direct payments share this
+		// table under the SUBPAY- prefix, which sorts ABOVE "PAY-" (S > P), so an
+		// unfiltered desc scan returns a SUBPAY row → replace(/^PAY-/) no-ops →
+		// parseInt = NaN → every claim payment collides on PAY-0001.
 		const lastPayment = await tx.subcontractPayment.findFirst({
-			where: { contractId: claim.contractId },
+			where: { contractId: claim.contractId, paymentNo: { startsWith: "PAY-" } },
 			orderBy: { paymentNo: "desc" },
 			select: { paymentNo: true },
 		});
@@ -914,7 +935,11 @@ export async function addSubcontractClaimPayment(data: {
 		// 6. Deduct from bank account if specified — guard against overdrawing
 		if (data.sourceAccountId) {
 			const bankDec = await tx.organizationBank.updateMany({
-				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
+				where: {
+					id: data.sourceAccountId,
+					organizationId: data.organizationId,
+					balance: { gte: data.amount },
+				},
 				data: {
 					balance: { decrement: data.amount },
 				},

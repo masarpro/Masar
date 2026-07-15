@@ -292,16 +292,19 @@ const getAll = protectedProcedure
 				}
 			: null;
 
+		// Strip finance figures server-side for members without finance.view —
+		// hiding them only in the UI still ships the numbers in the payload
+		// (visible in DevTools). Mirrors the heroMetrics stripping above.
 		return {
 			stats,
 			upcoming,
 			overdue: {
 				milestones: overdueMilestones,
-				invoices: overdueInvoices,
+				invoices: canViewFinance ? overdueInvoices : [],
 			},
-			financialTrend,
-			pendingSubcontractClaims,
-			invoiceTotals,
+			financialTrend: canViewFinance ? financialTrend : null,
+			pendingSubcontractClaims: canViewFinance ? pendingSubcontractClaims : null,
+			invoiceTotals: canViewFinance ? invoiceTotals : null,
 			fieldActivity,
 			heroMetrics,
 		};

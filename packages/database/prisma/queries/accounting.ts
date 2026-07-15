@@ -1040,6 +1040,12 @@ export async function getJournalIncomeStatement(
 			AND je."status" IN ('POSTED', 'REVERSED')
 			AND je."date" >= ${options.dateFrom}
 			AND je."date" <= ${options.dateTo}
+			-- Exclude closing entries: YEAR_END_* / PERIOD_CLOSING zero out the
+			-- revenue/expense accounts (roll them into retained earnings) on the
+			-- period's last day. Including them makes any income statement that
+			-- spans that day (every full-year statement) read ~0 revenue/expense,
+			-- which cascades into overdraw alerts and partner profit shares.
+			AND (je."reference_type" IS NULL OR je."reference_type" NOT IN ('YEAR_END_CLOSING', 'YEAR_END_RETAINED', 'PERIOD_CLOSING'))
 		WHERE a."organization_id" = ${organizationId}
 			AND a."is_postable" = true
 			AND a."is_active" = true

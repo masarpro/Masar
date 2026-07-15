@@ -4,6 +4,7 @@ import {
 	listBankReconciliations,
 } from "@repo/database";
 import { db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -75,6 +76,30 @@ export const createReconciliationProcedure = subscriptionProcedure
 			section: "finance",
 			action: "edit",
 		});
+
+		// Cross-tenant guard: the bank account must belong to this org, and
+		// every matched journal line must belong to this org's journal entries.
+		const bank = await db.organizationBank.findFirst({
+			where: { id: input.bankAccountId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!bank) {
+			throw new ORPCError("NOT_FOUND", { message: "الحساب البنكي غير موجود" });
+		}
+
+		if (input.matchedLineIds.length > 0) {
+			const ownedCount = await db.journalEntryLine.count({
+				where: {
+					id: { in: input.matchedLineIds },
+					journalEntry: { organizationId: input.organizationId },
+				},
+			});
+			if (ownedCount !== input.matchedLineIds.length) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "بعض سطور القيود لا تنتمي لهذه المنظمة",
+				});
+			}
+		}
 
 		return createBankReconciliation(db, input.organizationId, {
 			bankAccountId: input.bankAccountId,

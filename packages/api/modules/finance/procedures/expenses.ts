@@ -235,6 +235,19 @@ export const createExpenseProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// A COMPLETED expense moves the bank and posts an EXP-JE. If it's dated in
+		// a closed period the journal is silently skipped while the bank still
+		// moves — a silent bank↔ledger divergence. Reject up front. (PENDING
+		// expenses post no journal, so they're unaffected.)
+		if (
+			input.status !== "PENDING" &&
+			(await isPeriodClosed(db, input.organizationId, input.date))
+		) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن تسجيل مصروف بتاريخ داخل فترة محاسبية مغلقة",
+			});
+		}
+
 		// Resolve the DB-backed category. Accepts either the OrgCategory id
 		// (cuid, sent by the DB-backed combobox) or the stable systemId
 		// (legacy/back-compat callers). Custom categories have no systemId.
