@@ -44,17 +44,19 @@ export function FloatingChatButton({
 
 	return (
 		<>
-			{/* Floating button - explicit left positioning for RTL */}
+			{/* زر عائم في الطرف المقابل لزر المساعد — نفس الأبعاد والمسافات
+			    تماماً (bottom-20 فوق الشريط السفلي العام على الجوال، 6 من
+			    الحافة) ونفس هندسة الظل بلون أسود بدل توهج المساعد الأحمر */}
 			{!isOpen && (
 				<button
 					onClick={() => setIsOpen(true)}
 					className={cn(
-						"fixed end-4 bottom-24 z-[9999] md:bottom-6",
+						"fixed end-6 bottom-20 z-[60] md:bottom-6",
 						"flex items-center justify-center",
 						"h-14 w-14 rounded-full",
-						"bg-primary text-primary-foreground",
-						"shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)]",
-						"hover:scale-110 active:scale-95 transition-all duration-200",
+						"bg-primary text-primary-foreground ring-1 ring-white/15",
+						"shadow-[0_10px_30px_-4px_rgba(0,0,0,0.35)]",
+						"hover:scale-105 active:scale-95 transition-all duration-300",
 					)}
 				>
 					<MessageSquare className="h-6 w-6" />
