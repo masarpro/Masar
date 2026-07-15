@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { getSignedUploadUrl } from "@repo/storage";
+import { getSignedUploadUrl, UPLOAD_URL_EXPIRES_IN } from "@repo/storage";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -103,6 +103,6 @@ export const getUploadUrlProcedure = subscriptionProcedure
 			thumbnailUploadUrl,
 			thumbnailPath,
 			uploadId,
-			expiresIn: 60,
+			expiresIn: UPLOAD_URL_EXPIRES_IN,
 		};
 	});

@@ -55,8 +55,17 @@ const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
 // DB round-trips (session, access check, storage-usage aggregate) against a
 // small Postgres pool (max 5) over high-latency links. Firing every dropped
 // file in parallel exhausts the pool and makes unrelated requests (notifications,
-// chat, the saves themselves) fail with 500. A small cap keeps the burst bounded.
-const MAX_CONCURRENT_UPLOADS = 3;
+// chat, the saves themselves) fail with 500. Two at a time also keeps mobile
+// bandwidth per upload high enough that large photos finish before the signed
+// URL expires.
+const MAX_CONCURRENT_UPLOADS = 2;
+// Signed upload URLs are valid for 15 minutes server-side — give the PUT the
+// same ceiling instead of the old 2-minute abort that killed large photos on
+// slow mobile data.
+const UPLOAD_TIMEOUT_MS = 600_000;
+// One automatic retry after this delay when createUploadUrl is rejected by
+// the 10/min upload rate limit (dropping 10+ files at once can hit it).
+const RATE_LIMIT_RETRY_DELAY_MS = 15_000;
 const ACCEPTED_MEDIA_TYPES = {
 	"image/jpeg": [".jpg", ".jpeg"],
 	"image/png": [".png"],
@@ -161,14 +170,30 @@ export function MultiPhotoUploadForm({
 		async (item: QueueItem) => {
 			updateItem(item.id, { status: "uploading", progress: 0, errorMessage: undefined });
 			try {
-				const uploadResponse = await getUploadUrlMutation.mutateAsync({
-					organizationId,
-					projectId,
-					ownerType: "PHOTO" as const,
-					fileName: item.file.name,
-					fileSize: item.file.size,
-					mimeType: item.file.type,
-				});
+				const requestUploadUrl = () =>
+					getUploadUrlMutation.mutateAsync({
+						organizationId,
+						projectId,
+						ownerType: "PHOTO" as const,
+						fileName: item.file.name,
+						fileSize: item.file.size,
+						mimeType: item.file.type,
+					});
+
+				let uploadResponse: Awaited<ReturnType<typeof requestUploadUrl>>;
+				try {
+					uploadResponse = await requestUploadUrl();
+				} catch (urlErr) {
+					const status = (urlErr as { status?: number })?.status;
+					const code = (urlErr as { code?: string })?.code;
+					if (status === 429 || code === "TOO_MANY_REQUESTS") {
+						// Rate-limited (10 upload-URL requests/min): wait once, retry once.
+						await new Promise((r) => setTimeout(r, RATE_LIMIT_RETRY_DELAY_MS));
+						uploadResponse = await requestUploadUrl();
+					} else {
+						throw urlErr;
+					}
+				}
 				const uploadUrl = uploadResponse.uploadUrl as string;
 				const storagePath = uploadResponse.storagePath as string;
 				const proxyPath =
@@ -195,7 +220,7 @@ export function MultiPhotoUploadForm({
 					xhr.addEventListener("timeout", () =>
 						reject(new Error("Upload timeout")),
 					);
-					xhr.timeout = 120000;
+					xhr.timeout = UPLOAD_TIMEOUT_MS;
 					xhr.open("PUT", uploadUrl);
 					xhr.setRequestHeader("Content-Type", item.file.type);
 					xhr.send(item.file);
