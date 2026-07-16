@@ -694,7 +694,7 @@
       "providerNotFound": "This provider is not suppported.",
       "socialAccountAlreadyLinked": "This account is already linked to a user.",
       "userEmailNotFound": "Email not found.",
-      "userAlreadyExists": "This user already exists.",
+      "userAlreadyExists": "An account with this email already exists — try signing in instead.",
       "invalidInvitation": "The invitation is invalid or expired.",
       "sessionExpired": "The session has expired.",
       "failedToUnlinkLastAccount": "Failed to unlink account",

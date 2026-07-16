@@ -694,7 +694,7 @@
       "providerNotFound": "هذا المزود غير مدعوم.",
       "socialAccountAlreadyLinked": "هذا الحساب مرتبط بالفعل بمستخدم آخر.",
       "userEmailNotFound": "البريد الإلكتروني غير موجود.",
-      "userAlreadyExists": "هذا المستخدم موجود بالفعل.",
+      "userAlreadyExists": "يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل — جرّب تسجيل الدخول بدلاً من ذلك.",
       "invalidInvitation": "الدعوة غير صالحة أو منتهية الصلاحية.",
       "sessionExpired": "انتهت صلاحية الجلسة.",
       "failedToUnlinkLastAccount": "فشل في إلغاء ربط الحساب",
