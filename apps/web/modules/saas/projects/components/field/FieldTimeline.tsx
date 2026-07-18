@@ -16,6 +16,7 @@ import { Button } from "@ui/components/button";
 import {
 	AlertTriangle,
 	Camera,
+	ClipboardList,
 	Clock,
 	FileText,
 	Trash2,
@@ -126,6 +127,12 @@ export function FieldTimeline({
 			icon: FileText,
 			href: `${basePath}/execution/new-report`,
 			color: "bg-chart-4/15 text-chart-4 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:text-chart-4",
+		},
+		{
+			label: t("projects.field.reportsTitle"),
+			icon: ClipboardList,
+			href: `${basePath}/execution/reports`,
+			color: "bg-chart-3/15 text-chart-3 hover:bg-chart-3/15 dark:bg-chart-3/20 dark:text-chart-3",
 		},
 		{
 			label: t("projects.field.uploadPhoto"),

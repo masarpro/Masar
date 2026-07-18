@@ -13,12 +13,17 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { Textarea } from "@ui/components/textarea";
-import { ChevronLeft } from "lucide-react";
+import { Camera, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+	MultiPhotoUploadForm,
+	type MultiPhotoUploadFormHandle,
+	type PhotoQueueState,
+} from "../photos/MultiPhotoUploadForm";
 
 interface DailyReportFormProps {
 	organizationId: string;
@@ -54,6 +59,7 @@ export function DailyReportForm({
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
+	const reportsPath = `${basePath}/execution/reports`;
 
 	const [reportDate, setReportDate] = useState(
 		new Date().toISOString().split("T")[0],
@@ -64,12 +70,24 @@ export function DailyReportForm({
 	const [blockers, setBlockers] = useState("");
 	const [weather, setWeather] = useState<WeatherCondition>("SUNNY");
 
+	const photoUploadRef = useRef<MultiPhotoUploadFormHandle | null>(null);
+	const [photoQueue, setPhotoQueue] = useState<PhotoQueueState>({
+		total: 0,
+		ready: 0,
+		uploading: false,
+	});
+
 	const createMutation = useMutation(
 		orpc.projectField.createDailyReport.mutationOptions(),
 	);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		if (photoQueue.uploading) {
+			toast.error(t("projects.photos.waitForUploads"));
+			return;
+		}
 
 		try {
 			await createMutation.mutateAsync({
@@ -82,13 +100,28 @@ export function DailyReportForm({
 				blockers: blockers || undefined,
 				weather,
 			});
-
-			toast.success(t("projects.field.reportCreated"));
-			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
-			router.push(`${basePath}/execution`);
-		} catch {
-			toast.error(t("projects.field.reportCreateError"));
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "";
+			toast.error(message || t("projects.field.reportCreateError"));
+			return;
 		}
+
+		// Attach queued photos to the project gallery (they show up on the
+		// photos page automatically, stamped with the report date).
+		if (photoUploadRef.current?.getReadyCount()) {
+			const { saved, failed } =
+				await photoUploadRef.current.saveReadyPhotos();
+			if (saved > 0) {
+				toast.success(t("projects.photos.savedCount", { count: saved }));
+			}
+			if (failed > 0) {
+				toast.error(t("projects.photos.someFailed", { count: failed }));
+			}
+		}
+
+		toast.success(t("projects.field.reportCreated"));
+		queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+		router.push(reportsPath);
 	};
 
 	return (
@@ -101,7 +134,7 @@ export function DailyReportForm({
 					asChild
 					className="shrink-0 rounded-xl hover:bg-accent"
 				>
-					<Link href={`${basePath}/execution`}>
+					<Link href={reportsPath}>
 						<ChevronLeft className="h-5 w-5" />
 					</Link>
 				</Button>
@@ -211,19 +244,49 @@ export function DailyReportForm({
 					</div>
 				</div>
 
+				{/* Report Photos */}
+				<div className="rounded-2xl border-2 bg-card p-6">
+					<div className="mb-4 flex items-center gap-3">
+						<div className="rounded-xl bg-chart-3/15 p-2.5">
+							<Camera className="h-5 w-5 text-chart-3" />
+						</div>
+						<div>
+							<h2 className="text-base font-semibold text-card-foreground">
+								{t("projects.field.reportPhotos")}
+							</h2>
+							<p className="text-sm text-muted-foreground">
+								{t("projects.field.reportPhotosHint")}
+							</p>
+						</div>
+					</div>
+					<MultiPhotoUploadForm
+						controlled
+						apiRef={photoUploadRef}
+						organizationId={organizationId}
+						organizationSlug={organizationSlug}
+						projectId={projectId}
+						dateOverride={reportDate}
+						onQueueStateChange={setPhotoQueue}
+					/>
+				</div>
+
 				{/* Submit */}
 				<div className="flex justify-end gap-3">
 					<Button
 						type="button"
 						variant="outline"
-						onClick={() => router.push(`${basePath}/execution`)}
+						onClick={() => router.push(reportsPath)}
 						className="rounded-xl"
 					>
 						{t("common.cancel")}
 					</Button>
 					<Button
 						type="submit"
-						disabled={createMutation.isPending || !workDone.trim()}
+						disabled={
+							createMutation.isPending ||
+							photoQueue.uploading ||
+							!workDone.trim()
+						}
 						className="min-w-[120px] rounded-xl"
 					>
 						{createMutation.isPending

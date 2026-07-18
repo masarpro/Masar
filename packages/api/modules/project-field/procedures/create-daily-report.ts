@@ -1,4 +1,6 @@
+import { ORPCError } from "@orpc/server";
 import { createDailyReport, getProjectById } from "@repo/database";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -27,25 +29,44 @@ export const createDailyReportProcedure = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// Verify membership, project access, and permission (projects.edit for creating reports)
-		await verifyProjectAccess(
+		// Verify membership + project access, then allow either projects.edit OR
+		// reports.create — field supervisors have reports.create without
+		// projects.edit, and filing daily reports is their core job.
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
-			{ section: "projects", action: "edit" },
 		);
+		if (
+			!hasPermission(permissions, "projects", "edit") &&
+			!hasPermission(permissions, "reports", "create")
+		) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "ليس لديك صلاحية إنشاء التقارير اليومية",
+			});
+		}
 
-		// Create the daily report
-		const report = await createDailyReport({
-			projectId: input.projectId,
-			createdById: context.user.id,
-			reportDate: input.reportDate,
-			manpower: input.manpower,
-			equipment: input.equipment,
-			workDone: input.workDone,
-			blockers: input.blockers,
-			weather: input.weather,
-		});
+		// Create the daily report (one report per project per day — @@unique)
+		let report: Awaited<ReturnType<typeof createDailyReport>>;
+		try {
+			report = await createDailyReport({
+				projectId: input.projectId,
+				createdById: context.user.id,
+				reportDate: input.reportDate,
+				manpower: input.manpower,
+				equipment: input.equipment,
+				workDone: input.workDone,
+				blockers: input.blockers,
+				weather: input.weather,
+			});
+		} catch (err) {
+			if ((err as { code?: string })?.code === "P2002") {
+				throw new ORPCError("CONFLICT", {
+					message: "يوجد تقرير مسجّل لهذا التاريخ بالفعل",
+				});
+			}
+			throw err;
+		}
 
 		// إشعار مديري المشروع + مسؤولي المنظمة (الجمهور يُحل من السجل)
 		const project = await getProjectById(input.projectId, input.organizationId);

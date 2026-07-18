@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
 	Calculator,
+	ClipboardList,
 	FileText,
 	Plus,
 	Receipt,
@@ -16,6 +17,7 @@ import { useActiveOrganization } from "@saas/organizations/hooks/use-active-orga
 import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
+import { SelectProjectDialog } from "./SelectProjectDialog";
 
 interface QuickActionsGridProps {
 	organizationSlug: string;
@@ -34,6 +36,11 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const organizationId = activeOrganization?.id ?? "";
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+	// Daily-report shortcut needs a project context — the dialog picks one,
+	// then routes to that project's reports hub / new-report form.
+	const [reportPickerTarget, setReportPickerTarget] = useState<string | null>(
+		null,
+	);
 
 	// Each quick action requires the same permission as its target section
 	const allowed = {
@@ -43,9 +50,24 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		invoices: isOwner || can("finance", "invoices"),
 		studies: isOwner || can("pricing", "studies"),
 		leads: isOwner || can("pricing", "leads"),
+		// Field supervisors carry reports.create without projects.edit — the
+		// daily report is their core action, so either permission qualifies.
+		dailyReports:
+			isOwner || can("reports", "create") || can("projects", "edit"),
 	};
 
 	const quickActions = [
+		{
+			icon: ClipboardList,
+			visible: allowed.dailyReports,
+			sectionLabel: t("dashboard.actions.dailyReports"),
+			actionLabel: t("dashboard.actions.newDailyReport"),
+			browsePath: "",
+			createPath: "",
+			chip: "bg-chart-4/15 text-chart-4",
+			onBrowseClick: () => setReportPickerTarget("execution/reports"),
+			onCreateClick: () => setReportPickerTarget("execution/new-report"),
+		},
 		{
 			icon: TrendingDown,
 			visible: allowed.expenses,
@@ -126,20 +148,38 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 								key={i}
 								className="flex min-h-0 min-w-0 items-center gap-2 rounded-2xl border-2 p-2 transition-colors hover:border-primary/20"
 							>
-								<Link
-									href={action.browsePath}
-									className="flex min-w-0 flex-1 items-center gap-2.5"
-									title={action.sectionLabel}
-								>
-									<span
-										className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
+								{action.onBrowseClick ? (
+									<button
+										type="button"
+										onClick={action.onBrowseClick}
+										className="flex min-w-0 flex-1 items-center gap-2.5 text-start"
+										title={action.sectionLabel}
 									>
-										<Icon className="size-4" />
-									</span>
-									<span className="truncate text-sm font-semibold text-card-foreground">
-										{action.sectionLabel}
-									</span>
-								</Link>
+										<span
+											className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
+										>
+											<Icon className="size-4" />
+										</span>
+										<span className="truncate text-sm font-semibold text-card-foreground">
+											{action.sectionLabel}
+										</span>
+									</button>
+								) : (
+									<Link
+										href={action.browsePath}
+										className="flex min-w-0 flex-1 items-center gap-2.5"
+										title={action.sectionLabel}
+									>
+										<span
+											className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${action.chip}`}
+										>
+											<Icon className="size-4" />
+										</span>
+										<span className="truncate text-sm font-semibold text-card-foreground">
+											{action.sectionLabel}
+										</span>
+									</Link>
+								)}
 								{action.onCreateClick ? (
 									<button
 										type="button"
@@ -178,6 +218,16 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 				onOpenChange={setPaymentDialogOpen}
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
+			/>
+
+			<SelectProjectDialog
+				open={reportPickerTarget !== null}
+				onOpenChange={(open) => {
+					if (!open) setReportPickerTarget(null);
+				}}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				targetPath={reportPickerTarget ?? "execution/reports"}
 			/>
 		</>
 	);

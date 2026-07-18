@@ -27,7 +27,14 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useCallback, useId, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
@@ -97,6 +104,20 @@ interface QueueItem {
 	errorMessage?: string;
 }
 
+/** Imperative API exposed to a parent form via `apiRef` in controlled mode. */
+export interface MultiPhotoUploadFormHandle {
+	/** Persist all uploaded-and-ready photos. Returns saved/failed counts. */
+	saveReadyPhotos: () => Promise<{ saved: number; failed: number }>;
+	getReadyCount: () => number;
+	hasUploading: () => boolean;
+}
+
+export interface PhotoQueueState {
+	total: number;
+	ready: number;
+	uploading: boolean;
+}
+
 interface MultiPhotoUploadFormProps {
 	organizationId: string;
 	organizationSlug: string;
@@ -107,6 +128,17 @@ interface MultiPhotoUploadFormProps {
 	embedded?: boolean;
 	/** Called after a successful save when embedded. */
 	onSaved?: () => void;
+	/**
+	 * Controlled mode: rendered inside a parent <form> (no own form element,
+	 * header, or submit row). The parent triggers saving through `apiRef`.
+	 */
+	controlled?: boolean;
+	/** Imperative handle for controlled mode. */
+	apiRef?: React.Ref<MultiPhotoUploadFormHandle>;
+	/** Hides the date field and stamps all photos with this date (YYYY-MM-DD). */
+	dateOverride?: string;
+	/** Notifies the parent whenever the upload queue changes. */
+	onQueueStateChange?: (state: PhotoQueueState) => void;
 }
 
 function formatFileSize(bytes: number): string {
@@ -129,6 +161,10 @@ export function MultiPhotoUploadForm({
 	returnTo,
 	embedded = false,
 	onSaved,
+	controlled = false,
+	apiRef,
+	dateOverride,
+	onQueueStateChange,
 }: MultiPhotoUploadFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -335,6 +371,83 @@ export function MultiPhotoUploadForm({
 		if (target) enqueueUpload(target);
 	};
 
+	const saveReadyPhotos = useCallback(async (): Promise<{
+		saved: number;
+		failed: number;
+	}> => {
+		const ready = items.filter(
+			(it) => it.status === "uploaded" && it.uploadedUrl,
+		);
+		if (ready.length === 0) {
+			return { saved: 0, failed: 0 };
+		}
+
+		setSubmitting(true);
+		let savedCount = 0;
+		let failedCount = 0;
+
+		const effectiveDate = dateOverride ?? photoDate;
+
+		for (const item of ready) {
+			try {
+				await createPhotoMutation.mutateAsync({
+					organizationId,
+					projectId,
+					url: item.uploadedUrl!,
+					caption: item.caption.trim() || undefined,
+					category,
+					mediaType: item.mediaType,
+					mimeType: item.file.type,
+					milestoneId: milestoneId === "none" ? undefined : milestoneId,
+					takenAt: effectiveDate ? new Date(effectiveDate) : undefined,
+				});
+				updateItem(item.id, { status: "saved" });
+				savedCount++;
+			} catch {
+				updateItem(item.id, {
+					status: "error",
+					errorMessage: t("projects.field.photoUploadError"),
+				});
+				failedCount++;
+			}
+		}
+
+		setSubmitting(false);
+		queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+		return { saved: savedCount, failed: failedCount };
+	}, [
+		items,
+		dateOverride,
+		photoDate,
+		category,
+		milestoneId,
+		organizationId,
+		projectId,
+		createPhotoMutation,
+		queryClient,
+		t,
+		updateItem,
+	]);
+
+	useImperativeHandle(
+		apiRef,
+		() => ({
+			saveReadyPhotos,
+			getReadyCount: () =>
+				items.filter((it) => it.status === "uploaded").length,
+			hasUploading: () => items.some((it) => it.status === "uploading"),
+		}),
+		[saveReadyPhotos, items],
+	);
+
+	useEffect(() => {
+		onQueueStateChange?.({
+			total: items.length,
+			ready: items.filter((it) => it.status === "uploaded").length,
+			uploading: items.some((it) => it.status === "uploading"),
+		});
+	}, [items, onQueueStateChange]);
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -350,43 +463,12 @@ export function MultiPhotoUploadForm({
 			return;
 		}
 
-		setSubmitting(true);
-		let savedCount = 0;
-		let failedCount = 0;
+		const { saved, failed } = await saveReadyPhotos();
 
-		for (const item of ready) {
-			try {
-				await createPhotoMutation.mutateAsync({
-					organizationId,
-					projectId,
-					url: item.uploadedUrl!,
-					caption: item.caption.trim() || undefined,
-					category,
-					mediaType: item.mediaType,
-					mimeType: item.file.type,
-					milestoneId: milestoneId === "none" ? undefined : milestoneId,
-					takenAt: photoDate ? new Date(photoDate) : undefined,
-				});
-				updateItem(item.id, { status: "saved" });
-				savedCount++;
-			} catch {
-				updateItem(item.id, {
-					status: "error",
-					errorMessage: t("projects.field.photoUploadError"),
-				});
-				failedCount++;
-			}
+		if (saved > 0) {
+			toast.success(t("projects.photos.savedCount", { count: saved }));
 		}
-
-		setSubmitting(false);
-		queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
-
-		if (savedCount > 0) {
-			toast.success(
-				t("projects.photos.savedCount", { count: savedCount }),
-			);
-		}
-		if (failedCount === 0) {
+		if (failed === 0) {
 			if (embedded) {
 				// Clear the queue and let the parent refresh the gallery
 				setItems((prev) => {
@@ -398,17 +480,20 @@ export function MultiPhotoUploadForm({
 				router.push(returnTo ?? defaultReturnTo);
 			}
 		} else {
-			toast.error(t("projects.photos.someFailed", { count: failedCount }));
+			toast.error(t("projects.photos.someFailed", { count: failed }));
 		}
 	};
 
 	const uploadedReady = items.filter((it) => it.status === "uploaded").length;
 	const milestones = milestonesQuery.data?.milestones ?? [];
+	// Controlled mode lives inside the parent's <form> — nesting forms is
+	// invalid HTML, so the same tree renders as a plain <div> there.
+	const FormTag = (controlled ? "div" : "form") as "form";
 
 	return (
 		<div className="space-y-6">
 			{/* Header (hidden when embedded inline on the photos page) */}
-			{!embedded && (
+			{!embedded && !controlled && (
 				<div className="flex items-center gap-4">
 					<Button
 						variant="ghost"
@@ -431,19 +516,24 @@ export function MultiPhotoUploadForm({
 				</div>
 			)}
 
-			<form onSubmit={handleSubmit} className="space-y-6">
+			<FormTag
+				onSubmit={controlled ? undefined : handleSubmit}
+				className="space-y-6"
+			>
 				{/* Batch settings: date + category + milestone */}
 				<div className="grid grid-cols-1 gap-4 rounded-2xl border-2 bg-card p-5 sm:grid-cols-2 lg:grid-cols-3">
-					<div className="space-y-2">
-						<Label>{t("projects.photos.photoDate")}</Label>
-						<Input
-							type="date"
-							value={photoDate}
-							max={todayLocalDate()}
-							onChange={(e) => setPhotoDate(e.target.value)}
-							className="rounded-xl"
-						/>
-					</div>
+					{!dateOverride && (
+						<div className="space-y-2">
+							<Label>{t("projects.photos.photoDate")}</Label>
+							<Input
+								type="date"
+								value={photoDate}
+								max={todayLocalDate()}
+								onChange={(e) => setPhotoDate(e.target.value)}
+								className="rounded-xl"
+							/>
+						</div>
+					)}
 					<div className="space-y-2">
 						<Label>{t("projects.field.categoryLabel")}</Label>
 						<Select
@@ -655,35 +745,37 @@ export function MultiPhotoUploadForm({
 					</div>
 				)}
 
-				{/* Submit */}
-				<div className="flex justify-end gap-3">
-					{!embedded && (
+				{/* Submit (the parent form owns saving in controlled mode) */}
+				{!controlled && (
+					<div className="flex justify-end gap-3">
+						{!embedded && (
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => router.push(returnTo ?? defaultReturnTo)}
+								className="rounded-xl"
+								disabled={submitting}
+							>
+								{t("common.cancel")}
+							</Button>
+						)}
 						<Button
-							type="button"
-							variant="outline"
-							onClick={() => router.push(returnTo ?? defaultReturnTo)}
-							className="rounded-xl"
-							disabled={submitting}
+							type="submit"
+							disabled={
+								submitting ||
+								uploadedReady === 0 ||
+								items.some((it) => it.status === "uploading")
+							}
+							className="min-w-[160px] rounded-xl"
 						>
-							{t("common.cancel")}
+							<Camera className="me-2 h-4 w-4" />
+							{submitting
+								? t("common.saving")
+								: t("projects.photos.saveCount", { count: uploadedReady })}
 						</Button>
-					)}
-					<Button
-						type="submit"
-						disabled={
-							submitting ||
-							uploadedReady === 0 ||
-							items.some((it) => it.status === "uploading")
-						}
-						className="min-w-[160px] rounded-xl"
-					>
-						<Camera className="me-2 h-4 w-4" />
-						{submitting
-							? t("common.saving")
-							: t("projects.photos.saveCount", { count: uploadedReady })}
-					</Button>
-				</div>
-			</form>
+					</div>
+				)}
+			</FormTag>
 		</div>
 	);
 }

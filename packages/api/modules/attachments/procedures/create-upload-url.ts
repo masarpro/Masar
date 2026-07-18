@@ -5,6 +5,7 @@
 
 import { ORPCError } from "@orpc/server";
 import { validateAttachment, validateFileName, db } from "@repo/database";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { getSignedUploadUrl, UPLOAD_URL_EXPIRES_IN } from "@repo/storage";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -43,12 +44,22 @@ export const createUploadUrlProcedure = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		const { user } = context;
 
-		// Verify organization access with edit permission
-		await verifyOrganizationAccess(
+		// Verify organization access with edit permission. Photo uploads also
+		// accept reports.create — field supervisors attach photos to daily
+		// reports without having projects.edit (same gate as createPhoto).
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			user.id,
-			{ section: "projects", action: "edit" },
 		);
+		const allowed =
+			hasPermission(permissions, "projects", "edit") ||
+			(input.ownerType === "PHOTO" &&
+				hasPermission(permissions, "reports", "create"));
+		if (!allowed) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "ليس لديك صلاحية رفع الملفات",
+			});
+		}
 
 		// Check organization storage limit
 		const org = await db.organization.findUnique({

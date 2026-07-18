@@ -39,6 +39,36 @@ export async function getProjectDailyReports(
 }
 
 /**
+ * Aggregate stats for the daily-reports hub page
+ */
+export async function getDailyReportStats(projectId: string) {
+	const now = new Date();
+	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+	const [total, monthAgg, latest] = await Promise.all([
+		db.projectDailyReport.count({ where: { projectId } }),
+		db.projectDailyReport.aggregate({
+			where: { projectId, reportDate: { gte: monthStart } },
+			_count: { _all: true },
+			_avg: { manpower: true },
+		}),
+		db.projectDailyReport.findFirst({
+			where: { projectId },
+			orderBy: { reportDate: "desc" },
+			select: { reportDate: true, manpower: true },
+		}),
+	]);
+
+	return {
+		totalReports: total,
+		monthReports: monthAgg._count._all,
+		avgManpowerThisMonth: Math.round(monthAgg._avg.manpower ?? 0),
+		lastReportDate: latest?.reportDate ?? null,
+		lastReportManpower: latest?.manpower ?? null,
+	};
+}
+
+/**
  * Get a daily report by ID
  */
 export async function getDailyReportById(id: string, projectId: string) {

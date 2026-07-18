@@ -29,7 +29,7 @@ export function QuickActions({
 			id: "daily-report",
 			icon: FileText,
 			label: t("projects.commandCenter.dailyReport"),
-			href: `${basePath}/execution/new-report`,
+			href: `${basePath}/execution/reports`,
 			section: "execution",
 			bgColor: "bg-card",
 			iconBg: "bg-chart-4/15",

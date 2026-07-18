@@ -1,4 +1,6 @@
+import { ORPCError } from "@orpc/server";
 import { createPhoto, getProjectById } from "@repo/database";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -32,13 +34,22 @@ export const createPhotoProcedure = subscriptionProcedure
 		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
 		await rateLimitChecker(context.user.id, "project-field.createPhoto", RATE_LIMITS.UPLOAD);
 
-		// Verify membership, project access, and permission
-		await verifyProjectAccess(
+		// Verify membership + project access, then allow either projects.edit OR
+		// reports.create — field supervisors attach photos to their daily
+		// reports without having projects.edit.
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
-			{ section: "projects", action: "edit" },
 		);
+		if (
+			!hasPermission(permissions, "projects", "edit") &&
+			!hasPermission(permissions, "reports", "create")
+		) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "ليس لديك صلاحية رفع صور المشروع",
+			});
+		}
 
 		// Create the photo / video
 		const photo = await createPhoto({

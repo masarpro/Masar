@@ -5,6 +5,7 @@ import { createDailyReportProcedure } from "./procedures/create-daily-report";
 import { createIssueProcedure } from "./procedures/create-issue";
 import { createPhotoProcedure } from "./procedures/create-photo";
 import { deletePhotoProcedure } from "./procedures/delete-photo";
+import { getDailyReportStatsProcedure } from "./procedures/get-daily-report-stats";
 import { getFieldTimelineProcedure } from "./procedures/get-field-timeline";
 import { listDailyReportsProcedure } from "./procedures/list-daily-reports";
 import { listIssuesProcedure } from "./procedures/list-issues";
@@ -21,6 +22,7 @@ export const projectFieldRouter = {
 	// Daily Reports
 	createDailyReport: createDailyReportProcedure,
 	listDailyReports: listDailyReportsProcedure,
+	getDailyReportStats: getDailyReportStatsProcedure,
 
 	// Photos
 	createPhoto: createPhotoProcedure,
