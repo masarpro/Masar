@@ -125,13 +125,13 @@ export function FieldTimeline({
 		{
 			label: t("projects.field.newReport"),
 			icon: FileText,
-			href: `${basePath}/execution/new-report`,
+			href: `${basePath}/reports/new`,
 			color: "bg-chart-4/15 text-chart-4 hover:bg-chart-4/15 dark:bg-chart-4/20 dark:text-chart-4",
 		},
 		{
 			label: t("projects.field.reportsTitle"),
 			icon: ClipboardList,
-			href: `${basePath}/execution/reports`,
+			href: `${basePath}/reports`,
 			color: "bg-chart-3/15 text-chart-3 hover:bg-chart-3/15 dark:bg-chart-3/20 dark:text-chart-3",
 		},
 		{

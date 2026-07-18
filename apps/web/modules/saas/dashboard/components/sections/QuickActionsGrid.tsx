@@ -65,8 +65,8 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			browsePath: "",
 			createPath: "",
 			chip: "bg-chart-4/15 text-chart-4",
-			onBrowseClick: () => setReportPickerTarget("execution/reports"),
-			onCreateClick: () => setReportPickerTarget("execution/new-report"),
+			onBrowseClick: () => setReportPickerTarget("reports"),
+			onCreateClick: () => setReportPickerTarget("reports/new"),
 		},
 		{
 			icon: TrendingDown,
@@ -227,7 +227,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 				}}
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
-				targetPath={reportPickerTarget ?? "execution/reports"}
+				targetPath={reportPickerTarget ?? "reports"}
 			/>
 		</>
 	);

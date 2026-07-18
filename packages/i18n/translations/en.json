@@ -10691,6 +10691,7 @@
       "navigation": {
         "overview": "Overview",
         "execution": "Execution",
+        "reports": "Daily Reports",
         "subcontracts": "Subcontracts",
         "finance": "Finance",
         "expenses": "Expenses",
@@ -10705,6 +10706,7 @@
       "sections": {
         "overview": "Overview",
         "execution": "Execution",
+        "reports": "Daily Reports",
         "field": "Field",
         "finance": "Finance",
         "expenses": "Expenses",

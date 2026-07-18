@@ -81,6 +81,13 @@ export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
 		section: "execution",
 	},
 	{
+		id: "reports",
+		path: "reports",
+		labelKey: "projects.shell.sections.reports",
+		icon: ClipboardList,
+		section: "reports",
+	},
+	{
 		id: "expenses",
 		path: "finance/expenses",
 		labelKey: "projects.shell.sections.expenses",
@@ -313,6 +320,15 @@ export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
 		showInMobileDock: true,
 	},
 	{
+		id: "reports",
+		labelKey: "projects.shell.navigation.reports",
+		icon: ClipboardList,
+		type: "direct",
+		sectionIds: ["reports"],
+		directSectionId: "reports",
+		showInMobileDock: true,
+	},
+	{
 		id: "subcontracts",
 		labelKey: "projects.shell.navigation.subcontracts",
 		icon: Hammer,
@@ -413,7 +429,7 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "تقرير جديد",
 			labelEn: "New Report",
 			icon: FileText,
-			href: "execution/new-report",
+			href: "reports/new",
 			variant: "primary",
 		},
 		{
@@ -546,6 +562,17 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			labelEn: "Add Member",
 			icon: Users,
 			href: "team?action=add",
+			variant: "primary",
+		},
+	],
+	// Daily reports hub
+	reports: [
+		{
+			id: "new-report",
+			label: "تقرير جديد",
+			labelEn: "New Report",
+			icon: FileText,
+			href: "reports/new",
 			variant: "primary",
 		},
 	],

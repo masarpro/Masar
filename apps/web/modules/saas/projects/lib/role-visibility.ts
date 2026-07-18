@@ -7,6 +7,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 	MANAGER: [
 		"overview",
 		"execution",
+		"reports",
 		"finance",
 		"finance/expenses",
 		"finance/payments",
@@ -27,6 +28,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 	ENGINEER: [
 		"overview",
 		"execution",
+		"reports",
 		"finance",
 		"finance/subcontracts",
 		"quantities",
@@ -40,6 +42,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 	SUPERVISOR: [
 		"overview",
 		"execution",
+		"reports",
 		"quantities",
 		"photos",
 		"documents",

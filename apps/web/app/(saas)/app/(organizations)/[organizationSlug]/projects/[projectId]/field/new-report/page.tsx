@@ -6,5 +6,5 @@ export default async function NewReportPage({
 	params: Promise<{ organizationSlug: string; projectId: string }>;
 }) {
 	const { organizationSlug, projectId } = await params;
-	redirect(`/app/${organizationSlug}/projects/${projectId}/execution/new-report`);
+	redirect(`/app/${organizationSlug}/projects/${projectId}/reports/new`);
 }

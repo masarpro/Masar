@@ -86,7 +86,7 @@ export function DailyReportsHub({
 						asChild
 						className="shrink-0 rounded-xl hover:bg-accent"
 					>
-						<Link href={`${basePath}/execution`}>
+						<Link href={basePath}>
 							<ChevronLeft className="h-5 w-5" />
 						</Link>
 					</Button>
@@ -100,7 +100,7 @@ export function DailyReportsHub({
 					</div>
 				</div>
 				<Button asChild className="rounded-xl">
-					<Link href={`${basePath}/execution/new-report`}>
+					<Link href={`${basePath}/reports/new`}>
 						<Plus className="me-2 h-4 w-4" />
 						{t("projects.commandCenter.newReport")}
 					</Link>
@@ -154,7 +154,7 @@ export function DailyReportsHub({
 							{t("projects.field.noReportsHint")}
 						</p>
 						<Button asChild className="mt-4 rounded-xl">
-							<Link href={`${basePath}/execution/new-report`}>
+							<Link href={`${basePath}/reports/new`}>
 								<Plus className="me-2 h-4 w-4" />
 								{t("projects.commandCenter.newReport")}
 							</Link>

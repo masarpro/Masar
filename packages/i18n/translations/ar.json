@@ -10691,6 +10691,7 @@
       "navigation": {
         "overview": "نظرة عامة",
         "execution": "التنفيذ",
+        "reports": "التقارير اليومية",
         "subcontracts": "عقود الباطن",
         "finance": "المالية",
         "expenses": "المصاريف",
@@ -10705,6 +10706,7 @@
       "sections": {
         "overview": "نظرة عامة",
         "execution": "التنفيذ",
+        "reports": "التقارير اليومية",
         "field": "الميداني",
         "finance": "المالية",
         "expenses": "المصاريف",

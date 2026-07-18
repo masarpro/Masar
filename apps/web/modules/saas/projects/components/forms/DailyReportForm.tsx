@@ -59,7 +59,7 @@ export function DailyReportForm({
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
-	const reportsPath = `${basePath}/execution/reports`;
+	const reportsPath = `${basePath}/reports`;
 
 	const [reportDate, setReportDate] = useState(
 		new Date().toISOString().split("T")[0],
