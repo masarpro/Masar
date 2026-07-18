@@ -484,6 +484,8 @@ export async function duplicateCostStudy(
  * Recalculate all cost totals for a study
  */
 export async function recalculateCostStudyTotals(id: string) {
+	// مهلة موسّعة: 6 استعلامات متتالية عبر pgbouncer (Mumbai ~25-60ms/استعلام)
+	// كانت تتجاوز مهلة 5000ms الافتراضية أحياناً → 500 متقطع عند حفظ العناصر
 	return db.$transaction(async (tx) => {
 		const [structural, finishing, mep, labor] = await Promise.all([
 			tx.structuralItem.aggregate({
@@ -539,7 +541,7 @@ export async function recalculateCostStudyTotals(id: string) {
 				totalCost,
 			},
 		});
-	});
+	}, { maxWait: 10000, timeout: 20000 });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

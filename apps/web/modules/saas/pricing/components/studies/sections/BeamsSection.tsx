@@ -80,7 +80,9 @@ export function BeamsSection({
 
 	const [formData, setFormData] = useState({
 		name: "",
-		beamType: "beam" as "beam" | "groundBeam",
+		// القسم اسمه «الميدة» — الافتراضي كمرة أرضية حتى لا تُصنّف العناصر
+		// تحت «الكمرات» في الملخص وبأجرة عمالة مختلفة دون انتباه المستخدم
+		beamType: "groundBeam" as "beam" | "groundBeam",
 		quantity: 1,
 		width: 30, // سم
 		height: 60, // سم

@@ -35,6 +35,27 @@ function getOtherStructuralSavedResult(item: StructuralItem): OtherStructuralRes
 	return result && typeof result === "object" ? (result as OtherStructuralResult) : null;
 }
 
+/**
+ * عدد بلوك الهوردي لعنصر سقف — من dimensions.blocksCount (محفوظ لكل وحدة)
+ * أو يُعاد حسابه للعناصر القديمة من هندسة الأعصاب (يطابق calculateRibbedSlab:
+ * بلوكة 20سم بطول العصب + هدر 3%).
+ */
+export function getSlabBlockCount(item: StructuralItem): number {
+	if (item.category !== "slabs") return 0;
+	const dims = (item.dimensions || {}) as Record<string, number>;
+	const qty = item.quantity || 1;
+	if ((dims.blocksCount || 0) > 0) return Math.ceil(dims.blocksCount * qty);
+	// عناصر هوردي قديمة (قبل حفظ blocksCount ضمن الأبعاد)
+	if (dims.ribSpacing && dims.blockHeight && (dims.length || 0) > 0 && (dims.width || 0) > 0) {
+		const ribSpacingM = dims.ribSpacing / 100;
+		const ribsCount = Math.floor(dims.width / ribSpacingM + 1e-9) + 1;
+		const blocksPerGap = Math.floor(dims.length / 0.2);
+		const total = (ribsCount - 1) * blocksPerGap;
+		return Math.ceil(Math.ceil(total * 1.03) * qty);
+	}
+	return 0;
+}
+
 export interface BOQItemDetail {
 	item: StructuralItem;
 	recalc: RecalcResult;
@@ -115,7 +136,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 const SECTION_ICONS: Record<string, string> = {
-	plainConcrete: "🧱",
+	plainConcrete: "🪨",
 	foundations: "🏗️",
 	groundBeams: "📏",
 	beams: "📏",
@@ -489,6 +510,9 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 			let blocks = 0;
 			if (category === "blocks") {
 				blocks = groupItems.reduce((s, d) => s + d.item.quantity, 0);
+			} else if (category === "slabs") {
+				// بلوك الهوردي — كان مستثنى من إجمالي البلوك فتنقص طلبية الشراء
+				blocks = groupItems.reduce((s, d) => s + getSlabBlockCount(d.item), 0);
 			} else if (category === "otherStructural") {
 				// بلوك عناصر البيارات/الأسوار — من عمود العنصر أو النتيجة المحفوظة
 				blocks = groupItems.reduce((s, d) => {

@@ -6,6 +6,7 @@ import { Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createDefaultConfig } from "../../types/structural-building-config";
+import { getSlabBlockCount } from "../../lib/boq-aggregator";
 
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
@@ -92,9 +93,15 @@ export function StructuralItemsEditor({
 			(sum: any, item: any) => sum + (item.steelWeight || 0),
 			0
 		),
-		blocks: structuralItems
-			.filter((item: any) => item.category === "blocks")
-			.reduce((sum: any, item: any) => sum + (item.quantity || 0), 0),
+		blocks:
+			structuralItems
+				.filter((item: any) => item.category === "blocks")
+				.reduce((sum: any, item: any) => sum + (item.quantity || 0), 0) +
+			// بلوك أسقف الهوردي — كان مستثنى من بطاقة "إجمالي البلوك"
+			structuralItems.reduce(
+				(sum: any, item: any) => sum + getSlabBlockCount(item),
+				0,
+			),
 		formwork: structuralItems
 			.filter((item: any) => item.category !== "blocks" && item.category !== "plainConcrete")
 			.reduce((sum: any, item: any) => {

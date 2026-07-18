@@ -137,8 +137,15 @@ export function SlabForm({
 	const [showFormwork, setShowFormwork] = useState(false);
 	const [showBeamCutting, setShowBeamCutting] = useState(false);
 
-	// كمرات السقف الصلب
-	const [slabBeams, setSlabBeams] = useState<SlabBeamDef[]>([]);
+	// كمرات السقف الصلب — تُستعاد من dimensions.slabBeamTemplates عند التحرير
+	const [slabBeams, setSlabBeams] = useState<SlabBeamDef[]>(() => {
+		if (editingItem?.dimensions?.slabBeamTemplates) {
+			try {
+				return JSON.parse(editingItem.dimensions.slabBeamTemplates as unknown as string);
+			} catch { return []; }
+		}
+		return [];
+	});
 	const [expandedBeamIds, setExpandedBeamIds] = useState<string[]>([]);
 
 	// نماذج الكمرات العريضة
@@ -643,13 +650,17 @@ export function SlabForm({
 					hasRibStirrup: formData.hasRibStirrup ? 1 : 0,
 					ribStirrupDiameter: formData.ribStirrupDiameter,
 					ribStirrupSpacing: formData.ribStirrupSpacing,
+					// عدد بلوك الهوردي لكل وحدة — يُقرأ في boq-aggregator لإجمالي البلوك
+					blocksCount: calculations.blocksCount || 0,
 				}),
-				// بيانات الكمرات (للسقف الصلب)
+				// بيانات الكمرات (للسقف الصلب) — النماذج تُحفظ كاملة حتى يعيد
+				// الـBOQ توليد صفوف تقطيعها (كانت تُحفظ كمجاميع فقط فتسقط من الطلبية)
 				...(formData.slabType === "solid" &&
 					slabBeams.length > 0 && {
 						beamsCount: slabBeams.length,
 						beamsConcrete: beamsCalcs?.totalConcrete || 0,
 						beamsSteel: beamsCalcs?.totalGrossWeight || 0,
+						slabBeamTemplates: JSON.stringify(slabBeams),
 					}),
 				// بيانات نماذج الكمرات العريضة
 				...(formData.slabType === "banded_beam" && bandedBeamTemplates.length > 0 && {

@@ -416,8 +416,9 @@ export function recalculateSlabCutting(
 	const length = dims.length || 0;
 	const width = dims.width || 0;
 	const cover = dims.cover || 0.025;
+	const isRibbed = !!(dims.ribBarDiameter && dims.ribBottomBars);
 
-	if (!bottomMainDiameter || !bottomMainBarsPerMeter || length <= 0 || width <= 0) {
+	if (length <= 0 || width <= 0 || (!isRibbed && (!bottomMainDiameter || !bottomMainBarsPerMeter))) {
 		return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 	}
 
@@ -428,33 +429,33 @@ export function recalculateSlabCutting(
 	const meshCountOf = (dimension: number, barsPerMeter: number) =>
 		Math.ceil((dimension - 2 * cover) * barsPerMeter) + 1;
 
-	// Bottom main bars (اتجاه X — تمتد بالعرض)
-	const bmBarLength = width - 2 * cover + 0.4;
-	const bmCount = meshCountOf(length, bottomMainBarsPerMeter) * quantity;
-	details.push(calcCutting(itemName, "شبكة سفلية - رئيسي", bottomMainDiameter, bmBarLength, bmCount));
+	if (!isRibbed) {
+		// Bottom main bars (اتجاه X — تمتد بالعرض)
+		const bmBarLength = width - 2 * cover + 0.4;
+		const bmCount = meshCountOf(length, bottomMainBarsPerMeter) * quantity;
+		details.push(calcCutting(itemName, "شبكة سفلية - رئيسي", bottomMainDiameter, bmBarLength, bmCount));
 
-	// Bottom secondary bars (اتجاه Y — تمتد بالطول)
-	const bsDiameter = dims.bottomSecondaryDiameter || 10;
-	const bsBarsPerMeter = dims.bottomSecondaryBarsPerMeter || 5;
-	const bsBarLength = length - 2 * cover + 0.4;
-	const bsCount = meshCountOf(width, bsBarsPerMeter) * quantity;
-	details.push(calcCutting(itemName, "شبكة سفلية - ثانوي", bsDiameter, bsBarLength, bsCount));
+		// Bottom secondary bars (اتجاه Y — تمتد بالطول)
+		const bsDiameter = dims.bottomSecondaryDiameter || 10;
+		const bsBarsPerMeter = dims.bottomSecondaryBarsPerMeter || 5;
+		const bsBarLength = length - 2 * cover + 0.4;
+		const bsCount = meshCountOf(width, bsBarsPerMeter) * quantity;
+		details.push(calcCutting(itemName, "شبكة سفلية - ثانوي", bsDiameter, bsBarLength, bsCount));
 
-	// Top mesh
-	if (dims.hasTopMesh) {
-		const tmDiameter = dims.topMainDiameter || 10;
-		const tmBarsPerMeter = dims.topMainBarsPerMeter || 5;
-		const tmCount = meshCountOf(length, tmBarsPerMeter) * quantity;
-		details.push(calcCutting(itemName, "شبكة علوية - رئيسي", tmDiameter, bmBarLength, tmCount));
+		// Top mesh
+		if (dims.hasTopMesh) {
+			const tmDiameter = dims.topMainDiameter || 10;
+			const tmBarsPerMeter = dims.topMainBarsPerMeter || 5;
+			const tmCount = meshCountOf(length, tmBarsPerMeter) * quantity;
+			details.push(calcCutting(itemName, "شبكة علوية - رئيسي", tmDiameter, bmBarLength, tmCount));
 
-		const tsDiameter = dims.topSecondaryDiameter || 8;
-		const tsBarsPerMeter = dims.topSecondaryBarsPerMeter || 4;
-		const tsCount = meshCountOf(width, tsBarsPerMeter) * quantity;
-		details.push(calcCutting(itemName, "شبكة علوية - ثانوي", tsDiameter, bsBarLength, tsCount));
-	}
-
-	// Ribbed slab ribs — يطابق المحرك: عدد الأعصاب floor+1 وامتداد 0.8م
-	if (dims.ribBarDiameter && dims.ribBottomBars) {
+			const tsDiameter = dims.topSecondaryDiameter || 8;
+			const tsBarsPerMeter = dims.topSecondaryBarsPerMeter || 4;
+			const tsCount = meshCountOf(width, tsBarsPerMeter) * quantity;
+			details.push(calcCutting(itemName, "شبكة علوية - ثانوي", tsDiameter, bsBarLength, tsCount));
+		}
+	} else {
+		// Ribbed slab ribs — يطابق المحرك: عدد الأعصاب floor+1 وامتداد 0.8م
 		const ribSpacing = (dims.ribSpacing || 52) / 100; // cm to m
 		const ribCount = Math.floor(width / ribSpacing + 1e-9) + 1;
 		const ribLength = length;
@@ -466,15 +467,96 @@ export function recalculateSlabCutting(
 		}
 
 		if (dims.hasRibStirrup && dims.ribStirrupDiameter) {
+			// يطابق المحرك (calculateRibbedSlab): محيط الكانة بعمق البلوكة فقط
+			// + خطافات 10d + 0.10م، والعدد floor(الطول/التباعد)+1
 			const ribWidth = (dims.ribWidth || 15) / 100;
-			const ribHeight = ((dims.blockHeight || 20) + (dims.toppingThickness || 5)) / 100;
-			const stirrupPerimeter = 2 * (ribWidth + ribHeight - 0.04) + 0.2;
-			const stirrupsPerRib = Math.ceil((ribLength * 1000) / (dims.ribStirrupSpacing || 200)) + 1;
+			const blockHeightM = (dims.blockHeight || 20) / 100;
+			const stirrupHooks = 2 * ((10 * dims.ribStirrupDiameter) / 1000);
+			const stirrupPerimeter = 2 * (ribWidth + blockHeightM) + stirrupHooks + 0.1;
+			const stirrupSpacingM = (dims.ribStirrupSpacing || 200) / 1000;
+			const stirrupsPerRib = Math.floor(ribLength / stirrupSpacingM) + 1;
 			details.push(calcCutting(itemName, "أعصاب - كانات", dims.ribStirrupDiameter, stirrupPerimeter, stirrupsPerRib * ribCount * quantity));
+		}
+
+		// شبكة الطبقة العلوية — المحرك يحسب الاتجاهين من نفس المواصفة
+		// (floor(البعد/التباعد)+1، والطول = البعد + 2×غطاء)
+		const meshDiameter = dims.bottomSecondaryDiameter || 10;
+		const meshBarsPerMeter = dims.bottomSecondaryBarsPerMeter || 5;
+		if (meshBarsPerMeter > 0) {
+			const meshSpacing = 1 / meshBarsPerMeter;
+			const mxCount = (Math.floor(width / meshSpacing) + 1) * quantity;
+			details.push(calcCutting(itemName, "شبكة الطبقة العلوية - X", meshDiameter, length + 2 * cover, mxCount));
+			const myCount = (Math.floor(length / meshSpacing) + 1) * quantity;
+			details.push(calcCutting(itemName, "شبكة الطبقة العلوية - Y", meshDiameter, width + 2 * cover, myCount));
+		}
+	}
+
+	// كمرات السقف الصلب — النماذج محفوظة JSON في dimensions.slabBeamTemplates
+	// (يطابق computeBeamCalc: امتداد 0.6م، محيط كانة 2(b+h−0.08)+0.3)
+	const slabBeams = parseTemplates(dims.slabBeamTemplates);
+	for (const b of slabBeams) {
+		const beamQty = (b.quantity || 1) * quantity;
+		const barLength = (b.length || 0) + 0.6;
+		if (b.topBarsCount && b.topBarDiameter) {
+			details.push(calcCutting(itemName, `${b.name || "كمرة"} - حديد علوي`, b.topBarDiameter, barLength, b.topBarsCount * beamQty));
+		}
+		if (b.bottomBarsCount && b.bottomBarDiameter) {
+			details.push(calcCutting(itemName, `${b.name || "كمرة"} - حديد سفلي`, b.bottomBarDiameter, barLength, b.bottomBarsCount * beamQty));
+		}
+		if (b.stirrupDiameter && b.stirrupSpacing) {
+			const stirrupPerimeter = 2 * ((b.width || 30) / 100 + (b.height || 60) / 100 - 0.08) + 0.3;
+			const stirrupsCount = Math.ceil(((b.length || 0) * 1000) / b.stirrupSpacing) + 1;
+			details.push(calcCutting(itemName, `${b.name || "كمرة"} - كانات`, b.stirrupDiameter, stirrupPerimeter, stirrupsCount * beamQty));
+		}
+	}
+
+	// الكمرات العريضة (banded beams) — النماذج محفوظة JSON في
+	// dimensions.bandedBeamTemplates (كانت تسقط كلياً من التقطيع وطلبية المصنع).
+	// يطابق المحرك (calculateBandedBeamSlab): امتداد 0.8م، إضافي 0.6L+0.4،
+	// كانات ربع البحر ×2 + المنتصف، خطاف 2×10d+0.10
+	const bands = parseTemplates(dims.bandedBeamTemplates);
+	for (const t of bands) {
+		const bandQty = (t.quantity || 1) * quantity;
+		const beamLength = t.length || 0;
+		const bandName = t.name || "كمرة عريضة";
+
+		if (t.bottomContCount && t.bottomContDiameter) {
+			details.push(calcCutting(itemName, `${bandName} - سفلي مستمر`, t.bottomContDiameter, beamLength + 0.8, t.bottomContCount * bandQty));
+		}
+		if (t.bottomAddEnabled && t.bottomAddCount && t.bottomAddDiameter) {
+			details.push(calcCutting(itemName, `${bandName} - سفلي إضافي`, t.bottomAddDiameter, beamLength * 0.6 + 0.4, t.bottomAddCount * bandQty));
+		}
+		if (t.topContCount && t.topContDiameter) {
+			details.push(calcCutting(itemName, `${bandName} - علوي مستمر`, t.topContDiameter, beamLength + 0.8, t.topContCount * bandQty));
+		}
+		if (t.stirrupDiameter && t.stirrupSpacingQuarter && t.stirrupSpacingMid) {
+			const spacingQuarter = t.stirrupSpacingQuarter / 100;
+			const spacingMid = t.stirrupSpacingMid / 100;
+			const perQuarter = Math.ceil(beamLength / 4 / spacingQuarter) + 1;
+			const atMid = Math.ceil(beamLength / 2 / spacingMid) + 1;
+			const totalStirrups = (perQuarter * 2 + atMid) * bandQty;
+			const hookAllowance = 2 * ((10 * t.stirrupDiameter) / 1000) + 0.1;
+			const outerPerimeter = 2 * ((t.width || 1.2) + (t.depth || 0.4) - 4 * cover) + hookAllowance;
+			details.push(calcCutting(itemName, `${bandName} - كانات`, t.stirrupDiameter, outerPerimeter, totalStirrups));
+			if ((t.stirrupLegs || 2) >= 4) {
+				const innerPerimeter = 2 * ((t.width || 1.2) / 2 + (t.depth || 0.4) - 4 * cover) + hookAllowance;
+				details.push(calcCutting(itemName, `${bandName} - كانات داخلية`, t.stirrupDiameter, innerPerimeter, totalStirrups));
+			}
 		}
 	}
 
 	return aggregateResult(itemName, details);
+}
+
+/** نماذج كمرات محفوظة كسلسلة JSON داخل dimensions — ترجع [] لأي قيمة تالفة */
+function parseTemplates(raw: unknown): Array<Record<string, any>> {
+	if (!raw || typeof raw !== "string") return [];
+	try {
+		const parsed = JSON.parse(raw);
+		return Array.isArray(parsed) ? parsed : [];
+	} catch {
+		return [];
+	}
 }
 
 // ─────────────────────────────────────────────────────────────

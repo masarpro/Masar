@@ -30,6 +30,7 @@ import {
 import { Button } from "@ui/components/button";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "../../../lib/utils";
+import { getRebarWeightPerMeter } from "../../../lib/structural-calculations";
 
 interface CuttingDetail {
 	description: string;
@@ -40,10 +41,28 @@ interface CuttingDetail {
 	stocksNeeded: number;
 	weight: number;
 	grossWeight?: number;
+	stockLength?: number;
 	wastePercentage: number;
 	stockBarsPerUnit?: number;
 	splicesPerBar?: number;
 	lapSpliceLength?: number;
+}
+
+/**
+ * وزن الشراء (الإجمالي) للصف — بعض الأقسام تمرر net فقط في `weight`
+ * (الكمرات/الأعمدة/السلالم) وبعضها يمرر gross، فكان عمود «الوزن» يعني
+ * شيئاً مختلفاً في كل قسم. التوحيد: إجمالي دائماً (أسياخ × طول × كجم/م).
+ */
+function getRowGrossWeight(detail: CuttingDetail): number {
+	if (detail.grossWeight != null) return detail.grossWeight;
+	if (detail.stockLength) {
+		return (
+			detail.stocksNeeded *
+			detail.stockLength *
+			getRebarWeightPerMeter(detail.diameter)
+		);
+	}
+	return detail.weight;
 }
 
 interface StockNeeded {
@@ -311,7 +330,7 @@ export function CalculationResultsPanel({
 														)}
 													</TableCell>
 													<TableCell className="text-xs text-center font-medium">
-														{formatNumber(detail.grossWeight || detail.weight)} كجم
+														{formatNumber(getRowGrossWeight(detail))} كجم
 													</TableCell>
 													<TableCell className="text-center">
 														<Badge

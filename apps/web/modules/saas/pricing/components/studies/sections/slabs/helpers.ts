@@ -22,8 +22,9 @@ export function calculateCuttingDetails(
 		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
 		const stocksNeeded = Math.ceil(barCount / cutsPerStock);
 		const wastePerStock = stockLength - cutsPerStock * barLength;
-		const totalWaste = stocksNeeded * wastePerStock;
 		const grossLength = stocksNeeded * stockLength;
+		// الهالك الحقيقي = المشترى − المستخدم (توحيد التعريف مع بقية الأقسام)
+		const totalWaste = grossLength - totalLength;
 		const wastePercentage =
 			grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
 
@@ -44,7 +45,14 @@ export function calculateCuttingDetails(
 	// SPLICE PATH — barLength > stockLength, needs lap splices
 	const lapLength = (diameter * 40) / 1000;
 	const effectiveStockLength = stockLength - lapLength;
-	const stockBarsPerUnit = Math.ceil(barLength / effectiveStockLength);
+	// n أسياخ مع (n−1) وصلة تغطي n×stock − (n−1)×lap — نفس صيغة المحرك
+	let stockBarsPerUnit = Math.max(
+		2,
+		Math.ceil((barLength - lapLength) / effectiveStockLength),
+	);
+	if (stockBarsPerUnit * stockLength - (stockBarsPerUnit - 1) * lapLength < barLength) {
+		stockBarsPerUnit += 1;
+	}
 	const splicesPerBar = stockBarsPerUnit - 1;
 	const totalStockBars = stockBarsPerUnit * barCount;
 	const totalGrossLength = totalStockBars * stockLength;

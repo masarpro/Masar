@@ -384,7 +384,7 @@ export function RibbedSlabFields({
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						<RebarMeshInput
 							title="الشبكة العلوية"
-							direction="الاتجاه الطويل"
+							direction="بالاتجاهين — نفس المواصفة تُطبق طولاً وعرضاً"
 							diameter={formData.bottomSecondaryDiameter}
 							onDiameterChange={(d) =>
 								setFormData({

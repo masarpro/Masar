@@ -124,11 +124,19 @@ export function FoundationsSection({
 		}
 
 		if (formData.type === "combined") {
-			if (formData.length <= 0 || formData.width <= 0 || formData.height <= 0) return null;
+			// الطول يُشتق تلقائياً من الأعمدة إن تُرك فارغاً:
+			// (عدد الأعمدة − 1) × المسافة + 0.5م بروزاً من كل طرف — نفس صيغة المحرك
+			const derivedLength =
+				formData.length > 0
+					? formData.length
+					: formData.combinedColumnCount > 1 && formData.combinedColumnSpacing > 0
+						? (formData.combinedColumnCount - 1) * formData.combinedColumnSpacing + 1
+						: 0;
+			if (derivedLength <= 0 || formData.width <= 0 || formData.height <= 0) return null;
 
 			const input: CombinedFoundationInput = {
 				quantity: formData.quantity,
-				length: formData.length,
+				length: derivedLength,
 				width: formData.width,
 				height: formData.height,
 				cover: formData.cover,
@@ -355,7 +363,12 @@ export function FoundationsSection({
 			quantity: formData.quantity,
 			unit: "m3",
 			dimensions: {
-				length: formData.length,
+				// للمشتركة بلا طول مُدخل: يُخزَّن الطول المشتق حتى يعمل معيد
+				// حساب الـBOQ (كان العنصر يُحفظ بطول صفري بلا نتائج)
+				length:
+					formData.type === "combined" && formData.length <= 0
+						? (formData.combinedColumnCount - 1) * formData.combinedColumnSpacing + 1
+						: formData.length,
 				width: formData.width,
 				height: formData.height,
 				cover: formData.cover,
@@ -527,8 +540,14 @@ export function FoundationsSection({
 									</TableCell>
 									<TableCell>{item.quantity}</TableCell>
 									<TableCell>
-										{item.dimensions?.length || 0}×{item.dimensions?.width || 0}×
-										{item.dimensions?.height || 0} {t("pricing.studies.units.m")}
+										{/* اللبشة بعدها الثالث السماكة، والشريطية طولها الكلي في
+										    stripLength — العرض القديم كان يظهر 0.6 الافتراضي/صفراً */}
+										{item.subCategory === "raft"
+											? `${item.dimensions?.length || 0}×${item.dimensions?.width || 0}×${item.dimensions?.thickness || 0}`
+											: item.subCategory === "strip"
+												? `${item.dimensions?.stripLength || item.dimensions?.segmentLength || item.dimensions?.length || 0}×${item.dimensions?.width || 0}×${item.dimensions?.height || 0}`
+												: `${item.dimensions?.length || 0}×${item.dimensions?.width || 0}×${item.dimensions?.height || 0}`}{" "}
+										{t("pricing.studies.units.m")}
 									</TableCell>
 									<TableCell>
 										{formatNumber(item.concreteVolume)} {t("pricing.studies.units.m3")}
@@ -625,6 +644,16 @@ export function FoundationsSection({
 									<Calculator className="h-5 w-5 text-primary" />
 									<h4 className="font-medium">{t("pricing.studies.calculations.results")}</h4>
 								</div>
+
+								{/* الطول المشتق تلقائياً للمشتركة عند ترك حقل الطول فارغاً */}
+								{formData.type === "combined" && formData.length <= 0 && (
+									<div className="text-sm bg-chart-1/10 border border-chart-1/30 rounded p-2">
+										<span className="text-muted-foreground">طول القاعدة المشتق تلقائياً من الأعمدة: </span>
+										<span className="font-medium">
+											{formatNumber((formData.combinedColumnCount - 1) * formData.combinedColumnSpacing + 1)} م
+										</span>
+									</div>
+								)}
 
 								{/* عرض خرسانة النظافة إن وجدت */}
 								{'leanConcreteVolume' in calculations && calculations.leanConcreteVolume != null && calculations.leanConcreteVolume > 0 && (

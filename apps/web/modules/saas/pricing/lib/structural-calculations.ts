@@ -179,7 +179,10 @@ function calcFoundationRebar(
 	const totalBars = barCount * quantity;
 	const stocksNeeded = Math.ceil(totalBars / cutsPerStock);
 	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
+	// الهالك الحقيقي = المشترى − المستخدم (يشمل بقية السيخ الأخير غير مكتمل
+	// القصّات) — الصيغة القديمة stocksNeeded×wastePerStock كانت تعرض 9.6%
+	// لهالك شراء فعلي 25.6% وتناقض «الصافي/الإجمالي» في نفس اللوحة
+	const totalWaste = stocksNeeded * stockLength - totalBars * barLength;
 
 	const netLength = totalBars * barLength;
 	const grossLength = stocksNeeded * stockLength;
@@ -2858,7 +2861,8 @@ function calcStairCuttingDetail(
 	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
 	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
 	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
+	// الهالك الحقيقي = المشترى − المستخدم (توحيد التعريف مع بقية الأقسام)
+	const totalWaste = stocksNeeded * stockLength - barCount * barLength;
 
 	const netLength = barCount * barLength;
 	const grossLength = stocksNeeded * stockLength;

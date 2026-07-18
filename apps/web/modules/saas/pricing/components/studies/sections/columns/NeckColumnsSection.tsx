@@ -24,7 +24,7 @@ import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
-import { calculateColumnRebar } from "../../../../lib/structural-calculations";
+import { calculateColumnRebar, getRebarWeightPerMeter } from "../../../../lib/structural-calculations";
 import { formatNumber } from "../../../../lib/utils";
 import type {
 	StructuralItemCreateInput,
@@ -398,7 +398,13 @@ export function NeckColumnsSection({
 														{d.wastePercentage}%
 													</TableCell>
 													<TableCell className="text-xs">
-														{formatNumber(d.weight)} كجم
+														{/* وزن الشراء (إجمالي) — توحيداً مع بقية الأقسام */}
+														{formatNumber(
+															d.stocksNeeded *
+																d.stockLength *
+																getRebarWeightPerMeter(d.diameter),
+														)}{" "}
+														كجم
 													</TableCell>
 												</TableRow>
 											))}

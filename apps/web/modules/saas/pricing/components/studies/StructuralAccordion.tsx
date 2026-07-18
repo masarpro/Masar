@@ -113,7 +113,7 @@ export function StructuralAccordion({
 		{
 			id: "plainConcrete",
 			title: t("pricing.studies.structural.plainConcrete"),
-			icon: "🧱",
+			icon: "🪨",
 			component: PlainConcreteSection,
 		},
 		{
