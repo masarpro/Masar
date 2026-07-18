@@ -200,9 +200,21 @@ export async function createOrganizationForUser({
 	const slug = await generateUniqueSlug(name);
 	const now = new Date();
 
+	// The 7-day trial is anchored to the user's REGISTRATION date, not to org
+	// creation: with email verification the org is auto-created on the first
+	// visit to the app, which can be days after signup — the trial must not
+	// restart then.
+	const user = await db.user.findUnique({
+		where: { id: userId },
+		select: { createdAt: true },
+	});
+	const trialStart = user?.createdAt ?? now;
+
 	return db.$transaction(async (tx) => {
 		// Create the organization with 7-day trial (PRO limits)
-		const trialEndsAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+		const trialEndsAt = new Date(
+			trialStart.getTime() + 7 * 24 * 60 * 60 * 1000,
+		);
 		const organization = await tx.organization.create({
 			data: {
 				name,

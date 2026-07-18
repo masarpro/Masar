@@ -225,23 +225,16 @@ describe("trial expiration", () => {
 		});
 	});
 
-	it("active trial allows write operations", async () => {
+	it("active trial allows write operations even with FREE plan", async () => {
 		const future = new Date();
-		future.setDate(future.getDate() + 14);
+		future.setDate(future.getDate() + 5);
 		mockOrg({ status: "TRIALING", plan: "FREE", trialEndsAt: future });
 		const ctx = makeContext();
 
-		// TRIALING with future trialEndsAt and plan FREE — should NOT be SUSPENDED/CANCELLED
-		// but since plan is FREE, it will be blocked at the FREE plan check.
-		// Actually, TRIALING status with future date passes the status check,
-		// but since plan is FREE, it gets blocked at the plan check.
-		try {
-			await checkSubscription(ctx);
-			expect.unreachable("Should have thrown");
-		} catch (err) {
-			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
-		}
+		// New orgs are created as TRIALING + FREE with a 7-day trialEndsAt:
+		// an active trial must grant full write access despite the FREE plan.
+		await expect(checkSubscription(ctx)).resolves.toBeUndefined();
+		expect(mockOrgUpdate).not.toHaveBeenCalled();
 	});
 
 	it("active trial with PRO plan allows write operations", async () => {

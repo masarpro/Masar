@@ -19,12 +19,17 @@ export function SubscriptionGuard({
 		return <UpgradePrompt />;
 	}
 
-	// Warning states
+	// Warning states. Reads never trigger the server-side lazy downgrade of an
+	// expired trial, so the status can stay TRIALING after trialEndsAt has
+	// passed — treat that as the free plan instead of showing "0 days left".
+	const trialExpired =
+		!!trialEndsAt && new Date(trialEndsAt).getTime() <= Date.now();
 	const showPastDueBanner = orgStatus === "PAST_DUE";
 	const showTrialBanner =
-		orgStatus === "TRIALING" && !!trialEndsAt;
+		orgStatus === "TRIALING" && !!trialEndsAt && !trialExpired;
 	const showFreePlanBanner =
-		orgPlan === "FREE" && orgStatus !== "TRIALING";
+		orgPlan === "FREE" &&
+		(orgStatus !== "TRIALING" || trialExpired || !trialEndsAt);
 
 	return (
 		<>

@@ -105,29 +105,32 @@ export async function checkSubscription(context: {
 		});
 	}
 
-	// Check trial expiration — lazy update to FREE
-	if (
-		org.status === "TRIALING" &&
-		org.trialEndsAt &&
-		new Date() > org.trialEndsAt
-	) {
-		await db.organization.update({
-			where: { id: orgId },
-			data: { status: "ACTIVE", plan: "FREE" },
-		});
-		invalidateSubscriptionCache(orgId);
-		logBusinessEvent({
-			type: "subscription.expired",
-			userId: context.user.id,
-			organizationId: orgId,
-			metadata: { trialEndsAt: org.trialEndsAt.toISOString() },
-			severity: "info",
-		});
-		throw new ORPCError("FORBIDDEN", {
-			message:
-				"انتهت الفترة التجريبية. يرجى ترقية اشتراكك للمتابعة.",
-			data: { code: "UPGRADE_REQUIRED" },
-		});
+	// Trial handling: an ACTIVE trial grants full write access even though the
+	// plan column is still FREE (new orgs are created as TRIALING + FREE).
+	// An EXPIRED trial lazy-downgrades the org to FREE and blocks the write.
+	if (org.status === "TRIALING" && org.trialEndsAt) {
+		if (new Date() > org.trialEndsAt) {
+			await db.organization.update({
+				where: { id: orgId },
+				data: { status: "ACTIVE", plan: "FREE" },
+			});
+			invalidateSubscriptionCache(orgId);
+			logBusinessEvent({
+				type: "subscription.expired",
+				userId: context.user.id,
+				organizationId: orgId,
+				metadata: { trialEndsAt: org.trialEndsAt.toISOString() },
+				severity: "info",
+			});
+			throw new ORPCError("FORBIDDEN", {
+				message:
+					"انتهت الفترة التجريبية. يرجى ترقية اشتراكك للمتابعة.",
+				data: { code: "UPGRADE_REQUIRED" },
+			});
+		}
+
+		// Active trial — allow writes; the FREE-plan block below must not apply.
+		return;
 	}
 
 	// Block FREE plan from write operations

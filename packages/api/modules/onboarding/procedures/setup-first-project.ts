@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { db, createProject } from "@repo/database";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
-export const setupFirstProject = protectedProcedure
+export const setupFirstProject = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/onboarding/first-project",
@@ -24,6 +25,15 @@ export const setupFirstProject = protectedProcedure
 			section: "projects",
 			action: "create",
 		});
+
+		// Enforce the same project-creation plan gate as the canonical
+		// projects.create path, otherwise free-plan users could bypass the
+		// 1-project limit via onboarding.
+		await enforceFeatureAccess(
+			input.organizationId,
+			"projects.create",
+			context.user,
+		);
 
 		const { organizationId, projectName, ownerName, estimatedBudget, city } =
 			input;
