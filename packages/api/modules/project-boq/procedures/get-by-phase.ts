@@ -2,13 +2,16 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
-function convertDecimalFields(item: any) {
+function convertDecimalFields(item: any, showPrices: boolean) {
 	return {
 		...item,
 		quantity: Number(item.quantity),
-		unitPrice: item.unitPrice != null ? Number(item.unitPrice) : null,
-		totalPrice: item.totalPrice != null ? Number(item.totalPrice) : null,
+		unitPrice:
+			showPrices && item.unitPrice != null ? Number(item.unitPrice) : null,
+		totalPrice:
+			showPrices && item.totalPrice != null ? Number(item.totalPrice) : null,
 	};
 }
 
@@ -26,12 +29,13 @@ export const getByPhase = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		// Get project milestones
 		const milestones = await db.projectMilestone.findMany({
@@ -56,7 +60,7 @@ export const getByPhase = protectedProcedure
 		const phases = milestones.map((milestone) => {
 			const phaseItems = allItems
 				.filter((item) => item.projectPhaseId === milestone.id)
-				.map(convertDecimalFields);
+				.map((item) => convertDecimalFields(item, showPrices));
 			const total = phaseItems.reduce(
 				(sum, item) => sum + (item.totalPrice ?? 0),
 				0,
@@ -72,7 +76,7 @@ export const getByPhase = protectedProcedure
 		// Unassigned items (no phase)
 		const unassignedItems = allItems
 			.filter((item) => item.projectPhaseId === null)
-			.map(convertDecimalFields);
+			.map((item) => convertDecimalFields(item, showPrices));
 		const unassignedTotal = unassignedItems.reduce(
 			(sum, item) => sum + (item.totalPrice ?? 0),
 			0,

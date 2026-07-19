@@ -4,6 +4,10 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { toNum, convertCostingItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	requireCostingReadAccess,
+	requireCostingWriteAccess,
+} from "../lib/pricing-access";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { dedupeCostingItems, summarizeCostingItems } from "../lib/costing-aggregation";
 import { isUnifiedStudyServer } from "../../unified-quantities/lib/classify";
@@ -68,11 +72,11 @@ export const costingGenerateItems = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireCostingWriteAccess(permissions);
 
 		return db.$transaction(async (tx) => {
 			// قفل صف الدراسة لمنع التوليد المتزامن — طلبان متوازيان كانا يريان
@@ -357,11 +361,12 @@ export const costingGetItems = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		requireCostingReadAccess(permissions);
 
 		const where: Record<string, unknown> = {
 			costStudyId: input.studyId,
@@ -412,11 +417,11 @@ export const costingUpdateItem = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireCostingWriteAccess(permissions);
 
 		const existing = await db.costingItem.findFirst({
 			where: {
@@ -491,11 +496,11 @@ export const costingBulkUpdate = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireCostingWriteAccess(permissions);
 
 		// Fetch all existing items
 		const existingItems = await db.costingItem.findMany({
@@ -572,11 +577,11 @@ export const costingSetSectionLabor = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireCostingWriteAccess(permissions);
 
 		const items = await db.costingItem.findMany({
 			where: {
@@ -644,11 +649,12 @@ export const costingGetSummary = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		requireCostingReadAccess(permissions);
 
 		const items = await db.costingItem.findMany({
 			where: {

@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
 export const getAvailableCostStudies = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getAvailableCostStudies = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		// Get IDs of studies already copied to this project
 		const copiedStudies = await db.projectBOQItem.findMany({
@@ -74,7 +76,7 @@ export const getAvailableCostStudies = protectedProcedure
 			name: study.name,
 			customerName: study.customerName,
 			projectType: study.projectType,
-			totalCost: Number(study.totalCost),
+			totalCost: showPrices ? Number(study.totalCost) : 0,
 			status: study.status,
 			isLinkedToProject: study.projectId !== null,
 			itemCounts: study._count,

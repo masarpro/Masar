@@ -4,6 +4,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess, scrubPriceKeys } from "../lib/pricing-access";
 
 // ═══════════════════════════════════════════════════════════════
 // SCHEMA
@@ -104,7 +105,7 @@ export const getStructuralSpecs = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
@@ -126,7 +127,12 @@ export const getStructuralSpecs = protectedProcedure
 			});
 		}
 
-		return (study.structuralSpecs as Record<string, string> | null) ?? {};
+		const specs =
+			(study.structuralSpecs as Record<string, string> | null) ?? {};
+		// أسعار المواد داخل المواصفات تُحجب لمن لا يملك صلاحية تكاليف
+		return hasCostingReadAccess(permissions)
+			? specs
+			: (scrubPriceKeys(specs) as Record<string, string>);
 	});
 
 // ═══════════════════════════════════════════════════════════════

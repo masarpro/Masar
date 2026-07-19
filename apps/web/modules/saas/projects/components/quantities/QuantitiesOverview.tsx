@@ -38,6 +38,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { formatNumber } from "@shared/lib/formatters";
 import { LinkStudyDialog } from "./LinkStudyDialog";
 import { CreateStudyDialog } from "./CreateStudyDialog";
@@ -56,6 +57,10 @@ export function QuantitiesOverview({
 	const t = useTranslations("projectQuantities");
 	const queryClient = useQueryClient();
 	const router = useRouter();
+	const { can } = usePermission();
+	// التكاليف بيانات مالية — الخادم يحجبها والبطاقات/الأعمدة تُخفى بلا صلاحية
+	const showPrices =
+		can("projects", "viewFinance") || can("quantities", "pricing");
 
 	const studyPath = (studyId: string) =>
 		`/app/${organizationSlug}/pricing/studies/${studyId}`;
@@ -212,6 +217,7 @@ export function QuantitiesOverview({
 			</div>
 
 			{/* Summary Cards Row */}
+			{showPrices && (
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{summaryCards.map((card) => (
 					<Card key={card.label} className="rounded-2xl border-2">
@@ -233,8 +239,10 @@ export function QuantitiesOverview({
 					</Card>
 				))}
 			</div>
+			)}
 
 			{/* Grand Total Card */}
+			{showPrices && (
 			<Card className="rounded-2xl border-2">
 				<CardContent className="p-5">
 					<div className="flex items-center justify-between">
@@ -252,6 +260,7 @@ export function QuantitiesOverview({
 					</div>
 				</CardContent>
 			</Card>
+			)}
 
 			{/* Studies Table */}
 			<div className="rounded-2xl border-2 bg-card">
@@ -265,7 +274,7 @@ export function QuantitiesOverview({
 						<TableRow>
 							<TableHead>{t("studies.name")}</TableHead>
 							<TableHead>{t("studies.itemCount")}</TableHead>
-							<TableHead>{t("studies.total")}</TableHead>
+							{showPrices && <TableHead>{t("studies.total")}</TableHead>}
 							<TableHead className="w-[60px]" />
 						</TableRow>
 					</TableHeader>
@@ -299,9 +308,11 @@ export function QuantitiesOverview({
 										(study.itemCounts?.laborItems ?? 0)
 									).toLocaleString("en-US")}
 								</TableCell>
-								<TableCell className="font-medium text-card-foreground">
-									{formatNumber(Number(study.totalCost ?? 0), 2)}
-								</TableCell>
+								{showPrices && (
+									<TableCell className="font-medium text-card-foreground">
+										{formatNumber(Number(study.totalCost ?? 0), 2)}
+									</TableCell>
+								)}
 								<TableCell>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>

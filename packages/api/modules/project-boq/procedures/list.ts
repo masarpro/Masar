@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
 const boqSectionEnum = z.enum([
 	"STRUCTURAL",
@@ -44,12 +45,13 @@ export const list = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const where: any = {
 			projectId: input.projectId,
@@ -95,8 +97,14 @@ export const list = protectedProcedure
 			items: items.map((item) => ({
 				...item,
 				quantity: Number(item.quantity),
-				unitPrice: item.unitPrice != null ? Number(item.unitPrice) : null,
-				totalPrice: item.totalPrice != null ? Number(item.totalPrice) : null,
+				unitPrice:
+					showPrices && item.unitPrice != null
+						? Number(item.unitPrice)
+						: null,
+				totalPrice:
+					showPrices && item.totalPrice != null
+						? Number(item.totalPrice)
+						: null,
 			})),
 			total,
 			limit: input.limit,

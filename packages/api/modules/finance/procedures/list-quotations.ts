@@ -36,7 +36,7 @@ export const listQuotations = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "pricing",
-			action: "view",
+			action: "quotations",
 		});
 
 		const result = await getOrganizationQuotations(input.organizationId, {
@@ -80,7 +80,7 @@ export const getQuotation = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "pricing",
-			action: "view",
+			action: "quotations",
 		});
 
 		const quotation = await getQuotationById(input.id, input.organizationId);

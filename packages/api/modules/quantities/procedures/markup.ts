@@ -7,6 +7,10 @@ import { dedupeCostingItems } from "../lib/costing-aggregation";
 import { VAT_RATE } from "@repo/utils";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	requireCostingReadAccess,
+	requireSellingWriteAccess,
+} from "../lib/pricing-access";
 
 // ═══════════════════════════════════════════════════════════════
 // 1. GET MARKUP SETTINGS
@@ -26,11 +30,12 @@ export const markupGetSettings = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		requireCostingReadAccess(permissions);
 
 		const study = await db.costStudy.findFirst({
 			where: {
@@ -104,11 +109,11 @@ export const markupSetUniform = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireSellingWriteAccess(permissions);
 
 		const study = await db.costStudy.findFirst({
 			where: { id: input.studyId, organizationId: input.organizationId },
@@ -174,11 +179,11 @@ export const markupSetSectionMarkups = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
 		);
+		requireSellingWriteAccess(permissions);
 
 		const study = await db.costStudy.findFirst({
 			where: { id: input.studyId, organizationId: input.organizationId },
@@ -243,11 +248,12 @@ export const markupGetProfitAnalysis = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		requireCostingReadAccess(permissions);
 
 		const study = await db.costStudy.findFirst({
 			where: {

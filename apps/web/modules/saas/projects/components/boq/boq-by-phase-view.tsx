@@ -35,6 +35,7 @@ import {
 	useBOQGroupedByPhase,
 	useDeleteBOQItem,
 } from "@saas/projects/hooks/use-project-boq";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { formatSAR } from "@shared/lib/formatters";
 
 interface BOQByPhaseViewProps {
@@ -58,6 +59,10 @@ export function BOQByPhaseView({
 	onEditItem,
 }: BOQByPhaseViewProps) {
 	const t = useTranslations("projectBoq");
+	const { can } = usePermission();
+	// الأسعار بيانات مالية — الخادم يحجبها لمن لا يملك الصلاحية، والأعمدة تُخفى
+	const showPrices =
+		can("projects", "viewFinance") || can("quantities", "pricing");
 	const { data, isLoading } = useBOQGroupedByPhase(organizationId, projectId);
 	const deleteMutation = useDeleteBOQItem();
 	const [pendingDelete, setPendingDelete] = useState<string | null>(null);
@@ -121,6 +126,7 @@ export function BOQByPhaseView({
 					<PhaseCard
 						key={p.milestone.id}
 						phase={p}
+						showPrices={showPrices}
 						onAddFromStudy={() =>
 							onAddFromStudy(p.milestone.id, p.milestone.title)
 						}
@@ -147,6 +153,7 @@ export function BOQByPhaseView({
 							pricedCount: unassigned.pricedCount,
 							unpricedCount: unassigned.unpricedCount,
 						}}
+						showPrices={showPrices}
 						isUnassigned
 						onAddFromStudy={() =>
 							onAddFromStudy(null, t("phaseView.unassigned"))
@@ -189,6 +196,7 @@ export function BOQByPhaseView({
 
 function PhaseCard({
 	phase,
+	showPrices,
 	isUnassigned,
 	onAddFromStudy,
 	onAddManual,
@@ -197,6 +205,7 @@ function PhaseCard({
 	t,
 }: {
 	phase: any;
+	showPrices: boolean;
 	isUnassigned?: boolean;
 	onAddFromStudy: () => void;
 	onAddManual: () => void;
@@ -230,7 +239,7 @@ function PhaseCard({
 							<Layers className="inline h-3 w-3 me-1" />
 							{t("phaseView.itemsCount", { count })}
 						</span>
-						{total > 0 && (
+						{showPrices && total > 0 && (
 							<span className="rounded-lg bg-success/15 px-2 py-0.5 text-success">
 								{formatSAR(total)}
 							</span>
@@ -288,12 +297,16 @@ function PhaseCard({
 										<th className="text-end py-2 px-3 font-medium">
 											{t("table.quantity")}
 										</th>
-										<th className="text-end py-2 px-3 font-medium">
-											{t("table.unitPrice")}
-										</th>
-										<th className="text-end py-2 px-3 font-medium">
-											{t("table.totalPrice")}
-										</th>
+										{showPrices && (
+											<th className="text-end py-2 px-3 font-medium">
+												{t("table.unitPrice")}
+											</th>
+										)}
+										{showPrices && (
+											<th className="text-end py-2 px-3 font-medium">
+												{t("table.totalPrice")}
+											</th>
+										)}
 										<th className="py-2 px-3"></th>
 									</tr>
 								</thead>
@@ -322,16 +335,20 @@ function PhaseCard({
 											<td className="py-2 px-3 text-end font-mono text-xs">
 												{formatNumber(item.quantity)}
 											</td>
-											<td className="py-2 px-3 text-end font-mono text-xs">
-												{item.unitPrice != null
-													? formatNumber(item.unitPrice)
-													: <span className="text-chart-1">{t("table.noPrice")}</span>}
-											</td>
-											<td className="py-2 px-3 text-end font-mono text-xs font-semibold">
-												{item.totalPrice != null
-													? formatSAR(item.totalPrice)
-													: "—"}
-											</td>
+											{showPrices && (
+												<td className="py-2 px-3 text-end font-mono text-xs">
+													{item.unitPrice != null
+														? formatNumber(item.unitPrice)
+														: <span className="text-chart-1">{t("table.noPrice")}</span>}
+												</td>
+											)}
+											{showPrices && (
+												<td className="py-2 px-3 text-end font-mono text-xs font-semibold">
+													{item.totalPrice != null
+														? formatSAR(item.totalPrice)
+														: "—"}
+												</td>
+											)}
 											<td className="py-2 px-3">
 												<div className="flex items-center justify-end gap-1">
 													<Button

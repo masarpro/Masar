@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../../project-boq/lib/price-visibility";
 
 export const listStudies = protectedProcedure
 	.route({
@@ -17,12 +18,16 @@ export const listStudies = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		// Study costs and margins are financial data — zeroed without price access
+		const money = canViewBoqPrices(permissions)
+			? (v: unknown) => Number(v)
+			: () => 0;
 
 		const studies = await db.costStudy.findMany({
 			where: {
@@ -51,14 +56,14 @@ export const listStudies = protectedProcedure
 			buildingArea: Number(study.buildingArea),
 			numberOfFloors: study.numberOfFloors,
 			finishingLevel: study.finishingLevel,
-			structuralCost: Number(study.structuralCost),
-			finishingCost: Number(study.finishingCost),
-			mepCost: Number(study.mepCost),
-			laborCost: Number(study.laborCost),
-			totalCost: Number(study.totalCost),
-			overheadPercent: Number(study.overheadPercent),
-			profitPercent: Number(study.profitPercent),
-			contingencyPercent: Number(study.contingencyPercent),
+			structuralCost: money(study.structuralCost),
+			finishingCost: money(study.finishingCost),
+			mepCost: money(study.mepCost),
+			laborCost: money(study.laborCost),
+			totalCost: money(study.totalCost),
+			overheadPercent: money(study.overheadPercent),
+			profitPercent: money(study.profitPercent),
+			contingencyPercent: money(study.contingencyPercent),
 			vatIncluded: study.vatIncluded,
 			status: study.status,
 			createdAt: study.createdAt,

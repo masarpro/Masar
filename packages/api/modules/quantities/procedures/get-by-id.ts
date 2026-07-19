@@ -5,6 +5,7 @@ import { z } from "zod";
 import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess, stripStudyMoney } from "../lib/pricing-access";
 
 export const getById = protectedProcedure
 	.route({
@@ -20,7 +21,7 @@ export const getById = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
@@ -34,5 +35,9 @@ export const getById = protectedProcedure
 			});
 		}
 
-		return convertStudyDecimals(costStudy);
+		// التكاليف والهوامش تُحجب لمن لا يملك صلاحية تسعير فعلية
+		return stripStudyMoney(
+			convertStudyDecimals(costStudy),
+			hasCostingReadAccess(permissions),
+		);
 	});

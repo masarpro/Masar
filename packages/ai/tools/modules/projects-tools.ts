@@ -84,6 +84,11 @@ registerTool({
         orderBy: { createdAt: "desc" },
       });
 
+      // قيمة العقد وبنوده المالية تتطلب projects.viewFinance — الأداة نفسها
+      // متاحة بـ projects.view لعرض البيانات غير المالية
+      const canViewFinance =
+        context.permissions?.projects?.viewFinance ?? false;
+
       return {
         project: {
           name: p.name,
@@ -91,17 +96,26 @@ registerTool({
           status: p.status,
           location: p.location,
           progress: toNum(p.progress) + "%",
-          contractValue: toNum(p.contractValue).toFixed(2),
+          ...(canViewFinance
+            ? { contractValue: toNum(p.contractValue).toFixed(2) }
+            : {}),
           clientName: p.clientName,
           startDate: p.startDate,
           endDate: p.endDate,
         },
         contract: p.contract
-          ? {
-              ...p.contract,
-              value: p.contract.value?.toString(),
-              retentionPercent: p.contract.retentionPercent?.toString(),
-            }
+          ? canViewFinance
+            ? {
+                ...p.contract,
+                value: p.contract.value?.toString(),
+                retentionPercent: p.contract.retentionPercent?.toString(),
+              }
+            : {
+                contractNo: p.contract.contractNo,
+                startDate: p.contract.startDate,
+                endDate: p.contract.endDate,
+                status: p.contract.status,
+              }
           : null,
         team: (p.members ?? []).map((m: any) => ({
           name: m.user?.name,

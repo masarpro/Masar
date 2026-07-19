@@ -3,6 +3,7 @@ import { z } from "zod";
 import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess, stripStudyMoney } from "../lib/pricing-access";
 
 export const list = protectedProcedure
 	.route({
@@ -22,11 +23,12 @@ export const list = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		const showMoney = hasCostingReadAccess(permissions);
 
 		const result = await getOrganizationCostStudies(input.organizationId, {
 			status: input.status,
@@ -36,12 +38,15 @@ export const list = protectedProcedure
 			offset: input.offset,
 		});
 
-		// Convert Decimal to number for JSON serialization
+		// Convert Decimal to number for JSON serialization.
+		// التكاليف والإجماليات تُحجب لمن لا يملك صلاحية تسعير فعلية.
 		return {
 			costStudies: result.costStudies.map((study) =>
-				convertStudyDecimals(study),
+				stripStudyMoney(convertStudyDecimals(study), showMoney),
 			),
 			total: result.total,
-			stats: result.stats,
+			stats: showMoney
+				? result.stats
+				: { ...result.stats, totalValue: 0 },
 		};
 	});

@@ -34,12 +34,14 @@ export const generateWeeklyReportProcedure = subscriptionProcedure
 		}
 
 		// Project-scoped permission check (membership alone is not enough).
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "projects", action: "view" },
 		);
+		// مصروفات الأسبوع بيانات مالية — تُضمّن في التقرير فقط لمن يملك viewFinance
+		const canViewFinance = permissions.projects?.viewFinance ?? false;
 
 		await enforceFeatureAccess(input.organizationId, "export.pdf", context.user);
 
@@ -74,16 +76,18 @@ export const generateWeeklyReportProcedure = subscriptionProcedure
 			orderBy: { createdAt: "desc" },
 		});
 
-		// Get expenses for the week
-		const expenses = await db.projectExpense.findMany({
-			where: {
-				projectId: input.projectId,
-				date: {
-					gte: weekStart,
-					lte: weekEnd,
-				},
-			},
-		});
+		// Get expenses for the week (finance-gated)
+		const expenses = canViewFinance
+			? await db.projectExpense.findMany({
+					where: {
+						projectId: input.projectId,
+						date: {
+							gte: weekStart,
+							lte: weekEnd,
+						},
+					},
+				})
+			: [];
 
 		// Get issues for the week
 		const issues = await db.projectIssue.findMany({

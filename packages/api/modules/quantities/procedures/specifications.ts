@@ -4,6 +4,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess } from "../lib/pricing-access";
 
 // ═══════════════════════════════════════════════════════════════
 // 1. GET SPECIFICATIONS
@@ -663,7 +664,7 @@ export const getBOM = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
@@ -682,6 +683,15 @@ export const getBOM = protectedProcedure
 			where: { costStudyId: input.studyId },
 			orderBy: [{ parentItemType: "asc" }, { parentCategory: "asc" }, { sortOrder: "asc" }],
 		});
+
+		// أسعار الوحدة/الإجمالي في BOM تُحجب لمن لا يملك صلاحية تكاليف
+		if (!hasCostingReadAccess(permissions)) {
+			return entries.map((entry) => ({
+				...entry,
+				unitPrice: null,
+				totalPrice: null,
+			}));
+		}
 
 		return entries;
 	});

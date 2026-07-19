@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
 export const getAvailableQuotations = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getAvailableQuotations = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const quotations = await db.quotation.findMany({
 			where: {
@@ -61,7 +63,7 @@ export const getAvailableQuotations = protectedProcedure
 			clientName: q.clientName,
 			client: q.client,
 			status: q.status,
-			totalAmount: Number(q.totalAmount),
+			totalAmount: showPrices ? Number(q.totalAmount) : 0,
 			itemCount: q._count.items,
 			createdAt: q.createdAt,
 		}));

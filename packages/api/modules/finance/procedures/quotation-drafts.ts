@@ -246,7 +246,7 @@ export const listQuotationDraftsProcedure = protectedProcedure
 	.route({ method: "GET", path: "/finance/quotations/drafts", tags: ["Finance", "Quotations"], summary: "List quotation drafts" })
 	.input(z.object({ organizationId: idString(), query: searchQuery(), limit: paginationLimit(), offset: paginationOffset() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "view" });
+		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "quotations" });
 		const result = await getOrganizationQuotationDrafts(input.organizationId, {
 			query: input.query,
 			limit: input.limit,
@@ -267,7 +267,7 @@ export const getQuotationDraftProcedure = protectedProcedure
 	.route({ method: "GET", path: "/finance/quotations/drafts/{id}", tags: ["Finance", "Quotations"], summary: "Get a quotation draft" })
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "view" });
+		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "quotations" });
 		const quotation = await getQuotationById(input.id, input.organizationId);
 		if (!quotation || !quotation.isDraft) {
 			throw new ORPCError("NOT_FOUND", { message: "المسودة غير موجودة" });
@@ -280,6 +280,6 @@ export const countQuotationDraftsProcedure = protectedProcedure
 	.route({ method: "GET", path: "/finance/quotations/drafts/count", tags: ["Finance", "Quotations"], summary: "Count quotation drafts" })
 	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "view" });
+		await verifyOrganizationAccess(input.organizationId, context.user.id, { section: "pricing", action: "quotations" });
 		return { count: await countOrganizationQuotationDrafts(input.organizationId) };
 	});

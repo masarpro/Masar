@@ -4,6 +4,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess, scrubPriceKeys } from "../lib/pricing-access";
 
 // ═══════════════════════════════════════════════════════════════
 // SCHEMA
@@ -76,7 +77,7 @@ export const getLaborBreakdown = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
@@ -98,7 +99,12 @@ export const getLaborBreakdown = protectedProcedure
 			});
 		}
 
-		return (study.laborBreakdown as Record<string, unknown> | null) ?? {};
+		const breakdown =
+			(study.laborBreakdown as Record<string, unknown> | null) ?? {};
+		// أسعار/أجور داخل التفصيل تُحجب لمن لا يملك صلاحية تكاليف
+		return hasCostingReadAccess(permissions)
+			? breakdown
+			: (scrubPriceKeys(breakdown) as Record<string, unknown>);
 	});
 
 // ═══════════════════════════════════════════════════════════════

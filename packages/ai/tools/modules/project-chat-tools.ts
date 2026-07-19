@@ -68,11 +68,25 @@ registerTool({
         };
       }
 
+      // قناة المالك تتضمن تحديثات مالية (مبالغ المستخلصات) — تُقصر على من
+      // يملك projects.viewFinance؛ البقية يرون قناة الفريق فقط
+      const canViewFinance =
+        context.permissions?.projects?.viewFinance ?? false;
+      if (params.channel === "OWNER" && !canViewFinance) {
+        return {
+          error: "ليس لديك صلاحية الاطلاع على قناة المالك",
+        };
+      }
+
       const where: any = {
         projectId: params.projectId,
         organizationId: context.organizationId,
       };
-      if (params.channel) where.channel = params.channel;
+      if (params.channel) {
+        where.channel = params.channel;
+      } else if (!canViewFinance) {
+        where.channel = "TEAM";
+      }
 
       const messages = await db.projectMessage.findMany({
         where,

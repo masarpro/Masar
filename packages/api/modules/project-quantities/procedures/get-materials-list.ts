@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../../project-boq/lib/price-visibility";
 
 export const getMaterialsList = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getMaterialsList = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const studyFilter = {
 			costStudy: {
@@ -135,6 +137,15 @@ export const getMaterialsList = protectedProcedure
 				phaseId: i.projectPhaseId,
 				specifications: null,
 			});
+		}
+
+		// Prices/costs are financial data — zero them server-side for members
+		// without price access (quantities stay visible, money doesn't).
+		if (!showPrices) {
+			for (const item of items) {
+				item.unitPrice = 0;
+				item.totalCost = 0;
+			}
 		}
 
 		// Group items

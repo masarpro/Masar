@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { isUnifiedStudy } from "../lib/unified-flag";
 
 interface StudyConfigInput {
@@ -36,76 +37,103 @@ export function useStudyConfig(study: StudyConfigInput) {
 		studyType: study.studyType,
 	});
 
+	// مراحل الأموال (التكلفة/التسعير/العرض) تُخفى لمن لا يملك صلاحية تسعير
+	// فعلية — الـ API يحجب بياناتها أيضاً؛ هذا الإخفاء يمنع صفحات 403 فارغة
+	const { can } = usePermission();
+	const canSeeCosting =
+		can("pricing", "editCosting") ||
+		can("pricing", "approveCosting") ||
+		can("pricing", "editSellingPrice") ||
+		can("pricing", "pricing") ||
+		can("quantities", "pricing");
+	const canSeeQuotation =
+		can("pricing", "quotations") || can("pricing", "pricing");
+	const stageAllowed = (stage: string) => {
+		if (stage === "costing" || stage === "pricing") return canSeeCosting;
+		if (stage === "COSTING" || stage === "PRICING") return canSeeCosting;
+		if (stage === "quotation" || stage === "convert") return canSeeQuotation;
+		if (stage === "QUOTATION" || stage === "CONVERSION") return canSeeQuotation;
+		return true;
+	};
+
 	const enabledStages = useMemo(() => {
-		if (useUnifiedWorkspace) return ["quantities"] as const;
-		switch (study.studyType) {
-			case "FULL_STUDY":
-			case "FULL_PROJECT": // backward compat
-				return [
-					"quantities",
-					"specifications",
-					"costing",
-					"pricing",
-					"quotation",
-				] as const;
-			case "COST_PRICING":
-				return [
-					"quantities",
-					"specifications",
-					"costing",
-					"pricing",
-					"quotation",
-				] as const;
-			case "QUICK_PRICING":
-			case "CUSTOM_ITEMS": // backward compat
-				return ["pricing", "quotation"] as const;
-			case "LUMP_SUM_ANALYSIS":
-				return ["costing", "pricing"] as const;
-			default:
-				return [
-					"quantities",
-					"specifications",
-					"costing",
-					"pricing",
-				] as const;
-		}
-	}, [study.studyType, useUnifiedWorkspace]);
+		const base: readonly string[] = (() => {
+			if (useUnifiedWorkspace) return ["quantities"] as const;
+			switch (study.studyType) {
+				case "FULL_STUDY":
+				case "FULL_PROJECT": // backward compat
+					return [
+						"quantities",
+						"specifications",
+						"costing",
+						"pricing",
+						"quotation",
+					] as const;
+				case "COST_PRICING":
+					return [
+						"quantities",
+						"specifications",
+						"costing",
+						"pricing",
+						"quotation",
+					] as const;
+				case "QUICK_PRICING":
+				case "CUSTOM_ITEMS": // backward compat
+					return ["pricing", "quotation"] as const;
+				case "LUMP_SUM_ANALYSIS":
+					return ["costing", "pricing"] as const;
+				default:
+					return [
+						"quantities",
+						"specifications",
+						"costing",
+						"pricing",
+					] as const;
+			}
+		})();
+		return base.filter(stageAllowed);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [study.studyType, useUnifiedWorkspace, canSeeCosting, canSeeQuotation]);
 
 	/** Uppercase stage types for filtering PIPELINE_STAGES by key */
 	const enabledStageTypes = useMemo(() => {
-		if (useUnifiedWorkspace) return ["QUANTITIES"] as const;
-		switch (study.studyType) {
-			case "FULL_STUDY":
-			case "FULL_PROJECT":
-				return [
-					"QUANTITIES",
-					"SPECIFICATIONS",
-					"COSTING",
-					"PRICING",
-					"QUOTATION",
-				] as const;
-			case "COST_PRICING":
-				return [
-					"QUANTITIES",
-					"SPECIFICATIONS",
-					"COSTING",
-					"PRICING",
-					"QUOTATION",
-				] as const;
-			case "QUICK_PRICING":
-			case "CUSTOM_ITEMS":
-				return ["PRICING", "QUOTATION"] as const;
-			case "LUMP_SUM_ANALYSIS":
-				return ["COSTING", "PRICING"] as const;
-			default:
-				return [
-					"QUANTITIES",
-					"SPECIFICATIONS",
-					"COSTING",
-					"PRICING",
-				] as const;
-		}
-	}, [study.studyType, useUnifiedWorkspace]);
+		const base: readonly string[] = (() => {
+			if (useUnifiedWorkspace) return ["QUANTITIES"] as const;
+			switch (study.studyType) {
+				case "FULL_STUDY":
+				case "FULL_PROJECT":
+					return [
+						"QUANTITIES",
+						"SPECIFICATIONS",
+						"COSTING",
+						"PRICING",
+						"QUOTATION",
+					] as const;
+				case "COST_PRICING":
+					return [
+						"QUANTITIES",
+						"SPECIFICATIONS",
+						"COSTING",
+						"PRICING",
+						"QUOTATION",
+					] as const;
+				case "QUICK_PRICING":
+				case "CUSTOM_ITEMS":
+					return ["PRICING", "QUOTATION"] as const;
+				case "LUMP_SUM_ANALYSIS":
+					return ["COSTING", "PRICING"] as const;
+				default:
+					return [
+						"QUANTITIES",
+						"SPECIFICATIONS",
+						"COSTING",
+						"PRICING",
+					] as const;
+			}
+		})();
+		return base.filter(stageAllowed);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [study.studyType, useUnifiedWorkspace, canSeeCosting, canSeeQuotation]);
 
 	const enabledTabs = useMemo(() => {
 		const scopes = study.workScopes;

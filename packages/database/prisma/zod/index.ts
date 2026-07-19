@@ -5001,7 +5001,7 @@ export const ZatcaDeviceSchema = z.object({
   complianceCsid: z.string().nullish(),
   complianceSecret: z.string().nullish(),
   invoiceCounter: z.number().int(),
-  previousInvoiceHash: z.string().default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYmUxYjE3ZTExNzA5"),
+  previousInvoiceHash: z.string().default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ=="),
   status: ZatcaIntegrationStatusSchema.default("DISABLED"),
   lastError: z.string().nullish(),
   onboardedAt: z.date().nullish(),

@@ -6,7 +6,8 @@ import type { Permissions } from "@repo/database/prisma/permissions";
  * Maps sidebar item ids (see use-sidebar-menu.ts) to permission predicates.
  * Items WITHOUT an entry here are intentionally ungoverned by org permissions:
  *   - "start" (home) — always visible
- *   - "project-*" children — governed by the separate ProjectRole system
+ *   - "project-*" children — non-financial ones follow the ProjectRole system;
+ *     the financial ones (subcontracts/expenses/payments) ARE mapped below
  *   - "finance-partners" — governed by partnerAccessLevel
  *   - "orgSettings" — governed by isOrganizationAdmin
  *   - "admin" — governed by user.role === "admin"
@@ -55,13 +56,29 @@ export const SIDEBAR_PERMISSION_MAP: Record<
 	"pricing-studies": ({ can }) => can("pricing", "studies"),
 	"pricing-quotations": ({ can }) => can("pricing", "quotations"),
 	"pricing-leads": ({ can }) => can("pricing", "leads"),
-	// مراحل الدراسة: التنقل ليس تعديلاً — إجراءات edit/approve يحميها الـ backend
+	// مراحل الدراسة: البنية والكميات بـ studies، أما مراحل الأموال (التكلفة/
+	// التسعير/العرض) فتتطلب صلاحية تسعير فعلية — تطابق بوابات القراءة في الـ API
 	"study-overview": ({ can }) => can("pricing", "studies"),
 	"study-quantities": ({ can }) => can("pricing", "studies"),
 	"study-specifications": ({ can }) => can("pricing", "studies"),
-	"study-costing": ({ can }) => can("pricing", "studies"),
-	"study-pricing": ({ can }) => can("pricing", "studies"),
-	"study-quotation": ({ can }) => can("pricing", "studies"),
+	"study-costing": ({ can }) =>
+		can("pricing", "editCosting") ||
+		can("pricing", "approveCosting") ||
+		can("pricing", "pricing") ||
+		can("quantities", "pricing"),
+	"study-pricing": ({ can }) =>
+		can("pricing", "editSellingPrice") ||
+		can("pricing", "approveCosting") ||
+		can("pricing", "pricing") ||
+		can("quantities", "pricing"),
+	"study-quotation": ({ can }) =>
+		can("pricing", "quotations") || can("pricing", "pricing"),
+
+	// ── روابط مالية المشروع في الشريط الجانبي ──
+	// كانت بلا حاكم (تظهر للجميع) — تُحكم بصلاحية عرض مالية المشروع
+	"project-subcontracts": ({ can }) => can("projects", "viewFinance"),
+	"project-expenses": ({ can }) => can("projects", "viewFinance"),
+	"project-payments": ({ can }) => can("projects", "viewFinance"),
 
 	// ── أبناء المنشأة ──
 	"company-dashboard": ({ can }) => can("company", "view"),

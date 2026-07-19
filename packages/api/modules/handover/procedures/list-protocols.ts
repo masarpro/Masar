@@ -43,17 +43,20 @@ export const listHandoverProtocols = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		let permissions: Awaited<ReturnType<typeof verifyOrganizationAccess>>["permissions"];
 		if (input.projectId) {
-			await verifyProjectAccess(input.projectId, input.organizationId, context.user.id, {
+			({ permissions } = await verifyProjectAccess(input.projectId, input.organizationId, context.user.id, {
 				section: "projects",
 				action: "view",
-			});
+			}));
 		} else {
-			await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			({ permissions } = await verifyOrganizationAccess(input.organizationId, context.user.id, {
 				section: "projects",
 				action: "view",
-			});
+			}));
 		}
+		// مبلغ إفراج الضمان بيانات مالية — يُحجب لمن لا يملك viewFinance
+		const canViewFinance = permissions.projects?.viewFinance ?? false;
 
 		const where: Prisma.HandoverProtocolWhereInput = { organizationId: input.organizationId };
 		if (input.projectId) {
@@ -97,7 +100,12 @@ export const listHandoverProtocols = protectedProcedure
 			db.handoverProtocol.count({ where }),
 		]);
 
-		return { items, total };
+		return {
+			items: canViewFinance
+				? items
+				: items.map((item) => ({ ...item, retentionReleaseAmount: null })),
+			total,
+		};
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -126,10 +134,15 @@ export const getHandoverProtocol = protectedProcedure
 			throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 		}
 
-		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
+		const { permissions } = await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
 			section: "projects",
 			action: "view",
 		});
+
+		// مبلغ إفراج الضمان بيانات مالية — يُحجب لمن لا يملك viewFinance
+		if (!(permissions.projects?.viewFinance ?? false)) {
+			return { ...protocol, retentionReleaseAmount: null };
+		}
 
 		return protocol;
 	});

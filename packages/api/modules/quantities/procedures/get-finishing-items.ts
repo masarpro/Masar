@@ -3,6 +3,7 @@ import { z } from "zod";
 import { convertFinishingItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { hasCostingReadAccess, stripItemMoney } from "../lib/pricing-access";
 
 export const getFinishingItems = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getFinishingItems = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		const showMoney = hasCostingReadAccess(permissions);
 
 		const items = await getCostStudyFinishingItems(input.costStudyId, input.organizationId);
-		return items.map(convertFinishingItemDecimals);
+		return items.map((item) => stripItemMoney(convertFinishingItemDecimals(item), showMoney));
 	});

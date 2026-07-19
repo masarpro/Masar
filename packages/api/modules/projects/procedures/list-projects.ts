@@ -35,13 +35,14 @@ export const listProjects = protectedProcedure
 		// data is never returned to the client.
 		// Runs in parallel with the access check: the scope read is org+user
 		// scoped and its result is only used after the check has passed.
-		const [, scope] = await Promise.all([
+		const [{ permissions }, scope] = await Promise.all([
 			verifyOrganizationAccess(input.organizationId, context.user.id, {
 				section: "projects",
 				action: "view",
 			}),
 			getCachedUserProjectScope(context.user.id, input.organizationId),
 		]);
+		const canViewFinance = permissions.projects?.viewFinance ?? false;
 
 		let restrictToProjectIds: string[] | undefined;
 		if (!scope.allProjects) {
@@ -63,13 +64,16 @@ export const listProjects = protectedProcedure
 			getProjectStats(input.organizationId),
 		]);
 
-		// Convert Decimal to number for JSON serialization
+		// Convert Decimal to number for JSON serialization.
+		// Contract values (per project + org-wide sum) are financial data —
+		// stripped server-side for members without projects.viewFinance.
 		return {
 			projects: result.projects.map((project) => ({
 				...project,
-				contractValue: project.contractValue
-					? Number(project.contractValue)
-					: null,
+				contractValue:
+					canViewFinance && project.contractValue
+						? Number(project.contractValue)
+						: null,
 				progress: Number(project.progress),
 				memberCount: (project as any)._count?.members ?? 0,
 				photos: ((project as any).photos ?? [])
@@ -80,6 +84,6 @@ export const listProjects = protectedProcedure
 				),
 			})),
 			total: result.total,
-			stats,
+			stats: canViewFinance ? stats : { ...stats, totalValue: 0 },
 		};
 	});

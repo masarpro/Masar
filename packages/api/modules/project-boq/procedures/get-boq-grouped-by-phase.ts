@@ -2,13 +2,16 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
-function convertDecimalFields(item: any) {
+function convertDecimalFields(item: any, showPrices: boolean) {
 	return {
 		...item,
 		quantity: Number(item.quantity),
-		unitPrice: item.unitPrice != null ? Number(item.unitPrice) : null,
-		totalPrice: item.totalPrice != null ? Number(item.totalPrice) : null,
+		unitPrice:
+			showPrices && item.unitPrice != null ? Number(item.unitPrice) : null,
+		totalPrice:
+			showPrices && item.totalPrice != null ? Number(item.totalPrice) : null,
 	};
 }
 
@@ -27,12 +30,13 @@ export const getBoqGroupedByPhase = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const [milestones, allItems] = await Promise.all([
 			db.projectMilestone.findMany({
@@ -55,15 +59,16 @@ export const getBoqGroupedByPhase = protectedProcedure
 		]);
 
 		const phases = milestones.map((m) => {
-			const items = allItems
-				.filter((it) => it.projectPhaseId === m.id)
-				.map(convertDecimalFields);
+			const rawItems = allItems.filter((it) => it.projectPhaseId === m.id);
+			const items = rawItems.map((it) => convertDecimalFields(it, showPrices));
+			// Counts come from the raw rows so "priced X/Y" stays correct even
+			// when the money fields are stripped; totals only ship with showPrices.
 			let total = 0;
 			let pricedCount = 0;
 			let unpricedCount = 0;
-			for (const it of items) {
+			for (const it of rawItems) {
 				if (it.totalPrice != null) {
-					total += it.totalPrice;
+					if (showPrices) total += Number(it.totalPrice);
 					pricedCount++;
 				} else {
 					unpricedCount++;
@@ -88,15 +93,16 @@ export const getBoqGroupedByPhase = protectedProcedure
 			};
 		});
 
-		const unassignedItems = allItems
-			.filter((it) => it.projectPhaseId === null)
-			.map(convertDecimalFields);
+		const rawUnassigned = allItems.filter((it) => it.projectPhaseId === null);
+		const unassignedItems = rawUnassigned.map((it) =>
+			convertDecimalFields(it, showPrices),
+		);
 		let unassignedTotal = 0;
 		let unassignedPriced = 0;
 		let unassignedUnpriced = 0;
-		for (const it of unassignedItems) {
+		for (const it of rawUnassigned) {
 			if (it.totalPrice != null) {
-				unassignedTotal += it.totalPrice;
+				if (showPrices) unassignedTotal += Number(it.totalPrice);
 				unassignedPriced++;
 			} else {
 				unassignedUnpriced++;

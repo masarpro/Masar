@@ -79,6 +79,8 @@ export function getAssistantTools(ctx: ToolContext) {
         if (!isToolAuthorized(perms, "queryProjects", { action })) {
           return permissionDeniedResult();
         }
+        // قيمة العقد بيانات مالية — تُحجب لمن لا يملك projects.viewFinance
+        const canViewFinance = perms.projects?.viewFinance ?? false;
         try {
           if (action === "list") {
             const result = await getOrganizationProjects(ctx.organizationId, {
@@ -94,7 +96,9 @@ export function getAssistantTools(ctx: ToolContext) {
                 status: p.status,
                 type: p.type,
                 progress: toNum(p.progress),
-                contractValue: toNum(p.contractValue),
+                ...(canViewFinance
+                  ? { contractValue: toNum(p.contractValue) }
+                  : {}),
                 clientName: p.clientName,
                 startDate: p.startDate,
                 endDate: p.endDate,
@@ -121,7 +125,9 @@ export function getAssistantTools(ctx: ToolContext) {
                 status: project.status,
                 type: project.type,
                 progress: toNum(project.progress),
-                contractValue: toNum(project.contractValue),
+                ...(canViewFinance
+                  ? { contractValue: toNum(project.contractValue) }
+                  : {}),
                 clientName: project.clientName,
                 startDate: project.startDate,
                 endDate: project.endDate,
@@ -133,7 +139,10 @@ export function getAssistantTools(ctx: ToolContext) {
 
           if (action === "stats") {
             const stats = await getProjectStats(ctx.organizationId);
-            return { stats };
+            // totalValue = مجموع قيم العقود — يُحجب بدون viewFinance
+            return {
+              stats: canViewFinance ? stats : { ...stats, totalValue: 0 },
+            };
           }
 
           return { error: "إجراء غير معروف" };

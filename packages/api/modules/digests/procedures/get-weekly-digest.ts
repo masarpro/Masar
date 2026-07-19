@@ -18,7 +18,7 @@ export const getWeeklyDigest = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 		);
@@ -31,6 +31,16 @@ export const getWeeklyDigest = protectedProcedure
 				weekStart: input.weekStart,
 			},
 		);
+
+		// Claim amounts are financial data — strip them server-side for members
+		// without finance.view instead of relying on the UI to hide them.
+		if (!(permissions.finance?.view ?? false)) {
+			return {
+				...digest,
+				summary: { ...digest.summary, upcomingPaymentsCount: 0 },
+				upcomingPayments: [],
+			};
+		}
 
 		return digest;
 	});

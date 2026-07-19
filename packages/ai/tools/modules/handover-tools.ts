@@ -64,14 +64,17 @@ registerTool({
           completedAt: true,
         },
       });
+      // مبلغ إفراج الضمان بيانات مالية — يُحجب لمن لا يملك viewFinance
+      const canViewFinance =
+        context.permissions?.projects?.viewFinance ?? false;
       return {
         project: { id: project.id, name: project.name },
         protocols: protocols.map((p) => ({
           ...p,
           retentionReleaseAmount:
-            p.retentionReleaseAmount == null
-              ? null
-              : Number(p.retentionReleaseAmount),
+            canViewFinance && p.retentionReleaseAmount != null
+              ? Number(p.retentionReleaseAmount)
+              : null,
         })),
         total: protocols.length,
       };

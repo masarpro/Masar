@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../../project-boq/lib/price-visibility";
 
 export const getPhaseBreakdown = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getPhaseBreakdown = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		// Get project milestones with linked items
 		const milestones = await db.projectMilestone.findMany({
@@ -78,6 +80,10 @@ export const getPhaseBreakdown = protectedProcedure
 			]);
 
 		const toNumber = (val: unknown) => Number(val);
+		// Cost/price fields are financial data — zeroed for members without
+		// price access; dimensions and quantities stay untouched.
+		const toMoney = (val: unknown) => (showPrices ? Number(val) : 0);
+		const money = (val: number) => (showPrices ? val : 0);
 
 		const phases = milestones.map((m) => {
 			const phaseTotal =
@@ -100,9 +106,9 @@ export const getPhaseBreakdown = protectedProcedure
 					steelWeight: i.steelWeight ? toNumber(i.steelWeight) : null,
 					steelRatio: i.steelRatio ? toNumber(i.steelRatio) : null,
 					wastagePercent: toNumber(i.wastagePercent),
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					totalCost: toNumber(i.totalCost),
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					totalCost: toMoney(i.totalCost),
 				})),
 				finishing: m.finishingItems.map((i) => ({
 					...i,
@@ -113,34 +119,34 @@ export const getPhaseBreakdown = protectedProcedure
 					perimeter: i.perimeter ? toNumber(i.perimeter) : null,
 					quantity: i.quantity ? toNumber(i.quantity) : null,
 					wastagePercent: i.wastagePercent ? toNumber(i.wastagePercent) : null,
-					materialPrice: i.materialPrice ? toNumber(i.materialPrice) : null,
-					laborPrice: i.laborPrice ? toNumber(i.laborPrice) : null,
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					totalCost: toNumber(i.totalCost),
+					materialPrice: i.materialPrice ? toMoney(i.materialPrice) : null,
+					laborPrice: i.laborPrice ? toMoney(i.laborPrice) : null,
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					totalCost: toMoney(i.totalCost),
 				})),
 				mep: m.mepItems.map((i) => ({
 					...i,
 					quantity: toNumber(i.quantity),
 					length: i.length ? toNumber(i.length) : null,
 					area: i.area ? toNumber(i.area) : null,
-					materialPrice: toNumber(i.materialPrice),
-					laborPrice: toNumber(i.laborPrice),
+					materialPrice: toMoney(i.materialPrice),
+					laborPrice: toMoney(i.laborPrice),
 					wastagePercent: toNumber(i.wastagePercent),
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					unitPrice: toNumber(i.unitPrice),
-					totalCost: toNumber(i.totalCost),
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					unitPrice: toMoney(i.unitPrice),
+					totalCost: toMoney(i.totalCost),
 				})),
 				labor: m.laborItems.map((i) => ({
 					...i,
-					dailyRate: toNumber(i.dailyRate),
-					insuranceCost: toNumber(i.insuranceCost),
-					housingCost: toNumber(i.housingCost),
-					otherCosts: toNumber(i.otherCosts),
-					totalCost: toNumber(i.totalCost),
+					dailyRate: toMoney(i.dailyRate),
+					insuranceCost: toMoney(i.insuranceCost),
+					housingCost: toMoney(i.housingCost),
+					otherCosts: toMoney(i.otherCosts),
+					totalCost: toMoney(i.totalCost),
 				})),
-				phaseTotal,
+				phaseTotal: money(phaseTotal),
 			};
 		});
 
@@ -160,9 +166,9 @@ export const getPhaseBreakdown = protectedProcedure
 					steelWeight: i.steelWeight ? toNumber(i.steelWeight) : null,
 					steelRatio: i.steelRatio ? toNumber(i.steelRatio) : null,
 					wastagePercent: toNumber(i.wastagePercent),
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					totalCost: toNumber(i.totalCost),
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					totalCost: toMoney(i.totalCost),
 				})),
 				finishing: unassignedFinishing.map((i) => ({
 					...i,
@@ -173,34 +179,34 @@ export const getPhaseBreakdown = protectedProcedure
 					perimeter: i.perimeter ? toNumber(i.perimeter) : null,
 					quantity: i.quantity ? toNumber(i.quantity) : null,
 					wastagePercent: i.wastagePercent ? toNumber(i.wastagePercent) : null,
-					materialPrice: i.materialPrice ? toNumber(i.materialPrice) : null,
-					laborPrice: i.laborPrice ? toNumber(i.laborPrice) : null,
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					totalCost: toNumber(i.totalCost),
+					materialPrice: i.materialPrice ? toMoney(i.materialPrice) : null,
+					laborPrice: i.laborPrice ? toMoney(i.laborPrice) : null,
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					totalCost: toMoney(i.totalCost),
 				})),
 				mep: unassignedMep.map((i) => ({
 					...i,
 					quantity: toNumber(i.quantity),
 					length: i.length ? toNumber(i.length) : null,
 					area: i.area ? toNumber(i.area) : null,
-					materialPrice: toNumber(i.materialPrice),
-					laborPrice: toNumber(i.laborPrice),
+					materialPrice: toMoney(i.materialPrice),
+					laborPrice: toMoney(i.laborPrice),
 					wastagePercent: toNumber(i.wastagePercent),
-					materialCost: toNumber(i.materialCost),
-					laborCost: toNumber(i.laborCost),
-					unitPrice: toNumber(i.unitPrice),
-					totalCost: toNumber(i.totalCost),
+					materialCost: toMoney(i.materialCost),
+					laborCost: toMoney(i.laborCost),
+					unitPrice: toMoney(i.unitPrice),
+					totalCost: toMoney(i.totalCost),
 				})),
 				labor: unassignedLabor.map((i) => ({
 					...i,
-					dailyRate: toNumber(i.dailyRate),
-					insuranceCost: toNumber(i.insuranceCost),
-					housingCost: toNumber(i.housingCost),
-					otherCosts: toNumber(i.otherCosts),
-					totalCost: toNumber(i.totalCost),
+					dailyRate: toMoney(i.dailyRate),
+					insuranceCost: toMoney(i.insuranceCost),
+					housingCost: toMoney(i.housingCost),
+					otherCosts: toMoney(i.otherCosts),
+					totalCost: toMoney(i.totalCost),
 				})),
-				total: unassignedTotal,
+				total: money(unassignedTotal),
 			},
 		};
 	});

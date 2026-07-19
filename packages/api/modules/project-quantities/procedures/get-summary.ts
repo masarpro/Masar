@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../../project-boq/lib/price-visibility";
 
 export const getSummary = protectedProcedure
 	.route({
@@ -17,12 +18,16 @@ export const getSummary = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		// Costs, margins and totals are financial data — zeroed server-side for
+		// members without price access (same policy as the BOQ reads).
+		const showPrices = canViewBoqPrices(permissions);
+		const money = (v: number) => (showPrices ? v : 0);
 
 		const studies = await db.costStudy.findMany({
 			where: {
@@ -71,15 +76,15 @@ export const getSummary = protectedProcedure
 			return {
 				id: study.id,
 				name: study.name ?? "دراسة بدون اسم",
-				totalStructural,
-				totalFinishing,
-				totalMEP,
-				totalLabor,
-				subtotal,
-				overheadPercent,
-				profitPercent,
+				totalStructural: money(totalStructural),
+				totalFinishing: money(totalFinishing),
+				totalMEP: money(totalMEP),
+				totalLabor: money(totalLabor),
+				subtotal: money(subtotal),
+				overheadPercent: money(overheadPercent),
+				profitPercent: money(profitPercent),
 				vatPercent,
-				grandTotal,
+				grandTotal: money(grandTotal),
 			};
 		});
 

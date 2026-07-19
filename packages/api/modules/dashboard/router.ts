@@ -37,20 +37,46 @@ const organizationInput = z.object({
 });
 
 /**
+ * Zero out the financial blocks of getDashboardStats for members without
+ * finance.view — same server-side stripping policy as getAll's heroMetrics.
+ * Shape is preserved (zeros, not nulls) so existing consumers don't break.
+ */
+function stripStatsFinancials(
+	stats: Awaited<ReturnType<typeof getDashboardStats>>,
+	canViewFinance: boolean,
+) {
+	if (canViewFinance) return stats;
+	return {
+		...stats,
+		financials: {
+			totalContractValue: 0,
+			totalExpenses: 0,
+			totalPaidClaims: 0,
+			pendingClaimsValue: 0,
+		},
+		changeOrders: {
+			...stats.changeOrders,
+			totalCostImpact: 0,
+		},
+	};
+}
+
+/**
  * Get comprehensive dashboard statistics
  */
 const getStats = protectedProcedure
 	.input(organizationInput)
 	.handler(async ({ input, context }) => {
-		const membership = await verifyOrganizationMembership(
-			input.organizationId,
-			context.user.id,
-		);
+		const [membership, permissions] = await Promise.all([
+			verifyOrganizationMembership(input.organizationId, context.user.id),
+			getCachedUserPermissions(context.user.id, input.organizationId),
+		]);
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
-		return getDashboardStats(input.organizationId);
+		const stats = await getDashboardStats(input.organizationId);
+		return stripStatsFinancials(stats, permissions.finance?.view ?? false);
 	});
 
 /**
@@ -88,18 +114,16 @@ const getTypeDistribution = protectedProcedure
 	});
 
 /**
- * Get financial summary by project
+ * Get financial summary by project — per-project contract values, expenses
+ * and paid claims, so it requires finance.view (not just membership).
  */
 const getFinancialSummary = protectedProcedure
 	.input(organizationInput)
 	.handler(async ({ input, context }) => {
-		const membership = await verifyOrganizationMembership(
-			input.organizationId,
-			context.user.id,
-		);
-		if (!membership) {
-			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
-		}
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
 
 		return getFinancialSummaryByProject(input.organizationId);
 	});
@@ -168,18 +192,16 @@ const getActivities = protectedProcedure
 	});
 
 /**
- * Get monthly financial trend for charts
+ * Get monthly financial trend for charts — cash-movement series off the
+ * ledger accounts, so it requires finance.view (not just membership).
  */
 const getFinancialTrend = protectedProcedure
 	.input(organizationInput)
 	.handler(async ({ input, context }) => {
-		const membership = await verifyOrganizationMembership(
-			input.organizationId,
-			context.user.id,
-		);
-		if (!membership) {
-			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
-		}
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
 
 		return getMonthlyFinancialTrend(input.organizationId);
 	});
@@ -196,13 +218,14 @@ const activeProjects = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		const [, scope] = await Promise.all([
+		const [{ permissions }, scope] = await Promise.all([
 			verifyOrganizationAccess(input.organizationId, context.user.id, {
 				section: "projects",
 				action: "view",
 			}),
 			getCachedUserProjectScope(context.user.id, input.organizationId),
 		]);
+		const canViewProjectFinance = permissions.projects?.viewFinance ?? false;
 
 		let restrictToProjectIds: string[] | undefined;
 		if (!scope.allProjects) {
@@ -221,6 +244,9 @@ const activeProjects = protectedProcedure
 		return {
 			projects: projects.map((p) => ({
 				...p,
+				// مدفوعات/مقبوضات المشروع بيانات مالية — تُحجب لمن لا يملك viewFinance
+				expensesTotal: canViewProjectFinance ? p.expensesTotal : 0,
+				paymentsTotal: canViewProjectFinance ? p.paymentsTotal : 0,
 				coverPhoto: normalizePhotoRecord(p.coverPhoto),
 				photos: p.photos
 					.map((ph) => normalizePhotoRecord(ph))
@@ -296,7 +322,7 @@ const getAll = protectedProcedure
 		// hiding them only in the UI still ships the numbers in the payload
 		// (visible in DevTools). Mirrors the heroMetrics stripping above.
 		return {
-			stats,
+			stats: stripStatsFinancials(stats, canViewFinance),
 			upcoming,
 			overdue: {
 				milestones: overdueMilestones,

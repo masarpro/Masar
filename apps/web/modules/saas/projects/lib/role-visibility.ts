@@ -25,12 +25,12 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"team",
 		"handover",
 	],
+	// المهندس لا يرى أي قسم مالي — قرار سياسة 2026-07-18 (تدقيق الصلاحيات):
+	// الأقسام المالية تُمنح من إعدادات الأعضاء (viewFinance) وليس من هذا الدور
 	ENGINEER: [
 		"overview",
 		"execution",
 		"reports",
-		"finance",
-		"finance/subcontracts",
 		"quantities",
 		"photos",
 		"changes",

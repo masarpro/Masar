@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../../project-boq/lib/price-visibility";
 
 export const getAvailableStudies = protectedProcedure
 	.route({
@@ -18,12 +19,13 @@ export const getAvailableStudies = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const studies = await db.costStudy.findMany({
 			where: {
@@ -54,7 +56,7 @@ export const getAvailableStudies = protectedProcedure
 			buildingArea: Number(study.buildingArea),
 			numberOfFloors: study.numberOfFloors,
 			finishingLevel: study.finishingLevel,
-			totalCost: Number(study.totalCost),
+			totalCost: showPrices ? Number(study.totalCost) : 0,
 			status: study.status,
 			createdAt: study.createdAt,
 			itemCounts: study._count,

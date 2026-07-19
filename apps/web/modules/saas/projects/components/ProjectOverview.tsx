@@ -46,20 +46,24 @@ export function ProjectOverview({
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const { canViewSection, projectData } = useProjectRole();
 	const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+	const showFinance = canViewSection("finance");
 
-	// Fetch finance summary
-	const { data: financeSummary, isLoading: summaryLoading } = useQuery(
-		orpc.projectFinance.getSummary.queryOptions({
+	// Fetch finance summary — لا تُطلق الاستعلامات المالية لمن لا يرى القسم
+	// (كانت تُطلق دائماً وترجع 403 وتملأ سجل permission.denied ضجيجاً)
+	const { data: financeSummary, isLoading: summaryLoading } = useQuery({
+		...orpc.projectFinance.getSummary.queryOptions({
 			input: { organizationId, projectId },
 		}),
-	);
+		enabled: showFinance,
+	});
 
 	// Fetch expense categories for donut chart
-	const { data: categoryData } = useQuery(
-		orpc.projectFinance.getExpensesByCategory.queryOptions({
+	const { data: categoryData } = useQuery({
+		...orpc.projectFinance.getExpensesByCategory.queryOptions({
 			input: { organizationId, projectId },
 		}),
-	);
+		enabled: showFinance,
+	});
 
 	// Do NOT gate the whole page on the finance summary: it runs a heavy
 	// aggregation and every other card's query used to wait for it (a 2-round
@@ -67,39 +71,40 @@ export function ProjectOverview({
 	// only the finance card shows a local skeleton while its data arrives.
 	return (
 		<div className="space-y-6">
-			{/* Three Overview Cards: Execution, Finance, Timeline */}
-			{canViewSection("finance") && (
-				<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-					<ExecutionPhasesCard
-						organizationId={organizationId}
-						projectId={projectId}
-						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
-						projectStatus={projectData?.status}
-					/>
-					{summaryLoading ? (
+			{/* Three Overview Cards: Execution, Finance (permission-gated), Timeline */}
+			<div
+				className={`grid grid-cols-1 gap-4 ${showFinance ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}
+			>
+				<ExecutionPhasesCard
+					organizationId={organizationId}
+					projectId={projectId}
+					projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
+					projectStatus={projectData?.status}
+				/>
+				{showFinance &&
+					(summaryLoading ? (
 						<div className="h-full min-h-[220px] animate-pulse rounded-2xl border-2 bg-muted/30" />
 					) : (
-					<FinanceBudgetCard
-						contractValue={
-							financeSummary?.adjustedContractValueGross ??
-							financeSummary?.grossContractValue ??
-							financeSummary?.contractValue ??
-							0
-						}
-						actualExpenses={financeSummary?.actualExpenses ?? 0}
-						totalPayments={financeSummary?.totalPayments ?? 0}
-						remaining={financeSummary?.remaining ?? 0}
-						claimsPaid={financeSummary?.claimsPaid ?? 0}
-						expectedProfit={financeSummary?.expectedProfit ?? 0}
-					/>
-					)}
-					<TimelineScheduleCard
-						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
-						startDate={projectData?.startDate}
-						endDate={projectData?.endDate}
-					/>
-				</div>
-			)}
+						<FinanceBudgetCard
+							contractValue={
+								financeSummary?.adjustedContractValueGross ??
+								financeSummary?.grossContractValue ??
+								financeSummary?.contractValue ??
+								0
+							}
+							actualExpenses={financeSummary?.actualExpenses ?? 0}
+							totalPayments={financeSummary?.totalPayments ?? 0}
+							remaining={financeSummary?.remaining ?? 0}
+							claimsPaid={financeSummary?.claimsPaid ?? 0}
+							expectedProfit={financeSummary?.expectedProfit ?? 0}
+						/>
+					))}
+				<TimelineScheduleCard
+					projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
+					startDate={projectData?.startDate}
+					endDate={projectData?.endDate}
+				/>
+			</div>
 
 			{/* Quick Actions */}
 			<QuickActions

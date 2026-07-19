@@ -3,6 +3,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
 const num = (v: any) => (v == null ? null : Number(v));
 
@@ -22,12 +23,15 @@ export const getStudyItemsDetail = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
+		// Study item costs are money — zeroed for members without price access
+		const cost = (v: any) => (showPrices ? (num(v) ?? 0) : 0);
 
 		const study = await db.costStudy.findFirst({
 			where: { id: input.studyId, organizationId: input.organizationId },
@@ -57,7 +61,7 @@ export const getStudyItemsDetail = protectedProcedure
 				description: it.description,
 				unit: it.unit,
 				quantity: num(it.quantity) ?? 0,
-				totalCost: num(it.totalCost) ?? 0,
+				totalCost: cost(it.totalCost),
 			})),
 			finishing: study.finishingItems.map((it) => ({
 				id: it.id,
@@ -69,7 +73,7 @@ export const getStudyItemsDetail = protectedProcedure
 				unit: it.unit,
 				area: num(it.area),
 				quantity: num(it.quantity),
-				totalCost: num(it.totalCost) ?? 0,
+				totalCost: cost(it.totalCost),
 				specifications: it.specifications,
 			})),
 			mep: study.mepItems.map((it) => ({
@@ -82,8 +86,8 @@ export const getStudyItemsDetail = protectedProcedure
 				roomName: it.roomName,
 				unit: it.unit,
 				quantity: num(it.quantity) ?? 0,
-				unitPrice: num(it.unitPrice) ?? 0,
-				totalCost: num(it.totalCost) ?? 0,
+				unitPrice: cost(it.unitPrice),
+				totalCost: cost(it.totalCost),
 				specifications: it.specifications,
 			})),
 			labor: study.laborItems.map((it) => ({
@@ -94,8 +98,8 @@ export const getStudyItemsDetail = protectedProcedure
 				name: it.name,
 				quantity: it.quantity,
 				durationDays: it.durationDays,
-				dailyRate: num(it.dailyRate) ?? 0,
-				totalCost: num(it.totalCost) ?? 0,
+				dailyRate: cost(it.dailyRate),
+				totalCost: cost(it.totalCost),
 			})),
 		};
 	});

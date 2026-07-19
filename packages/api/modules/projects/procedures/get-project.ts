@@ -21,7 +21,7 @@ export const getProject = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		// Verify membership, project access, and permission
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.id,
 			input.organizationId,
 			context.user.id,
@@ -37,11 +37,15 @@ export const getProject = protectedProcedure
 			});
 		}
 
+		// Contract value is financial data — only members with viewFinance get it
+		const canViewFinance = permissions.projects?.viewFinance ?? false;
+
 		return {
 			...project,
-			contractValue: project.contractValue
-				? Number(project.contractValue)
-				: null,
+			contractValue:
+				canViewFinance && project.contractValue
+					? Number(project.contractValue)
+					: null,
 			progress: Number(project.progress),
 			coverPhoto: normalizePhotoRecord(project.coverPhoto),
 		};

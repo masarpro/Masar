@@ -4,6 +4,7 @@ import { createQuote, getCostStudyById, getQuoteById, updateQuote, deleteQuote a
 import { z } from "zod";
 import { convertQuoteDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { requireQuotationReadAccess } from "../lib/pricing-access";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 export const quoteCreate = subscriptionProcedure
@@ -83,11 +84,13 @@ export const quoteGetById = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		// مبالغ العروض أسعار بيع — تتطلب صلاحية عروض أسعار فعلية
+		requireQuotationReadAccess(permissions);
 
 		const quote = await getQuoteById(input.id);
 
@@ -206,11 +209,13 @@ export const quoteList = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
 		);
+		// مبالغ العروض أسعار بيع — تتطلب صلاحية عروض أسعار فعلية
+		requireQuotationReadAccess(permissions);
 
 		// Verify the study exists and belongs to the organization
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);

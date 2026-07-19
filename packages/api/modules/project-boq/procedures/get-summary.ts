@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { canViewBoqPrices } from "../lib/price-visibility";
 
 export const getSummary = protectedProcedure
 	.route({
@@ -17,12 +18,13 @@ export const getSummary = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyProjectAccess(
+		const { permissions } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "quantities", action: "view" },
 		);
+		const showPrices = canViewBoqPrices(permissions);
 
 		const baseWhere = {
 			projectId: input.projectId,
@@ -75,7 +77,8 @@ export const getSummary = protectedProcedure
 		}
 		for (const s of sectionTotals) {
 			const entry = sectionMap[s.section] ?? { count: 0, total: 0 };
-			entry.total = Number(s._sum.totalPrice ?? 0);
+			// Section totals are money — stripped for members without price access
+			entry.total = showPrices ? Number(s._sum.totalPrice ?? 0) : 0;
 			sectionMap[s.section] = entry;
 		}
 
@@ -96,6 +99,6 @@ export const getSummary = protectedProcedure
 			unpricedItems: totalCount - pricedCount,
 			sections: sectionMap,
 			sources: sourceMap,
-			grandTotal: Number(grandTotal._sum.totalPrice ?? 0),
+			grandTotal: showPrices ? Number(grandTotal._sum.totalPrice ?? 0) : 0,
 		};
 	});
