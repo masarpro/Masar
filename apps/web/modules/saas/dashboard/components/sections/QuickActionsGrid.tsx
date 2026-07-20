@@ -9,7 +9,6 @@ import {
 	Receipt,
 	TrendingDown,
 	TrendingUp,
-	Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -49,7 +48,6 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		quotations: isOwner || can("pricing", "quotations"),
 		invoices: isOwner || can("finance", "invoices"),
 		studies: isOwner || can("pricing", "studies"),
-		leads: isOwner || can("pricing", "leads"),
 		// Field supervisors carry reports.create without projects.edit — the
 		// daily report is their core action, so either permission qualifies.
 		dailyReports:
@@ -114,15 +112,6 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			browsePath: `/app/${organizationSlug}/pricing/studies`,
 			createPath: `/app/${organizationSlug}/pricing/studies?new=1`,
 			chip: "bg-chart-1/25 text-foreground",
-		},
-		{
-			icon: Users,
-			visible: allowed.leads,
-			sectionLabel: t("dashboard.actions.leads"),
-			actionLabel: t("dashboard.actions.newLead"),
-			browsePath: `/app/${organizationSlug}/pricing/leads`,
-			createPath: `/app/${organizationSlug}/pricing/leads/new`,
-			chip: "bg-primary/10 text-primary",
 		},
 	];
 
