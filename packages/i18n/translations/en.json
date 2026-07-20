@@ -6980,7 +6980,8 @@
       "draft": "Draft",
       "inReview": "In Review",
       "stagesPanel": {
-        "title": "Study stages: Specifications → Costing → Pricing",
+        "title": "Study panel: Specifications + Cost & Pricing (all live)",
+        "costPricingCard": "Cost & Pricing",
         "totalCost": "Total cost",
         "sellingPrice": "Selling price"
       },
@@ -7713,6 +7714,9 @@
         "boq": {
           "title": "BOQ Summary Table",
           "floorFilter": "Filter by Floor",
+          "sectionFilter": "Filter by Section",
+          "itemFilter": "Specific Item",
+          "accuracyNote": "Note: quantities are calculated from the values you entered and may differ from actual site conditions — review before final adoption.",
           "allFloors": "Entire Project",
           "foundations": "Foundations",
           "concreteSection": "Concrete",
@@ -9274,7 +9278,8 @@
         "finishing": "Finishing",
         "mep": "MEP",
         "labor": "General Labor",
-        "manual": "Manual Items"
+        "manual": "Manual Items",
+        "indirect": "Indirect Costs"
       },
       "common": {
         "totalCost": "Total Cost",

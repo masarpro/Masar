@@ -10,6 +10,7 @@ import {
 } from "../lib/pricing-access";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { dedupeCostingItems, summarizeCostingItems } from "../lib/costing-aggregation";
+import { computeIndirectCosts } from "../lib/indirect-costs";
 import { isUnifiedStudyServer } from "../../unified-quantities/lib/classify";
 
 function calculateItemTotals(data: {
@@ -665,7 +666,7 @@ export const costingGetSummary = protectedProcedure
 
 		const study = await db.costStudy.findFirst({
 			where: { id: input.studyId, organizationId: input.organizationId },
-			select: { overheadPercent: true },
+			select: { overheadPercent: true, laborBreakdown: true },
 		});
 
 		// إزالة الصفوف المكررة (توليد متزامن تاريخي) قبل التجميع —
@@ -677,5 +678,22 @@ export const costingGetSummary = protectedProcedure
 		// cost summary showed +5% while the profit analysis / quotation used 0.
 		const overheadPercent =
 			study?.overheadPercent == null ? 5 : toNum(study.overheadPercent);
-		return summarizeCostingItems(uniqueItems, overheadPercent);
+		const summary = summarizeCostingItems(uniqueItems, overheadPercent);
+
+		// المصاريف غير المباشرة (سلك ومسمار، إشراف، تشغيل) — جزء من التكلفة
+		// قبل المصاريف الإدارية والربح والضريبة
+		const indirect = computeIndirectCosts(study?.laborBreakdown);
+		const totalWithIndirect = summary.grandTotal.total + indirect.total;
+		const overheadAmount = totalWithIndirect * (overheadPercent / 100);
+		return {
+			...summary,
+			indirect,
+			grandTotal: {
+				...summary.grandTotal,
+				indirect: indirect.total,
+				total: totalWithIndirect,
+			},
+			overheadAmount,
+			costWithOverhead: totalWithIndirect + overheadAmount,
+		};
 	});

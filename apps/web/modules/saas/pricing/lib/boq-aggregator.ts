@@ -413,6 +413,98 @@ export function filterItemsByFloor(
 }
 
 // ─────────────────────────────────────────────────────────────
+// Section (بند) & Item Filter Helpers
+// ─────────────────────────────────────────────────────────────
+
+export interface SectionFilterOption {
+	value: string; // "all" | section category key
+	label: string;
+	icon?: string;
+}
+
+export interface ItemFilterOption {
+	value: string; // "all" | StructuralItem.id
+	label: string;
+}
+
+/**
+ * المفتاح الفعلي لقسم العنصر في الجدول — الميدة تُفصل عن الكمرات
+ * (نفس منطق aggregateBOQ حتى يتطابق الفلتر مع أقسام العرض).
+ */
+export function getItemSectionKey(item: StructuralItem): string {
+	if (item.category === "beams" && item.subCategory === "groundBeam") {
+		return "groundBeams";
+	}
+	return item.category;
+}
+
+/**
+ * خيارات فلتر البند (القسم الإنشائي) — تُبنى من الأقسام الموجودة فعلاً.
+ */
+export function buildSectionFilterOptions(
+	items: StructuralItem[],
+): SectionFilterOption[] {
+	const present = new Set(items.map(getItemSectionKey));
+	const options: SectionFilterOption[] = [
+		{ value: "all", label: "كل البنود", icon: "📋" },
+	];
+	for (const key of SECTION_ORDER) {
+		if (present.has(key)) {
+			options.push({
+				value: key,
+				label: SECTION_LABELS[key] || key,
+				icon: SECTION_ICONS[key],
+			});
+			present.delete(key);
+		}
+	}
+	// فئات خارج SECTION_ORDER تظهر آخر القائمة حتى لا تختفي عناصرها من الفلتر
+	for (const key of present) {
+		options.push({
+			value: key,
+			label: SECTION_LABELS[key] || key,
+			icon: SECTION_ICONS[key],
+		});
+	}
+	return options;
+}
+
+export function filterItemsBySection(
+	items: StructuralItem[],
+	sectionValue: string,
+): StructuralItem[] {
+	if (sectionValue === "all") return items;
+	return items.filter((item) => getItemSectionKey(item) === sectionValue);
+}
+
+/**
+ * خيارات فلتر العنصر المنفرد — عنصر واحد فقط بدون البقية.
+ */
+export function buildItemFilterOptions(
+	items: StructuralItem[],
+): ItemFilterOption[] {
+	const options: ItemFilterOption[] = [
+		{ value: "all", label: "كل العناصر" },
+	];
+	for (const item of items) {
+		const sectionLabel = SECTION_LABELS[getItemSectionKey(item)];
+		options.push({
+			value: item.id,
+			label: sectionLabel ? `${item.name} — ${sectionLabel}` : item.name,
+		});
+	}
+	return options;
+}
+
+export function filterItemsById(
+	items: StructuralItem[],
+	itemId: string,
+): StructuralItem[] {
+	if (itemId === "all") return items;
+	return items.filter((item) => item.id === itemId);
+}
+
+// ─────────────────────────────────────────────────────────────
 // Aggregation
 // ─────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import {
 	Table,
@@ -12,7 +12,7 @@ import {
 	TableRow,
 } from "@ui/components/table";
 import {
-	CheckCircle2,
+	ArrowLeft,
 	Loader2,
 	Package,
 	HardHat,
@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
 
 interface CostingSummaryTabProps {
@@ -28,6 +27,8 @@ interface CostingSummaryTabProps {
 	organizationSlug: string;
 	studyId: string;
 	buildingArea: number;
+	/** الانتقال لتبويب التسعير داخل اللوحة المدموجة (بديل صفحة التسعير المنفصلة) */
+	onNavigateToPricing?: () => void;
 }
 
 const SECTION_LABELS: Record<string, string> = {
@@ -51,29 +52,14 @@ export function CostingSummaryTab({
 	organizationSlug,
 	studyId,
 	buildingArea,
+	onNavigateToPricing,
 }: CostingSummaryTabProps) {
 	const t = useTranslations("pricing.costingV2");
-	const queryClient = useQueryClient();
 
 	// Fetch costing summary
 	const { data: summary, isLoading } = useQuery(
 		orpc.pricing.studies.costing.getSummary.queryOptions({
 			input: { organizationId, studyId },
-		}),
-	);
-
-	// Approve stage mutation
-	const approveMutation = useMutation(
-		orpc.pricing.studies.studyStages.approve.mutationOptions({
-			onSuccess: () => {
-				toast.success("تم اعتماد مرحلة تسعير التكلفة");
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.studyStages.key(),
-				});
-			},
-			onError: () => {
-				toast.error("حدث خطأ أثناء الاعتماد");
-			},
 		}),
 	);
 
@@ -86,6 +72,8 @@ export function CostingSummaryTab({
 	// وصف الإجمالي أقل من مجموع عمود "الإجمالي" لكل قسم
 	const grandStorage = (summary as any)?.grandTotal?.storage ?? 0;
 	const grandOther = (summary as any)?.grandTotal?.other ?? 0;
+	// المصاريف غير المباشرة (سلك ومسمار، إشراف، تشغيل) — من تبويبها الخاص
+	const grandIndirect = (summary as any)?.grandTotal?.indirect ?? 0;
 	const grandTotalAll = (summary as any)?.grandTotal?.total ?? 0;
 
 	// Extract STRUCTURAL section to match المواد and المصنعيات tabs exactly
@@ -270,6 +258,19 @@ export function CostingSummaryTab({
 								</TableCell>
 							</TableRow>
 						)}
+						{/* المصاريف غير المباشرة — سلك ومسمار + إشراف + تشغيل */}
+						{grandIndirect > 0 && (
+							<TableRow className="text-muted-foreground hover:bg-muted/20">
+								<TableCell className="font-medium">
+									مصاريف غير مباشرة (سلك ومسمار، إشراف، تشغيل)
+								</TableCell>
+								<TableCell className="text-center">—</TableCell>
+								<TableCell className="text-center">—</TableCell>
+								<TableCell className="text-center" dir="ltr">
+									{formatNum(grandIndirect)}
+								</TableCell>
+							</TableRow>
+						)}
 						{/* Grand total row — الإجمالي يشمل التشوين والمصاريف الأخرى */}
 						<TableRow className="bg-primary/10 font-bold border-t-2 border-primary/20">
 							<TableCell className="text-base">الإجمالي</TableCell>
@@ -294,33 +295,21 @@ export function CostingSummaryTab({
 				</div>
 			</div>
 
-			{/* Action button — full-width prominent */}
+			{/* الانتقال للتسعير — بلا اعتماد، كل شيء حي */}
 			<Button
-				onClick={() =>
-					(approveMutation as any).mutate(
-						{
-							organizationId,
-							studyId,
-							stage: "COSTING",
-						},
-						{
-							onSuccess: () => {
-								window.location.href = `/app/${organizationSlug}/pricing/studies/${studyId}/pricing`;
-							},
-						},
-					)
-				}
-				/* البوابة على إجمالي كل الأقسام (شاملاً التشوين/الأخرى) — الاقتصار على الإنشائي كان يقفل اعتماد دراسات التشطيبات/MEP فقط */
-				disabled={approveMutation.isPending || grandTotalAll === 0}
+				onClick={() => {
+					if (onNavigateToPricing) {
+						onNavigateToPricing();
+					} else {
+						window.location.href = `/app/${organizationSlug}/pricing/studies/${studyId}/pricing`;
+					}
+				}}
+				disabled={grandTotalAll === 0}
 				className="w-full gap-2 py-4 sm:py-6 text-sm sm:text-base rounded-xl"
 				size="lg"
 			>
-				{approveMutation.isPending ? (
-					<Loader2 className="h-5 w-5 animate-spin" />
-				) : (
-					<CheckCircle2 className="h-5 w-5" />
-				)}
-				اعتماد أسعار التكلفة والانتقال إلى التسعير
+				الانتقال إلى التسعير والأرباح
+				<ArrowLeft className="h-5 w-5" />
 			</Button>
 		</div>
 	);

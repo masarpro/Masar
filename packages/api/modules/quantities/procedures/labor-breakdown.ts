@@ -57,6 +57,34 @@ const laborBreakdownSchema = z.object({
 	steelPriceD6: z.number().nonnegative().max(999999999.99).optional(),
 	steelPriceD8: z.number().nonnegative().max(999999999.99).optional(),
 	steelPriceMain: z.number().nonnegative().max(999999999.99).optional(),
+	// المصاريف غير المباشرة — سلك ومسمار + إشراف + تشغيل
+	// (الإجمالي يُعاد حسابه على السيرفر في lib/indirect-costs.ts)
+	indirectCosts: z.object({
+		// مستهلكات: سلك تربيط (كجم/طن حديد) + مسامير شدات (كجم/م²)
+		tieWireEnabled: z.boolean().optional(),
+		tieWireKgPerTon: z.number().nonnegative().max(1000).optional(),
+		tieWirePricePerKg: z.number().nonnegative().max(999999.99).optional(),
+		nailsEnabled: z.boolean().optional(),
+		nailsKgPerSqm: z.number().nonnegative().max(1000).optional(),
+		nailsPricePerKg: z.number().nonnegative().max(999999.99).optional(),
+		// كميات مرجعية وقت الحفظ (من BOQ): أطنان حديد / م² شدات
+		steelTons: z.number().nonnegative().max(1000000).optional(),
+		formworkArea: z.number().nonnegative().max(100000000).optional(),
+		// الإشراف الهندسي والميداني: عدد × راتب شهري × أشهر
+		supervision: z.array(z.object({
+			id: z.string().trim().max(100),
+			role: z.string().trim().max(200),
+			count: z.number().nonnegative().max(1000),
+			monthlySalary: z.number().nonnegative().max(999999999.99),
+			months: z.number().nonnegative().max(1000),
+		})).optional(),
+		// مصاريف التشغيل: سكن عمال، إعاشة، كهرباء وماء، نقل، نثريات، ...
+		operating: z.array(z.object({
+			id: z.string().trim().max(100),
+			label: z.string().trim().max(200),
+			amount: z.number().nonnegative().max(999999999.99),
+		})).optional(),
+	}).optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════

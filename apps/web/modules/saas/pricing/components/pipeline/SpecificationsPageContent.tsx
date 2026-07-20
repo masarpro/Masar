@@ -17,7 +17,6 @@ import { deriveAllQuantities } from "../../lib/derivation-engine";
 import { InlineSpecEditor } from "../specifications/InlineSpecEditor";
 import { SpecQuickTemplateBar } from "../specifications/SpecQuickTemplateBar";
 import { StructuralSpecs } from "./StructuralSpecs";
-import { StageApprovalButton } from "./StageApprovalButton";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -58,13 +57,6 @@ export function SpecificationsPageContent({
 		(tab) => tab !== "manual" && tab !== "unified",
 	);
 	const [activeTab, setActiveTab] = useState(specTabs[0] || "structural");
-
-	// ─── Fetch stages ───
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.stages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
 
 	const { data: finishingItems = [] } = useQuery(
 		orpc.pricing.studies.getFinishingItems.queryOptions({
@@ -150,7 +142,7 @@ export function SpecificationsPageContent({
 	);
 
 	// ─── Loading ───
-	if (stagesLoading || studyLoading) {
+	if (studyLoading) {
 		return <StudyEditorSkeleton />;
 	}
 
@@ -161,22 +153,6 @@ export function SpecificationsPageContent({
 			</div>
 		);
 	}
-
-	const stages = (stagesData as any)?.stages ?? {
-		quantities: "DRAFT" as const,
-		specs: "NOT_STARTED" as const,
-		costing: "NOT_STARTED" as const,
-		pricing: "NOT_STARTED" as const,
-		quotation: "NOT_STARTED" as const,
-	};
-
-	const canApprove = (stagesData as any)?.canApprove ?? {
-		quantities: true,
-		specs: true,
-		costing: true,
-		pricing: true,
-		quotation: true,
-	};
 
 	return (
 		<div className="space-y-4" dir="rtl">
@@ -261,19 +237,6 @@ export function SpecificationsPageContent({
 					</div>
 				</TabsContent>
 			</Tabs>
-
-			{/* Approval Button */}
-			<div className="flex justify-end pt-4 border-t">
-				<StageApprovalButton
-					organizationId={organizationId}
-					organizationSlug={organizationSlug}
-					studyId={studyId}
-					stage="specs"
-					status={stages.specs}
-					canReopen
-					canApprove={canApprove.specs}
-				/>
-			</div>
 		</div>
 	);
 }

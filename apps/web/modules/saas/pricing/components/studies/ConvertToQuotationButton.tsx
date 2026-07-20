@@ -13,7 +13,8 @@ interface ConvertToQuotationButtonProps {
 	organizationSlug: string;
 	studyId: string;
 	studyType: string;
-	pricingStageStatus: string | undefined;
+	/** لم يعد الزر مشروطاً باعتماد التسعير — المراحل حية دائماً */
+	pricingStageStatus?: string | undefined;
 	/** اسم العميل من الدراسة — يُستخدم كاسم عميل العرض المبدئي */
 	clientName?: string | null;
 }
@@ -30,7 +31,6 @@ export function ConvertToQuotationButton({
 	organizationSlug,
 	studyId,
 	studyType,
-	pricingStageStatus,
 	clientName,
 }: ConvertToQuotationButtonProps) {
 	const t = useTranslations();
@@ -55,9 +55,6 @@ export function ConvertToQuotationButton({
 	// Only show for FULL_STUDY, FULL_PROJECT, or COST_PRICING
 	const allowedTypes = ["FULL_STUDY", "FULL_PROJECT", "COST_PRICING"];
 	if (!allowedTypes.includes(studyType)) return null;
-
-	// Only after the pricing stage is APPROVED
-	if (pricingStageStatus !== "APPROVED") return null;
 
 	const handleConvert = () => {
 		(createMutation as any).mutate({

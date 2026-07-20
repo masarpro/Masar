@@ -9,12 +9,10 @@ import { Label } from "@ui/components/label";
 import { cn } from "@ui/lib";
 import {
 	Calculator,
-	CheckCircle2,
 	ChevronDown,
 	ChevronLeft,
 	DollarSign,
 	Loader2,
-	Lock,
 	Percent,
 	Ruler,
 	TrendingUp,
@@ -52,15 +50,10 @@ export function PricingPageContentV2({
 		MEP: t("sections.mep"),
 		LABOR: t("sections.labor"),
 		MANUAL: t("sections.manual"),
+		INDIRECT: t("sections.indirect"),
 	};
 
 	// ─── Queries ──────────────────────────────────────────────────
-
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
 
 	const { data: markupSettings } = useQuery(
 		orpc.pricing.studies.markup.getSettings.queryOptions({
@@ -115,13 +108,8 @@ export function PricingPageContentV2({
 
 	// ─── Derived values ───────────────────────────────────────────
 
-	const stages = (stagesData as any)?.stages ?? [];
-	const costingStage = stages.find((s: { stage: string }) => s.stage === "COSTING");
-	const isCostingApproved = costingStage?.status === "APPROVED";
-
-	// QUICK_PRICING / CUSTOM_ITEMS skip directly to pricing — costing is auto-APPROVED
+	// المراحل حية دائماً — لا شرط اعتماد للتكلفة قبل التسعير
 	const studyType = (studyData as any)?.studyType ?? "FULL_PROJECT";
-	const skipCostingCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
 	// Build enabled sections based on workScopes.
 	// الدراسات الموحّدة: FINISHING/MEP تُسعَّر في مساحة العمل الموحدة، وهذه
@@ -290,17 +278,6 @@ export function PricingPageContentV2({
 		}),
 	);
 
-	const approveMutation = useMutation(
-		orpc.pricing.studies.studyStages.approve.mutationOptions({
-			onSuccess: () => {
-				toast.success(t("toasts.pricingStageApproved"));
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.studyStages.key(),
-				});
-			},
-		}),
-	);
-
 	// ─── Handlers ─────────────────────────────────────────────────
 
 	const handleSaveUniform = () => {
@@ -361,34 +338,10 @@ export function PricingPageContentV2({
 		});
 	};
 
-	// ─── Loading & guard ──────────────────────────────────────────
+	// ─── Loading ──────────────────────────────────────────────────
 
-	if (stagesLoading) {
+	if (profitLoading && !profitData) {
 		return <StudyEditorSkeleton />;
-	}
-
-	if (!skipCostingCheck && !isCostingApproved) {
-		return (
-			<div
-				className="flex flex-col items-center justify-center py-16 text-center"
-				dir="rtl"
-			>
-				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
-					<Lock className="h-10 w-10 text-chart-1" />
-				</div>
-				<h3 className="text-lg font-semibold mb-2">{t("locked.title")}</h3>
-				<p className="text-muted-foreground mb-4 max-w-md">
-					{t("locked.description")}
-				</p>
-				<Button asChild variant="outline" className="rounded-xl">
-					<Link
-						href={`/app/${organizationSlug}/pricing/studies/${studyId}/costing`}
-					>
-						{t("locked.backToCosting")}
-					</Link>
-				</Button>
-			</div>
-		);
 	}
 
 	// ─── Method definitions ───────────────────────────────────────
@@ -1098,26 +1051,8 @@ export function PricingPageContentV2({
 				/>
 			)}
 
-			{/* ═══ Approve & navigate ═══ */}
+			{/* ═══ Navigate to quotation ═══ */}
 			<div className="flex gap-3 justify-end">
-				<Button
-					onClick={() =>
-						(approveMutation as any).mutate({ 
-							organizationId,
-							studyId,
-							stage: "PRICING",
-						})
-					}
-					disabled={approveMutation.isPending}
-					className="gap-2 rounded-xl"
-				>
-					{approveMutation.isPending ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
-					) : (
-						<CheckCircle2 className="h-4 w-4" />
-					)}
-					{t("actions.approvePricing")}
-				</Button>
 				<Button asChild variant="outline" className="gap-2 rounded-xl">
 					<Link
 						href={`/app/${organizationSlug}/pricing/studies/${studyId}/quotation`}

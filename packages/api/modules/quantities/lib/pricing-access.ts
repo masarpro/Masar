@@ -131,7 +131,9 @@ export function scrubPriceKeys(value: unknown): unknown {
 	if (value && typeof value === "object") {
 		const out: Record<string, unknown> = {};
 		for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
-			if (/price/i.test(key) || key === "dailyRate") continue;
+			// salary/amount تغطي رواتب الإشراف ومبالغ التشغيل في indirectCosts
+			// وكذلك lumpSumAmount ورواتب salaryWorkers القديمة
+			if (/price|salary|amount/i.test(key) || key === "dailyRate") continue;
 			out[key] = scrubPriceKeys(v);
 		}
 		return out;

@@ -7,8 +7,7 @@ import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { Badge } from "@ui/components/badge";
-import { FileText, Lock } from "lucide-react";
-import Link from "next/link";
+import { FileText } from "lucide-react";
 import { useState } from "react";
 import {
 	QuotationFormatSelector,
@@ -36,13 +35,6 @@ export function StudyQuotationPageContent({
 	const [perSqmPrice, setPerSqmPrice] = useState("");
 	const [lumpSumDesc, setLumpSumDesc] = useState("");
 
-	// Check that PRICING stage is APPROVED
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
 	// Fetch study details
 	const { data: study } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -64,34 +56,12 @@ export function StudyQuotationPageContent({
 		}),
 	);
 
-	const stages = (stagesData as any)?.stages ?? [];
-	const pricingStage = stages.find((s: any) => s.stage === "PRICING");
-	const isPricingApproved = pricingStage?.status === "APPROVED";
-
+	// المراحل حية دائماً — لا شرط اعتماد للتسعير قبل إنشاء عرض السعر
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
-	if (stagesLoading) {
+	if (!study) {
 		return <StudyEditorSkeleton />;
-	}
-
-	if (!isPricingApproved) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
-				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
-					<Lock className="h-10 w-10 text-chart-1" />
-				</div>
-				<h3 className="text-lg font-semibold mb-2">مرحلة عرض السعر مقفلة</h3>
-				<p className="text-muted-foreground mb-4 max-w-md">
-					يجب اعتماد مرحلة التسعير أولاً قبل إنشاء عرض السعر
-				</p>
-				<Button asChild variant="outline" className="rounded-xl">
-					<Link href={`/app/${organizationSlug}/pricing/studies/${studyId}/pricing`}>
-						الرجوع للتسعير
-					</Link>
-				</Button>
-			</div>
-		);
 	}
 
 	const buildingArea = Number((study as any)?.buildingArea ?? 0);

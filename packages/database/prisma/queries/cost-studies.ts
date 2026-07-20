@@ -6,12 +6,15 @@ import { db } from "../client";
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Derive the display status of a study from its stage scalar fields.
+ * Derive the display status of a study.
  *
  * عمود `status` في قاعدة البيانات لا يُحدَّث بعد الإنشاء (يبقى "draft")،
- * لذا نشتق الحالة من حقول المراحل عند القراءة — بدون أي كتابة على العمود:
- * - "completed": مرحلة التسعير (أو عرض السعر) معتمدة
- * - "in_progress": أي مرحلة APPROVED أو IN_REVIEW
+ * لذا نشتق الحالة عند القراءة — بدون أي كتابة على العمود.
+ *
+ * بعد إلغاء نظام الاعتماد/إعادة الفتح (المراحل حية دائماً) صارت الحالة
+ * مشتقة من تقدّم البيانات الفعلي بدل حالات الاعتماد:
+ * - "completed": أُنشئ عرض سعر من الدراسة (أو اعتماد قديم قبل الإلغاء)
+ * - "in_progress": توجد بنود كميات/تكلفة محفوظة (أو حالة مرحلة قديمة متقدمة)
  * - "draft": ما عدا ذلك
  */
 export function deriveCostStudyStatus(study: {
@@ -20,14 +23,36 @@ export function deriveCostStudyStatus(study: {
 	costingStatus?: string | null;
 	pricingStatus?: string | null;
 	quotationStatus?: string | null;
+	generatedQuotationId?: string | null;
+	_count?: {
+		structuralItems?: number;
+		finishingItems?: number;
+		mepItems?: number;
+		laborItems?: number;
+		quotes?: number;
+	} | null;
 }): "draft" | "in_progress" | "completed" {
+	// أُنجز عرض سعر — الدراسة مكتملة (يشمل بيانات الاعتماد القديمة)
 	if (
+		study.generatedQuotationId ||
+		(study._count?.quotes ?? 0) > 0 ||
 		study.pricingStatus === "APPROVED" ||
 		study.quotationStatus === "APPROVED"
 	) {
 		return "completed";
 	}
 
+	// وجود بنود محفوظة = عمل جارٍ
+	const itemCount =
+		(study._count?.structuralItems ?? 0) +
+		(study._count?.finishingItems ?? 0) +
+		(study._count?.mepItems ?? 0) +
+		(study._count?.laborItems ?? 0);
+	if (itemCount > 0) {
+		return "in_progress";
+	}
+
+	// توافق خلفي مع دراسات اعتُمدت مراحلها قبل إلغاء النظام
 	const stageStatuses = [
 		study.quantitiesStatus,
 		study.specsStatus,

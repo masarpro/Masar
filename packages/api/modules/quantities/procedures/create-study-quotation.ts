@@ -7,6 +7,7 @@ import { toNum } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { dedupeCostingItems } from "../lib/costing-aggregation";
+import { computeIndirectCosts } from "../lib/indirect-costs";
 
 const displayConfigSchema = z.object({
 	grouping: z.enum(["BY_SECTION", "BY_FLOOR", "BY_ITEM", "FLAT"]),
@@ -94,16 +95,33 @@ export const createStudyQuotation = subscriptionProcedure
 		// Generate quotation items based on format
 		// dedupe يحمي من صفوف CostingItem التاريخية المكررة (نفس البند المصدري)
 		const costingItems = dedupeCostingItems(study.costingItems);
+		const itemsForQuotation = costingItems.map((item) => ({
+			id: item.id,
+			section: item.section,
+			description: item.description,
+			unit: item.unit,
+			quantity: toNum(item.quantity),
+			totalCost: toNum(item.totalCost),
+		}));
+
+		// المصاريف غير المباشرة (سلك ومسمار، إشراف، تشغيل) — بند تكلفة إضافي
+		// حتى لا يقل إجمالي العرض عن التكلفة الفعلية للدراسة
+		const indirect = computeIndirectCosts(study.laborBreakdown);
+		if (indirect.total > 0) {
+			itemsForQuotation.push({
+				id: "__indirect-costs__",
+				section: "INDIRECT",
+				description:
+					"مصاريف غير مباشرة (إشراف هندسي وتشغيل ومستهلكات)",
+				unit: "مقطوع",
+				quantity: 1,
+				totalCost: indirect.total,
+			});
+		}
+
 		const quotationItems = generateItems(
 			input.format,
-			costingItems.map((item) => ({
-				id: item.id,
-				section: item.section,
-				description: item.description,
-				unit: item.unit,
-				quantity: toNum(item.quantity),
-				totalCost: toNum(item.totalCost),
-			})),
+			itemsForQuotation,
 			{
 				sectionMarkupsMap,
 				defaultMarkup,
@@ -314,6 +332,7 @@ function generateItems(
 					MEP: "الأعمال الكهروميكانيكية",
 					LABOR: "أعمال العمالة",
 					MANUAL: "بنود إضافية",
+					INDIRECT: "مصاريف غير مباشرة",
 				};
 
 				for (const [section, cost] of sectionTotals) {

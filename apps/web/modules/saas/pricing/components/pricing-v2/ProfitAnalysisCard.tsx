@@ -12,6 +12,12 @@ import {
 
 interface ProfitAnalysisData {
 	totalCost: number;
+	indirect?: {
+		consumablesTotal: number;
+		supervisionTotal: number;
+		operatingTotal: number;
+		total: number;
+	} | null;
 	overheadAmount: number;
 	profitAmount: number;
 	contingencyAmount: number;
@@ -38,8 +44,20 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
+	const indirectTotal = data.indirect?.total ?? 0;
+
 	const rows: { label: string; value: number; isSeparator?: boolean }[] = [
-		{ label: "التكلفة المباشرة", value: data.totalCost },
+		// التكلفة الإجمالية تشمل غير المباشرة — نعرض التفصيل للوضوح
+		...(indirectTotal > 0
+			? [
+					{ label: "التكلفة المباشرة", value: data.totalCost - indirectTotal },
+					{
+						label: "مصاريف غير مباشرة (سلك ومسمار، إشراف، تشغيل)",
+						value: indirectTotal,
+					},
+					{ label: "إجمالي التكلفة", value: data.totalCost, isSeparator: true },
+				]
+			: [{ label: "التكلفة المباشرة", value: data.totalCost }]),
 		...(data.profitAmount > 0
 			? [{ label: `هامش الربح (${fmt(data.profitPercent)}%)`, value: data.profitAmount }]
 			: []),
@@ -92,6 +110,12 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 					</TableRow>
 				</TableFooter>
 			</Table>
+
+			{/* توضيح: الربح يُحسب من السعر قبل الضريبة — الضريبة لا تدخل في الربح */}
+			<p className="px-4 pb-3 pt-2 text-xs text-muted-foreground text-center">
+				هامش الربح يُحسب على التكلفة قبل الضريبة — ضريبة القيمة المضافة
+				تُضاف في النهاية فقط ولا تدخل في حساب الربح.
+			</p>
 
 			{/* Per-sqm & profit % below the table */}
 			{(data.buildingArea > 0 || data.profitPercent > 0) && (

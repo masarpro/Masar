@@ -165,30 +165,6 @@ export function QuickPricingPageContent({
 		}),
 	);
 
-	const approveMutation = useMutation(
-		// المخزن الجديد (StudyStage) — يزامن الحقول القديمة داخل $transaction
-		orpc.pricing.studies.studyStages.approve.mutationOptions({
-			onSuccess: () => {
-				toast.success(t("toasts.pricingStageApproved"));
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.stages.key(),
-				});
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.studyStages.key(),
-				});
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.getById.key(),
-				});
-				queryClient.invalidateQueries({
-					queryKey: orpc.pricing.studies.list.key(),
-				});
-			},
-			onError: (error: any) => {
-				toast.error(error.message || t("toasts.approveError"));
-			},
-		}),
-	);
-
 	// ─── Handlers ─────────────────────────────────────────────────
 	const handleSaveItems = async () => {
 		const validItems = items.filter(
@@ -233,14 +209,6 @@ export function QuickPricingPageContent({
 		router.push(
 			`/app/${organizationSlug}/pricing/studies/${studyId}/quotation`,
 		);
-	};
-
-	const handleApprove = () => {
-		(approveMutation as any).mutate({
-			organizationId,
-			studyId,
-			stage: "PRICING",
-		});
 	};
 
 	// ─── Render ───────────────────────────────────────────────────
@@ -552,19 +520,6 @@ export function QuickPricingPageContent({
 				>
 					<FileText className="h-4 w-4" />
 					{t("quick.createQuotation")}
-				</Button>
-
-				<Button
-					onClick={handleApprove}
-					disabled={approveMutation.isPending}
-					className="gap-2 rounded-xl"
-				>
-					{approveMutation.isPending ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
-					) : (
-						<Zap className="h-4 w-4" />
-					)}
-					{t("quick.approve")}
 				</Button>
 			</div>
 		</div>

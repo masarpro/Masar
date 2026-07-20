@@ -1,12 +1,5 @@
 "use client";
 
-import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
-import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
-import { Lock } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@ui/components/button";
-
 import { SpecificationsPageContent } from "../pipeline/SpecificationsPageContent";
 
 interface SpecificationsPageContentV2Props {
@@ -15,57 +8,14 @@ interface SpecificationsPageContentV2Props {
 	studyId: string;
 }
 
+// المراحل حية دائماً — أُلغي نظام الاعتماد/إعادة الفتح، فلا قفل على المواصفات
 export function SpecificationsPageContentV2({
 	organizationId,
 	organizationSlug,
 	studyId,
 }: SpecificationsPageContentV2Props) {
-	// Check that QUANTITIES stage is APPROVED
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	const stages = (stagesData as any)?.stages ?? [];
-	const quantitiesStage = stages.find((s: any) => s.stage === "QUANTITIES");
-	const isQuantitiesApproved = quantitiesStage?.status === "APPROVED";
-
-	// Fetch study to check studyType for skip logic
-	const { data: studyForType } = useQuery(
-		orpc.pricing.studies.getById.queryOptions({
-			input: { id: studyId, organizationId },
-		}),
-	);
-	const studyType = (studyForType as any)?.studyType ?? "FULL_PROJECT";
-	const skipQuantitiesCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
-
-	if (stagesLoading) {
-		return <StudyEditorSkeleton />;
-	}
-
-	if (!skipQuantitiesCheck && !isQuantitiesApproved) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
-				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
-					<Lock className="h-10 w-10 text-chart-1" />
-				</div>
-				<h3 className="text-lg font-semibold mb-2">مرحلة المواصفات مقفلة</h3>
-				<p className="text-muted-foreground mb-4 max-w-md">
-					يجب اعتماد مرحلة الكميات أولاً قبل البدء في تحديد المواصفات
-				</p>
-				<Button asChild variant="outline" className="rounded-xl">
-					<Link href={`/app/${organizationSlug}/pricing/studies/${studyId}/quantities`}>
-						الرجوع للكميات
-					</Link>
-				</Button>
-			</div>
-		);
-	}
-
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* Existing specs content (editing specs per item) */}
 			{/* كتلة BOM حُذفت بطلب جودت — كانت تعرض "لم يتم استخراج المواد
 			    بعد" داخل الدراسة الإنشائية بلا فائدة */}
 			<SpecificationsPageContent

@@ -38,7 +38,11 @@ import { useTranslations } from "next-intl";
 import {
 	aggregateBOQ,
 	buildFloorFilterOptions,
+	buildItemFilterOptions,
+	buildSectionFilterOptions,
 	filterItemsByFloor,
+	filterItemsById,
+	filterItemsBySection,
 	getItemFloorGroup,
 	type StructuralItem,
 	type BOQSection,
@@ -100,6 +104,8 @@ export function BOQSummaryTable({
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
 	const [selectedFloor, setSelectedFloor] = useState<string>("all");
+	const [selectedSection, setSelectedSection] = useState<string>("all");
+	const [selectedItemId, setSelectedItemId] = useState<string>("all");
 
 	// Fetch organization settings (cached)
 	const { data: orgSettings } = useQuery({
@@ -114,9 +120,37 @@ export function BOQSummaryTable({
 		[items, enabledFloors],
 	);
 
-	const filteredItems = useMemo(
+	const floorFilteredItems = useMemo(
 		() => filterItemsByFloor(items, selectedFloor, enabledFloors),
 		[items, selectedFloor, enabledFloors],
+	);
+
+	// فلتر البند (القسم الإنشائي) — خياراته تُبنى من عناصر الدور المختار
+	const sectionOptions = useMemo(
+		() => buildSectionFilterOptions(floorFilteredItems),
+		[floorFilteredItems],
+	);
+	const effectiveSection = sectionOptions.some((o) => o.value === selectedSection)
+		? selectedSection
+		: "all";
+
+	const sectionFilteredItems = useMemo(
+		() => filterItemsBySection(floorFilteredItems, effectiveSection),
+		[floorFilteredItems, effectiveSection],
+	);
+
+	// فلتر العنصر المنفرد — بند واحد فقط بدون البقية
+	const itemOptions = useMemo(
+		() => buildItemFilterOptions(sectionFilteredItems),
+		[sectionFilteredItems],
+	);
+	const effectiveItemId = itemOptions.some((o) => o.value === selectedItemId)
+		? selectedItemId
+		: "all";
+
+	const filteredItems = useMemo(
+		() => filterItemsById(sectionFilteredItems, effectiveItemId),
+		[sectionFilteredItems, effectiveItemId],
 	);
 
 	const summary = useMemo(() => aggregateBOQ(filteredItems), [filteredItems]);
@@ -143,6 +177,17 @@ export function BOQSummaryTable({
 	}, [summary]);
 
 	const selectedFloorLabel = floorOptions.find((o) => o.value === selectedFloor)?.label;
+	const selectedSectionLabel = sectionOptions.find((o) => o.value === effectiveSection)?.label;
+	const selectedItemLabel = itemOptions.find((o) => o.value === effectiveItemId)?.label;
+
+	// وصف النطاق المُفلتر (للتصدير والطباعة)
+	const scopeLabel = [
+		selectedFloor !== "all" ? selectedFloorLabel : undefined,
+		effectiveSection !== "all" ? selectedSectionLabel : undefined,
+		effectiveItemId !== "all" ? selectedItemLabel : undefined,
+	]
+		.filter(Boolean)
+		.join(" - ") || undefined;
 
 	const toggleSection = (key: string) => {
 		setExpandedSections((prev) => {
@@ -169,7 +214,7 @@ export function BOQSummaryTable({
 			activeTab,
 			summary,
 			studyName,
-			floorLabel: selectedFloor !== "all" ? selectedFloorLabel : undefined,
+			floorLabel: scopeLabel,
 			organizationName: orgSettingsAny?.companyNameAr ?? undefined,
 			organizationLogo: resolveImageSrc(orgSettingsAny?.logo),
 			organizationAddress: orgSettingsAny?.address ?? undefined,
@@ -197,8 +242,8 @@ export function BOQSummaryTable({
 				</h3>
 				<BOQExportDropdown
 					onExcelExport={() => {
-						const label = selectedFloor !== "all" && selectedFloorLabel
-							? `${studyName || ""} - ${selectedFloorLabel}`.trim()
+						const label = scopeLabel
+							? `${studyName || ""} - ${scopeLabel}`.trim()
 							: studyName;
 						if (activeTab === "factory") {
 							exportFactoryOrder(summary.factoryOrder, label);
@@ -212,24 +257,82 @@ export function BOQSummaryTable({
 				/>
 			</div>
 
-			{/* Floor Filter */}
-			{floorOptions.length > 2 && (
-				<div className="flex items-center gap-3 print:hidden">
-					<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.floorFilter")}:</span>
-					<Select value={selectedFloor} onValueChange={setSelectedFloor}>
-						<SelectTrigger className="w-[220px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{floorOptions.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.icon ? `${option.icon} ` : ""}{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-			)}
+			{/* Filters: floor / section (بند) / single item */}
+			<div className="flex flex-wrap items-center gap-3 print:hidden">
+				{floorOptions.length > 2 && (
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.floorFilter")}:</span>
+						<Select
+							value={selectedFloor}
+							onValueChange={(value) => {
+								setSelectedFloor(value);
+								setSelectedSection("all");
+								setSelectedItemId("all");
+							}}
+						>
+							<SelectTrigger className="w-[200px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{floorOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.icon ? `${option.icon} ` : ""}{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)}
+				{sectionOptions.length > 2 && (
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.sectionFilter")}:</span>
+						<Select
+							value={effectiveSection}
+							onValueChange={(value) => {
+								setSelectedSection(value);
+								setSelectedItemId("all");
+							}}
+						>
+							<SelectTrigger className="w-[200px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{sectionOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.icon ? `${option.icon} ` : ""}{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)}
+				{itemOptions.length > 2 && (
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.itemFilter")}:</span>
+						<Select
+							value={effectiveItemId}
+							onValueChange={setSelectedItemId}
+						>
+							<SelectTrigger className="w-[240px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{itemOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)}
+			</div>
+
+			{/* تنويه: الكميات محسوبة من المدخلات وقد تختلف عن الواقع */}
+			<div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400 print:hidden">
+				<AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+				<span>{t("structural.boq.accuracyNote")}</span>
+			</div>
 
 			{/* Tabs */}
 			<div className="flex gap-1 p-1 bg-muted rounded-lg print:hidden">

@@ -5,15 +5,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import {
 	Hammer,
-	Lock,
 	PaintBucket,
 	Users,
 	Wrench,
 	Calculator,
+	Receipt,
 	Save,
 	ArrowLeft,
+	Tags,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@ui/components/button";
 import { useEffect, useState } from "react";
 
@@ -22,6 +22,8 @@ import { FinishingCostingTab } from "./FinishingCostingTab";
 import { MEPCostingTab } from "./MEPCostingTab";
 import { LaborOverviewTab } from "./LaborOverviewTab";
 import { CostingSummaryTab } from "./CostingSummaryTab";
+import { IndirectCostsTab } from "./IndirectCostsTab";
+import { PricingPageContentV2 } from "../pricing-v2/PricingPageContentV2";
 import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { isUnifiedStudy } from "../../lib/unified-flag";
@@ -39,38 +41,26 @@ export function CostingPageContentV2({
 }: CostingPageContentV2Props) {
 	const [activeTab, setActiveTab] = useState("");
 
-	// Check that SPECIFICATIONS stage is APPROVED
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.studyStages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	const stages = (stagesData as any)?.stages ?? [];
-	const specsStage = stages.find((s: { stage: string }) => s.stage === "SPECIFICATIONS");
-	const isSpecsApproved = specsStage?.status === "APPROVED";
-
-	// Also fetch study for buildingArea and studyType
+	// Fetch study for buildingArea and studyType
 	const { data: study } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: { id: studyId, organizationId },
 		}),
 	);
 
-	// Study types that skip earlier stages have specs auto-APPROVED — skip the check for safety
 	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
-	const skipSpecsCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
-	// Auto-generate costing items when entering the page
+	// المراحل حية دائماً — توليد بنود التكلفة يعمل فور الدخول بلا شرط اعتماد
 	const generateMutation = useMutation(
 		orpc.pricing.studies.costing.generate.mutationOptions({}),
 	);
 
 	useEffect(() => {
-		if (isSpecsApproved && !generateMutation.isPending && !generateMutation.isSuccess) {
+		if (!generateMutation.isPending && !generateMutation.isSuccess) {
 			(generateMutation as any).mutate({ organizationId, studyId });
 		}
-	}, [isSpecsApproved]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	// إثراء سياق المساعد بمعلومات صفحة تسعير التكلفة v2
 	const updateAiContext = usePageContextStore((s) => s.updateContext);
@@ -87,32 +77,12 @@ export function CostingPageContentV2({
 				buildingArea: buildingAreaVal,
 				studyType,
 				activeTab: activeTab || "default",
-				specsApproved: isSpecsApproved ? "نعم" : "لا",
 			},
 		});
-	}, [study, studyType, activeTab, isSpecsApproved, updateAiContext]);
+	}, [study, studyType, activeTab, updateAiContext]);
 
-	if (stagesLoading) {
+	if (!study) {
 		return <StudyEditorSkeleton />;
-	}
-
-	if (!skipSpecsCheck && !isSpecsApproved) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
-				<div className="p-4 rounded-2xl bg-chart-1/15 mb-4">
-					<Lock className="h-10 w-10 text-chart-1" />
-				</div>
-				<h3 className="text-lg font-semibold mb-2">مرحلة تسعير التكلفة مقفلة</h3>
-				<p className="text-muted-foreground mb-4 max-w-md">
-					يجب اعتماد مرحلة المواصفات أولاً قبل البدء في تسعير التكلفة
-				</p>
-				<Button asChild variant="outline" className="rounded-xl">
-					<Link href={`/app/${organizationSlug}/pricing/studies/${studyId}/specifications`}>
-						الرجوع للمواصفات
-					</Link>
-				</Button>
-			</div>
-		);
 	}
 
 	const buildingArea = Number((study as any)?.buildingArea ?? 0);
@@ -136,15 +106,18 @@ export function CostingPageContentV2({
 			enabledTabs.push("finishing");
 		if (!unified && workScopes.includes("MEP")) enabledTabs.push("mep");
 	}
-	// Always include labor and summary
-	enabledTabs.push("labor", "summary");
+	// Always include labor, indirect costs, summary and pricing —
+	// لوحة واحدة مدموجة لتسعير التكلفة والتسعير (كل شيء حي)
+	enabledTabs.push("labor", "indirect", "summary", "pricing");
 
 	const tabDefs = [
 		{ value: "structural", icon: Hammer, label: "المواد" },
 		{ value: "finishing", icon: PaintBucket, label: "تشطيبات" },
 		{ value: "mep", icon: Wrench, label: "كهروميكانيكية" },
 		{ value: "labor", icon: Users, label: "المصنعيات" },
-		{ value: "summary", icon: Calculator, label: "ملخص" },
+		{ value: "indirect", icon: Receipt, label: "مصاريف غير مباشرة" },
+		{ value: "summary", icon: Calculator, label: "ملخص التكلفة" },
+		{ value: "pricing", icon: Tags, label: "التسعير والأرباح" },
 	].filter((t) => enabledTabs.includes(t.value));
 
 	// Set initial active tab to first enabled tab
@@ -212,12 +185,28 @@ export function CostingPageContentV2({
 					</Button>
 				</TabsContent>
 
+				<TabsContent value="indirect" className="mt-4">
+					<IndirectCostsTab
+						organizationId={organizationId}
+						studyId={studyId}
+					/>
+				</TabsContent>
+
 				<TabsContent value="summary" className="mt-4">
 					<CostingSummaryTab
 						organizationId={organizationId}
 						organizationSlug={organizationSlug}
 						studyId={studyId}
 						buildingArea={buildingArea}
+						onNavigateToPricing={() => setActiveTab("pricing")}
+					/>
+				</TabsContent>
+
+				<TabsContent value="pricing" className="mt-4">
+					<PricingPageContentV2
+						organizationId={organizationId}
+						organizationSlug={organizationSlug}
+						studyId={studyId}
 					/>
 				</TabsContent>
 			</Tabs>

@@ -4,6 +4,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { toNum } from "../../../lib/decimal-helpers";
 import { dedupeCostingItems } from "../lib/costing-aggregation";
+import { computeIndirectCosts } from "../lib/indirect-costs";
 import { VAT_RATE } from "@repo/utils";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -268,6 +269,7 @@ export const markupGetProfitAnalysis = protectedProcedure
 				contractValue: true,
 				studyType: true,
 				buildingArea: true,
+				laborBreakdown: true,
 			},
 		});
 
@@ -294,6 +296,17 @@ export const markupGetProfitAnalysis = protectedProcedure
 			const s = item.section;
 			sectionTotals.set(s, (sectionTotals.get(s) || 0) + cost);
 			totalCost += cost;
+		}
+
+		// المصاريف غير المباشرة (سلك ومسمار، إشراف، تشغيل) — قسم تكلفة إضافي
+		// يدخل في totalCost قبل الهوامش والضريبة (الضريبة لا تدخل في الربح)
+		const indirect = computeIndirectCosts(study.laborBreakdown);
+		if (indirect.total > 0) {
+			sectionTotals.set(
+				"INDIRECT",
+				(sectionTotals.get("INDIRECT") || 0) + indirect.total,
+			);
+			totalCost += indirect.total;
 		}
 
 		// Check if per-section markups exist
@@ -381,6 +394,7 @@ export const markupGetProfitAnalysis = protectedProcedure
 		return {
 			method,
 			totalCost,
+			indirect,
 			overheadAmount,
 			profitAmount,
 			contingencyAmount,
