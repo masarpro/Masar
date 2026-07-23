@@ -68,7 +68,7 @@ export function ProjectsHero({
 			</div>
 
 			{/* شريط الإحصائيات الزجاجي — 4 خلايا */}
-			<div className="mt-4 grid grid-cols-2 gap-3 rounded-[20px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-4 py-4 backdrop-blur-[24px] sm:mt-5 sm:grid-cols-4 sm:gap-6 sm:rounded-[24px] sm:px-8 sm:py-5">
+			<div className="mt-4 grid grid-cols-2 gap-3 rounded-[20px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-4 py-4 backdrop-blur-[24px] sm:mt-5 sm:gap-6 sm:rounded-[24px] sm:px-8 sm:py-5 lg:grid-cols-4">
 				{cells.map((cell) => (
 					<div key={cell.label} className="flex min-w-0 flex-col gap-1">
 						<p className="truncate text-xs font-semibold text-[#1d1d1d]/70 sm:text-sm">

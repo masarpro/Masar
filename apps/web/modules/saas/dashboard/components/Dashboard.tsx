@@ -99,11 +99,13 @@ export function Dashboard({
 		<div className="h-[220px] animate-pulse rounded-lg bg-muted" />
 	);
 
-	// Botly Dashboard/Light (Figma 120:11546), single viewport on xl.
+	// Botly Dashboard/Light (Figma 120:11546), single viewport on xltall
+	// (wide AND tall desktops). Short laptop screens keep the side-by-side
+	// columns but scroll naturally, so nothing gets squished or clipped.
 	// Left 2/3: hero → shortcut tiles → projects table (same width as hero).
 	// Right 1/3: cash-flow bars → portfolio pulse → attention + latest docs.
 	return (
-		<div className="flex flex-col gap-6 p-3 sm:p-4 xl:h-[calc(100dvh-11.25rem)] xl:min-h-[620px] xl:flex-row xl:overflow-hidden xl:p-0">
+		<div className="flex flex-col gap-6 p-3 sm:p-4 xl:flex-row xl:p-0 xltall:h-[calc(100dvh-11.25rem)] xltall:min-h-[620px] xltall:overflow-hidden">
 			{/* Fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
 				<div className="flex-1">
@@ -115,7 +117,7 @@ export function Dashboard({
 				<>
 					{/* Left column — 2/3 */}
 					<div className="flex min-h-0 min-w-0 flex-col gap-6 xl:w-2/3">
-						<div className="min-h-0 xl:flex-[4]">
+						<div className="min-h-0 xltall:flex-[4]">
 							{finLoading || statsLoading ? (
 								sectionSkeleton
 							) : (
@@ -152,12 +154,12 @@ export function Dashboard({
 							)}
 						</div>
 
-						<div className="min-h-0 xl:flex-[3]">
+						<div className="min-h-0 xltall:flex-[3]">
 							<QuickActionsGrid organizationSlug={organizationSlug} />
 						</div>
 
 						{showProjects && (
-							<div className="min-h-0 xl:flex-[5]">
+							<div className="min-h-0 xltall:flex-[5]">
 								{projLoading ? (
 									sectionSkeleton
 								) : (
@@ -173,7 +175,7 @@ export function Dashboard({
 					{/* Right column — 1/3 */}
 					<div className="flex min-h-0 min-w-0 flex-col gap-6 xl:w-1/3">
 						{showFinance && (
-							<div className="min-h-0 xl:flex-[4]">
+							<div className="min-h-0 xltall:flex-[4]">
 								{finLoading || statsLoading ? (
 									cardSkeleton
 								) : (
@@ -185,7 +187,7 @@ export function Dashboard({
 							</div>
 						)}
 						{showProjects && (
-							<div className="min-h-0 xl:flex-[3]">
+							<div className="min-h-0 xltall:flex-[3]">
 								{projLoading || statsLoading ? (
 									cardSkeleton
 								) : (
@@ -196,7 +198,7 @@ export function Dashboard({
 								)}
 							</div>
 						)}
-						<div className="min-h-0 xl:flex-[5]">
+						<div className="min-h-0 xltall:flex-[5]">
 							{statsLoading ? (
 								cardSkeleton
 							) : (

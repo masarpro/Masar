@@ -270,14 +270,16 @@ export function BotlyHero({
 
 	return (
 		<div
-			className="relative h-full min-h-[190px] overflow-hidden rounded-[32px] xl:min-h-0"
+			className="relative flex h-full min-h-[190px] flex-col overflow-hidden rounded-[32px]"
 			style={{
 				backgroundImage:
 					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
 			}}
 		>
-			{/* Content — greeting on a single line + contextual CTA + carousel arrows */}
-			<div className="absolute inset-x-6 top-6 flex items-center gap-2 xl:inset-x-12 xl:top-10 xl:gap-3">
+			{/* Content — greeting on a single line + contextual CTA + carousel arrows.
+			    In normal flow (not absolute) so on short laptop screens the card
+			    grows with its content instead of the greeting overlapping the strip. */}
+			<div className="flex items-center gap-2 px-6 pt-6 xl:gap-3 xl:px-12 xl:pt-8">
 				<h2 className="min-w-0 flex-1 truncate text-base font-bold leading-tight text-[#1d1d1d] xl:text-xl">
 					{t("dashboard.welcome.greeting", { name: orgName })}
 				</h2>
@@ -314,10 +316,14 @@ export function BotlyHero({
 				)}
 			</div>
 
+			{/* Flexible spacer — keeps the greeting and the stats strip apart,
+			    absorbs any extra height when the card is viewport-locked. */}
+			<div className="min-h-3 flex-1" />
+
 			{/* Bottom block — card title + dots, then the glass stats strip
 			    (Figma 45:4463: 12px inset, glass, rounded-24, px-36 py-24) */}
 			{activeCard && (
-				<div className="absolute inset-x-3 bottom-3 flex flex-col gap-1.5">
+				<div className="flex flex-col gap-1.5 p-3 pt-0">
 					{cards.length > 1 && (
 						<div className="flex items-center justify-between px-3">
 							<span className="truncate text-xs font-semibold text-[#1d1d1d]/60 xl:text-sm">
@@ -343,7 +349,7 @@ export function BotlyHero({
 						</div>
 					)}
 					{activeCard.stats.length > 0 && (
-						<div className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5">
+						<div className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-4 2xl:py-5">
 							{activeCard.stats.map((stat) => (
 								<div
 									key={stat.label}
@@ -352,7 +358,7 @@ export function BotlyHero({
 									<p className="truncate text-sm font-semibold leading-6 text-[#1d1d1d] xl:text-[17px]">
 										{stat.label}
 									</p>
-									<p className="truncate text-2xl font-bold tabular-nums leading-none tracking-[-0.84px] text-[#1d1d1d] xl:text-4xl xl:leading-[1.1]">
+									<p className="truncate text-2xl font-bold tabular-nums leading-none tracking-[-0.84px] text-[#1d1d1d] xl:text-3xl xl:leading-[1.1] 2xl:text-4xl">
 										{stat.value}
 									</p>
 								</div>

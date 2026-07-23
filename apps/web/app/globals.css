@@ -15,6 +15,15 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* xltall — desktop wide AND tall enough for the viewport-locked dashboard
+   (Botly single-viewport). Short laptop screens fall back to the normal
+   scrolling layout so the hero card never gets squished. */
+@custom-variant xltall {
+	@media (min-width: 80rem) and (min-height: 53.125rem) {
+		@slot;
+	}
+}
+
 /* Masar Card Glow — financial KPI cards */
 .masar-glow {
 	transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;

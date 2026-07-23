@@ -72,12 +72,13 @@ export function ModuleHeroCard({
 				)}
 			</div>
 
-			{/* Glass KPI strip — Figma 45:4463 */}
+			{/* Glass KPI strip — Figma 45:4463. Always allowed to wrap: on small
+			    desktop widths long currency values push cells to a second row
+			    instead of truncating into unreadable fragments. */}
 			{stats.length > 0 && (
 				<div
 					className={cn(
-						"flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-5",
-						compact && "flex-wrap gap-y-3 xl:gap-y-4",
+						"flex w-full flex-wrap gap-4 gap-y-3 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-5 py-3.5 backdrop-blur-[24px] xl:gap-6 xl:gap-y-4 xl:px-9 xl:py-5",
 					)}
 				>
 					{stats.map((s) => (
@@ -85,7 +86,7 @@ export function ModuleHeroCard({
 							key={s.label}
 							className={cn(
 								"flex min-w-0 flex-1 flex-col gap-1 xl:gap-1.5",
-								compact && "min-w-[140px] basis-[28%]",
+								compact ? "min-w-[140px] basis-[28%]" : "min-w-[150px]",
 							)}
 						>
 							<p
@@ -93,7 +94,7 @@ export function ModuleHeroCard({
 									"truncate text-xs font-semibold leading-tight text-[#1d1d1d]",
 									compact
 										? "xl:text-sm xl:leading-5"
-										: "xl:text-[17px] xl:leading-6",
+										: "xl:text-sm xl:leading-5 2xl:text-[17px] 2xl:leading-6",
 								)}
 							>
 								{s.label}
@@ -103,7 +104,7 @@ export function ModuleHeroCard({
 									"truncate font-bold tabular-nums leading-none tracking-[-0.5px] text-[#1d1d1d]",
 									compact
 										? "text-lg xl:text-2xl xl:leading-[1.1]"
-										: "text-xl xl:text-4xl xl:leading-[1.1]",
+										: "text-xl xl:text-2xl xl:leading-[1.1] 2xl:text-4xl",
 								)}
 							>
 								{s.value}

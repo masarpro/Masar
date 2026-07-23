@@ -82,8 +82,11 @@ export function FinancePanel({
 			</div>
 
 			{/* Explicit height: ResponsiveContainer needs a computed height —
-			    min-height alone resolves percentage children to 0 (prod bug). */}
-			<div className="h-36 xl:h-auto xl:min-h-0 xl:flex-1">
+			    min-height alone resolves percentage children to 0 (prod bug).
+			    Flexible fill only when the dashboard is viewport-locked (xltall);
+			    in the scrolling fallback the parent has no fixed height, so
+			    flex-1 with basis-0 would collapse the chart to 0px. */}
+			<div className="h-36 xltall:h-auto xltall:min-h-0 xltall:flex-1">
 				<FinancePanelChart financialTrend={financialTrend} />
 			</div>
 		</div>
