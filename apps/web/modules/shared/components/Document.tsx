@@ -76,7 +76,11 @@ export async function Document({
 				<SkipNavLink />
 				<NuqsAdapter>
 					<ConsentProvider
-						initialConsent={consentCookie?.value === "true"}
+						initialConsent={
+							consentCookie == null
+								? null
+								: consentCookie.value === "true"
+						}
 					>
 						<ClientProviders>{children}</ClientProviders>
 					</ConsentProvider>

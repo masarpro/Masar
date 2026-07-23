@@ -119,6 +119,13 @@ export function NewClientDialog({ open, onOpenChange, organizationId, onClientCr
 
 // ─── Add Payment Dialog ─────────────────────────────────────
 
+interface PaymentAccountOption {
+	id: string;
+	name: string;
+	accountType?: string;
+	balance?: number | string;
+}
+
 interface AddPaymentDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -128,12 +135,15 @@ interface AddPaymentDialogProps {
 	paymentMethod: string;
 	paymentReference: string;
 	paymentNotes: string;
+	paymentAccountId: string;
+	accounts: PaymentAccountOption[];
 	isPending: boolean;
 	onPaymentAmountChange: (value: string) => void;
 	onPaymentDateChange: (value: string) => void;
 	onPaymentMethodChange: (value: string) => void;
 	onPaymentReferenceChange: (value: string) => void;
 	onPaymentNotesChange: (value: string) => void;
+	onPaymentAccountChange: (value: string) => void;
 	onSubmit: () => void;
 }
 
@@ -146,12 +156,15 @@ export function AddPaymentDialog({
 	paymentMethod,
 	paymentReference,
 	paymentNotes,
+	paymentAccountId,
+	accounts,
 	isPending,
 	onPaymentAmountChange,
 	onPaymentDateChange,
 	onPaymentMethodChange,
 	onPaymentReferenceChange,
 	onPaymentNotesChange,
+	onPaymentAccountChange,
 	onSubmit,
 }: AddPaymentDialogProps) {
 	const t = useTranslations();
@@ -184,6 +197,24 @@ export function AddPaymentDialog({
 							onChange={(e: any) => onPaymentDateChange(e.target.value)}
 							className="rounded-xl mt-1"
 						/>
+					</div>
+					<div>
+						<Label>{t("finance.invoices.receivingAccount")} *</Label>
+						<Select value={paymentAccountId} onValueChange={onPaymentAccountChange}>
+							<SelectTrigger className="rounded-xl mt-1">
+								<SelectValue placeholder={t("finance.expenses.selectAccountPlaceholder")} />
+							</SelectTrigger>
+							<SelectContent className="rounded-xl">
+								{accounts.map((account) => (
+									<SelectItem key={account.id} value={account.id}>
+										{account.name}
+										{account.balance != null
+											? ` (${new Intl.NumberFormat("en-US").format(Number(account.balance))})`
+											: ""}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 					<div>
 						<Label>{t("finance.invoices.paymentMethod")}</Label>
@@ -225,7 +256,7 @@ export function AddPaymentDialog({
 					</Button>
 					<Button
 						onClick={onSubmit}
-						disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || isPending}
+						disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || !paymentAccountId || isPending}
 						className="rounded-xl"
 					>
 						<Plus className="h-4 w-4 me-2" />

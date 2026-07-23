@@ -3,6 +3,7 @@
  * Universal Professional Template - Bilingual (Arabic/English)
  */
 
+import { numberToArabicWords } from "@repo/utils";
 import type { ElementType } from "../components/templates/ComponentsPanel";
 
 export interface TemplateElement {
@@ -1101,69 +1102,12 @@ export function getPresetByKey(key: string): DefaultTemplateConfig | undefined {
 }
 
 /**
- * Convert number to Arabic words (for Saudi Riyal)
+ * Convert number to Arabic words (for Saudi Riyal).
+ * Delegates to the canonical @repo/utils implementation — the previous local
+ * copy printed digits for 11-999 thousands ("14 ألف" instead of "أربعة عشر
+ * ألفاً") and had no millions support.
  */
-export function numberToArabicWords(amount: number): string {
-	const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
-	const tens = ["", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
-	const teens = ["عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"];
-	const hundreds = ["", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
-
-	if (amount === 0) return "صفر";
-
-	const parts: string[] = [];
-	const intPart = Math.floor(amount);
-	const decPart = Math.round((amount - intPart) * 100);
-
-	// Handle thousands
-	if (intPart >= 1000) {
-		const thousands = Math.floor(intPart / 1000);
-		if (thousands === 1) {
-			parts.push("ألف");
-		} else if (thousands === 2) {
-			parts.push("ألفان");
-		} else if (thousands <= 10) {
-			parts.push(ones[thousands] + " آلاف");
-		} else {
-			parts.push(thousands.toString() + " ألف");
-		}
-	}
-
-	// Handle hundreds
-	const remainder = intPart % 1000;
-	if (remainder >= 100) {
-		const hundredIndex = Math.floor(remainder / 100);
-		parts.push(hundreds[hundredIndex]);
-	}
-
-	// Handle tens and ones
-	const tensAndOnes = remainder % 100;
-	if (tensAndOnes > 0) {
-		if (tensAndOnes >= 10 && tensAndOnes < 20) {
-			parts.push(teens[tensAndOnes - 10]);
-		} else {
-			const onesDigit = tensAndOnes % 10;
-			const tensDigit = Math.floor(tensAndOnes / 10);
-
-			if (onesDigit > 0 && tensDigit > 0) {
-				parts.push(ones[onesDigit] + " و" + tens[tensDigit]);
-			} else if (onesDigit > 0) {
-				parts.push(ones[onesDigit]);
-			} else if (tensDigit > 0) {
-				parts.push(tens[tensDigit]);
-			}
-		}
-	}
-
-	let result = parts.join(" و") + " ريال سعودي";
-
-	// Handle halalas
-	if (decPart > 0) {
-		result += " و" + decPart.toString() + " هللة";
-	}
-
-	return result;
-}
+export { numberToArabicWords };
 
 /**
  * Convert number to English words

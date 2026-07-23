@@ -340,7 +340,8 @@ export const createExpenseProcedure = subscriptionProcedure
 					isVatExempt: dbCategory.isVatExempt,
 					amount: expense.amount,
 					date: expense.date,
-					description: input.description ?? expense.description ?? "",
+					description:
+						input.description || expense.description || dbCategory.nameAr,
 					sourceAccountId: input.sourceAccountId,
 					projectId: input.projectId,
 					sourceType: input.sourceType,
@@ -428,7 +429,9 @@ export const updateExpenseProcedure = subscriptionProcedure
 			categoryId: z.string().trim().max(100).optional(),
 			subcategoryId: z.string().trim().max(100).optional(),
 			description: optionalTrimmed(MAX_DESC),
+			amount: positiveAmount().optional(),
 			date: z.coerce.date().optional(),
+			sourceAccountId: z.string().trim().max(100).optional(),
 			vendorName: optionalTrimmed(MAX_NAME),
 			vendorTaxNumber: z.string().trim().max(MAX_CODE).optional(),
 			projectId: z.string().trim().max(100).nullable().optional(),
@@ -483,10 +486,19 @@ export const updateExpenseProcedure = subscriptionProcedure
 
 		// Snapshot journal-affecting fields before the update so we can tell if the
 		// posted entry needs rebuilding (category/date/project drive GL account,
-		// period and cost-center — a stale entry silently diverges from the ledger).
+		// period and cost-center; amount/account drive the entry lines and the
+		// bank side — a stale entry silently diverges from the ledger).
 		const before = await db.financeExpense.findFirst({
 			where: { id, organizationId },
-			select: { status: true, category: true, categoryId: true, date: true, projectId: true },
+			select: {
+				status: true,
+				category: true,
+				categoryId: true,
+				date: true,
+				projectId: true,
+				amount: true,
+				sourceAccountId: true,
+			},
 		});
 
 		// Closed-period guard BEFORE any write: when a posted expense's
@@ -498,7 +510,9 @@ export const updateExpenseProcedure = subscriptionProcedure
 				(data.category !== undefined && data.category !== before.category) ||
 				(resolvedCategoryId !== undefined && resolvedCategoryId !== before.categoryId) ||
 				(data.date !== undefined && data.date.getTime() !== before.date.getTime()) ||
-				(rest.projectId !== undefined && rest.projectId !== before.projectId);
+				(rest.projectId !== undefined && rest.projectId !== before.projectId) ||
+				(rest.amount !== undefined && rest.amount !== Number(before.amount)) ||
+				(rest.sourceAccountId !== undefined && rest.sourceAccountId !== before.sourceAccountId);
 			if (willRebuildJournal) {
 				const newDate = data.date ?? before.date;
 				if (
@@ -513,7 +527,13 @@ export const updateExpenseProcedure = subscriptionProcedure
 			}
 		}
 
-		const expense = await updateExpense(id, organizationId, data);
+		let expense: Awaited<ReturnType<typeof updateExpense>>;
+		try {
+			expense = await updateExpense(id, organizationId, data);
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : "فشل تعديل المصروف";
+			throw new ORPCError("BAD_REQUEST", { message: msg });
+		}
 
 		// If the expense is already posted and a journal-affecting field changed,
 		// reverse the old entry and recreate it with the new values.
@@ -522,7 +542,9 @@ export const updateExpenseProcedure = subscriptionProcedure
 				(data.category !== undefined && data.category !== before.category) ||
 				(resolvedCategoryId !== undefined && resolvedCategoryId !== before.categoryId) ||
 				(data.date !== undefined && data.date.getTime() !== before.date.getTime()) ||
-				(rest.projectId !== undefined && rest.projectId !== before.projectId);
+				(rest.projectId !== undefined && rest.projectId !== before.projectId) ||
+				(rest.amount !== undefined && rest.amount !== Number(before.amount)) ||
+				(rest.sourceAccountId !== undefined && rest.sourceAccountId !== before.sourceAccountId);
 			if (journalFieldsChanged) {
 				try {
 					const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
@@ -535,7 +557,7 @@ export const updateExpenseProcedure = subscriptionProcedure
 					const payCategory = expense.categoryId
 						? await db.orgCategory.findUnique({
 								where: { id: expense.categoryId },
-								select: { accountCode: true, isVatExempt: true },
+								select: { accountCode: true, isVatExempt: true, nameAr: true },
 							})
 						: null;
 					await onExpenseCompleted(db, {
@@ -546,7 +568,8 @@ export const updateExpenseProcedure = subscriptionProcedure
 						isVatExempt: payCategory?.isVatExempt,
 						amount: expense.amount,
 						date: expense.date,
-						description: expense.description ?? expense.category,
+						description:
+							expense.description || payCategory?.nameAr || expense.category,
 						sourceAccountId: expense.sourceAccountId,
 						projectId: expense.projectId,
 						sourceType: expense.sourceType,

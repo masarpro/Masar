@@ -163,10 +163,16 @@ export async function getProjectFinanceSummary(
 	// Change order cost impacts are already VAT-inclusive → added on top.
 	const adjustedContractValueGross = grossContractValue + changeOrdersImpact;
 
+	// Remaining against the VAT-inclusive contract — the overview card shows the
+	// gross contract value, so its "remaining" KPI must use the same base or the
+	// percentage reads wrong (e.g. 100,000 displayed as 87% of a 115,000 header).
+	const remainingGross = adjustedContractValueGross - actualExpenses;
+
 	// Quantities & specifications grand total (دراسة الكميات والمواصفات).
 	// Computed identically to the project quantities summary page so the two
 	// figures always reconcile.
 	let quantitiesTotal = 0;
+	let quantitiesTotalNet = 0;
 	for (const study of costStudies) {
 		const subtotal =
 			study.structuralItems.reduce((s, i) => s + Number(i.totalCost), 0) +
@@ -179,10 +185,19 @@ export async function getProjectFinanceSummary(
 		const beforeVat = subtotal + overhead + profit + contingency;
 		const vat = study.vatIncluded ? beforeVat * VAT_RATE : 0;
 		quantitiesTotal += beforeVat + vat;
+		quantitiesTotalNet += beforeVat;
 	}
 
-	// Expected profit = (contract incl. VAT + change orders) − quantities total
-	const expectedProfit = adjustedContractValueGross - quantitiesTotal;
+	// Expected profit — computed NET of VAT on both sides: VAT collected on the
+	// contract is owed to ZATCA, not revenue, so including it overstated profit
+	// by 15% (a زero-cost project showed the gross contract as "profit").
+	const contractVatDivisor = contract?.includesVat
+		? 1 + (contract.vatPercent != null ? Number(contract.vatPercent) : 15) / 100
+		: 1;
+	const netContractValue = contract ? Number(contract.value) : contractValue;
+	const netChangeOrdersImpact = changeOrdersImpact / contractVatDivisor;
+	const expectedProfit =
+		netContractValue + netChangeOrdersImpact - quantitiesTotalNet;
 
 	// Total received (المقبوضات) = unified FinancePayment + legacy ProjectPayment.
 	// Project receipts are recorded through the project-payments module (ProjectPayment),
@@ -201,6 +216,7 @@ export async function getProjectFinanceSummary(
 		adjustedContractValue,
 		grossContractValue,
 		adjustedContractValueGross,
+		netContractValue,
 		quantitiesTotal,
 		expectedProfit,
 		changeOrdersImpact,
@@ -208,6 +224,7 @@ export async function getProjectFinanceSummary(
 		subcontractExpenses,
 		totalPayments,
 		remaining,
+		remainingGross,
 		claimsTotal,
 		claimsPaid,
 		claimsApproved,

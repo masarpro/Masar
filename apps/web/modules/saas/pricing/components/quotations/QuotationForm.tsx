@@ -664,7 +664,10 @@ export function QuotationForm({
 		return result.id;
 	};
 
-	// زر "حفظ" → commit ثم الانتقال لعرض السعر المعتمد
+	// زر "حفظ" → commit ثم الانتقال لمعاينة عرض السعر المعتمد.
+	// (المسار ${basePath}/${id} هو صفحة التعديل — الدخول إليها مباشرةً بعد
+	// الحفظ كان يفتح مسودة تعديل جديدة فوراً ويُظهر تحذير "تغييرات غير محفوظة"
+	// رغم نجاح الحفظ.)
 	const handleSaveClick = async () => {
 		if (!clientName.trim()) {
 			toast.error(t("pricing.quotations.errors.clientRequired"));
@@ -675,7 +678,7 @@ export function QuotationForm({
 			const id = await commitDraft();
 			if (id) {
 				toast.success(t("drafts.saveSuccess"));
-				router.push(`${basePath}/${id}`);
+				router.push(`${basePath}/${id}/preview`);
 			}
 		} catch (e: any) {
 			toast.error(e?.message || t("drafts.saveError"));
@@ -700,7 +703,7 @@ export function QuotationForm({
 			await orpcClient.pricing.quotations.updateStatus({ organizationId, id, status: "SENT" });
 			queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.key() });
 			toast.success(t("pricing.quotations.status.sentSuccess"));
-			router.push(`${basePath}/${id}`);
+			router.push(`${basePath}/${id}/preview`);
 		} catch (e: any) {
 			toast.error(e?.message || t("pricing.quotations.statusUpdateError"));
 			setIsPublishing(false);

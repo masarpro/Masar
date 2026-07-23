@@ -103,7 +103,17 @@ export function CreateInvoiceForm({
 	const [newPaymentMethod, setNewPaymentMethod] = useState("");
 	const [newPaymentReference, setNewPaymentReference] = useState("");
 	const [newPaymentNotes, setNewPaymentNotes] = useState("");
+	const [newPaymentAccountId, setNewPaymentAccountId] = useState("");
 	const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
+
+	// الحسابات البنكية — لاختيار الحساب المستلم للدفعة (لا تُجلب إلا عند فتح النافذة)
+	const { data: paymentAccountsData } = useQuery({
+		...orpc.finance.banks.list.queryOptions({
+			input: { organizationId, isActive: true },
+		}),
+		enabled: paymentDialogOpen,
+	});
+	const paymentAccounts = (paymentAccountsData as any)?.accounts ?? [];
 
 	// Validation state
 	const [itemErrors, setItemErrors] = useState<Record<string, string>>({});
@@ -485,6 +495,9 @@ export function CreateInvoiceForm({
 
 	const addPaymentMutation = useMutation({
 		mutationFn: async () => {
+			if (!newPaymentAccountId) {
+				throw new Error(t("finance.expenses.errors.accountRequired"));
+			}
 			return orpcClient.finance.invoices.addPayment({
 				organizationId,
 				id: invoiceId!,
@@ -493,6 +506,7 @@ export function CreateInvoiceForm({
 				paymentMethod: newPaymentMethod || undefined,
 				referenceNo: newPaymentReference || undefined,
 				notes: newPaymentNotes || undefined,
+				sourceAccountId: newPaymentAccountId,
 			});
 		},
 		onSuccess: () => {
@@ -500,6 +514,7 @@ export function CreateInvoiceForm({
 			setPaymentDialogOpen(false);
 			resetPaymentForm();
 			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.paymentAddError"));
@@ -518,6 +533,7 @@ export function CreateInvoiceForm({
 			toast.success(t("finance.invoices.paymentDeleteSuccess"));
 			setDeletePaymentId(null);
 			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.paymentDeleteError"));
@@ -562,6 +578,7 @@ export function CreateInvoiceForm({
 		setNewPaymentMethod("");
 		setNewPaymentReference("");
 		setNewPaymentNotes("");
+		setNewPaymentAccountId("");
 	};
 
 	const handleClientSelect = (client: Client | null) => {
@@ -932,12 +949,15 @@ export function CreateInvoiceForm({
 				paymentMethod={newPaymentMethod}
 				paymentReference={newPaymentReference}
 				paymentNotes={newPaymentNotes}
+				paymentAccountId={newPaymentAccountId}
+				accounts={paymentAccounts}
 				isPending={addPaymentMutation.isPending}
 				onPaymentAmountChange={setNewPaymentAmount}
 				onPaymentDateChange={setNewPaymentDate}
 				onPaymentMethodChange={setNewPaymentMethod}
 				onPaymentReferenceChange={setNewPaymentReference}
 				onPaymentNotesChange={setNewPaymentNotes}
+				onPaymentAccountChange={setNewPaymentAccountId}
 				onSubmit={() => addPaymentMutation.mutate()}
 			/>
 

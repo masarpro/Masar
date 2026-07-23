@@ -300,7 +300,7 @@ export function JournalEntriesPage({
 									className="h-8 w-full rounded-xl border border-input bg-transparent px-2 text-sm"
 								>
 									<option value="">{t("common.all")}</option>
-									{["INVOICE", "INVOICE_PAYMENT", "EXPENSE", "TRANSFER", "SUBCONTRACT_PAYMENT", "PAYROLL", "ORG_PAYMENT", "CREDIT_NOTE", "REVERSAL", "ADJUSTMENT", "OPENING_BALANCE", "MANUAL"].map((key) => (
+									{["INVOICE", "INVOICE_PAYMENT", "EXPENSE", "TRANSFER", "SUBCONTRACT_PAYMENT", "SUBCONTRACT_CLAIM_APPROVED", "PAYROLL", "ORG_PAYMENT", "PROJECT_PAYMENT", "PROJECT_CLAIM_APPROVED", "RECEIPT_VOUCHER", "PAYMENT_VOUCHER", "OWNER_DRAWING", "CAPITAL_CONTRIBUTION", "HANDOVER_RETENTION_RELEASE", "CREDIT_NOTE", "REVERSAL", "ADJUSTMENT", "OPENING_BALANCE", "MANUAL"].map((key) => (
 										<option key={key} value={key}>{t(`finance.accounting.referenceTypes.${key}`)}</option>
 									))}
 								</select>

@@ -2610,31 +2610,37 @@ export async function getOrCreateInvoiceEditDraft(
 	organizationId: string,
 	createdById: string,
 ) {
-	const existing = await db.financeInvoice.findFirst({
-		where: { organizationId, isDraft: true, sourceInvoiceId },
-		select: { id: true },
-	});
-	if (existing) {
-		return existing;
-	}
+	// Advisory xact-lock: serializes concurrent resume-or-create calls so they
+	// can't both miss the existence check and create duplicate edit drafts
+	// (same failure mode as quotation edit drafts).
+	return db.$transaction(async (tx) => {
+		await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`inv-edit:${organizationId}:${sourceInvoiceId}`}, 0))`;
 
-	const source = await db.financeInvoice.findFirst({
-		where: { id: sourceInvoiceId, organizationId },
-		include: { items: { orderBy: { sortOrder: "asc" } } },
-	});
-	if (!source) {
-		throw new Error("الفاتورة غير موجودة");
-	}
-	if (source.isDraft) {
-		throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
-	}
-	if (source.status !== "DRAFT") {
-		throw new Error(
-			"لا يمكن تعديل فاتورة تم إصدارها. أنشئ إشعاراً دائناً بدلاً من ذلك.",
-		);
-	}
+		const existing = await tx.financeInvoice.findFirst({
+			where: { organizationId, isDraft: true, sourceInvoiceId },
+			select: { id: true },
+		});
+		if (existing) {
+			return existing;
+		}
 
-	return db.financeInvoice.create({
+		const source = await tx.financeInvoice.findFirst({
+			where: { id: sourceInvoiceId, organizationId },
+			include: { items: { orderBy: { sortOrder: "asc" } } },
+		});
+		if (!source) {
+			throw new Error("الفاتورة غير موجودة");
+		}
+		if (source.isDraft) {
+			throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
+		}
+		if (source.status !== "DRAFT") {
+			throw new Error(
+				"لا يمكن تعديل فاتورة تم إصدارها. أنشئ إشعاراً دائناً بدلاً من ذلك.",
+			);
+		}
+
+		return tx.financeInvoice.create({
 		data: {
 			organizationId,
 			createdById,
@@ -2676,6 +2682,7 @@ export async function getOrCreateInvoiceEditDraft(
 			},
 		},
 		include: { items: { orderBy: { sortOrder: "asc" } } },
+		});
 	});
 }
 
@@ -3119,32 +3126,39 @@ export async function getOrCreateQuotationEditDraft(
 	organizationId: string,
 	createdById: string,
 ) {
-	const existing = await db.quotation.findFirst({
-		where: { organizationId, isDraft: true, sourceQuotationId },
-		select: { id: true },
-	});
-	if (existing) {
-		return existing;
-	}
+	// Advisory xact-lock: two concurrent resume-or-create calls (StrictMode
+	// double-effect, double navigation, two tabs) used to both miss the
+	// existence check and create duplicate edit drafts. The lock serializes
+	// them per (org, source quotation) and releases on commit/rollback.
+	return db.$transaction(async (tx) => {
+		await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`qt-edit:${organizationId}:${sourceQuotationId}`}, 0))`;
 
-	const source = await db.quotation.findFirst({
-		where: { id: sourceQuotationId, organizationId },
-		include: {
-			items: { orderBy: { sortOrder: "asc" } },
-			contentBlocks: { orderBy: { sortOrder: "asc" } },
-		},
-	});
-	if (!source) {
-		throw new Error("عرض السعر غير موجود");
-	}
-	if (source.isDraft) {
-		throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
-	}
-	if (source.status === "CONVERTED") {
-		throw new Error("لا يمكن تعديل عرض سعر تم تحويله إلى فاتورة.");
-	}
+		const existing = await tx.quotation.findFirst({
+			where: { organizationId, isDraft: true, sourceQuotationId },
+			select: { id: true },
+		});
+		if (existing) {
+			return existing;
+		}
 
-	return db.quotation.create({
+		const source = await tx.quotation.findFirst({
+			where: { id: sourceQuotationId, organizationId },
+			include: {
+				items: { orderBy: { sortOrder: "asc" } },
+				contentBlocks: { orderBy: { sortOrder: "asc" } },
+			},
+		});
+		if (!source) {
+			throw new Error("عرض السعر غير موجود");
+		}
+		if (source.isDraft) {
+			throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
+		}
+		if (source.status === "CONVERTED") {
+			throw new Error("لا يمكن تعديل عرض سعر تم تحويله إلى فاتورة.");
+		}
+
+		return tx.quotation.create({
 		data: {
 			organizationId,
 			createdById,
@@ -3199,6 +3213,7 @@ export async function getOrCreateQuotationEditDraft(
 			items: { orderBy: { sortOrder: "asc" } },
 			contentBlocks: { orderBy: { sortOrder: "asc" } },
 		},
+		});
 	});
 }
 

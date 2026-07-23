@@ -92,11 +92,18 @@ export function ProjectOverview({
 								financeSummary?.contractValue ??
 								0
 							}
+							netContractValue={financeSummary?.netContractValue}
 							actualExpenses={financeSummary?.actualExpenses ?? 0}
 							totalPayments={financeSummary?.totalPayments ?? 0}
-							remaining={financeSummary?.remaining ?? 0}
+							remaining={
+								financeSummary?.remainingGross ??
+								financeSummary?.remaining ??
+								0
+							}
 							claimsPaid={financeSummary?.claimsPaid ?? 0}
 							expectedProfit={financeSummary?.expectedProfit ?? 0}
+							upcomingClaimsTotal={financeSummary?.upcomingClaimsTotal ?? 0}
+							upcomingClaimsCount={financeSummary?.upcomingClaimsCount ?? 0}
 						/>
 					))}
 				<TimelineScheduleCard

@@ -5,11 +5,16 @@ import { useTranslations } from "next-intl";
 
 interface FinanceBudgetCardProps {
 	contractValue: number;
+	/** القيمة الصافية (قبل الضريبة) — أساس هامش الربح */
+	netContractValue?: number;
 	actualExpenses: number;
 	totalPayments: number;
 	remaining: number;
 	claimsPaid: number;
 	expectedProfit: number;
+	/** إجمالي المستخلصات المستحقة خلال 30 يوماً — لا تُعرض بطاقة "الدفعة القادمة" بدونها */
+	upcomingClaimsTotal?: number;
+	upcomingClaimsCount?: number;
 }
 
 function formatNumber(value: number): string {
@@ -27,11 +32,14 @@ function formatCompact(value: number): string {
 
 export function FinanceBudgetCard({
 	contractValue,
+	netContractValue,
 	actualExpenses,
 	totalPayments,
 	remaining,
 	claimsPaid,
 	expectedProfit,
+	upcomingClaimsTotal = 0,
+	upcomingClaimsCount = 0,
 }: FinanceBudgetCardProps) {
 	const t = useTranslations();
 
@@ -48,19 +56,22 @@ export function FinanceBudgetCard({
 	const retentionAmount = claimsPaid > 0 ? Math.round(claimsPaid * 0.1) : 0;
 	const retentionPct = claimsPaid > 0 ? 10 : 0;
 
-	// Expected profit comes from the backend:
-	// (contract incl. VAT + change orders) − quantities & specifications total
+	// Expected profit comes from the backend NET of VAT — the margin base is
+	// the net contract value so a zero-cost project reads 100%, not 115%.
+	const profitBase =
+		netContractValue && netContractValue > 0
+			? netContractValue
+			: contractValue;
 	const profitMargin =
-		contractValue > 0
-			? Math.round((expectedProfit / contractValue) * 100)
-			: 0;
+		profitBase > 0 ? Math.round((expectedProfit / profitBase) * 100) : 0;
 	const cashFlow = totalPayments - actualExpenses;
 
 	// Budget bar percentage
 	const budgetBarPct = Math.min(expensePct, 100);
 
-	// Next payment estimate (10% milestone or upcoming)
-	const nextPaymentAmount = Math.round(contractValue * 0.1);
+	// Next payment — real upcoming claims only (no synthetic 10% estimate)
+	const nextPaymentAmount = upcomingClaimsTotal;
+	const hasUpcomingPayment = upcomingClaimsCount > 0 && upcomingClaimsTotal > 0;
 
 	return (
 		<div className="flex flex-col overflow-hidden rounded-2xl border-2 bg-card">
@@ -238,28 +249,30 @@ export function FinanceBudgetCard({
 					</div>
 				</div>
 
-				{/* Next Payment */}
-				<div className="relative mt-auto overflow-hidden rounded-xl border border-chart-4 bg-chart-4/15 p-3.5 dark:border-chart-4/30 dark:bg-chart-4/20">
-					<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-chart-4/10" />
-					<div className="relative flex items-center justify-between">
-						<div className="flex items-center gap-1.5">
-							<CreditCard className="h-3.5 w-3.5 text-chart-4 dark:text-chart-4" />
-							<span className="text-xs font-semibold text-chart-4 dark:text-chart-4">
-								{t("projects.commandCenter.nextPayment")}
+				{/* Next Payment — real upcoming claims only */}
+				{hasUpcomingPayment && (
+					<div className="relative mt-auto overflow-hidden rounded-xl border border-chart-4 bg-chart-4/15 p-3.5 dark:border-chart-4/30 dark:bg-chart-4/20">
+						<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-chart-4/10" />
+						<div className="relative flex items-center justify-between">
+							<div className="flex items-center gap-1.5">
+								<CreditCard className="h-3.5 w-3.5 text-chart-4 dark:text-chart-4" />
+								<span className="text-xs font-semibold text-chart-4 dark:text-chart-4">
+									{t("projects.commandCenter.nextPayment")}
+								</span>
+							</div>
+							<span className="rounded-full bg-chart-4 px-2 py-0.5 text-[10px] font-semibold text-white">
+								{t("projects.commandCenter.milestonePayment")}
 							</span>
 						</div>
-						<span className="rounded-full bg-chart-4 px-2 py-0.5 text-[10px] font-semibold text-white">
-							{t("projects.commandCenter.milestonePayment")}
-						</span>
+						<div
+							className="relative mt-1.5 text-xl font-bold text-chart-4 dark:text-chart-4"
+							dir="ltr"
+							style={{ textAlign: "right" }}
+						>
+							{formatNumber(nextPaymentAmount)} {t("common.sar")}
+						</div>
 					</div>
-					<div
-						className="relative mt-1.5 text-xl font-bold text-chart-4 dark:text-chart-4"
-						dir="ltr"
-						style={{ textAlign: "right" }}
-					>
-						{formatNumber(nextPaymentAmount)} {t("common.sar")}
-					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);

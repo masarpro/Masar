@@ -183,6 +183,26 @@ export const GeneralExpenseTab = forwardRef<
 		(a: any) => a.id === formData.sourceAccountId,
 	);
 	const numericAmount = Number.parseFloat(formData.amount) || 0;
+	// في وضع التعديل: المبلغ الأصلي مخصوم مسبقاً من حسابه — أثر الحفظ الفعلي هو
+	// (إرجاع القديم لحسابه القديم) ثم (خصم الجديد من الحساب المختار). المعاينة
+	// تعكس ذلك بدل خصم المبلغ الجديد كاملاً مرة ثانية.
+	const originalAmount = isEditMode
+		? Number((existingExpense as any)?.amount ?? 0)
+		: 0;
+	const originalAccountId = isEditMode
+		? ((existingExpense as any)?.sourceAccountId ?? "")
+		: "";
+	const editRefund =
+		isEditMode && formData.sourceAccountId === originalAccountId
+			? originalAmount
+			: 0;
+	const projectedBalance = selectedAccount
+		? Number(selectedAccount.balance) + editRefund - numericAmount
+		: 0;
+	const balanceWillChange =
+		!!selectedAccount &&
+		numericAmount > 0 &&
+		projectedBalance !== Number(selectedAccount.balance);
 	const effectiveProjectId =
 		fixedProjectId || formData.projectId || undefined;
 
@@ -299,6 +319,17 @@ export const GeneralExpenseTab = forwardRef<
 			if (!formData.categoryId) {
 				throw new Error(t("finance.expenses.categoryRequired"));
 			}
+			if (!formData.amount || parseFloat(formData.amount) <= 0) {
+				throw new Error(t("finance.expenses.errors.amountRequired"));
+			}
+			// الالتزامات المعلقة بلا حساب مصدر تبقى قابلة للتعديل بدون حساب —
+			// الحساب إلزامي فقط للمصروفات المدفوعة (المكتملة)
+			if (
+				!formData.sourceAccountId &&
+				(existingExpense as any)?.status === "COMPLETED"
+			) {
+				throw new Error(t("finance.expenses.errors.accountRequired"));
+			}
 
 			return orpcClient.finance.expenses.update({
 				organizationId,
@@ -306,7 +337,9 @@ export const GeneralExpenseTab = forwardRef<
 				categoryId: formData.categoryId,
 				subcategoryId: formData.subcategoryId || undefined,
 				description: formData.description || undefined,
+				amount: parseFloat(formData.amount),
 				date: new Date(formData.date),
+				sourceAccountId: formData.sourceAccountId,
 				vendorName: formData.vendorName || undefined,
 				vendorTaxNumber: formData.vendorTaxNumber || undefined,
 				projectId: formData.projectId || null,
@@ -458,7 +491,6 @@ export const GeneralExpenseTab = forwardRef<
 						className="rounded-xl text-base font-semibold h-10"
 						dir="ltr"
 						required
-						disabled={isEditMode}
 					/>
 				</div>
 				<div className="space-y-1">
@@ -521,7 +553,7 @@ export const GeneralExpenseTab = forwardRef<
 					onValueChange={(value: any) =>
 						setFormData({ ...formData, sourceAccountId: value })
 					}
-					disabled={isObligation || isEditMode}
+					disabled={isObligation}
 				>
 					<SelectTrigger className="rounded-xl h-10">
 						<SelectValue
@@ -582,16 +614,13 @@ export const GeneralExpenseTab = forwardRef<
 								amount={Number(selectedAccount.balance)}
 							/>
 						</span>
-						{numericAmount > 0 && (
+						{balanceWillChange && (
 							<>
 								<ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-								<span className="text-destructive font-semibold">
-									<Currency
-										amount={
-											Number(selectedAccount.balance) -
-											numericAmount
-										}
-									/>
+								<span
+									className={`font-semibold ${projectedBalance < Number(selectedAccount.balance) ? "text-destructive" : "text-success"}`}
+								>
+									<Currency amount={projectedBalance} />
 								</span>
 							</>
 						)}

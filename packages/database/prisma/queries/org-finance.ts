@@ -1014,7 +1014,13 @@ export function getExpensePaymentStatus(expense: {
 }
 
 /**
- * Update an expense
+ * Update an expense.
+ *
+ * When `amount` or `sourceAccountId` changes, the operational balances are
+ * adjusted atomically: the already-paid amount is refunded to the old account
+ * and the new amount is deducted from the new account (with a non-negative
+ * balance guard). Facility-generated expenses reject amount/account changes —
+ * their run owns the money movement.
  */
 export async function updateExpense(
 	id: string,
@@ -1025,7 +1031,9 @@ export async function updateExpense(
 		categoryId: string;
 		subcategoryId: string;
 		description: string;
+		amount: number;
 		date: Date;
+		sourceAccountId: string;
 		vendorName: string;
 		vendorTaxNumber: string;
 		projectId: string | null;
@@ -1037,16 +1045,105 @@ export async function updateExpense(
 ) {
 	const existing = await db.financeExpense.findFirst({
 		where: { id, organizationId },
-		select: { id: true },
+		select: {
+			id: true,
+			status: true,
+			amount: true,
+			paidAmount: true,
+			sourceAccountId: true,
+			sourceType: true,
+		},
 	});
 
 	if (!existing) {
 		throw new Error("Expense not found");
 	}
 
-	return db.financeExpense.update({
-		where: { id },
-		data,
+	const { amount: newAmount, sourceAccountId: newAccountId, ...rest } = data;
+
+	const oldAmount = Number(existing.amount);
+	const oldPaid = Number(existing.paidAmount);
+	const oldAccountId = existing.sourceAccountId;
+
+	const amountChanged = newAmount !== undefined && newAmount !== oldAmount;
+	const accountChanged =
+		newAccountId !== undefined && newAccountId !== oldAccountId;
+
+	// No money-affecting change → plain update
+	if (!amountChanged && !accountChanged) {
+		return db.financeExpense.update({ where: { id }, data: rest });
+	}
+
+	// Money movement is owned by the source module for facility expenses
+	if (existing.sourceType !== "MANUAL") {
+		throw new Error(
+			"لا يمكن تعديل مبلغ/حساب مصروف مولّد من وحدة أخرى — عدّله من مصدره",
+		);
+	}
+	if (existing.status === "CANCELLED") {
+		throw new Error("لا يمكن تعديل مصروف ملغى");
+	}
+
+	const effectiveAmount = newAmount ?? oldAmount;
+	const effectiveAccountId = newAccountId ?? oldAccountId;
+	const isCompleted = existing.status === "COMPLETED";
+
+	// PENDING with partial payments: the new amount must still cover what was paid
+	if (!isCompleted && effectiveAmount < oldPaid) {
+		throw new Error(
+			`المبلغ الجديد (${effectiveAmount}) أقل من المدفوع فعلياً (${oldPaid})`,
+		);
+	}
+
+	// Amount actually deducted going forward: full amount when COMPLETED,
+	// otherwise whatever was already paid stays as-is on the (possibly new) account.
+	const newDeduction = isCompleted ? effectiveAmount : oldPaid;
+	const oldDeduction = oldPaid;
+
+	if (newDeduction > 0 && !effectiveAccountId) {
+		throw new Error("الحساب المصدر مطلوب");
+	}
+
+	return db.$transaction(async (tx) => {
+		// Serialize concurrent edits/payments on the same expense
+		await tx.$queryRaw`SELECT id FROM finance_expenses WHERE id = ${id} AND organization_id = ${organizationId} FOR UPDATE`;
+
+		// 1) Refund the old deduction to the old account
+		if (oldDeduction > 0 && oldAccountId) {
+			const refunded = await tx.organizationBank.updateMany({
+				where: { id: oldAccountId, organizationId },
+				data: { balance: { increment: oldDeduction } },
+			});
+			if (refunded.count === 0) {
+				throw new Error("الحساب المصدر السابق غير موجود");
+			}
+		}
+
+		// 2) Deduct the new amount from the new account (non-negative guard,
+		//    org-scoped so a foreign bank id can never be mutated)
+		if (newDeduction > 0 && effectiveAccountId) {
+			const deducted = await tx.organizationBank.updateMany({
+				where: {
+					id: effectiveAccountId,
+					organizationId,
+					balance: { gte: newDeduction },
+				},
+				data: { balance: { decrement: newDeduction } },
+			});
+			if (deducted.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
+		}
+
+		return tx.financeExpense.update({
+			where: { id },
+			data: {
+				...rest,
+				...(amountChanged ? { amount: effectiveAmount } : {}),
+				...(accountChanged ? { sourceAccountId: effectiveAccountId } : {}),
+				...(isCompleted ? { paidAmount: effectiveAmount } : {}),
+			},
+		});
 	});
 }
 

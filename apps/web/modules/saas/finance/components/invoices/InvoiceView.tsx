@@ -122,6 +122,7 @@ export function InvoiceView({
 	const [newPaymentMethod, setNewPaymentMethod] = useState("");
 	const [newPaymentReference, setNewPaymentReference] = useState("");
 	const [newPaymentNotes, setNewPaymentNotes] = useState("");
+	const [newPaymentAccountId, setNewPaymentAccountId] = useState("");
 
 	// ─── Queries ──────────────────────────────────────────────────────────
 	const { data: invoice, isLoading } = useQuery(
@@ -129,6 +130,15 @@ export function InvoiceView({
 			input: { organizationId, id: invoiceId },
 		}),
 	);
+
+	// الحسابات البنكية — لاختيار الحساب المستلم للدفعة (تُجلب عند فتح النافذة فقط)
+	const { data: paymentAccountsData } = useQuery({
+		...orpc.finance.banks.list.queryOptions({
+			input: { organizationId, isActive: true },
+		}),
+		enabled: paymentDialogOpen,
+	});
+	const paymentAccounts: any[] = (paymentAccountsData as any)?.accounts ?? [];
 
 	// ─── Derived state ───────────────────────────────────────────────────
 	const isDraft = invoice?.status === "DRAFT";
@@ -185,6 +195,9 @@ export function InvoiceView({
 	// Add payment
 	const addPaymentMutation = useMutation({
 		mutationFn: async () => {
+			if (!newPaymentAccountId) {
+				throw new Error(t("finance.expenses.errors.accountRequired"));
+			}
 			return orpcClient.finance.invoices.addPayment({
 				organizationId,
 				id: invoiceId,
@@ -193,6 +206,7 @@ export function InvoiceView({
 				paymentMethod: newPaymentMethod || undefined,
 				referenceNo: newPaymentReference || undefined,
 				notes: newPaymentNotes || undefined,
+				sourceAccountId: newPaymentAccountId,
 			});
 		},
 		onSuccess: () => {
@@ -201,6 +215,9 @@ export function InvoiceView({
 			resetPaymentForm();
 			queryClient.invalidateQueries({
 				queryKey: orpc.finance.invoices.key(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: orpc.finance.banks.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -222,6 +239,9 @@ export function InvoiceView({
 			setDeletePaymentId(null);
 			queryClient.invalidateQueries({
 				queryKey: orpc.finance.invoices.key(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: orpc.finance.banks.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -284,6 +304,7 @@ export function InvoiceView({
 		setNewPaymentMethod("");
 		setNewPaymentReference("");
 		setNewPaymentNotes("");
+		setNewPaymentAccountId("");
 	};
 
 	// ─── Loading / Not found ─────────────────────────────────────────────
@@ -558,6 +579,24 @@ export function InvoiceView({
 							<Input type="date" value={newPaymentDate} onChange={(e: any) => setNewPaymentDate(e.target.value)} className="rounded-xl mt-1" />
 						</div>
 						<div>
+							<Label>{t("finance.invoices.receivingAccount")} *</Label>
+							<Select value={newPaymentAccountId} onValueChange={setNewPaymentAccountId}>
+								<SelectTrigger className="rounded-xl mt-1">
+									<SelectValue placeholder={t("finance.expenses.selectAccountPlaceholder")} />
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									{paymentAccounts.map((account: any) => (
+										<SelectItem key={account.id} value={account.id}>
+											{account.name}
+											{account.balance != null
+												? ` (${new Intl.NumberFormat("en-US").format(Number(account.balance))})`
+												: ""}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+						<div>
 							<Label>{t("finance.invoices.paymentMethod")}</Label>
 							<Select value={newPaymentMethod} onValueChange={setNewPaymentMethod}>
 								<SelectTrigger className="rounded-xl mt-1">
@@ -583,7 +622,7 @@ export function InvoiceView({
 					</div>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => setPaymentDialogOpen(false)} className="rounded-xl">{t("common.cancel")}</Button>
-						<Button onClick={() => addPaymentMutation.mutate()} disabled={!newPaymentAmount || parseFloat(newPaymentAmount) <= 0 || addPaymentMutation.isPending} className="rounded-xl">
+						<Button onClick={() => addPaymentMutation.mutate()} disabled={!newPaymentAmount || parseFloat(newPaymentAmount) <= 0 || !newPaymentAccountId || addPaymentMutation.isPending} className="rounded-xl">
 							<Plus className="h-4 w-4 me-2" />
 							{addPaymentMutation.isPending ? t("common.saving") : t("finance.invoices.addPayment")}
 						</Button>

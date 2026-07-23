@@ -601,7 +601,13 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			paymentMethod: z.string().trim().max(MAX_CODE).optional(),
 			referenceNo: z.string().trim().max(MAX_CODE).optional(),
 			notes: optionalTrimmed(MAX_DESC),
-			sourceAccountId: z.string().trim().max(100).optional(),
+			// إلزامي: بدون حساب مستلم لا يتحدّث الرصيد التشغيلي بينما يفترض القيد
+			// التلقائي حساباً افتراضياً — فيتباعد دفتر الأستاذ عن شاشة البنوك.
+			sourceAccountId: z
+				.string()
+				.trim()
+				.min(1, "الحساب المستلم مطلوب")
+				.max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -646,7 +652,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 					clientName: inv.clientName,
 					amount: payment.amount,
 					date: new Date(input.paymentDate),
-					sourceAccountId: input.sourceAccountId || "",
+					sourceAccountId: input.sourceAccountId,
 					projectId: inv.projectId,
 					userId: context.user.id,
 				});

@@ -160,7 +160,7 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 									<td className="p-3">
 										<Link href={`${editBasePath}/${draft.id}`} className="font-medium text-primary hover:underline">
 											{sourceNo
-												? t("drafts.editDraftOf").replace("{number}", sourceNo)
+												? t("drafts.editDraftOf", { number: sourceNo })
 												: t("drafts.provisional")}
 										</Link>
 									</td>
