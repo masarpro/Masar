@@ -372,7 +372,9 @@ export const createExpenseProcedure = subscriptionProcedure
 						date: expense.date,
 						amount: expense.amount,
 						amountInWords: numberToArabicWords(Number(expense.amount)),
-						payeeName: input.vendorName || input.description || input.categoryId,
+						// لا تسقط أبداً لـ categoryId — كان يظهر CUID خام كاسم مستفيد
+						payeeName:
+							input.vendorName || input.description || dbCategory.nameAr,
 						payeeType: "SUPPLIER",
 						paymentMethod: input.paymentMethod || "BANK_TRANSFER",
 						sourceAccountId: input.sourceAccountId || null,
@@ -535,6 +537,34 @@ export const updateExpenseProcedure = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: msg });
 		}
 
+		// Keep the auto-created payment voucher in sync — a changed amount or
+		// source account otherwise leaves the voucher stating the OLD figures.
+		if (
+			(rest.amount !== undefined && rest.amount !== Number(before?.amount)) ||
+			(rest.sourceAccountId !== undefined &&
+				rest.sourceAccountId !== before?.sourceAccountId)
+		) {
+			try {
+				const { numberToArabicWords } = await import("@repo/utils");
+				await db.paymentVoucher.updateMany({
+					where: {
+						expenseId: id,
+						organizationId,
+						status: { not: "CANCELLED" },
+					},
+					data: {
+						amount: expense.amount,
+						amountInWords: numberToArabicWords(Number(expense.amount)),
+						...(rest.sourceAccountId !== undefined
+							? { sourceAccountId: rest.sourceAccountId }
+							: {}),
+					},
+				});
+			} catch (e) {
+				console.error("[PaymentVoucher] Failed to sync voucher after expense update:", e);
+			}
+		}
+
 		// If the expense is already posted and a journal-affecting field changed,
 		// reverse the old entry and recreate it with the new values.
 		if (before?.status === "COMPLETED") {
@@ -621,6 +651,18 @@ export const deleteExpenseProcedure = subscriptionProcedure
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
 			action: "payments",
+		});
+
+		// Cancel the auto-created payment voucher BEFORE deleting the expense —
+		// its expenseId FK is severed on delete, so a live voucher would stay
+		// ISSUED forever (orphan) with no way to trace it back.
+		await db.paymentVoucher.updateMany({
+			where: {
+				expenseId: input.id,
+				organizationId: input.organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
 		});
 
 		const result = await deleteExpense(input.id, input.organizationId);

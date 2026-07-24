@@ -2614,7 +2614,9 @@ export async function getOrCreateInvoiceEditDraft(
 	// can't both miss the existence check and create duplicate edit drafts
 	// (same failure mode as quotation edit drafts).
 	return db.$transaction(async (tx) => {
-		await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`inv-edit:${organizationId}:${sourceInvoiceId}`}, 0))`;
+		// $executeRaw, not $queryRaw: pg_advisory_xact_lock returns void which
+		// $queryRaw cannot deserialize.
+		await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`inv-edit:${organizationId}:${sourceInvoiceId}`}, 0))`;
 
 		const existing = await tx.financeInvoice.findFirst({
 			where: { organizationId, isDraft: true, sourceInvoiceId },
@@ -3131,7 +3133,9 @@ export async function getOrCreateQuotationEditDraft(
 	// existence check and create duplicate edit drafts. The lock serializes
 	// them per (org, source quotation) and releases on commit/rollback.
 	return db.$transaction(async (tx) => {
-		await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`qt-edit:${organizationId}:${sourceQuotationId}`}, 0))`;
+		// $executeRaw, not $queryRaw: pg_advisory_xact_lock returns void which
+		// $queryRaw cannot deserialize.
+		await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`qt-edit:${organizationId}:${sourceQuotationId}`}, 0))`;
 
 		const existing = await tx.quotation.findFirst({
 			where: { organizationId, isDraft: true, sourceQuotationId },

@@ -10,13 +10,15 @@ import {
 	DialogTitle,
 } from "@ui/components/dialog";
 import { Badge } from "@ui/components/badge";
-import { BuildingIcon, HomeIcon, WarehouseIcon, WrenchIcon } from "lucide-react";
+import { BuildingIcon, HomeIcon, Loader2, WarehouseIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { MILESTONE_TEMPLATES } from "../../lib/milestone-templates";
 
 interface MilestoneTemplateDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** يمنع النقر المزدوج أثناء تطبيق النموذج */
+	isApplying?: boolean;
 	onApply: (template: typeof MILESTONE_TEMPLATES[number]) => void;
 	onSkip: () => void;
 }
@@ -31,6 +33,7 @@ const TEMPLATE_ICONS: Record<string, typeof HomeIcon> = {
 export function MilestoneTemplateDialog({
 	open,
 	onOpenChange,
+	isApplying = false,
 	onApply,
 	onSkip,
 }: MilestoneTemplateDialogProps) {
@@ -57,12 +60,22 @@ export function MilestoneTemplateDialog({
 						return (
 							<Card
 								key={template.id}
-								className="p-4 cursor-pointer hover:border-primary transition-colors"
-								onClick={() => onApply(template)}
+								className={`p-4 transition-colors ${
+									isApplying
+										? "pointer-events-none opacity-60"
+										: "cursor-pointer hover:border-primary"
+								}`}
+								onClick={() => {
+									if (!isApplying) onApply(template);
+								}}
 							>
 								<div className="flex items-start gap-3">
 									<div className="p-2 rounded-xl bg-primary/10">
-										<Icon className="h-5 w-5 text-primary" />
+										{isApplying ? (
+											<Loader2 className="h-5 w-5 text-primary animate-spin" />
+										) : (
+											<Icon className="h-5 w-5 text-primary" />
+										)}
 									</div>
 									<div className="flex-1 min-w-0">
 										<h4 className="font-semibold text-sm">
@@ -88,7 +101,7 @@ export function MilestoneTemplateDialog({
 				</div>
 
 				<div className="flex justify-end mt-4">
-					<Button variant="ghost" onClick={onSkip}>
+					<Button variant="ghost" onClick={onSkip} disabled={isApplying}>
 						{t("execution.template.skip")}
 					</Button>
 				</div>

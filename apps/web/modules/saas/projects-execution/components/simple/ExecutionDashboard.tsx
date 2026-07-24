@@ -92,28 +92,21 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 		deleteMutation,
 	} = useMilestoneActions(projectId);
 
-	// Template application
+	// Template application — single atomic RPC (the old per-milestone/activity
+	// loop fired ~33 writes, tripped the 20/min rate limit mid-way with silent
+	// 429s, and double-clicks duplicated milestones)
 	const applyTemplateMutation = useMutation({
 		mutationFn: async (template: MilestoneTemplate) => {
 			if (!organizationId) throw new Error("No organization");
 
-			for (const milestone of template.milestones) {
-				const result = await apiClient.projectTimeline.createMilestone({
-					organizationId,
-					projectId,
-					title: milestone.title,
-				});
-
-				// Create activities for each milestone
-				for (const activityTitle of milestone.activities) {
-					await apiClient.projectExecution.createActivity({
-						organizationId,
-						projectId,
-						milestoneId: result.milestone.id,
-						title: activityTitle,
-					});
-				}
-			}
+			return apiClient.projectTimeline.applyTemplate({
+				organizationId,
+				projectId,
+				milestones: template.milestones.map((m) => ({
+					title: m.title,
+					activities: [...m.activities],
+				})),
+			});
 		},
 		onSuccess: () => {
 			toast.success(t("execution.notifications.templateApplied"));
@@ -328,6 +321,7 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 			<MilestoneTemplateDialog
 				open={isTemplateOpen}
 				onOpenChange={setIsTemplateOpen}
+				isApplying={applyTemplateMutation.isPending}
 				onApply={(template) => applyTemplateMutation.mutate(template)}
 				onSkip={() => {
 					setIsTemplateOpen(false);

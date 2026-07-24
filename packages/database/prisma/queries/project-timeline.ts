@@ -125,6 +125,71 @@ export async function getMilestone(
 }
 
 /**
+ * Apply a milestone template (milestones + their activities) in ONE atomic
+ * transaction. The previous flow issued one RPC per milestone/activity from
+ * the client (~33 writes for the villa template) — the 20/min write rate
+ * limit killed it mid-way with silent 429s, and a double-click duplicated
+ * everything. The advisory xact-lock serializes concurrent applies per
+ * project so a double submit can't interleave.
+ */
+export async function applyMilestoneTemplate(
+	organizationId: string,
+	projectId: string,
+	template: Array<{ title: string; activities: string[] }>,
+) {
+	return db.$transaction(async (tx) => {
+		// $executeRaw (not $queryRaw): pg_advisory_xact_lock returns void, which
+		// $queryRaw fails to deserialize ("Failed to deserialize column of type
+		// 'void'"). $executeRaw ignores the result set.
+		await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`ms-template:${organizationId}:${projectId}`}, 0))`;
+
+		const last = await tx.projectMilestone.findFirst({
+			where: { organizationId, projectId },
+			orderBy: { orderIndex: "desc" },
+			select: { orderIndex: true },
+		});
+		let orderIndex = (last?.orderIndex ?? -1) + 1;
+
+		let createdMilestones = 0;
+		let createdActivities = 0;
+
+		for (const item of template) {
+			const milestone = await tx.projectMilestone.create({
+				data: {
+					organizationId,
+					projectId,
+					title: item.title,
+					orderIndex,
+					isCritical: false,
+					status: "PLANNED",
+					progress: 0,
+				},
+				select: { id: true },
+			});
+			createdMilestones++;
+
+			if (item.activities.length > 0) {
+				await tx.projectActivity.createMany({
+					data: item.activities.map((title, i) => ({
+						organizationId,
+						projectId,
+						milestoneId: milestone.id,
+						title,
+						wbsCode: `M${orderIndex + 1}.A${i + 1}`,
+						orderIndex: i,
+					})),
+				});
+				createdActivities += item.activities.length;
+			}
+
+			orderIndex++;
+		}
+
+		return { createdMilestones, createdActivities };
+	});
+}
+
+/**
  * Create a new milestone
  */
 export async function createMilestone(
