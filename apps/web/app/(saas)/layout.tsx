@@ -15,13 +15,54 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
+/**
+ * Top-level translation namespaces used ONLY by the marketing site (landing
+ * sections, FAQ page, marketing assistant, landing dashboard replica chrome).
+ * Verified by grep: no client component under (saas)/modules references them
+ * (pricing's "hero.*" hits are the scoped pricing.pricingV2.hero keys).
+ * Stripping them keeps ~30KB of JSON out of every app document load.
+ */
+const MARKETING_ONLY_NAMESPACES = new Set([
+	"hero",
+	"features",
+	"howItWorks",
+	"landingPricing",
+	"landingRoles",
+	"landingVisuals",
+	"landingZatca",
+	"aiFeature",
+	"finalCta",
+	"faq",
+	"faqPage",
+	"footer",
+	"contact",
+	"marketingAssistant",
+	"chat",
+	"chatTable",
+]);
+
+function stripMarketingNamespaces<T extends Record<string, unknown>>(
+	messages: T,
+): T {
+	const filtered: Record<string, unknown> = {};
+	for (const [ns, value] of Object.entries(messages)) {
+		if (!MARKETING_ONLY_NAMESPACES.has(ns)) {
+			filtered[ns] = value;
+		}
+	}
+	return filtered as T;
+}
+
 export default async function SaaSLayout({ children }: PropsWithChildren) {
 	const layoutStart = performance.now();
-	const [locale, messages, session] = await Promise.all([
+	const [locale, allMessages, session] = await Promise.all([
 		getLocale(),
 		getMessages(),
 		getSession(),
 	]);
+	const messages = stripMarketingNamespaces(
+		allMessages as unknown as Record<string, unknown>,
+	) as typeof allMessages;
 
 	if (!session) {
 		redirect("/auth/login");
