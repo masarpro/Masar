@@ -49,8 +49,8 @@
 - **GPT-4o mini** (text generation) + **DALL-E 3** (images) + **Whisper-1** (audio)
 
 ### Infrastructure
-- **Vercel Pro** — functions في **dxb1/Dubai** (تم نقلها من Frankfurt)
-- **Supabase PostgreSQL** — **ap-south-1/Mumbai** (⚠️ ~20-30ms latency per query)
+- **Vercel Pro** — functions في **bom1/Mumbai** (vercel.json regions — منقولة بجانب قاعدة البيانات منذ 2026-07-10؛ كانت dxb1 ثم Frankfurt)
+- **Supabase PostgreSQL** — **ap-south-1/Mumbai** (co-located مع الدوال: ~1-2ms per query؛ المقابل أن رحلة المستخدم→الدالة من السعودية ~250-400ms، لذا قلّل نداءات RPC من العميل وفضّل server prefetch + hydration)
 - **AWS S3 / Supabase Storage** (files)
 - **Redis** (rate limiting)
 - **Turborepo + pnpm 10** (monorepo build)

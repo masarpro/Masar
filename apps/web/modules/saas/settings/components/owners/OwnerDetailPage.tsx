@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
+import dynamic from "next/dynamic";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { formatSARPrecise } from "@shared/lib/formatters";
@@ -70,15 +70,15 @@ import {
 	BarChart3,
 	FolderOpen,
 } from "lucide-react";
-import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
-} from "recharts";
+// recharts is heavy — load the chart leaf as its own chunk so it stays out of
+// this route's initial JS (the only route that still imported it statically).
+const OwnerMonthlyDrawingsChart = dynamic(
+	() =>
+		import("./OwnerMonthlyDrawingsChart").then((m) => ({
+			default: m.OwnerMonthlyDrawingsChart,
+		})),
+	{ ssr: false },
+);
 
 // ---------------------------------------------------------------------------
 // Types — matching the exact API response shapes (no `any`)
@@ -694,45 +694,7 @@ export function OwnerDetailPage({
 							</CardHeader>
 							<CardContent>
 								<div className="h-[200px] w-full">
-									<ResponsiveContainer
-										width="100%"
-										height="100%"
-									>
-										<BarChart data={chartData}>
-											<CartesianGrid
-												strokeDasharray="3 3"
-												className="stroke-border"
-											/>
-											<XAxis
-												dataKey="name"
-												tick={{
-													fontSize: 11,
-												}}
-												className="text-muted-foreground"
-											/>
-											<YAxis
-												tick={{
-													fontSize: 11,
-												}}
-												className="text-muted-foreground"
-											/>
-											<Tooltip
-												formatter={(
-													value: number,
-												) => [
-													formatSARPrecise(value),
-													t(
-														"dashboard.totalDrawingsYTD",
-													),
-												]}
-											/>
-											<Bar
-												dataKey="amount"
-												fill={CHART_SEMANTIC.negative}
-												radius={[4, 4, 0, 0]}
-											/>
-										</BarChart>
-									</ResponsiveContainer>
+									<OwnerMonthlyDrawingsChart data={chartData} />
 								</div>
 							</CardContent>
 						</Card>

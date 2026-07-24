@@ -3,7 +3,6 @@ import { ConsentProvider } from "@shared/components/ConsentProvider";
 import { SkipNavLink } from "@ui/components/skip-nav";
 import { cn } from "@ui/lib";
 import { Cairo, Inter, Libre_Baskerville } from "next/font/google";
-import { cookies } from "next/headers";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
 
@@ -31,12 +30,14 @@ const arabicSansFont = Cairo({
 	display: "swap",
 });
 
-export async function Document({
+// NOTE: deliberately NOT async and NOT reading cookies() here — that single
+// cookie read forced every marketing page into dynamic rendering (no CDN
+// cache, full SSR per visitor). Consent is now read client-side by
+// ConsentProvider's lazy initializer.
+export function Document({
 	children,
 	locale,
 }: PropsWithChildren<{ locale: string }>) {
-	const cookieStore = await cookies();
-	const consentCookie = cookieStore.get("consent");
 	const isRtl = RTL_LOCALES.includes(locale);
 
 	return (
@@ -75,13 +76,7 @@ export async function Document({
 			>
 				<SkipNavLink />
 				<NuqsAdapter>
-					<ConsentProvider
-						initialConsent={
-							consentCookie == null
-								? null
-								: consentCookie.value === "true"
-						}
-					>
+					<ConsentProvider>
 						<ClientProviders>{children}</ClientProviders>
 					</ConsentProvider>
 				</NuqsAdapter>

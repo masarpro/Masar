@@ -341,6 +341,129 @@ export async function rateLimitToken(token: string, procedureName: string): Prom
 	await enforceRateLimit(key, RATE_LIMITS.TOKEN);
 }
 
+interface RateLimitBucket {
+	procedureName: string;
+	config: RateLimitConfig;
+}
+
+/**
+ * Check TWO rate-limit buckets for the same user in a SINGLE Redis round trip.
+ *
+ * Write RPCs consume both the READ ("global") and WRITE ("global-write")
+ * buckets; doing that as two sequential rateLimitChecker calls paid two Redis
+ * round trips per mutation. This batches both INCR+PTTL pairs into one
+ * pipeline (and both conditional EXPIREs into a second pipeline only on
+ * window-open), preserving the exact same counting semantics.
+ *
+ * Throws ORPCError(TOO_MANY_REQUESTS) if EITHER bucket is exceeded.
+ */
+export async function rateLimitCheckerDual(
+	userId: string,
+	first: RateLimitBucket,
+	second: RateLimitBucket,
+): Promise<void> {
+	const buckets = [first, second];
+	const client = getRedisClient();
+
+	let results: RateLimitResult[];
+
+	if (!client || !redisReady || isCircuitOpen()) {
+		// Memory fallback — same behavior as two sequential checks.
+		results = buckets.map((b) =>
+			checkMemoryRateLimit(createRateLimitKey(userId, b.procedureName), b.config),
+		);
+	} else {
+		try {
+			const keys = buckets.map(
+				(b) => `${REDIS_KEY_PREFIX}${createRateLimitKey(userId, b.procedureName)}`,
+			);
+			const pipeline = client.pipeline();
+			for (const key of keys) {
+				pipeline.incr(key);
+				pipeline.pttl(key);
+			}
+			const raw = await pipeline.exec();
+			if (!raw || raw.length < 4) {
+				throw new Error("Unexpected pipeline result");
+			}
+
+			const counts: number[] = [];
+			const pttls: number[] = [];
+			for (let i = 0; i < 2; i++) {
+				const [incrErr, count] = raw[i * 2] as [Error | null, number];
+				const [ttlErr, pttl] = raw[i * 2 + 1] as [Error | null, number];
+				if (incrErr) throw incrErr;
+				if (ttlErr) throw ttlErr;
+				counts.push(count);
+				pttls.push(pttl);
+			}
+
+			// Set expiry for any bucket opening a new window — batched in one trip.
+			const expirePipeline = client.pipeline();
+			let needsExpire = false;
+			for (let i = 0; i < 2; i++) {
+				if (counts[i] === 1 || pttls[i] === -1) {
+					expirePipeline.expire(
+						keys[i],
+						Math.ceil(buckets[i].config.windowMs / 1000),
+					);
+					needsExpire = true;
+				}
+			}
+			if (needsExpire) {
+				await expirePipeline.exec();
+			}
+
+			recordRedisSuccess();
+
+			const now = Date.now();
+			results = buckets.map((b, i) => {
+				const resetAt = pttls[i] > 0 ? now + pttls[i] : now + b.config.windowMs;
+				if (counts[i] <= b.config.maxRequests) {
+					return {
+						allowed: true,
+						remaining: b.config.maxRequests - counts[i],
+						resetAt,
+					};
+				}
+				return {
+					allowed: false,
+					remaining: 0,
+					resetAt,
+					retryAfterMs: pttls[i] > 0 ? pttls[i] : b.config.windowMs,
+				};
+			});
+		} catch {
+			recordRedisFailure();
+			results = buckets.map((b) =>
+				checkMemoryRateLimit(createRateLimitKey(userId, b.procedureName), b.config),
+			);
+		}
+	}
+
+	const failedIndex = results.findIndex((r) => !r.allowed);
+	if (failedIndex !== -1) {
+		const bucket = buckets[failedIndex];
+		const result = results[failedIndex];
+		const { logBusinessEvent } = await import("@repo/logs");
+		logBusinessEvent({
+			type: "auth.rate_limited",
+			userId,
+			metadata: {
+				procedure: bucket.procedureName,
+				limit: bucket.config.maxRequests,
+				windowMs: bucket.config.windowMs,
+			},
+			severity: "warning",
+		});
+		const { ORPCError } = await import("@orpc/server");
+		const retrySeconds = Math.ceil((result.retryAfterMs || 0) / 1000);
+		throw new ORPCError("TOO_MANY_REQUESTS", {
+			message: `تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة بعد ${retrySeconds} ثانية`,
+		});
+	}
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Auth-Specific: Email Rate Limiting + Account Lockout + Progressive Delay
 // ═══════════════════════════════════════════════════════════════════════════

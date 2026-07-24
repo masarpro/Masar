@@ -27,9 +27,21 @@ export function ConsentProvider({
 }) {
 	// كان الرفض يخزّن consent=false لكنه يُبقي الشريط ظاهراً للأبد لأن الحالة
 	// كانت "هل وافق؟" بدل "هل قرر؟". نتتبع القرار (ثلاثي القيم) بدلاً من ذلك.
-	const [choice, setChoice] = useState<boolean | null>(
-		initialConsent ?? null,
-	);
+	// عند غياب initialConsent نقرأ الكوكي على العميل — قراءتها على الخادم عبر
+	// cookies() كانت تجعل كل صفحات التسويق ديناميكية (بلا كاش CDN). لا يحدث
+	// hydration mismatch لأن ConsentBanner لا يعرض شيئاً قبل mount.
+	const [choice, setChoice] = useState<boolean | null>(() => {
+		if (initialConsent !== undefined && initialConsent !== null) {
+			return initialConsent;
+		}
+		if (typeof document === "undefined") {
+			return null;
+		}
+		const cookie = Cookies.get("consent");
+		if (cookie === "true") return true;
+		if (cookie === "false") return false;
+		return null;
+	});
 
 	const allowCookies = () => {
 		Cookies.set("consent", "true", { expires: 30 });

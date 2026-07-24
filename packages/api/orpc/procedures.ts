@@ -38,8 +38,19 @@ export const publicProcedure = baseProcedure.use(async ({ next }) => {
 	}
 });
 
-export const protectedProcedure = publicProcedure.use(
-	async ({ context, next }) => {
+/**
+ * Shared auth middleware factory. `limitMode` picks the rate-limit strategy:
+ * - "read": READ bucket only (60/min) — one Redis round trip.
+ * - "write": READ + WRITE buckets checked in a SINGLE pipelined Redis round
+ *   trip (rateLimitCheckerDual). Write RPCs used to pay two sequential trips
+ *   (READ in protectedProcedure, then WRITE in subscriptionProcedure) — pure
+ *   added latency on every mutation.
+ * Rate limiting is skipped for in-process SSR prefetch calls — they are
+ * server-originated (a Redis round-trip there is pure latency on the render
+ * path, protecting nothing).
+ */
+const createAuthedProcedure = (limitMode: "read" | "write") =>
+	publicProcedure.use(async ({ context, next }) => {
 		const session =
 			context.isInternal && context.resolvedSession !== undefined
 				? context.resolvedSession
@@ -69,14 +80,18 @@ export const protectedProcedure = publicProcedure.use(
 			});
 		}
 
-		// Rate limit: READ preset (60/min per user). Skipped for in-process SSR
-		// prefetch calls — they are server-originated (one Redis round-trip per
-		// call would be pure latency on the render path, protecting nothing).
 		if (!context.isInternal) {
-			const { rateLimitChecker, RATE_LIMITS } = await import(
-				"../lib/rate-limit"
-			);
-			await rateLimitChecker(session.user.id, "global", RATE_LIMITS.READ);
+			const { rateLimitChecker, rateLimitCheckerDual, RATE_LIMITS } =
+				await import("../lib/rate-limit");
+			if (limitMode === "read") {
+				await rateLimitChecker(session.user.id, "global", RATE_LIMITS.READ);
+			} else {
+				await rateLimitCheckerDual(
+					session.user.id,
+					{ procedureName: "global", config: RATE_LIMITS.READ },
+					{ procedureName: "global-write", config: RATE_LIMITS.WRITE },
+				);
+			}
 		}
 
 		return await next({
@@ -85,8 +100,9 @@ export const protectedProcedure = publicProcedure.use(
 				user: session.user,
 			},
 		});
-	},
-);
+	});
+
+export const protectedProcedure = createAuthedProcedure("read");
 
 export const adminProcedure = protectedProcedure.use(
 	async ({ context, next }) => {
@@ -98,25 +114,12 @@ export const adminProcedure = protectedProcedure.use(
 	},
 );
 
-export const subscriptionProcedure = protectedProcedure.use(
+export const subscriptionProcedure = createAuthedProcedure("write").use(
 	async ({ context, next }) => {
 		const { checkSubscription } = await import(
 			"./middleware/subscription-middleware"
 		);
 		await checkSubscription(context);
-
-		// Rate limit: WRITE preset (20/min per user) — skipped for in-process
-		// SSR calls (same reasoning as the READ limiter above).
-		if (!context.isInternal) {
-			const { rateLimitChecker, RATE_LIMITS } = await import(
-				"../lib/rate-limit"
-			);
-			await rateLimitChecker(
-				context.user.id,
-				"global-write",
-				RATE_LIMITS.WRITE,
-			);
-		}
 
 		return await next();
 	},

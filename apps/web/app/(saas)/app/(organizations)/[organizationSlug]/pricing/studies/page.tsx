@@ -2,6 +2,9 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuantitiesList } from "@saas/pricing/components/studies/QuantitiesList";
 import { PricingShell } from "@saas/pricing/components/shell";
+import { orpcServer } from "@shared/lib/orpc-server";
+import { getServerQueryClient } from "@shared/lib/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -35,20 +38,31 @@ async function StudiesPageContent({ organizationSlug }: { organizationSlug: stri
 		return notFound();
 	}
 
+	// Server-prefetch the default list (no filters) with the same key the
+	// client uses so the table paints with rows on first load.
+	const queryClient = getServerQueryClient();
+	await queryClient.prefetchQuery(
+		orpcServer.pricing.studies.list.queryOptions({
+			input: { organizationId: activeOrganization.id },
+		}),
+	);
+
 	return (
-		<PageContextProvider
-			moduleId="quantities"
-			pageName="Cost Studies"
-			pageNameAr="دراسات الكميات"
-			pageDescription="عرض دراسات الكميات وتحليل التكاليف"
-			visibleStats={{}}
-		>
-			<PricingShell
-				organizationSlug={organizationSlug}
-				sectionKey="studies"
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<PageContextProvider
+				moduleId="quantities"
+				pageName="Cost Studies"
+				pageNameAr="دراسات الكميات"
+				pageDescription="عرض دراسات الكميات وتحليل التكاليف"
+				visibleStats={{}}
 			>
-				<QuantitiesList organizationId={activeOrganization.id} />
-			</PricingShell>
-		</PageContextProvider>
+				<PricingShell
+					organizationSlug={organizationSlug}
+					sectionKey="studies"
+				>
+					<QuantitiesList organizationId={activeOrganization.id} />
+				</PricingShell>
+			</PageContextProvider>
+		</HydrationBoundary>
 	);
 }
