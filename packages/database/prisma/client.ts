@@ -38,6 +38,18 @@ const prismaClientSingleton = () => {
 
 	const pool = new Pool({
 		connectionString: process.env.DATABASE_URL,
+		// AWS RDS requires TLS verified against Amazon's own CA chain (not in
+		// Node's default store). Set DATABASE_SSL_CA in the environment to the
+		// PEM content of the RDS global certificate bundle to enable strict TLS.
+		// Unset (Supabase/pgbouncer today) → behavior unchanged.
+		...(process.env.DATABASE_SSL_CA
+			? {
+					ssl: {
+						ca: process.env.DATABASE_SSL_CA,
+						rejectUnauthorized: true,
+					},
+				}
+			: {}),
 		// The org homepage alone fans out ~15 queries in one render (dashboard.getAll
 		// runs 10 in parallel, plus finance.orgDashboard, projects.list, and the
 		// layout chain). At max:5 those queued in 3 waves, each wave paying the full

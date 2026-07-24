@@ -17,6 +17,26 @@ const AUTH_REQUIRED_PATHS = [
 export default function proxy(req: NextRequest) {
 	const { pathname, origin } = req.nextUrl;
 
+	// 0. Maintenance mode (DB migration cutover). Enabled by setting
+	// MAINTENANCE_MODE=1 in Vercel env + redeploy. Blocks the app + token
+	// portals with a static page; marketing stays live. The hard write-freeze
+	// during cutover is rotating the old DB password (see migration runbook) —
+	// this page is the user-facing half.
+	if (process.env.MAINTENANCE_MODE === "1") {
+		if (pathname === "/maintenance") {
+			return NextResponse.next();
+		}
+		if (
+			pathname.startsWith("/app") ||
+			pathname.startsWith("/owner") ||
+			pathname.startsWith("/share") ||
+			pathname.startsWith("/auth") ||
+			AUTH_REQUIRED_PATHS.some((path) => pathname.startsWith(path))
+		) {
+			return NextResponse.rewrite(new URL("/maintenance", origin));
+		}
+	}
+
 	// 1. Public token routes — always pass through
 	if (pathname.startsWith("/owner") || pathname.startsWith("/share")) {
 		return NextResponse.next();
