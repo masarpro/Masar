@@ -98,11 +98,18 @@ export function UserList() {
 			}),
 		);
 
-		await authClient.admin.impersonateUser({
+		const { error } = await authClient.admin.impersonateUser({
 			userId,
 		});
-		await refetch();
 		toast.dismiss(toastId);
+
+		if (error) {
+			toast.error(
+				error.message || t("admin.users.impersonation.error"),
+			);
+			return;
+		}
+
 		window.location.href = new URL(
 			"/app",
 			window.location.origin,

@@ -6,6 +6,7 @@ import { ActiveOrganizationProvider } from "@saas/organizations/components/Activ
 import { organizationListQueryKey } from "@saas/organizations/lib/api";
 import { PermissionsProvider } from "@saas/permissions/components/PermissionsProvider";
 import { ConfirmationAlertProvider } from "@saas/shared/components/ConfirmationAlertProvider";
+import { ImpersonationBanner } from "@saas/shared/components/ImpersonationBanner";
 import { ConsentBanner } from "@shared/components/ConsentBanner";
 import { Document } from "@shared/components/Document";
 import { getServerQueryClient } from "@shared/lib/server";
@@ -109,6 +110,7 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 							<PermissionsProvider>
 								<ConfirmationAlertProvider>
 									{children}
+									<ImpersonationBanner />
 								</ConfirmationAlertProvider>
 							</PermissionsProvider>
 						</ActiveOrganizationProvider>

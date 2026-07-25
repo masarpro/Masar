@@ -471,7 +471,13 @@
       },
       "impersonate": "Impersonate",
       "impersonation": {
-        "impersonating": "Impersonating as {name}..."
+        "impersonating": "Impersonating as {name}...",
+        "error": "Failed to impersonate user",
+        "banner": {
+          "browsingAs": "You are browsing as {name}",
+          "stop": "Stop impersonating",
+          "stopError": "Failed to stop impersonating"
+        }
       },
       "loading": "Loading users...",
       "resendVerificationMail": {

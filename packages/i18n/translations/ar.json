@@ -471,7 +471,13 @@
       },
       "impersonate": "انتحال الشخصية",
       "impersonation": {
-        "impersonating": "جارٍ انتحال شخصية {name}..."
+        "impersonating": "جارٍ انتحال شخصية {name}...",
+        "error": "فشل انتحال الشخصية",
+        "banner": {
+          "browsingAs": "أنت تتصفح كـ {name}",
+          "stop": "إنهاء الانتحال",
+          "stopError": "فشل إنهاء الانتحال"
+        }
       },
       "loading": "جارٍ تحميل المستخدمين...",
       "resendVerificationMail": {
