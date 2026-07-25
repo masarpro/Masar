@@ -18,14 +18,20 @@ export function MilestoneProgressRow({
 	isLoading,
 }: MilestoneProgressRowProps) {
 	const t = useTranslations();
-	const [localProgress, setLocalProgress] = useState(Number(milestone.progress));
+	const serverProgress = Number(milestone.progress);
+	const [localProgress, setLocalProgress] = useState(serverProgress);
+	const [lastServerProgress, setLastServerProgress] = useState(serverProgress);
+
+	if (serverProgress !== lastServerProgress) {
+		setLastServerProgress(serverProgress);
+		setLocalProgress(serverProgress);
+	}
 
 	const isAutoCalculated = milestone.progressMethod === "ACTIVITIES";
 	const isChecklist = milestone.progressMethod === "CHECKLIST";
 	const isDisabled =
 		isAutoCalculated ||
 		isChecklist ||
-		milestone.status === "COMPLETED" ||
 		milestone.status === "CANCELLED" ||
 		isLoading;
 

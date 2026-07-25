@@ -287,6 +287,7 @@ export async function markActual(
 
 	// Determine new status based on actual dates
 	let newStatus: MilestoneStatus = existing.status;
+	let reopened = false;
 
 	if (data.actualEnd) {
 		// If actualEnd is set, milestone is completed
@@ -294,6 +295,14 @@ export async function markActual(
 	} else if (data.actualStart && existing.status === "PLANNED") {
 		// If actualStart is set and was PLANNED, move to IN_PROGRESS
 		newStatus = "IN_PROGRESS";
+	} else if (
+		data.progress !== undefined &&
+		data.progress < 100 &&
+		existing.status === "COMPLETED"
+	) {
+		// Editing progress below 100 on a completed milestone reopens it
+		newStatus = "IN_PROGRESS";
+		reopened = true;
 	}
 
 	// Check if delayed
@@ -323,11 +332,11 @@ export async function markActual(
 		where: { id: milestoneId },
 		data: {
 			actualStart: data.actualStart ?? existing.actualStart,
-			actualEnd: data.actualEnd ?? existing.actualEnd,
+			actualEnd: reopened ? null : (data.actualEnd ?? existing.actualEnd),
 			progress,
 			status: newStatus,
 			// Also update legacy fields for compatibility
-			actualDate: data.actualEnd ?? existing.actualEnd,
+			actualDate: reopened ? null : (data.actualEnd ?? existing.actualEnd),
 			isCompleted: newStatus === "COMPLETED",
 		},
 	});
