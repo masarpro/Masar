@@ -366,7 +366,7 @@ export function IncomeStatementReport({
 															</div>
 															<div className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden">
 																<div
-																	className="h-full bg-primary rounded-full"
+																	className="h-full bg-chart-4 rounded-full"
 																	style={{
 																		width: `${Math.max(pct, 2)}%`,
 																	}}

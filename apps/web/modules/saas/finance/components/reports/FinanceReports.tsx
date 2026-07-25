@@ -287,7 +287,7 @@ export function FinanceReports({
 												</div>
 												<div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
 													<div
-														className="bg-primary h-full rounded-full flex items-center justify-end pe-3"
+														className="bg-chart-4 h-full rounded-full flex items-center justify-end pe-3"
 														style={{
 															width: `${Math.max((Number(item.revenue) / maxRevenue) * 100, 5)}%`,
 														}}

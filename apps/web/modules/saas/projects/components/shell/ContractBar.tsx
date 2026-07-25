@@ -23,7 +23,7 @@ function getProgressColor(percent: number, isOverdue: boolean): string {
 	if (isOverdue) return "var(--destructive)";
 	if (percent >= 90) return "var(--destructive)";
 	if (percent >= 70) return "var(--chart-1)";
-	return "var(--primary)";
+	return "var(--chart-4)";
 }
 
 function ContractBarInner({
