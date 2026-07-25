@@ -29,6 +29,8 @@ import {
 } from "@saas/projects-owner/hooks/use-owner-session";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { resolveImageSrc } from "@saas/shared/lib/image-src";
+import { ColorModeToggle } from "@shared/components/ColorModeToggle";
+import { LocaleSwitch } from "@shared/components/LocaleSwitch";
 
 export default function OwnerPortalLayout({
 	children,
@@ -142,7 +144,7 @@ export default function OwnerPortalLayout({
 	// Show expired token page
 	if (isTokenExpired) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950" dir="rtl">
+			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
 				<div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 text-center dark:border-amber-900 dark:bg-slate-900">
 					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
 						<Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
@@ -161,7 +163,7 @@ export default function OwnerPortalLayout({
 	// Show error state (invalid/revoked)
 	if (error || (!isLoading && !summary)) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950" dir="rtl">
+			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
 				<div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center dark:border-red-900 dark:bg-slate-900">
 					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
 						<AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
@@ -181,7 +183,7 @@ export default function OwnerPortalLayout({
 	// immediately with small skeletons in the header only; each page shows
 	// its own matching content skeleton — one loading layer per route.
 	return (
-		<div className="min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
+		<div className="min-h-screen bg-slate-50 dark:bg-slate-950">
 			{/* Header */}
 			<header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80 print:hidden">
 				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
@@ -228,6 +230,10 @@ export default function OwnerPortalLayout({
 									</p>
 								</div>
 							)}
+						</div>
+						<div className="flex shrink-0 items-center gap-1">
+							<LocaleSwitch withLocaleInUrl={false} />
+							<ColorModeToggle />
 						</div>
 					</div>
 
