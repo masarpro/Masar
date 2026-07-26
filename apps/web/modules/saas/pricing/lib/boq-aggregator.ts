@@ -123,7 +123,7 @@ const SECTION_ORDER = [
 	"otherStructural",
 ];
 
-const SECTION_LABELS: Record<string, string> = {
+export const SECTION_LABELS: Record<string, string> = {
 	plainConcrete: "صبة النظافة",
 	foundations: "القواعد المسلحة",
 	groundBeams: "الميدة (الكمرات الأرضية)",
@@ -135,7 +135,7 @@ const SECTION_LABELS: Record<string, string> = {
 	otherStructural: "عناصر إنشائية أخرى",
 };
 
-const SECTION_ICONS: Record<string, string> = {
+export const SECTION_ICONS: Record<string, string> = {
 	plainConcrete: "🪨",
 	foundations: "🏗️",
 	groundBeams: "📏",

@@ -4,6 +4,7 @@
 
 import type { BOQSummary, FactoryOrderEntry } from "./boq-aggregator";
 import type { CuttingDetailRow } from "./boq-recalculator";
+import type { CostReport } from "./cost-report";
 
 // ─────────────────────────────────────────────────────────────
 // Shared style definitions
@@ -432,6 +433,200 @@ export async function exportCuttingDetails(cuttingDetails: CuttingDetailRow[], s
 	const fileName = studyName
 		? `تفاصيل_قص_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`
 		: `تفاصيل_قص_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+	XLSX.writeFile(wb, fileName);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cost & Pricing Report Export — تقرير التكلفة والتسعير
+// ─────────────────────────────────────────────────────────────
+
+export async function exportCostReport(report: CostReport, studyName?: string) {
+	const XLSX = await import("xlsx-js-style");
+
+	const wb = XLSX.utils.book_new();
+	const ws: any = {};
+	let row = 0;
+	const COLS = 6;
+
+	const title = (text: string) => {
+		setCell(ws, row, 0, text, STYLES.sectionHeader);
+		for (let c = 1; c < COLS; c++) setCell(ws, row, c, "", STYLES.sectionHeader);
+		mergeRange(ws, row, 0, row, COLS - 1);
+		row++;
+	};
+
+	const headers = (labels: string[]) => {
+		labels.forEach((label, i) => setCell(ws, row, i, label, STYLES.colHeader));
+		for (let c = labels.length; c < COLS; c++) setCell(ws, row, c, "", STYLES.colHeader);
+		row++;
+	};
+
+	const blank = () => {
+		for (let c = 0; c < COLS; c++) setCell(ws, row, c, "", STYLES.cell);
+		row++;
+	};
+
+	// ─── Title ───
+	setCell(ws, row, 0, `تقرير التكلفة والتسعير — ${studyName ?? ""}`, STYLES.title);
+	for (let c = 1; c < COLS; c++) setCell(ws, row, c, "", STYLES.title);
+	mergeRange(ws, row, 0, row, COLS - 1);
+	row += 2;
+
+	// ─── Materials ───
+	for (const section of report.materialSections) {
+		title(`${section.icon} ${section.label}`);
+		for (const group of section.groups) {
+			if (section.groups.length > 1) {
+				setCell(ws, row, 0, group.label, STYLES.subHeader);
+				for (let c = 1; c < COLS; c++) setCell(ws, row, c, "", STYLES.subHeader);
+				mergeRange(ws, row, 0, row, COLS - 1);
+				row++;
+			}
+			headers(["البند", "الدور", "الكمية", "الوحدة", "متوسط السعر", "الإجمالي (ر.س)"]);
+			for (const r of group.rows) {
+				setCell(ws, row, 0, r.label, STYLES.cell);
+				setCell(ws, row, 1, r.detail ?? "—", STYLES.cell);
+				setCell(ws, row, 2, fmt(r.quantity, group.unit === "طن" ? 3 : 2), STYLES.cellNumber);
+				setCell(ws, row, 3, r.unit, STYLES.cell);
+				setCell(ws, row, 4, fmt(r.unitPrice), STYLES.cellNumber);
+				setCell(ws, row, 5, fmt(r.total), STYLES.cellNumber);
+				row++;
+			}
+			setCell(ws, row, 0, `إجمالي ${group.label}`, STYLES.sectionTotal);
+			setCell(ws, row, 1, "", STYLES.sectionTotal);
+			setCell(ws, row, 2, fmt(group.totalQuantity, group.unit === "طن" ? 3 : 2), STYLES.sectionTotalNumber);
+			setCell(ws, row, 3, group.unit, STYLES.sectionTotal);
+			setCell(ws, row, 4, "", STYLES.sectionTotal);
+			setCell(ws, row, 5, fmt(group.total), STYLES.sectionTotalNumber);
+			row++;
+			blank();
+		}
+	}
+
+	if (report.materialSections.length > 0) {
+		setCell(ws, row, 0, "إجمالي المواد", STYLES.grandTotal);
+		for (let c = 1; c < COLS - 1; c++) setCell(ws, row, c, "", STYLES.grandTotal);
+		setCell(ws, row, COLS - 1, fmt(report.materialTotalComputed), STYLES.grandTotalNumber);
+		row += 2;
+	}
+
+	// ─── Unit prices ───
+	if (report.unitPriceRows.length > 0) {
+		title("🏷️ أسعار الوحدات المعتمدة");
+		headers(["المادة", "الوحدة", "السعر (ر.س)"]);
+		for (const r of report.unitPriceRows) {
+			setCell(ws, row, 0, r.label, STYLES.cell);
+			setCell(ws, row, 1, r.unit, STYLES.cell);
+			setCell(ws, row, 2, fmt(r.unitPrice), STYLES.cellNumber);
+			for (let c = 3; c < COLS; c++) setCell(ws, row, c, "", STYLES.cell);
+			row++;
+		}
+		blank();
+	}
+
+	// ─── Labor / storage / indirect ───
+	for (const section of [
+		report.laborSection,
+		report.storageSection,
+		report.indirectSection,
+	]) {
+		if (section.groups.length === 0 && section.total <= 0) continue;
+		title(`${section.icon} ${section.label}`);
+		for (const group of section.groups) {
+			if (section.groups.length > 1) {
+				setCell(ws, row, 0, group.label, STYLES.subHeader);
+				for (let c = 1; c < COLS; c++) setCell(ws, row, c, "", STYLES.subHeader);
+				mergeRange(ws, row, 0, row, COLS - 1);
+				row++;
+			}
+			headers(["البند", "التفاصيل", "الكمية", "الوحدة", "السعر", "الإجمالي (ر.س)"]);
+			for (const r of group.rows) {
+				setCell(ws, row, 0, r.label, STYLES.cell);
+				setCell(ws, row, 1, r.detail ?? "—", STYLES.cell);
+				setCell(ws, row, 2, fmt(r.quantity), STYLES.cellNumber);
+				setCell(ws, row, 3, r.unit, STYLES.cell);
+				setCell(ws, row, 4, fmt(r.unitPrice), STYLES.cellNumber);
+				setCell(ws, row, 5, fmt(r.total), STYLES.cellNumber);
+				row++;
+			}
+			setCell(ws, row, 0, `إجمالي ${group.label}`, STYLES.sectionTotal);
+			for (let c = 1; c < COLS - 1; c++) setCell(ws, row, c, "", STYLES.sectionTotal);
+			setCell(ws, row, COLS - 1, fmt(group.total), STYLES.sectionTotalNumber);
+			row++;
+		}
+		blank();
+	}
+
+	// ─── Final summary ───
+	title("📊 ملخص التكلفة النهائي");
+	headers(["البند", "الإجمالي (ر.س)", "النسبة %"]);
+	for (const r of report.summaryRows) {
+		setCell(ws, row, 0, r.label, STYLES.cell);
+		setCell(ws, row, 1, fmt(r.total), STYLES.cellNumber);
+		setCell(ws, row, 2, fmt(r.percent, 1), STYLES.cellNumber);
+		for (let c = 3; c < COLS; c++) setCell(ws, row, c, "", STYLES.cell);
+		row++;
+	}
+	setCell(ws, row, 0, "إجمالي التكلفة", STYLES.grandTotal);
+	setCell(ws, row, 1, fmt(report.grandTotal), STYLES.grandTotalNumber);
+	setCell(ws, row, 2, 100, STYLES.grandTotalNumber);
+	for (let c = 3; c < COLS; c++) setCell(ws, row, c, "", STYLES.grandTotal);
+	row += 2;
+
+	// ─── Pricing ───
+	const p = report.pricing;
+	if (p) {
+		title("💰 التسعير والأرباح");
+		headers(["البند", "المبلغ (ر.س)"]);
+		const pricingRows: Array<[string, number]> = [
+			["إجمالي التكلفة", p.totalCost],
+			["المصاريف الإدارية", p.overheadAmount],
+			["هامش الربح", p.profitAmount],
+			["احتياطي الطوارئ", p.contingencyAmount],
+			["سعر البيع قبل الضريبة", p.sellingPriceBeforeVat],
+			["ضريبة القيمة المضافة", p.vatAmount],
+		];
+		for (const [label, value] of pricingRows) {
+			if (value === 0 && label !== "إجمالي التكلفة") continue;
+			setCell(ws, row, 0, label, STYLES.cell);
+			setCell(ws, row, 1, fmt(value), STYLES.cellNumber);
+			for (let c = 2; c < COLS; c++) setCell(ws, row, c, "", STYLES.cell);
+			row++;
+		}
+		setCell(ws, row, 0, "الإجمالي شامل الضريبة", STYLES.grandTotal);
+		setCell(ws, row, 1, fmt(p.grandTotal), STYLES.grandTotalNumber);
+		for (let c = 2; c < COLS; c++) setCell(ws, row, c, "", STYLES.grandTotal);
+		row++;
+
+		if (p.buildingArea > 0) {
+			blank();
+			headers(["مساحة البناء (م²)", "تكلفة م² (ر.س)", "سعر بيع م² (ر.س)", "نسبة الربح %"]);
+			setCell(ws, row, 0, fmt(p.buildingArea), STYLES.cellNumber);
+			setCell(ws, row, 1, fmt(p.costPerSqm), STYLES.cellNumber);
+			setCell(ws, row, 2, fmt(p.pricePerSqm), STYLES.cellNumber);
+			setCell(ws, row, 3, fmt(p.profitPercent, 1), STYLES.cellNumber);
+			for (let c = 4; c < COLS; c++) setCell(ws, row, c, "", STYLES.cell);
+			row++;
+		}
+	}
+
+	setSheetRange(ws, row, COLS - 1);
+	ws["!cols"] = [
+		{ wch: 34 },
+		{ wch: 22 },
+		{ wch: 14 },
+		{ wch: 12 },
+		{ wch: 14 },
+		{ wch: 18 },
+	];
+	ws["!rows"] = [{ hpt: 30 }];
+	setRTL(ws);
+	XLSX.utils.book_append_sheet(wb, ws, "تقرير التكلفة والتسعير");
+
+	const fileName = studyName
+		? `تقرير_التكلفة_والتسعير_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`
+		: `تقرير_التكلفة_والتسعير_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
 	XLSX.writeFile(wb, fileName);
 }

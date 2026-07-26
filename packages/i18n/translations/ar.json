@@ -7775,7 +7775,8 @@
           "exportExcel": "تصدير Excel",
           "summaryTab": "ملخص الكميات",
           "factoryTab": "طلبية المصنع",
-          "cuttingTab": "تفاصيل التفصيل"
+          "cuttingTab": "تفاصيل التفصيل",
+          "costTab": "التكلفة والتسعير"
         },
         "otherStructural": {
           "title": "عناصر إنشائية أخرى",

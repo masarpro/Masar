@@ -16,14 +16,16 @@ import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
-import { aggregateBOQ, REBAR_WEIGHTS_MAP } from "@saas/pricing/lib/boq-aggregator";
-import { recalculateItem } from "@saas/pricing/lib/boq-recalculator";
+import { aggregateBOQ } from "@saas/pricing/lib/boq-aggregator";
 import {
 	aggregateBlockMaterials,
-	deriveBlockMaterials,
 	CEMENT_BAGS_PER_BLOCK,
 	SAND_VOLUME_PER_BLOCK,
 } from "@saas/pricing/lib/block-materials";
+import {
+	computeItemMaterialCost,
+	type MaterialPrices,
+} from "@saas/pricing/lib/cost-report";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -481,9 +483,21 @@ export function MaterialsCostingTab({
 		if (cItems.length === 0) return;
 
 		const structItems = (items as any[]) ?? [];
-		const d6Price = Number(steelPriceD6) || 0;
-		const d8Price = Number(steelPriceD8) || 0;
-		const mainPrice = Number(steelPriceMain) || 0;
+
+		// نفس دالة حساب تكلفة البند التي يستخدمها تقرير التكلفة والتسعير —
+		// مصدر واحد يمنع اختلاف الأرقام بين التبويب والتقرير
+		const itemPrices: MaterialPrices = {
+			concretePrices: concretePricesNum,
+			steelPriceD6: Number(steelPriceD6) || 0,
+			steelPriceD8: Number(steelPriceD8) || 0,
+			steelPriceMain: Number(steelPriceMain) || 0,
+			blockPrices: blockPricesNum,
+			mortarSandPrice: sandPriceNum,
+			mortarCementPrice: cementPriceNum,
+			lintelConcretePrice: lintelConcretePriceNum,
+			lintelSteelPrice: lintelSteelPriceNum,
+			storagePercent: storagePct,
+		};
 
 		const updateItems = cItems.map((ci: any) => {
 			const matchItem = structItems.find(
@@ -494,64 +508,12 @@ export function MaterialsCostingTab({
 				return { id: ci.id, materialUnitCost: 0 };
 			}
 
-			// ─── البلوك: بلوك + مونة (بطحة وأسمنت) + أعتاب الفتحات ───
-			if (matchItem.category === "blocks") {
-				const m = deriveBlockMaterials(matchItem);
-				const blockPrice = blockPricesNum[m.key] ?? 0;
-				const blockCost = m.blockCount * blockPrice;
-				const mortarCost =
-					m.sandVolume * sandPriceNum + m.cementBags * cementPriceNum;
-				const lintelCost =
-					m.lintelConcreteVolume * lintelConcretePriceNum +
-					(m.lintelSteelKg / 1000) * lintelSteelPriceNum;
-
-				const blockQty = Number(ci.quantity) || 1;
-				return {
-					id: ci.id,
-					materialUnitCost:
-						blockQty > 0 ? (blockCost + mortarCost + lintelCost) / blockQty : 0,
-					storageCostPercent: storagePct,
-				};
-			}
-
-			// Concrete cost — per-grade
-			const grade = matchItem.concreteType || "C30";
-			const itemConcreteVol = Number(matchItem.concreteVolume ?? 0);
-			const gradePrice = concretePricesNum[grade] ?? concretePricesNum["C30"] ?? 0;
-			const concreteCost = itemConcreteVol * gradePrice;
-
-			// Steel cost — per-diameter using recalculateItem
-			let steelCost = 0;
-			try {
-				const dims = matchItem.dimensions ?? {};
-				const recalc = recalculateItem(
-					matchItem.category,
-					matchItem.subCategory,
-					dims,
-					Number(matchItem.quantity ?? 1),
-					matchItem.name,
-				);
-
-				for (const stock of recalc.totals.stocksNeeded) {
-					const price =
-						stock.diameter <= 6 ? d6Price :
-						stock.diameter <= 8 ? d8Price :
-						mainPrice;
-					const weightPerMeter = REBAR_WEIGHTS_MAP[stock.diameter] ?? 0;
-					const weightTons = (stock.count * stock.length * weightPerMeter) / 1000;
-					steelCost += weightTons * price;
-				}
-			} catch {
-				// Fallback: use total steel weight with main price
-				const itemSteelTons = Number(matchItem.steelWeight ?? 0) / 1000;
-				steelCost = itemSteelTons * mainPrice;
-			}
-
+			const cost = computeItemMaterialCost(matchItem, itemPrices);
 			const qty = Number(ci.quantity) || 1;
 
 			return {
 				id: ci.id,
-				materialUnitCost: qty > 0 ? (concreteCost + steelCost) / qty : 0,
+				materialUnitCost: qty > 0 ? cost.total / qty : 0,
 				storageCostPercent: storagePct,
 			};
 		});

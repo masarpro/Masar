@@ -33,6 +33,8 @@ import {
 	ClipboardList,
 	AlertCircle,
 	Layers,
+	Wallet,
+	Loader2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
@@ -62,6 +64,7 @@ import {
 	exportBOQToExcel,
 	exportFactoryOrder,
 	exportCuttingDetails,
+	exportCostReport,
 } from "../../lib/boq-export";
 import { formatNumber } from "../../lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -69,6 +72,9 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { BOQExportDropdown } from "./BOQExportDropdown";
 import { printBOQ } from "./BOQPrintView";
+import { buildCostReport } from "../../lib/cost-report";
+import { CostReportView } from "./CostReportView";
+import { printCostReport } from "./CostReportPrintView";
 
 // ═══════════════════════════════════════════════════════════════
 // Props
@@ -86,7 +92,7 @@ interface BOQSummaryTableProps {
 // Tab types
 // ═══════════════════════════════════════════════════════════════
 
-type TabKey = "summary" | "factory" | "cutting";
+type TabKey = "summary" | "factory" | "cutting" | "cost";
 
 // ═══════════════════════════════════════════════════════════════
 // Main Component
@@ -114,6 +120,46 @@ export function BOQSummaryTable({
 		}),
 		staleTime: STALE_TIMES.FINANCE_SETTINGS,
 	});
+
+	// ─── بيانات تقرير التكلفة والتسعير ───
+	// تُجلب عند فتح التبويب فقط — التقرير شامل للمشروع ولا يتأثر بفلاتر الأدوار
+	const costTabActive = activeTab === "cost";
+
+	const { data: costSummary, isLoading: costSummaryLoading } = useQuery({
+		...orpc.pricing.studies.costing.getSummary.queryOptions({
+			input: { organizationId, studyId },
+		}),
+		enabled: costTabActive,
+	});
+
+	const { data: costBreakdown, isLoading: costBreakdownLoading } = useQuery({
+		...orpc.pricing.studies.laborBreakdown.get.queryOptions({
+			input: { organizationId, studyId },
+		}),
+		enabled: costTabActive,
+	});
+
+	const { data: profitAnalysis, isLoading: profitLoading } = useQuery({
+		...orpc.pricing.studies.markup.getProfitAnalysis.queryOptions({
+			input: { organizationId, studyId },
+		}),
+		enabled: costTabActive,
+	});
+
+	const costReportLoading =
+		costTabActive &&
+		(costSummaryLoading || costBreakdownLoading || profitLoading);
+
+	const costReport = useMemo(() => {
+		if (!costTabActive || !costSummary) return null;
+		return buildCostReport({
+			items,
+			enabledFloors,
+			laborBreakdown: costBreakdown,
+			summary: costSummary,
+			profit: profitAnalysis,
+		});
+	}, [costTabActive, items, enabledFloors, costBreakdown, costSummary, profitAnalysis]);
 
 	const floorOptions = useMemo(
 		() => buildFloorFilterOptions(items, enabledFloors),
@@ -210,6 +256,19 @@ export function BOQSummaryTable({
 	const orgSettingsAny = orgSettings as any;
 
 	const handlePrint = () => {
+		if (activeTab === "cost") {
+			if (!costReport) return;
+			printCostReport({
+				report: costReport,
+				studyName,
+				organizationName: orgSettingsAny?.companyNameAr ?? undefined,
+				organizationLogo: resolveImageSrc(orgSettingsAny?.logo),
+				organizationAddress: orgSettingsAny?.address ?? undefined,
+				organizationPhone: orgSettingsAny?.phone ?? undefined,
+				organizationEmail: orgSettingsAny?.email ?? undefined,
+			});
+			return;
+		}
 		printBOQ({
 			activeTab,
 			summary,
@@ -230,6 +289,7 @@ export function BOQSummaryTable({
 		{ key: "summary", label: t("structural.boq.summaryTab"), icon: ClipboardList },
 		{ key: "factory", label: t("structural.boq.factoryTab"), icon: Factory },
 		{ key: "cutting", label: t("structural.boq.cuttingTab"), icon: Scissors },
+		{ key: "cost", label: t("structural.boq.costTab"), icon: Wallet },
 	];
 
 	return (
@@ -245,7 +305,9 @@ export function BOQSummaryTable({
 						const label = scopeLabel
 							? `${studyName || ""} - ${scopeLabel}`.trim()
 							: studyName;
-						if (activeTab === "factory") {
+						if (activeTab === "cost") {
+							if (costReport) exportCostReport(costReport, studyName);
+						} else if (activeTab === "factory") {
 							exportFactoryOrder(summary.factoryOrder, label);
 						} else if (activeTab === "cutting") {
 							exportCuttingDetails(summary.allCuttingDetails, label);
@@ -257,8 +319,8 @@ export function BOQSummaryTable({
 				/>
 			</div>
 
-			{/* Filters: floor / section (بند) / single item */}
-			<div className="flex flex-wrap items-center gap-3 print:hidden">
+			{/* Filters: floor / section (بند) / single item — التقرير المالي شامل للمشروع */}
+			<div className={`flex flex-wrap items-center gap-3 print:hidden ${costTabActive ? "hidden" : ""}`}>
 				{floorOptions.length > 2 && (
 					<div className="flex items-center gap-2">
 						<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.floorFilter")}:</span>
@@ -381,6 +443,16 @@ export function BOQSummaryTable({
 					onPrint={handlePrint}
 					excludedSteelWeight={excludedSteelWeight}
 				/>
+			)}
+
+			{activeTab === "cost" && (
+				costReportLoading || !costReport ? (
+					<div className="flex justify-center py-12">
+						<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+					</div>
+				) : (
+					<CostReportView report={costReport} />
+				)
 			)}
 
 		</div>

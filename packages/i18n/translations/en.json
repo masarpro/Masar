@@ -7749,7 +7749,8 @@
           "exportExcel": "Export Excel",
           "summaryTab": "Quantities Summary",
           "factoryTab": "Factory Order",
-          "cuttingTab": "Cutting Details"
+          "cuttingTab": "Cutting Details",
+          "costTab": "Cost & Pricing"
         },
         "otherStructural": {
           "title": "Other Structural Elements",
