@@ -25,7 +25,13 @@ export function ActiveSessionsBlock() {
 				throw error;
 			}
 
-			return data;
+			// Hide impersonation sessions (admin support access) — the
+			// impersonated user must never see them in their session list.
+			return data?.filter(
+				(session) =>
+					!(session as { impersonatedBy?: string | null })
+						.impersonatedBy,
+			);
 		},
 	});
 
