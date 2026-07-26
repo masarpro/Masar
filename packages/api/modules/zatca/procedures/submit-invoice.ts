@@ -141,11 +141,13 @@ export const submitInvoice = subscriptionProcedure
 		// 7. Build ZatcaInvoiceData
 		//    Prefer OrganizationFinanceSettings (structured) over Organization (basic)
 		const fs = org.financeSettings;
-		const sellerStreet = invoice.sellerAddress || fs?.street || org.address || undefined;
+		const sellerStreet = fs?.street || invoice.sellerAddress || org.address || undefined;
 		const sellerBuildingNo = fs?.buildingNumber || undefined;
 		const sellerAdditionalNo = fs?.secondaryNumber || undefined;
 		const sellerPostalCode = fs?.postalCode || undefined;
-		const sellerCity = fs?.city || org.city || "Jeddah";
+		// No fake fallback — an empty city is omitted from the XML instead of
+		// fabricating "Jeddah" (ZATCA flags fabricated addresses as INACCURATE POST)
+		const sellerCity = fs?.city || org.city || "";
 		const sellerCR = fs?.commercialReg || org.commercialRegister || undefined;
 
 		// Warn about missing required address fields (BR-KSA-09)
@@ -191,14 +193,17 @@ export const submitInvoice = subscriptionProcedure
 				? {
 						name: invoice.clientName,
 						taxNumber: clientTaxNumber,
-						address: invoice.clientAddress
-							? {
-								street: invoice.clientAddress,
-								city: invoice.client?.city || undefined,
-								postalCode: invoice.client?.postalCode || undefined,
-								countryCode: "SA",
-							}
-							: undefined,
+						// Structured buyer national address (BR-KSA-10) — built from the
+						// Client record even when the invoice free-text address is empty
+						address: {
+							street:
+								invoice.client?.streetAddress1 ||
+								invoice.clientAddress ||
+								undefined,
+							city: invoice.client?.city || undefined,
+							postalCode: invoice.client?.postalCode || undefined,
+							countryCode: "SA",
+						},
 					}
 				: isSimplified
 					? undefined

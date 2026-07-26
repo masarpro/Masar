@@ -71,7 +71,14 @@ interface InvoiceForZatca {
 		totalPrice: any;
 		sortOrder: number;
 	}>;
-	client?: { taxNumber?: string | null } | null;
+	client?: {
+		taxNumber?: string | null;
+		/** Structured buyer national address (from Client record) */
+		streetAddress1?: string | null;
+		city?: string | null;
+		postalCode?: string | null;
+		address?: string | null;
+	} | null;
 }
 
 interface SellerInfo {
@@ -85,6 +92,7 @@ interface SellerInfo {
 	additionalNumber?: string;
 	postalCode?: string;
 	district?: string;
+	street?: string;
 }
 
 /**
@@ -279,10 +287,12 @@ async function processPhase2(
 			taxNumber: cleanTaxNumber,
 			crNumber: seller.crNumber,
 			address: {
-				street: seller.address || undefined,
+				street: seller.street || seller.address || undefined,
 				buildingNumber: seller.buildingNumber,
 				additionalNumber: seller.additionalNumber,
-				city: seller.city || "Jeddah",
+				// No fake fallback: an empty city is omitted from the XML instead of
+				// fabricating "Jeddah" — ZATCA flags fabricated addresses (INACCURATE POST)
+				city: seller.city || "",
 				postalCode: seller.postalCode,
 				district: seller.district,
 				countryCode: "SA",
@@ -292,9 +302,18 @@ async function processPhase2(
 			? {
 					name: invoice.clientName,
 					taxNumber: clientTaxNumber,
-					address: invoice.clientAddress
-						? { street: invoice.clientAddress, countryCode: "SA" }
-						: undefined,
+					// Structured buyer national address (BR-KSA-10): prefer the Client
+					// record's fields; fall back to the invoice's free-text address
+					address: {
+						street:
+							invoice.client?.streetAddress1 ||
+							invoice.clientAddress ||
+							invoice.client?.address ||
+							undefined,
+						city: invoice.client?.city || undefined,
+						postalCode: invoice.client?.postalCode || undefined,
+						countryCode: "SA",
+					},
 				}
 			: isSimplified
 				? undefined

@@ -909,7 +909,18 @@ export const issueInvoiceProcedure = subscriptionProcedure
 		// Resolve seller fields: finance settings take priority, fallback to org
 		const sellerName = financeSettings?.companyNameAr || org?.name || "";
 		const sellerTaxNumber = financeSettings?.taxNumber || org?.taxNumber || "";
-		const sellerAddress = financeSettings?.address || "";
+		// Free-text address falls back to the composed national address so the
+		// printed snapshot is never empty when only structured fields are filled
+		const composedNationalAddress = [
+			financeSettings?.buildingNumber,
+			financeSettings?.street,
+			financeSettings?.secondaryNumber,
+			financeSettings?.postalCode,
+			financeSettings?.city,
+		]
+			.filter(Boolean)
+			.join("، ");
+		const sellerAddress = financeSettings?.address || composedNationalAddress || "";
 		const sellerPhone = financeSettings?.phone || "";
 
 		// ─── Validation gate ─────────────────────────────────────────────
@@ -962,6 +973,82 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			});
 		}
 
+		// ─── ZATCA national-address gate (BR-KSA) ────────────────────────
+		// ZATCA rejects/flags invoices whose seller or buyer address is missing
+		// (INACCURATE POST — SELLER OR BUYER ADDRESS). A TAX (B2B) invoice cannot
+		// be issued without a complete national address for both parties.
+		if (invoice.invoiceType === "TAX" || invoice.invoiceType === "SIMPLIFIED") {
+			const sellerBuildingNo = financeSettings?.buildingNumber?.trim() ?? "";
+			const sellerStreet = financeSettings?.street?.trim() ?? "";
+			const sellerCity = financeSettings?.city?.trim() ?? "";
+			const sellerPostalCode = financeSettings?.postalCode?.trim() ?? "";
+			const sellerMissing: string[] = [];
+			if (!sellerBuildingNo) sellerMissing.push("رقم المبنى");
+			if (!sellerStreet) sellerMissing.push("الشارع");
+			if (!sellerCity) sellerMissing.push("المدينة");
+			if (!sellerPostalCode) sellerMissing.push("الرمز البريدي");
+
+			// SIMPLIFIED under Phase 1 keeps working (QR only, no XML). Once a
+			// Phase 2 device is active, the XML carries the seller address — enforce.
+			const enforceSeller =
+				invoice.invoiceType === "TAX" ||
+				Boolean(
+					await db.zatcaDevice.findFirst({
+						where: { organizationId: input.organizationId, status: "ACTIVE" },
+						select: { id: true },
+					}),
+				);
+
+			if (enforceSeller) {
+				if (sellerMissing.length > 0) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: `العنوان الوطني للمنشأة غير مكتمل (${sellerMissing.join("، ")}). أكمِله في صفحة الإعدادات ← بيانات المنشأة — العنوان الوطني مطلوب في الفوترة الإلكترونية (ZATCA)`,
+					});
+				}
+				if (!/^\d{5}$/.test(sellerPostalCode)) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: `الرمز البريدي للمنشأة يجب أن يكون 5 أرقام بالضبط. القيمة الحالية: "${sellerPostalCode}". صحّحه في صفحة الإعدادات ← بيانات المنشأة`,
+					});
+				}
+				if (!/^\d{4}$/.test(sellerBuildingNo)) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: `رقم المبنى في العنوان الوطني يجب أن يكون 4 أرقام بالضبط. القيمة الحالية: "${sellerBuildingNo}". صحّحه في صفحة الإعدادات ← بيانات المنشأة`,
+					});
+				}
+			}
+		}
+
+		if (invoice.invoiceType === "TAX") {
+			// Buyer national address (BR-KSA-10): B2B tax invoices must carry the
+			// buyer's street, city and postal code — "N/A" placeholders are a
+			// ZATCA violation.
+			const buyerStreet =
+				invoice.client?.streetAddress1?.trim() ||
+				invoice.clientAddress?.trim() ||
+				invoice.client?.address?.trim();
+			const buyerMissing: string[] = [];
+			if (!buyerStreet) buyerMissing.push("الشارع");
+			if (!invoice.client?.city?.trim()) buyerMissing.push("المدينة");
+			if (!invoice.client?.postalCode?.trim()) buyerMissing.push("الرمز البريدي");
+
+			if (buyerMissing.length > 0) {
+				const clientLabel = invoice.clientName || "العميل";
+				throw new ORPCError("BAD_REQUEST", {
+					message: invoice.client
+						? `العنوان الوطني للمشتري «${clientLabel}» غير مكتمل (${buyerMissing.join("، ")}). أكمِل عنوان العميل من صفحة العملاء ← تعديل العميل — لا يمكن إصدار فاتورة ضريبية (B2B) بدون عنوان وطني كامل للمشتري حسب متطلبات ZATCA`
+						: `لا يمكن إصدار فاتورة ضريبية (B2B) بدون عنوان وطني كامل للمشتري (${buyerMissing.join("، ")}). اربط الفاتورة بعميل مسجّل وأكمِل عنوانه الوطني (الشارع، المدينة، الرمز البريدي) من صفحة العملاء`,
+				});
+			}
+			if (
+				invoice.client?.postalCode &&
+				!/^\d{5}$/.test(invoice.client.postalCode.trim())
+			) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: `الرمز البريدي للعميل «${invoice.clientName}» يجب أن يكون 5 أرقام بالضبط. القيمة الحالية: "${invoice.client.postalCode}". صحّحه من صفحة العملاء ← تعديل العميل`,
+				});
+			}
+		}
+
 		const zatcaUuid = crypto.randomUUID();
 
 		// ─── Issue the invoice first (DRAFT → ISSUED) ───────────────────
@@ -978,14 +1065,18 @@ export const issueInvoiceProcedure = subscriptionProcedure
 		try {
 			const zatcaResult = await processInvoiceForZatca(
 				db,
-				{ ...issuedInvoice, zatcaUuid, items: issuedInvoice.items },
+				{ ...issuedInvoice, zatcaUuid, items: issuedInvoice.items, client: invoice.client },
 				input.organizationId,
 				{
 					name: sellerName,
 					taxNumber: sellerTaxNumber,
 					crNumber: org?.commercialRegister ?? undefined,
 					address: sellerAddress || org?.address || undefined,
-					city: org?.city ?? undefined,
+					street: financeSettings?.street ?? undefined,
+					buildingNumber: financeSettings?.buildingNumber ?? undefined,
+					additionalNumber: financeSettings?.secondaryNumber ?? undefined,
+					postalCode: financeSettings?.postalCode ?? undefined,
+					city: financeSettings?.city || org?.city || undefined,
 				},
 			);
 
@@ -1194,7 +1285,16 @@ export const createCreditNoteProcedure = subscriptionProcedure
 		// Resolve seller fields: finance settings take priority
 		const cnSellerName = financeSettingsCN?.companyNameAr || orgCN?.name || "";
 		const cnSellerTaxNumber = financeSettingsCN?.taxNumber || orgCN?.taxNumber || "";
-		const cnSellerAddress = financeSettingsCN?.address || "";
+		const cnComposedAddress = [
+			financeSettingsCN?.buildingNumber,
+			financeSettingsCN?.street,
+			financeSettingsCN?.secondaryNumber,
+			financeSettingsCN?.postalCode,
+			financeSettingsCN?.city,
+		]
+			.filter(Boolean)
+			.join("، ");
+		const cnSellerAddress = financeSettingsCN?.address || cnComposedAddress || "";
 		const cnSellerPhone = financeSettingsCN?.phone || "";
 
 		// Get original invoice to check its type
@@ -1222,14 +1322,18 @@ export const createCreditNoteProcedure = subscriptionProcedure
 		try {
 			const zatcaResult = await processInvoiceForZatca(
 				db,
-				{ ...creditNote, zatcaUuid: cnZatcaUuid, items: creditNote.items },
+				{ ...creditNote, zatcaUuid: cnZatcaUuid, items: creditNote.items, client: original.client },
 				input.organizationId,
 				{
 					name: cnSellerName,
 					taxNumber: cnSellerTaxNumber,
 					crNumber: orgCN?.commercialRegister ?? undefined,
 					address: cnSellerAddress || orgCN?.address || undefined,
-					city: orgCN?.city ?? undefined,
+					street: financeSettingsCN?.street ?? undefined,
+					buildingNumber: financeSettingsCN?.buildingNumber ?? undefined,
+					additionalNumber: financeSettingsCN?.secondaryNumber ?? undefined,
+					postalCode: financeSettingsCN?.postalCode ?? undefined,
+					city: financeSettingsCN?.city || orgCN?.city || undefined,
 				},
 			);
 

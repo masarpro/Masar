@@ -47,7 +47,15 @@ export const retrySubmission = subscriptionProcedure
 				invoice: {
 					include: {
 						items: { orderBy: { sortOrder: "asc" } },
-						client: { select: { taxNumber: true } },
+						client: {
+							select: {
+								taxNumber: true,
+								streetAddress1: true,
+								address: true,
+								city: true,
+								postalCode: true,
+							},
+						},
 					},
 				},
 			},
@@ -77,17 +85,29 @@ export const retrySubmission = subscriptionProcedure
 			});
 		}
 
-		// 2. Load organization
-		const org = await db.organization.findUnique({
-			where: { id: input.organizationId },
-			select: {
-				name: true,
-				taxNumber: true,
-				commercialRegister: true,
-				address: true,
-				city: true,
-			},
-		});
+		// 2. Load organization + structured national address from finance settings
+		const [org, financeSettings] = await Promise.all([
+			db.organization.findUnique({
+				where: { id: input.organizationId },
+				select: {
+					name: true,
+					taxNumber: true,
+					commercialRegister: true,
+					address: true,
+					city: true,
+				},
+			}),
+			db.organizationFinanceSettings.findUnique({
+				where: { organizationId: input.organizationId },
+				select: {
+					street: true,
+					buildingNumber: true,
+					secondaryNumber: true,
+					postalCode: true,
+					city: true,
+				},
+			}),
+		]);
 
 		if (!org?.taxNumber) {
 			throw new ORPCError("BAD_REQUEST", {
@@ -124,8 +144,12 @@ export const retrySubmission = subscriptionProcedure
 				taxNumber: invoice.sellerTaxNumber || cleanTaxNumber,
 				crNumber: org.commercialRegister ?? undefined,
 				address: {
-					street: invoice.sellerAddress || org.address || undefined,
-					city: org.city || "Jeddah",
+					street: financeSettings?.street || invoice.sellerAddress || org.address || undefined,
+					buildingNumber: financeSettings?.buildingNumber ?? undefined,
+					additionalNumber: financeSettings?.secondaryNumber ?? undefined,
+					postalCode: financeSettings?.postalCode ?? undefined,
+					// No fake fallback — an empty city is omitted from the XML
+					city: financeSettings?.city || org.city || "",
 					countryCode: "SA",
 				},
 			},
@@ -133,9 +157,16 @@ export const retrySubmission = subscriptionProcedure
 				? {
 						name: invoice.clientName,
 						taxNumber: clientTaxNumber,
-						address: invoice.clientAddress
-							? { street: invoice.clientAddress, countryCode: "SA" }
-							: undefined,
+						address: {
+							street:
+								invoice.client?.streetAddress1 ||
+								invoice.clientAddress ||
+								invoice.client?.address ||
+								undefined,
+							city: invoice.client?.city || undefined,
+							postalCode: invoice.client?.postalCode || undefined,
+							countryCode: "SA",
+						},
 					}
 				: undefined,
 			lineItems: invoice.items.map((item, idx) => ({

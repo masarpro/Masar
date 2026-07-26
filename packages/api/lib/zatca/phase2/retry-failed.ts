@@ -43,7 +43,15 @@ export async function retryFailedSubmissions(db: PrismaClient): Promise<RetryRes
 			invoice: {
 				include: {
 					items: { orderBy: { sortOrder: "asc" } },
-					client: { select: { taxNumber: true } },
+					client: {
+						select: {
+							taxNumber: true,
+							streetAddress1: true,
+							address: true,
+							city: true,
+							postalCode: true,
+						},
+					},
 				},
 			},
 			device: true,
@@ -68,11 +76,23 @@ export async function retryFailedSubmissions(db: PrismaClient): Promise<RetryRes
 			continue;
 		}
 
-		// Get org info
-		const org = await db.organization.findUnique({
-			where: { id: submission.organizationId },
-			select: { name: true, taxNumber: true, commercialRegister: true, address: true, city: true },
-		});
+		// Get org info + structured national address from finance settings
+		const [org, financeSettings] = await Promise.all([
+			db.organization.findUnique({
+				where: { id: submission.organizationId },
+				select: { name: true, taxNumber: true, commercialRegister: true, address: true, city: true },
+			}),
+			db.organizationFinanceSettings.findUnique({
+				where: { organizationId: submission.organizationId },
+				select: {
+					street: true,
+					buildingNumber: true,
+					secondaryNumber: true,
+					postalCode: true,
+					city: true,
+				},
+			}),
+		]);
 
 		if (!org?.taxNumber) {
 			result.skipped++;
@@ -106,8 +126,12 @@ export async function retryFailedSubmissions(db: PrismaClient): Promise<RetryRes
 					taxNumber: invoice.sellerTaxNumber || cleanTaxNumber,
 					crNumber: org.commercialRegister ?? undefined,
 					address: {
-						street: invoice.sellerAddress || org.address || undefined,
-						city: org.city || "Jeddah",
+						street: financeSettings?.street || invoice.sellerAddress || org.address || undefined,
+						buildingNumber: financeSettings?.buildingNumber ?? undefined,
+						additionalNumber: financeSettings?.secondaryNumber ?? undefined,
+						postalCode: financeSettings?.postalCode ?? undefined,
+						// No fake fallback — an empty city is omitted from the XML
+						city: financeSettings?.city || org.city || "",
 						countryCode: "SA",
 					},
 				},
@@ -115,7 +139,16 @@ export async function retryFailedSubmissions(db: PrismaClient): Promise<RetryRes
 					? {
 							name: invoice.clientName,
 							taxNumber: clientTaxNumber,
-							address: invoice.clientAddress ? { street: invoice.clientAddress, countryCode: "SA" } : undefined,
+							address: {
+								street:
+									invoice.client?.streetAddress1 ||
+									invoice.clientAddress ||
+									invoice.client?.address ||
+									undefined,
+								city: invoice.client?.city || undefined,
+								postalCode: invoice.client?.postalCode || undefined,
+								countryCode: "SA",
+							},
 						}
 					: undefined,
 				lineItems: invoice.items.map((item, idx) => ({
