@@ -228,6 +228,21 @@ export const blocksDimensionsSchema = z
 		floor: z.union([z.string(), z.number()]).optional(),
 		blockType: z.string().optional(),
 		wallCategory: z.string().optional(),
+		// فتحات الأبواب والشبابيك — منها تُحسب الأعتاب وتُسعَّر مع المواد
+		hasLintel: z.number().optional(),
+		openings: z
+			.array(
+				z.object({
+					id: z.string().max(100).optional(),
+					type: z.string().max(20),
+					width: z.number().nonnegative(),
+					height: z.number().nonnegative(),
+					quantity: z.number().nonnegative(),
+				}),
+			)
+			.optional(),
+		// نتيجة المحرك المحفوظة (بلوك/مونة/أعتاب) — يقرأها تسعير التكلفة
+		__result: z.record(z.string(), z.unknown()).optional(),
 	})
 	.passthrough();
 

@@ -11,7 +11,8 @@ export interface StructuralItemCreateInput {
 	subCategory?: string;
 	name: string;
 	description?: string;
-	dimensions?: Record<string, number | string | boolean>;
+	// بعض الأقسام تحفظ كائنات/مصفوفات داخل الأبعاد (فتحات البلوك، __result)
+	dimensions?: Record<string, unknown>;
 	quantity: number;
 	unit: string;
 	concreteVolume?: number;

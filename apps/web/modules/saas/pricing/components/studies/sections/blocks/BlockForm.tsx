@@ -72,6 +72,17 @@ export function BlockForm({
 
 	const [formData, setFormData] = useState(() => {
 		if (editingItem) {
+			// الفتحات تُحفظ ضمن الأبعاد — استعادتها ضرورية وإلا فُقدت الأعتاب
+			// عند أي تعديل لاحق على الجدار
+			const savedOpenings = Array.isArray(editingItem.dimensions?.openings)
+				? (editingItem.dimensions.openings as any[]).map((o, idx) => ({
+						id: String(o?.id ?? `opening-${idx}`),
+						type: (o?.type === "window" ? "window" : "door") as "door" | "window",
+						width: Number(o?.width ?? 0),
+						height: Number(o?.height ?? 0),
+						quantity: Number(o?.quantity ?? 1),
+					}))
+				: [];
 			return {
 				name: editingItem.name,
 				floor: isFloorScoped ? (floorLabel || "") : "",
@@ -80,8 +91,8 @@ export function BlockForm({
 				thickness: (editingItem.dimensions?.thickness || 20) as 10 | 15 | 20 | 25 | 30,
 				blockType: (String(editingItem.dimensions?.blockType || "hollow")) as keyof typeof BLOCK_TYPES,
 				wallCategory: (String(editingItem.dimensions?.wallCategory || "")) as keyof typeof WALL_CATEGORIES | "",
-				hasLintel: true,
-				openings: [] as Opening[],
+				hasLintel: editingItem.dimensions?.hasLintel !== 0,
+				openings: savedOpenings as Opening[],
 			};
 		}
 		return {
@@ -262,6 +273,32 @@ export function BlockForm({
 				floor: isFloorScoped ? (floorLabel || "") : "",
 				blockType: formData.blockType,
 				wallCategory: formData.wallCategory,
+				hasLintel: formData.hasLintel ? 1 : 0,
+				// الفتحات تُحفظ لتبقى الأعتاب قابلة لإعادة الحساب والتسعير
+				openings: formData.openings.map((o) => ({
+					id: o.id,
+					type: o.type,
+					width: o.width,
+					height: o.height,
+					quantity: o.quantity,
+				})),
+				// نتيجة المحرك محفوظة ليقرأها تبويب تسعير المواد والمصنعيات
+				// بدل إعادة الاشتقاق من الأبعاد الخام
+				__result: {
+					grossArea: calculations.grossArea,
+					openingsArea: calculations.openingsArea,
+					netArea: calculations.netArea,
+					blockCount: calculations.blocks.totalCount,
+					netBlockCount: calculations.blocks.count,
+					wastePercentage: calculations.blocks.wastePercentage,
+					mortarVolume: calculations.mortar.volume,
+					cementBags: calculations.mortar.cementBags,
+					sandVolume: calculations.mortar.sandVolume,
+					lintelCount: calculations.lintels?.count ?? 0,
+					lintelLength: calculations.lintels?.totalLength ?? 0,
+					lintelConcreteVolume: calculations.lintels?.concreteVolume ?? 0,
+					lintelRebarWeight: calculations.lintels?.rebarWeight ?? 0,
+				},
 			},
 			concreteVolume: calculations.lintels?.concreteVolume || 0,
 			steelWeight: calculations.lintels?.rebarWeight || 0,
@@ -500,10 +537,11 @@ export function BlockForm({
 										<Input
 											type="number"
 											step="0.1"
+											min={0}
 											className="w-20 h-8"
 											value={opening.width}
 											onChange={(e: any) =>
-												updateOpening(opening.id, "width", +e.target.value)
+												updateOpening(opening.id, "width", Math.max(0, +e.target.value))
 											}
 										/>
 									</div>
@@ -512,10 +550,11 @@ export function BlockForm({
 										<Input
 											type="number"
 											step="0.1"
+											min={0}
 											className="w-20 h-8"
 											value={opening.height}
 											onChange={(e: any) =>
-												updateOpening(opening.id, "height", +e.target.value)
+												updateOpening(opening.id, "height", Math.max(0, +e.target.value))
 											}
 										/>
 									</div>
@@ -527,7 +566,7 @@ export function BlockForm({
 											className="w-16 h-8"
 											value={opening.quantity}
 											onChange={(e: any) =>
-												updateOpening(opening.id, "quantity", +e.target.value)
+												updateOpening(opening.id, "quantity", Math.max(0, +e.target.value))
 											}
 										/>
 									</div>

@@ -48,6 +48,9 @@ export function CopyFromFloorButton({
 		try {
 			for (const item of sourceItems) {
 				const newName = item.name.replace(selectedSource, currentFloor);
+				// خرسانة/حديد البلوك = الأعتاب، ومصدرها __result (لم تكن موجودة
+				// داخل dimensions مباشرة، فكانت الأعتاب تُفقد عند النسخ)
+				const result = (item.dimensions?.__result ?? {}) as Record<string, any>;
 				await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
 					costStudyId: studyId,
 					organizationId,
@@ -57,8 +60,10 @@ export function CopyFromFloorButton({
 					quantity: item.quantity,
 					unit: "piece",
 					dimensions: { ...item.dimensions, floor: currentFloor },
-					concreteVolume: item.dimensions?.concreteVolume || 0,
-					steelWeight: item.dimensions?.steelWeight || 0,
+					concreteVolume:
+						Number(result.lintelConcreteVolume ?? 0) || Number(item.concreteVolume ?? 0),
+					steelWeight:
+						Number(result.lintelRebarWeight ?? 0) || Number(item.steelWeight ?? 0),
 					materialCost: 0,
 					laborCost: 0,
 					totalCost: item.totalCost,

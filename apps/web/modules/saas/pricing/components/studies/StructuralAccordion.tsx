@@ -72,7 +72,8 @@ interface StructuralItem {
 	category: string;
 	name: string;
 	quantity: number;
-	dimensions: Record<string, number>;
+	// بعض الأقسام (البلوك، العناصر الأخرى) تحفظ قيماً غير رقمية داخل الأبعاد
+	dimensions: Record<string, any>;
 	concreteVolume: number;
 	steelWeight: number;
 	totalCost: number;

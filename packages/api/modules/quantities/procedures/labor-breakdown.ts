@@ -57,6 +57,33 @@ const laborBreakdownSchema = z.object({
 	steelPriceD6: z.number().nonnegative().max(999999999.99).optional(),
 	steelPriceD8: z.number().nonnegative().max(999999999.99).optional(),
 	steelPriceMain: z.number().nonnegative().max(999999999.99).optional(),
+	// ─── البلوك ───
+	// أسعار حبة البلوك حسب النوع والسماكة: { "insulated|20": 6.5, "hollow|15": 3 }
+	blockPrices: z
+		.record(
+			z.string().trim().max(100),
+			z.number().nonnegative().max(999999999.99),
+		)
+		.optional(),
+	// مونة البناء: متوسط بطحة (م³) وأسمنت (كيس) لكل حبة بلوك — الكمية تلقائية
+	// والمستخدم يسعّر متر البطحة وكيس الأسمنت
+	mortarSandPrice: z.number().nonnegative().max(999999999.99).optional(),
+	mortarCementPrice: z.number().nonnegative().max(999999999.99).optional(),
+	// أعتاب الأبواب والشبابيك — خرسانة (م³) وحديد (طن)
+	lintelConcretePrice: z.number().nonnegative().max(999999999.99).optional(),
+	lintelSteelPrice: z.number().nonnegative().max(999999999.99).optional(),
+	// مصنعيات بناء البلوك — صف لكل نوع/سماكة (الكمية = المساحة الصافية م²)
+	blockLaborRows: z
+		.array(
+			z.object({
+				id: z.string().trim().max(100),
+				label: z.string().trim().max(200),
+				quantity: z.string().trim().max(200),
+				unit: z.string().trim().max(200),
+				pricePerUnit: z.string().trim().max(200),
+			}),
+		)
+		.optional(),
 	// المصاريف غير المباشرة — سلك ومسمار + إشراف + تشغيل
 	// (الإجمالي يُعاد حسابه على السيرفر في lib/indirect-costs.ts)
 	indirectCosts: z.object({

@@ -18,6 +18,12 @@ import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
 import { aggregateBOQ, REBAR_WEIGHTS_MAP } from "@saas/pricing/lib/boq-aggregator";
 import { recalculateItem } from "@saas/pricing/lib/boq-recalculator";
+import {
+	aggregateBlockMaterials,
+	deriveBlockMaterials,
+	CEMENT_BAGS_PER_BLOCK,
+	SAND_VOLUME_PER_BLOCK,
+} from "@saas/pricing/lib/block-materials";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -61,9 +67,18 @@ export function MaterialsCostingTab({
 	const [storagePercent, setStoragePercent] = useState("2");
 	const [initialized, setInitialized] = useState(false);
 
+	// ─── البلوك ومونته وأعتابه ───
+	const [blockPrices, setBlockPrices] = useState<Record<string, string>>({});
+	const [mortarSandPrice, setMortarSandPrice] = useState("");
+	const [mortarCementPrice, setMortarCementPrice] = useState("");
+	const [lintelConcretePrice, setLintelConcretePrice] = useState("");
+	const [lintelSteelPrice, setLintelSteelPrice] = useState("");
+
 	// Manual overrides for quantities
 	const [concreteOverrides, setConcreteOverrides] = useState<Record<string, string>>({});
 	const [steelOverrides, setSteelOverrides] = useState<Record<string, string>>({});
+	// تجاوزات كميات البلوك/المونة/الأعتاب (مفتاح واحد لكل بطاقة)
+	const [extraOverrides, setExtraOverrides] = useState<Record<string, string>>({});
 	const [editingCard, setEditingCard] = useState<string | null>(null);
 
 	// ─── Queries ───
@@ -108,10 +123,22 @@ export function MaterialsCostingTab({
 		}),
 	);
 
+	// ─── بنود البلوك تُسعَّر بصفوفها الخاصة (بلوك + مونة + أعتاب) ───
+	// استبعادها من تجميع الخرسانة/الحديد العام يمنع ازدواج احتساب الأعتاب
+	const nonBlockItems = useMemo(
+		() => ((items as any[]) ?? []).filter((it) => it.category !== "blocks"),
+		[items],
+	);
+
+	const blockAgg = useMemo(
+		() => aggregateBlockMaterials(((items as any[]) ?? []) as any),
+		[items],
+	);
+
 	// ─── Aggregate concrete by grade ───
 	const concreteGrades = useMemo<ConcreteGradeAgg[]>(() => {
 		const gradeMap: Record<string, number> = {};
-		for (const item of (items as any) ?? []) {
+		for (const item of nonBlockItems) {
 			const grade = item.concreteType || "C30";
 			const vol = Number(item.concreteVolume ?? 0);
 			gradeMap[grade] = (gradeMap[grade] ?? 0) + vol;
@@ -123,11 +150,11 @@ export function MaterialsCostingTab({
 				const numB = parseInt(b.grade.replace(/\D/g, "")) || 0;
 				return numA - numB;
 			});
-	}, [items]);
+	}, [nonBlockItems]);
 
 	// ─── Aggregate steel by diameter groups using aggregateBOQ ───
 	const steelGroups = useMemo<SteelGroupAgg[]>(() => {
-		const structItems = (items as any) ?? [];
+		const structItems = nonBlockItems;
 		if (structItems.length === 0) return [];
 
 		try {
@@ -177,7 +204,7 @@ export function MaterialsCostingTab({
 			}
 			return [];
 		}
-	}, [items]);
+	}, [nonBlockItems]);
 
 	// ─── Initialize from saved data ───
 	useEffect(() => {
@@ -213,6 +240,19 @@ export function MaterialsCostingTab({
 			}
 
 			if (bd.storagePercent != null) setStoragePercent(String(bd.storagePercent));
+
+			// البلوك والمونة والأعتاب
+			if (bd.blockPrices) {
+				const bp: Record<string, string> = {};
+				for (const [k, v] of Object.entries(bd.blockPrices)) {
+					bp[k] = String(v);
+				}
+				setBlockPrices(bp);
+			}
+			if (bd.mortarSandPrice != null) setMortarSandPrice(String(bd.mortarSandPrice));
+			if (bd.mortarCementPrice != null) setMortarCementPrice(String(bd.mortarCementPrice));
+			if (bd.lintelConcretePrice != null) setLintelConcretePrice(String(bd.lintelConcretePrice));
+			if (bd.lintelSteelPrice != null) setLintelSteelPrice(String(bd.lintelSteelPrice));
 		}
 
 		setInitialized(true);
@@ -232,6 +272,19 @@ export function MaterialsCostingTab({
 		}
 		return autoTons;
 	};
+
+	const getExtraQty = (key: string, autoQty: number) => {
+		if (extraOverrides[key] != null && extraOverrides[key] !== "") {
+			return Number(extraOverrides[key]) || 0;
+		}
+		return autoQty;
+	};
+
+	// ─── كميات البلوك والمونة والأعتاب الفعّالة ───
+	const sandVolume = getExtraQty("mortar-sand", blockAgg.mortar.sandVolume);
+	const cementBags = getExtraQty("mortar-cement", blockAgg.mortar.cementBags);
+	const lintelConcrete = getExtraQty("lintel-concrete", blockAgg.lintels.concreteVolume);
+	const lintelSteelTons = getExtraQty("lintel-steel", blockAgg.lintels.steelKg / 1000);
 
 	// ─── Pricing rows for table ───
 	const pricingRows = useMemo(() => {
@@ -282,8 +335,94 @@ export function MaterialsCostingTab({
 			});
 		}
 
+		// ─── البلوك: صف لكل نوع ومقاس (مثلاً «بلوك 20 سم — عازل») ───
+		for (const g of blockAgg.groups) {
+			const count = getExtraQty(`block-${g.key}`, g.blockCount);
+			const price = Number(blockPrices[g.key] ?? "") || 0;
+			rows.push({
+				key: `block-${g.key}`,
+				label: g.label,
+				quantity: count,
+				unit: "حبة",
+				priceState: blockPrices[g.key] ?? "",
+				setPrice: (v: string) => setBlockPrices((p) => ({ ...p, [g.key]: v })),
+				total: count * price,
+			});
+		}
+
+		// ─── مونة البناء: متوسط بطحة وأسمنت لكل حبة بلوك (كمية تلقائية) ───
+		if (blockAgg.totalBlockCount > 0) {
+			const sandPrice = Number(mortarSandPrice) || 0;
+			rows.push({
+				key: "mortar-sand",
+				label: "بطحة (رمل المونة)",
+				quantity: sandVolume,
+				unit: "م³",
+				priceState: mortarSandPrice,
+				setPrice: setMortarSandPrice,
+				total: sandVolume * sandPrice,
+			});
+
+			const cementPrice = Number(mortarCementPrice) || 0;
+			rows.push({
+				key: "mortar-cement",
+				label: "أسمنت المونة",
+				quantity: cementBags,
+				unit: "كيس",
+				priceState: mortarCementPrice,
+				setPrice: setMortarCementPrice,
+				total: cementBags * cementPrice,
+			});
+		}
+
+		// ─── أعتاب الأبواب والشبابيك (من الفتحات المدخلة) ───
+		if (lintelConcrete > 0) {
+			const price = Number(lintelConcretePrice) || 0;
+			rows.push({
+				key: "lintel-concrete",
+				label: "خرسانة الأعتاب (أبواب وشبابيك)",
+				quantity: lintelConcrete,
+				unit: "م³",
+				priceState: lintelConcretePrice,
+				setPrice: setLintelConcretePrice,
+				total: lintelConcrete * price,
+			});
+		}
+		if (lintelSteelTons > 0) {
+			const price = Number(lintelSteelPrice) || 0;
+			rows.push({
+				key: "lintel-steel",
+				label: "حديد الأعتاب",
+				quantity: lintelSteelTons,
+				unit: "طن",
+				priceState: lintelSteelPrice,
+				setPrice: setLintelSteelPrice,
+				total: lintelSteelTons * price,
+			});
+		}
+
 		return rows;
-	}, [concreteGrades, steelGroups, concretePrices, steelPriceD6, steelPriceD8, steelPriceMain, concreteOverrides, steelOverrides]);
+	}, [
+		concreteGrades,
+		steelGroups,
+		concretePrices,
+		steelPriceD6,
+		steelPriceD8,
+		steelPriceMain,
+		concreteOverrides,
+		steelOverrides,
+		blockAgg,
+		blockPrices,
+		mortarSandPrice,
+		mortarCementPrice,
+		lintelConcretePrice,
+		lintelSteelPrice,
+		sandVolume,
+		cementBags,
+		lintelConcrete,
+		lintelSteelTons,
+		extraOverrides,
+	]);
 
 	// ─── Computed totals ───
 	const materialSubtotal = pricingRows.reduce((s, r) => s + r.total, 0);
@@ -304,6 +443,17 @@ export function MaterialsCostingTab({
 			concretePricesNum[k] = Number(v) || 0;
 		}
 
+		// Build block prices map (numbers) — مفتاح: نوع البلوك|السماكة
+		const blockPricesNum: Record<string, number> = {};
+		for (const [k, v] of Object.entries(blockPrices)) {
+			blockPricesNum[k] = Number(v) || 0;
+		}
+
+		const sandPriceNum = Number(mortarSandPrice) || 0;
+		const cementPriceNum = Number(mortarCementPrice) || 0;
+		const lintelConcretePriceNum = Number(lintelConcretePrice) || 0;
+		const lintelSteelPriceNum = Number(lintelSteelPrice) || 0;
+
 		// 1. Save prices to laborBreakdown JSON
 		(setBreakdownMutation as any).mutate({
 			organizationId,
@@ -315,6 +465,11 @@ export function MaterialsCostingTab({
 				steelPriceD8: Number(steelPriceD8) || 0,
 				steelPriceMain: Number(steelPriceMain) || 0,
 				storagePercent: storagePct,
+				blockPrices: blockPricesNum,
+				mortarSandPrice: sandPriceNum,
+				mortarCementPrice: cementPriceNum,
+				lintelConcretePrice: lintelConcretePriceNum,
+				lintelSteelPrice: lintelSteelPriceNum,
 				// Keep legacy fields updated for backward compatibility
 				concretePrice: Object.values(concretePricesNum)[0] ?? 0,
 				steelPrice: Number(steelPriceMain) || 0,
@@ -337,6 +492,26 @@ export function MaterialsCostingTab({
 
 			if (!matchItem) {
 				return { id: ci.id, materialUnitCost: 0 };
+			}
+
+			// ─── البلوك: بلوك + مونة (بطحة وأسمنت) + أعتاب الفتحات ───
+			if (matchItem.category === "blocks") {
+				const m = deriveBlockMaterials(matchItem);
+				const blockPrice = blockPricesNum[m.key] ?? 0;
+				const blockCost = m.blockCount * blockPrice;
+				const mortarCost =
+					m.sandVolume * sandPriceNum + m.cementBags * cementPriceNum;
+				const lintelCost =
+					m.lintelConcreteVolume * lintelConcretePriceNum +
+					(m.lintelSteelKg / 1000) * lintelSteelPriceNum;
+
+				const blockQty = Number(ci.quantity) || 1;
+				return {
+					id: ci.id,
+					materialUnitCost:
+						blockQty > 0 ? (blockCost + mortarCost + lintelCost) / blockQty : 0,
+					storageCostPercent: storagePct,
+				};
 			}
 
 			// Concrete cost — per-grade
@@ -522,6 +697,94 @@ export function MaterialsCostingTab({
 									</div>
 								);
 							})}
+						</div>
+					</>
+				)}
+
+				{blockAgg.groups.length > 0 && (
+					<>
+						<h4 className="font-medium text-sm text-muted-foreground mt-4">
+							كميات البلوك
+						</h4>
+						<div className="flex flex-wrap gap-3">
+							{blockAgg.groups.map((g) => {
+								const count = getExtraQty(`block-${g.key}`, g.blockCount);
+								const isEditing = editingCard === `block-${g.key}`;
+								return (
+									<div
+										key={g.key}
+										className="rounded-xl border border-chart-2 bg-chart-2/15 dark:bg-chart-2/20 dark:border-chart-2 p-3 min-w-[160px] flex-1 max-w-[220px]"
+									>
+										<div className="text-xs text-chart-2 dark:text-chart-2 font-medium mb-1">
+											{g.label}
+										</div>
+										{isEditing ? (
+											<div className="flex items-center gap-1">
+												<Input
+													type="number"
+													className="h-7 w-20 text-sm rounded-lg"
+													dir="ltr"
+													autoFocus
+													value={extraOverrides[`block-${g.key}`] ?? String(g.blockCount)}
+													onChange={(e: any) =>
+														setExtraOverrides((p) => ({
+															...p,
+															[`block-${g.key}`]: e.target.value,
+														}))
+													}
+													onBlur={() => setEditingCard(null)}
+													onKeyDown={(e: any) => e.key === "Enter" && setEditingCard(null)}
+												/>
+												<span className="text-xs text-muted-foreground">حبة</span>
+											</div>
+										) : (
+											<div className="flex items-center justify-between">
+												<span className="text-lg font-bold" dir="ltr">
+													{formatNum(count)}{" "}
+													<span className="text-xs font-normal">حبة</span>
+												</span>
+												<button
+													type="button"
+													onClick={() => setEditingCard(`block-${g.key}`)}
+													className="text-chart-2 hover:text-chart-2 transition-colors"
+												>
+													<Pencil className="h-3.5 w-3.5" />
+												</button>
+											</div>
+										)}
+										<div className="text-[10px] text-muted-foreground mt-1" dir="ltr">
+											{formatNum(g.netArea)} م² صافي
+										</div>
+									</div>
+								);
+							})}
+						</div>
+
+						<div className="rounded-xl border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground leading-relaxed">
+							مونة البناء تُحسب تلقائياً بمتوسط{" "}
+							<span className="font-medium text-foreground" dir="ltr">
+								{SAND_VOLUME_PER_BLOCK.toFixed(5)} م³
+							</span>{" "}
+							بطحة و{" "}
+							<span className="font-medium text-foreground" dir="ltr">
+								{CEMENT_BAGS_PER_BLOCK.toFixed(4)} كيس
+							</span>{" "}
+							أسمنت لكل حبة بلوك — أدخل سعر متر البطحة وكيس الأسمنت في جدول
+							الأسعار أدناه.
+							{blockAgg.lintels.count > 0 && (
+								<>
+									{" "}
+									والأعتاب محسوبة من{" "}
+									<span className="font-medium text-foreground" dir="ltr">
+										{formatNum(blockAgg.lintels.count)}
+									</span>{" "}
+									فتحة (أبواب وشبابيك) بطول إجمالي{" "}
+									<span className="font-medium text-foreground" dir="ltr">
+										{formatNum(blockAgg.lintels.length)} م
+									</span>
+									.
+								</>
+							)}
 						</div>
 					</>
 				)}

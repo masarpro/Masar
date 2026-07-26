@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
+import { aggregateBlockMaterials } from "@saas/pricing/lib/block-materials";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -35,6 +36,7 @@ type LaborMode = "per_sqm" | "per_cbm_ton" | "lump_sum" | "salary";
 interface FloorRow { id: string; label: string; area: string; pricePerSqm: string; isAuto?: boolean; floorKey?: string; }
 interface ExtraRow { id: string; label: string; quantity: string; unit: string; pricePerUnit: string; }
 interface CbmTonRow { id: string; label: string; quantity: string; unit: string; pricePerUnit: string; }
+interface BlockLaborRow { id: string; label: string; quantity: string; unit: string; pricePerUnit: string; }
 interface SalaryWorker { id: string; craft: string; count: string; salary: string; months: string; }
 
 // ═══════════════════════════════════════════════════════════════
@@ -86,6 +88,7 @@ export function LaborOverviewTab({
 		{ id: "steel", label: t("labor.defaults.steelWork"), quantity: "", unit: "طن", pricePerUnit: "" },
 		{ id: "carpentry", label: t("labor.defaults.carpentry"), quantity: "", unit: "م²", pricePerUnit: "" },
 	]);
+	const [blockRows, setBlockRows] = useState<BlockLaborRow[]>([]);
 	const [lumpSumAmount, setLumpSumAmount] = useState("");
 	const [salaryWorkers, setSalaryWorkers] = useState<SalaryWorker[]>([]);
 	const [salaryInsurance, setSalaryInsurance] = useState("");
@@ -185,6 +188,18 @@ export function LaborOverviewTab({
 		return rows;
 	}, [structuralItems, t]);
 
+	// ─── Auto block-masonry labor rows (م² صافي لكل نوع ومقاس بلوك) ───
+	const autoBlockRows = useMemo<BlockLaborRow[]>(() => {
+		const agg = aggregateBlockMaterials(((structuralItems as any[]) ?? []) as any);
+		return agg.groups.map((g) => ({
+			id: `block_${g.key}`,
+			label: `بناء ${g.label}`,
+			quantity: String(g.netArea),
+			unit: "م²",
+			pricePerUnit: "",
+		}));
+	}, [structuralItems]);
+
 	// ─── Initialize from saved data ───
 	useEffect(() => {
 		if (initialized || breakdownLoading) return;
@@ -264,6 +279,23 @@ export function LaborOverviewTab({
 		});
 	}, [slabFloorRows, initialized]);
 
+	// ─── Sync block labor rows with the quantities stage ───
+	// الكمية تُشتق دائماً من بنود البلوك، والسعر يُستعاد من التحرير الحالي
+	// أولاً ثم من التفصيل المحفوظ
+	useEffect(() => {
+		if (breakdownLoading) return;
+		const saved: BlockLaborRow[] = (savedBreakdown as any)?.blockLaborRows ?? [];
+		const savedPrices = new Map(saved.map((r) => [r.id, r.pricePerUnit]));
+		setBlockRows((prev) => {
+			const prevPrices = new Map(prev.map((r) => [r.id, r.pricePerUnit]));
+			return autoBlockRows.map((row) => ({
+				...row,
+				pricePerUnit:
+					prevPrices.get(row.id) || savedPrices.get(row.id) || "",
+			}));
+		});
+	}, [autoBlockRows, savedBreakdown, breakdownLoading]);
+
 	// ─── Row update helpers ───
 	const updateFloorRow = (id: string, field: keyof FloorRow, value: string) => {
 		setFloorRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
@@ -273,6 +305,9 @@ export function LaborOverviewTab({
 	};
 	const updateCbmRow = (id: string, field: keyof CbmTonRow, value: string) => {
 		setCbmRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+	};
+	const updateBlockRow = (id: string, field: keyof BlockLaborRow, value: string) => {
+		setBlockRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
 	};
 	const updateWorker = (id: string, field: keyof SalaryWorker, value: string) => {
 		setSalaryWorkers((prev) => prev.map((w) => (w.id === id ? { ...w, [field]: value } : w)));
@@ -301,7 +336,18 @@ export function LaborOverviewTab({
 	};
 
 	// ─── Computed totals ───
-	const perSqmTotal = useMemo(() => {
+	// مصنعيات البلوك تُضاف للطريقتين القائمتين على الكميات (م² و م³/طن) —
+	// طريقتا المقطوعية والراتب تشملانها ضمن المبلغ الذي يدخله المستخدم
+	const blockLaborTotal = useMemo(() => {
+		let total = 0;
+		for (const row of blockRows) {
+			total += (Number(row.quantity) || 0) * (Number(row.pricePerUnit) || 0);
+		}
+		return total;
+	}, [blockRows]);
+
+	// إجمالي جدول الطريقة وحده (بدون البلوك) — يُعرض في تذييل بطاقة الطريقة
+	const perSqmRowsTotal = useMemo(() => {
 		let total = 0;
 		for (const row of floorRows) {
 			total += (Number(row.area) || 0) * (Number(row.pricePerSqm) || 0);
@@ -312,13 +358,16 @@ export function LaborOverviewTab({
 		return total;
 	}, [floorRows, extraRows]);
 
-	const perCbmTonTotal = useMemo(() => {
+	const perCbmRowsTotal = useMemo(() => {
 		let total = 0;
 		for (const row of cbmRows) {
 			total += (Number(row.quantity) || 0) * (Number(row.pricePerUnit) || 0);
 		}
 		return total;
 	}, [cbmRows]);
+
+	const perSqmTotal = perSqmRowsTotal + blockLaborTotal;
+	const perCbmTonTotal = perCbmRowsTotal + blockLaborTotal;
 
 	const lumpSumTotal = Number(lumpSumAmount) || 0;
 
@@ -440,6 +489,7 @@ export function LaborOverviewTab({
 				floorRows,
 				extraRows,
 				cbmRows,
+				blockLaborRows: blockRows,
 				lumpSumAmount: lumpSumTotal,
 				salaryWorkers,
 				salaryInsurance: Number(salaryInsurance) || 0,
@@ -666,7 +716,7 @@ export function LaborOverviewTab({
 						<div className="flex items-center justify-between text-sm font-medium">
 							<span>{t("common.total")}</span>
 							<span className="font-bold text-primary" dir="ltr">
-								{perSqmTotal > 0 ? `${formatNum(perSqmTotal)} ${t("common.sar")}` : "—"}
+								{perSqmRowsTotal > 0 ? `${formatNum(perSqmRowsTotal)} ${t("common.sar")}` : "—"}
 							</span>
 						</div>
 					</div>
@@ -732,12 +782,91 @@ export function LaborOverviewTab({
 						<div className="flex items-center justify-between text-sm font-medium">
 							<span>{t("common.total")}</span>
 							<span className="font-bold text-primary" dir="ltr">
-								{perCbmTonTotal > 0 ? `${formatNum(perCbmTonTotal)} ${t("common.sar")}` : "—"}
+								{perCbmRowsTotal > 0 ? `${formatNum(perCbmRowsTotal)} ${t("common.sar")}` : "—"}
 							</span>
 						</div>
 					</div>
 				</div>
 			)}
+
+			{/* ─── مصنعيات بناء البلوك (للطريقتين القائمتين على الكميات) ─── */}
+			{(laborMode === "per_sqm" || laborMode === "per_cbm_ton") &&
+				blockRows.length > 0 && (
+					<div className="rounded-xl border border-border bg-card overflow-hidden">
+						<div className="px-4 py-3 bg-muted/30 border-b border-border">
+							<h4 className="font-medium">{t("labor.blockWorkTitle")}</h4>
+							<p className="text-xs text-muted-foreground mt-1">
+								{t("labor.blockWorkHint")}
+							</p>
+						</div>
+
+						<div className="overflow-x-auto">
+							<table className="w-full text-sm">
+								<thead>
+									<tr className="border-b bg-muted/20 text-muted-foreground">
+										<th className="px-3 py-2.5 text-start font-medium">{t("common.item")}</th>
+										<th className="px-3 py-2.5 text-center font-medium">{t("labor.areaQuantity")}</th>
+										<th className="px-3 py-2.5 text-center font-medium">{t("common.unit")}</th>
+										<th className="px-3 py-2.5 text-center font-medium">{t("common.price")}</th>
+										<th className="px-3 py-2.5 text-center font-medium">{t("common.total")}</th>
+									</tr>
+								</thead>
+								<tbody>
+									{blockRows.map((row) => {
+										const rowTotal =
+											(Number(row.quantity) || 0) * (Number(row.pricePerUnit) || 0);
+										return (
+											<tr key={row.id} className="border-b last:border-0 hover:bg-muted/20">
+												<td className="px-3 py-2 font-medium">{row.label}</td>
+												<td className="px-3 py-2">
+													<div className="flex items-center justify-center gap-1.5">
+														<Input
+															type="number"
+															className="h-8 w-24 text-center rounded-lg bg-muted/50"
+															dir="ltr"
+															value={row.quantity}
+															readOnly
+														/>
+														<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+															{t("labor.autoBadge")}
+														</span>
+													</div>
+												</td>
+												<td className="px-3 py-2 text-center text-muted-foreground">{row.unit}</td>
+												<td className="px-3 py-2">
+													<Input
+														type="number"
+														className="h-8 w-24 mx-auto text-center rounded-lg"
+														dir="ltr"
+														placeholder={t("common.sarPerSqm")}
+														value={row.pricePerUnit}
+														onChange={(e: any) =>
+															updateBlockRow(row.id, "pricePerUnit", e.target.value)
+														}
+													/>
+												</td>
+												<td className="px-3 py-2 text-center font-medium" dir="ltr">
+													{rowTotal > 0 ? formatNum(rowTotal) : "—"}
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+
+						<div className="border-t border-border bg-muted/10 px-4 py-3">
+							<div className="flex items-center justify-between text-sm font-medium">
+								<span>{t("labor.blockWorkTotal")}</span>
+								<span className="font-bold text-primary" dir="ltr">
+									{blockLaborTotal > 0
+										? `${formatNum(blockLaborTotal)} ${t("common.sar")}`
+										: "—"}
+								</span>
+							</div>
+						</div>
+					</div>
+				)}
 
 			{/* ─── Lump sum mode ─── */}
 			{laborMode === "lump_sum" && (

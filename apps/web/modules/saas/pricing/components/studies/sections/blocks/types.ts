@@ -11,7 +11,10 @@ export interface BlocksSectionProps {
 		id: string;
 		name: string;
 		quantity: number;
-		dimensions: Record<string, number>;
+		// أبعاد البلوك تحمل قيماً غير رقمية أيضاً (الفتحات، __result، نوع البلوك)
+		dimensions: Record<string, any>;
+		concreteVolume?: number;
+		steelWeight?: number;
 		totalCost: number;
 	}>;
 	allItems?: Array<{ category: string; dimensions: Record<string, any>; subCategory?: string | null }>;
