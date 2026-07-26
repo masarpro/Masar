@@ -73,6 +73,13 @@ export function SolidSlabFields({
 		);
 	};
 
+	// مجموع الخرسانة المخصومة للكمرات المخفية (محسوبة ضمن حجم البلاطة)
+	const hiddenDeduction =
+		beamsCalcs?.details.reduce(
+			(sum, d) => sum + (d.calc.hiddenConcreteDeduction || 0),
+			0,
+		) ?? 0;
+
 	const removeBeam = (id: string) => {
 		setSlabBeams((prev) => prev.filter((b) => b.id !== id));
 		setExpandedBeamIds((prev) => prev.filter((x) => x !== id));
@@ -295,6 +302,7 @@ export function SolidSlabFields({
 								concreteType={
 									specs?.concreteType || "C30"
 								}
+								slabThickness={formData.thickness}
 							/>
 						))}
 					</div>
@@ -356,6 +364,18 @@ export function SolidSlabFields({
 									</span>
 								</div>
 							</div>
+
+							{/* خصم الكمرات المخفية */}
+							{hiddenDeduction > 0 && (
+								<p className="mt-2 pt-2 border-t border-chart-4/20 text-xs text-muted-foreground">
+									خُصمت{" "}
+									<span className="font-semibold text-foreground">
+										{formatNumber(hiddenDeduction)} م³
+									</span>{" "}
+									من خرسانة الكمرات المخفية لأنها محسوبة أصلاً ضمن حجم
+									البلاطة (تسليحها محسوب كاملاً).
+								</p>
+							)}
 						</div>
 
 						{/* تفاصيل القص للكمرات */}

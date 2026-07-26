@@ -85,6 +85,8 @@ export const slabDimensionsSchema = z
 		beamsCount: z.number().nonnegative().optional(),
 		beamsConcrete: z.number().nonnegative().optional(),
 		beamsSteel: z.number().nonnegative().optional(),
+		// Solid slab beam templates (stored as JSON string)
+		slabBeamTemplates: z.string().optional(),
 		// Banded beam templates (stored as JSON string)
 		bandedBeamTemplates: z.string().optional(),
 		// Area fields

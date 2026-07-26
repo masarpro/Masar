@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { Checkbox } from "@ui/components/checkbox";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
-import { Badge } from "@ui/components/badge";
 import {
 	Select,
 	SelectContent,
@@ -12,19 +12,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import {
-	Trash2,
-	ChevronDown,
-	ChevronLeft,
-} from "lucide-react";
+import { ChevronDown, ChevronLeft, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 import { REBAR_DIAMETERS } from "../../../../constants/prices";
 import { formatNumber } from "../../../../lib/utils";
-import {
-	RebarBarsInput,
-	StirrupsInput,
-} from "../../shared";
+import { NumericInput, RebarBarsInput, StirrupsInput } from "../../shared";
 import { computeBeamCalc } from "./helpers";
 import type { BeamInputRowProps } from "./types";
+import { BEAM_HEIGHT_OPTIONS, BEAM_WIDTH_OPTIONS } from "./types";
 
 export function BeamInputRow({
 	beam,
@@ -34,8 +29,12 @@ export function BeamInputRow({
 	onChange,
 	onRemove,
 	concreteType,
+	slabThickness,
 }: BeamInputRowProps) {
-	const calc = useMemo(() => computeBeamCalc(beam, concreteType), [beam, concreteType]);
+	const calc = useMemo(
+		() => computeBeamCalc(beam, concreteType, slabThickness),
+		[beam, concreteType, slabThickness],
+	);
 
 	return (
 		<div className="border rounded-lg overflow-hidden bg-background">
@@ -59,6 +58,14 @@ export function BeamInputRow({
 					<span className="text-xs text-muted-foreground">
 						{beam.width}×{beam.height} سم × {beam.length} م
 					</span>
+					{beam.isHidden && (
+						<Badge
+							variant="secondary"
+							className="text-[10px] font-normal"
+						>
+							مخفية
+						</Badge>
+					)}
 				</div>
 				<div className="flex items-center gap-4 text-xs text-muted-foreground">
 					<span>
@@ -85,7 +92,9 @@ export function BeamInputRow({
 							<Label className="text-xs">اسم الكمرة</Label>
 							<Input
 								value={beam.name}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+								onChange={(
+									e: React.ChangeEvent<HTMLInputElement>,
+								) =>
 									onChange({ ...beam, name: e.target.value })
 								}
 								className="h-8 text-sm"
@@ -93,14 +102,14 @@ export function BeamInputRow({
 						</div>
 						<div className="space-y-1">
 							<Label className="text-xs">العدد</Label>
-							<Input
-								type="number"
+							<NumericInput
 								min={1}
+								fallback={1}
 								value={beam.quantity}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+								onValueChange={(v) =>
 									onChange({
 										...beam,
-										quantity: Math.max(1, parseInt(e.target.value) || 1),
+										quantity: Math.round(v) || 1,
 									})
 								}
 								className="h-8 text-sm"
@@ -118,8 +127,11 @@ export function BeamInputRow({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{[20, 25, 30, 35, 40, 50, 60].map((w) => (
-										<SelectItem key={w} value={w.toString()}>
+									{BEAM_WIDTH_OPTIONS.map((w) => (
+										<SelectItem
+											key={w}
+											value={w.toString()}
+										>
 											{w} سم
 										</SelectItem>
 									))}
@@ -138,8 +150,11 @@ export function BeamInputRow({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{[30, 40, 50, 60, 70, 80, 90, 100].map((h) => (
-										<SelectItem key={h} value={h.toString()}>
+									{BEAM_HEIGHT_OPTIONS.map((h) => (
+										<SelectItem
+											key={h}
+											value={h.toString()}
+										>
 											{h} سم
 										</SelectItem>
 									))}
@@ -148,20 +163,16 @@ export function BeamInputRow({
 						</div>
 					</div>
 
-					{/* الطول */}
+					{/* الطول + نوع الكمرة */}
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 						<div className="space-y-1">
 							<Label className="text-xs">الطول (م)</Label>
-							<Input
-								type="number"
+							<NumericInput
 								min={0.5}
-								step={0.1}
+								fallback={1}
 								value={beam.length}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									onChange({
-										...beam,
-										length: Math.max(0.5, parseFloat(e.target.value) || 1),
-									})
+								onValueChange={(v) =>
+									onChange({ ...beam, length: v })
 								}
 								className="h-8 text-sm"
 							/>
@@ -173,6 +184,33 @@ export function BeamInputRow({
 							<span className="font-bold text-sm text-chart-4">
 								{formatNumber(calc.concreteVolume)} م³
 							</span>
+						</div>
+						<div className="md:col-span-2 flex items-start gap-2 rounded border border-dashed p-2">
+							<Checkbox
+								id={`beam-hidden-${beam.id}`}
+								checked={!!beam.isHidden}
+								onCheckedChange={(checked: any) =>
+									onChange({ ...beam, isHidden: !!checked })
+								}
+								className="mt-0.5"
+							/>
+							<Label
+								htmlFor={`beam-hidden-${beam.id}`}
+								className="text-xs font-normal leading-relaxed cursor-pointer"
+							>
+								كمرة مخفية (مدفونة داخل البلاطة)
+								<span className="block text-[11px] text-muted-foreground">
+									{beam.isHidden
+										? calc.hiddenConcreteDeduction > 0
+											? `خُصمت ${formatNumber(calc.hiddenConcreteDeduction)} م³ لأنها محسوبة ضمن خرسانة البلاطة${
+													calc.netHeight > 0
+														? ` — يُحتسب الجزء الساقط ${formatNumber(calc.netHeight, 0)} سم فقط`
+														: ""
+												}`
+											: "لا خصم — عمق الكمرة أكبر من سماكة البلاطة"
+										: "لا تُضف خرسانتها فوق البلاطة إن كانت مدفونة داخل سماكتها"}
+								</span>
+							</Label>
 						</div>
 					</div>
 
@@ -193,7 +231,9 @@ export function BeamInputRow({
 									onChange({ ...beam, bottomBarsCount: n })
 								}
 								colorScheme="blue"
-								availableDiameters={REBAR_DIAMETERS.filter((d) => d >= 12)}
+								availableDiameters={REBAR_DIAMETERS.filter(
+									(d) => d >= 12,
+								)}
 								availableBarsCount={[2, 3, 4, 5, 6, 8]}
 							/>
 							<RebarBarsInput
@@ -207,7 +247,9 @@ export function BeamInputRow({
 									onChange({ ...beam, topBarsCount: n })
 								}
 								colorScheme="green"
-								availableDiameters={REBAR_DIAMETERS.filter((d) => d >= 12)}
+								availableDiameters={REBAR_DIAMETERS.filter(
+									(d) => d >= 12,
+								)}
 								availableBarsCount={[2, 3, 4, 5, 6]}
 							/>
 							<StirrupsInput
@@ -219,8 +261,12 @@ export function BeamInputRow({
 								onSpacingChange={(s) =>
 									onChange({ ...beam, stirrupSpacing: s })
 								}
-								availableDiameters={REBAR_DIAMETERS.filter((d) => d <= 10)}
-								availableSpacings={[100, 125, 150, 175, 200, 250]}
+								availableDiameters={REBAR_DIAMETERS.filter(
+									(d) => d <= 10,
+								)}
+								availableSpacings={[
+									100, 125, 150, 175, 200, 250,
+								]}
 							/>
 						</div>
 					</div>
@@ -228,19 +274,25 @@ export function BeamInputRow({
 					{/* نتائج الكمرة */}
 					<div className="bg-muted/30 rounded-lg p-2 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
 						<div>
-							<span className="text-muted-foreground">خرسانة: </span>
+							<span className="text-muted-foreground">
+								خرسانة:{" "}
+							</span>
 							<span className="font-bold">
 								{formatNumber(calc.concreteVolume)} م³
 							</span>
 						</div>
 						<div>
-							<span className="text-muted-foreground">حديد (صافي): </span>
+							<span className="text-muted-foreground">
+								حديد (صافي):{" "}
+							</span>
 							<span className="font-bold">
 								{formatNumber(calc.netWeight)} كجم
 							</span>
 						</div>
 						<div>
-							<span className="text-muted-foreground">حديد (إجمالي): </span>
+							<span className="text-muted-foreground">
+								حديد (إجمالي):{" "}
+							</span>
 							<span className="font-bold">
 								{formatNumber(calc.grossWeight)} كجم
 							</span>

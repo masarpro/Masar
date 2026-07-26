@@ -24,7 +24,12 @@ export interface SlabsSectionProps {
 	buildingFloors?: StructuralFloorConfig[];
 }
 
-export type SlabTypeKey = "solid" | "flat" | "ribbed" | "hollow_core" | "banded_beam";
+export type SlabTypeKey =
+	| "solid"
+	| "flat"
+	| "ribbed"
+	| "hollow_core"
+	| "banded_beam";
 export type SlabTypeKeyOrEmpty = SlabTypeKey | "";
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,6 +43,12 @@ export interface SlabBeamDef {
 	width: number; // سم
 	height: number; // سم
 	length: number; // م
+	/**
+	 * كمرة مخفية (مدفونة داخل البلاطة) — خرسانتها محسوبة أصلاً ضمن حجم
+	 * البلاطة، فلا تُضاف مرة ثانية. يُحتسب فقط الجزء الساقط أسفل البلاطة
+	 * (الارتفاع − سماكة البلاطة) إن وُجد. التسليح يُحسب بالارتفاع الكامل.
+	 */
+	isHidden?: boolean;
 	topBarsCount: number;
 	topBarDiameter: number;
 	bottomBarsCount: number;
@@ -53,6 +64,7 @@ export const getDefaultBeam = (index: number): SlabBeamDef => ({
 	width: 30,
 	height: 60,
 	length: 5,
+	isHidden: false,
 	topBarsCount: 3,
 	topBarDiameter: 16,
 	bottomBarsCount: 4,
@@ -61,17 +73,27 @@ export const getDefaultBeam = (index: number): SlabBeamDef => ({
 	stirrupSpacing: 150,
 });
 
+/** خيارات عرض الكمرة (سم) — تصل إلى 120 لدعم الكمرات المخفية العريضة */
+export const BEAM_WIDTH_OPTIONS = [
+	20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
+] as const;
+
+/** خيارات عمق الكمرة (سم) */
+export const BEAM_HEIGHT_OPTIONS = [
+	20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
+] as const;
+
 // ═══════════════════════════════════════════════════════════════
 // كمرة عريضة (نموذج)
 // ═══════════════════════════════════════════════════════════════
 
 export interface BandedBeamTemplateDef {
 	id: string;
-	name: string;        // "ك1", "ك2"
+	name: string; // "ك1", "ك2"
 	quantity: number;
-	width: number;       // meters
-	depth: number;       // meters
-	length: number;      // meters
+	width: number; // meters
+	depth: number; // meters
+	length: number; // meters
 	bottomContCount: number;
 	bottomContDiameter: number;
 	bottomAddEnabled: boolean;
@@ -81,11 +103,14 @@ export interface BandedBeamTemplateDef {
 	topContDiameter: number;
 	stirrupDiameter: number;
 	stirrupSpacingQuarter: number; // cm (display)
-	stirrupSpacingMid: number;    // cm
-	stirrupLegs: number;          // 2 or 4
+	stirrupSpacingMid: number; // cm
+	stirrupLegs: number; // 2 or 4
 }
 
-export const getDefaultBandedBeamTemplate = (index: number, beamLength: number): BandedBeamTemplateDef => ({
+export const getDefaultBandedBeamTemplate = (
+	index: number,
+	beamLength: number,
+): BandedBeamTemplateDef => ({
 	id: `bbt-${Date.now()}-${index}`,
 	name: `ك${index + 1}`,
 	quantity: 1,
@@ -215,6 +240,8 @@ export interface BeamInputRowProps {
 	onChange: (beam: SlabBeamDef) => void;
 	onRemove: () => void;
 	concreteType: string;
+	/** سماكة البلاطة (سم) — لخصم خرسانة الكمرات المخفية */
+	slabThickness?: number;
 }
 
 export interface FloorInfo {
@@ -244,7 +271,10 @@ export interface SlabFormProps {
 export interface CopyFromFloorButtonProps {
 	currentFloor: string;
 	floors: FloorInfo[];
-	getFloorItems: (label: string, isFirst: boolean) => SlabsSectionProps["items"];
+	getFloorItems: (
+		label: string,
+		isFirst: boolean,
+	) => SlabsSectionProps["items"];
 	studyId: string;
 	organizationId: string;
 	specs?: { concreteType: string; steelGrade: string };
@@ -281,11 +311,17 @@ export interface SlabTypeFieldsProps {
 			splicesPerBar?: number;
 			lapSpliceLength?: number;
 		}>;
-		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
+		stocksNeeded: Array<{
+			diameter: number;
+			count: number;
+			length: number;
+		}>;
 		details: Array<{ beam: SlabBeamDef; calc: any }>;
 	} | null;
 	bandedBeamTemplates: BandedBeamTemplateDef[];
-	setBandedBeamTemplates: React.Dispatch<React.SetStateAction<BandedBeamTemplateDef[]>>;
+	setBandedBeamTemplates: React.Dispatch<
+		React.SetStateAction<BandedBeamTemplateDef[]>
+	>;
 	expandedBandedIds: string[];
 	setExpandedBandedIds: React.Dispatch<React.SetStateAction<string[]>>;
 	showCuttingDetails: boolean;

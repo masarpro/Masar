@@ -2,6 +2,7 @@ export { CalculationResultsPanel } from "./CalculationResultsPanel";
 export { ConcreteTypeSelect } from "./ConcreteTypeSelect";
 export { DimensionsCard } from "./DimensionsCard";
 export { ElementHeaderRow } from "./ElementHeaderRow";
+export { NumericInput } from "./NumericInput";
 export { RebarBarsInput } from "./RebarBarsInput";
 export { RebarMeshInput } from "./RebarMeshInput";
 export { RebarWeightBadge } from "./RebarWeightBadge";

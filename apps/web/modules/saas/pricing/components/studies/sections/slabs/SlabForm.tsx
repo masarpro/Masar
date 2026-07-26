@@ -174,7 +174,8 @@ export function SlabForm({
 		const concreteType = specs?.concreteType || "C30";
 		const allCalcs = slabBeams.map((beam) => ({
 			beam,
-			calc: computeBeamCalc(beam, concreteType),
+			// سماكة البلاطة تُمرَّر لخصم خرسانة الكمرات المخفية (محسوبة ضمن البلاطة)
+			calc: computeBeamCalc(beam, concreteType, formData.thickness),
 		}));
 
 		const totalConcrete = allCalcs.reduce(
@@ -225,7 +226,7 @@ export function SlabForm({
 			stocksNeeded: Array.from(stocksMap.values()),
 			details: allCalcs,
 		};
-	}, [slabBeams, formData.slabType, specs]);
+	}, [slabBeams, formData.slabType, formData.thickness, specs]);
 
 	// ═══ حساب السقف ═══
 	const calculations = useMemo((): EnhancedSlabResult | null => {
