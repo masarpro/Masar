@@ -78,13 +78,13 @@ export function RaftFields({
 								onDiameterChange={(d) => setFormData({ ...formData, topXDiameter: d })}
 								barsPerMeter={formData.topXBarsPerMeter}
 								onBarsPerMeterChange={(n) => setFormData({ ...formData, topXBarsPerMeter: n })}
-								colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12)} availableBarsPerMeter={[3, 4, 5, 6]} />
+								colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12)} availableBarsPerMeter={[3, 4, 5, 6, 7, 8]} />
 							<RebarMeshInput title="الشبكة العلوية" direction="اتجاه Y"
 								diameter={formData.topYDiameter}
 								onDiameterChange={(d) => setFormData({ ...formData, topYDiameter: d })}
 								barsPerMeter={formData.topYBarsPerMeter}
 								onBarsPerMeterChange={(n) => setFormData({ ...formData, topYBarsPerMeter: n })}
-								colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12)} availableBarsPerMeter={[3, 4, 5, 6]} />
+								colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12)} availableBarsPerMeter={[3, 4, 5, 6, 7, 8]} />
 						</div>
 					)}
 				</div>

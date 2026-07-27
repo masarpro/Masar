@@ -147,7 +147,7 @@ export function IsolatedCombinedFields({
 								onBarsPerMeterChange={(n) => setFormData({ ...formData, topShortBarsPerMeter: n })}
 								colorScheme="green"
 								availableDiameters={REBAR_DIAMETERS.filter(d => d >= 10 && d <= 25)}
-								availableBarsPerMeter={[3, 4, 5, 6]}
+								availableBarsPerMeter={[3, 4, 5, 6, 7, 8]}
 							/>
 							<RebarMeshInput
 								title="الغطاء العلوي"
@@ -158,7 +158,7 @@ export function IsolatedCombinedFields({
 								onBarsPerMeterChange={(n) => setFormData({ ...formData, topLongBarsPerMeter: n })}
 								colorScheme="green"
 								availableDiameters={REBAR_DIAMETERS.filter(d => d >= 10 && d <= 25)}
-								availableBarsPerMeter={[3, 4, 5, 6]}
+								availableBarsPerMeter={[3, 4, 5, 6, 7, 8]}
 							/>
 						</div>
 					)}
