@@ -14,7 +14,7 @@ import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
 import { UnifiedItemsWorkspace } from "../unified-quantities";
 import { ImportItemsDialog } from "./ImportItemsDialog";
 import { StudyStagesAccordion } from "./StudyStagesAccordion";
-import { StructuralItemsEditor } from "./StructuralItemsEditor";
+import { StudyWorkspace } from "./workspace/StudyWorkspace";
 // Legacy editors — only mounted when the unified workspace is OFF for this study
 import { FinishingItemsEditor } from "./FinishingItemsEditor";
 import { MEPItemsEditor } from "./MEPItemsEditor";
@@ -61,7 +61,8 @@ export function QuantitiesSubTabs({
 		if (isUnified) {
 			tabs.push("unified");
 		} else {
-			if (noScopes || workScopes.includes("FINISHING")) tabs.push("finishing");
+			if (noScopes || workScopes.includes("FINISHING"))
+				tabs.push("finishing");
 			if (noScopes || workScopes.includes("MEP")) tabs.push("mep");
 		}
 
@@ -123,7 +124,7 @@ export function QuantitiesSubTabs({
 				)}
 
 				<TabsContent value="structural" className="mt-4">
-					<StructuralItemsEditor
+					<StudyWorkspace
 						organizationId={organizationId}
 						organizationSlug={organizationSlug}
 						studyId={studyId}
@@ -166,7 +167,9 @@ export function QuantitiesSubTabs({
 							studyId={studyId}
 							onImported={() => {
 								queryClient.invalidateQueries({
-									queryKey: [["pricing", "studies", "manualItem"]],
+									queryKey: [
+										["pricing", "studies", "manualItem"],
+									],
 								});
 							}}
 						/>
@@ -181,7 +184,10 @@ export function QuantitiesSubTabs({
 			{/* Legacy mid-page summary — only useful for the legacy multi-tab flow.
 			    The unified workspace renders its own MiniPnLCard so we suppress this. */}
 			{!isUnified && enabledTabs.length > 1 && (
-				<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
+				<QuantitiesSummary
+					organizationId={organizationId}
+					studyId={studyId}
+				/>
 			)}
 
 			{/* المراحل مدموجة أسفل صفحة الكميات كأقسام مطوية (بطلب جودت):
@@ -189,9 +195,14 @@ export function QuantitiesSubTabs({
 			    التحويل لعرض سعر في رأس اللوحة. تظهر لكل الدراسات كاملة
 			    المسار — وللدراسات الموحّدة فقط عندما تشمل نطاقاً إنشائياً
 			    أو يدوياً (التشطيبات وMEP تُسعَّر داخل مساحة العمل). */}
-			{!["QUICK_PRICING", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS"].includes(
-				(study as any)?.studyType ?? "",
-			) &&
+			{/* الدراسات الإنشائية تعرض المواصفات والتكلفة داخل مساحة العمل
+			    كتبويبات حيّة، فلا داعي لتكرارها هنا كأقسام مطوية */}
+			{!enabledTabs.includes("structural") &&
+				![
+					"QUICK_PRICING",
+					"CUSTOM_ITEMS",
+					"LUMP_SUM_ANALYSIS",
+				].includes((study as any)?.studyType ?? "") &&
 				(!isUnified ||
 					workScopes.includes("STRUCTURAL") ||
 					workScopes.includes("CUSTOM")) && (
