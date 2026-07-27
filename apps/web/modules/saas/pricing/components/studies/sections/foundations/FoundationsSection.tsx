@@ -90,6 +90,7 @@ export function FoundationsSection({
 				height: formData.height,
 				cover: formData.cover,
 				hookLength: formData.hookLength,
+				bend: { mode: formData.bendMode, legLength: formData.bendLegLength || undefined },
 				coverBottom: formData.foundationCoverBottom,
 				coverTop: formData.foundationCoverTop,
 				coverSide: formData.foundationCoverSide,
@@ -141,6 +142,7 @@ export function FoundationsSection({
 				height: formData.height,
 				cover: formData.cover,
 				hookLength: formData.hookLength,
+				bend: { mode: formData.bendMode, legLength: formData.bendLegLength || undefined },
 				coverBottom: formData.foundationCoverBottom,
 				coverTop: formData.foundationCoverTop,
 				coverSide: formData.foundationCoverSide,
@@ -188,6 +190,7 @@ export function FoundationsSection({
 				height: formData.height,
 				quantity: formData.quantity,
 				hookLength: formData.hookLength,
+				bend: { mode: formData.bendMode, legLength: formData.bendLegLength || undefined },
 				coverBottom: formData.stripCoverBottom,
 				coverTop: formData.stripCoverTop,
 				coverSide: formData.stripCoverSide,
@@ -258,6 +261,7 @@ export function FoundationsSection({
 				thickness: formData.thickness,
 				cover: formData.cover,
 				hookLength: formData.hookLength,
+				bend: { mode: formData.bendMode, legLength: formData.bendLegLength || undefined },
 				coverBottom: formData.coverBottom,
 				coverTop: formData.coverTop,
 				coverSide: formData.coverSide,
@@ -373,6 +377,9 @@ export function FoundationsSection({
 				height: formData.height,
 				cover: formData.cover,
 				hookLength: formData.hookLength,
+				// ثني أطراف الشبكة — تُحفظ مسطّحة لأن dimensions سجل مفاتيح بسيطة
+				bendMode: formData.bendMode,
+				bendLegLength: formData.bendLegLength,
 				foundationType: formData.type,
 				// للقاعدة المعزولة والمشتركة
 				...(( formData.type === "isolated" || formData.type === "combined") && {

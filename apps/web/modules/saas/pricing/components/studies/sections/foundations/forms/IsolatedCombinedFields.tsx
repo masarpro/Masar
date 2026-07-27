@@ -15,6 +15,7 @@ import {
 	DimensionsCard,
 	RebarMeshInput,
 } from "../../../shared";
+import { BendFields } from "./BendFields";
 import type { FoundationFieldsProps } from "../types";
 
 export function IsolatedCombinedFields({
@@ -165,6 +166,17 @@ export function IsolatedCombinedFields({
 				</div>
 			</div>
 
+
+			<BendFields
+				mode={formData.bendMode}
+				onModeChange={(m) => setFormData({ ...formData, bendMode: m })}
+				legLength={formData.bendLegLength}
+				onLegLengthChange={(v) => setFormData({ ...formData, bendLegLength: v })}
+				thickness={formData.height}
+				coverBottom={formData.foundationCoverBottom}
+				coverTop={formData.foundationCoverTop}
+				maxBarDiameter={Math.max(formData.bottomShortDiameter, formData.bottomLongDiameter, formData.hasTopShort ? formData.topShortDiameter : 0, formData.hasTopLong ? formData.topLongDiameter : 0)}
+			/>
 			{/* إعدادات متقدمة */}
 			<div className="border-t pt-4 space-y-4">
 				{/* الأغطية الخرسانية */}

@@ -40,6 +40,9 @@ export interface FormData {
 	height: number;
 	cover: number;
 	hookLength: number;
+	// ثني أطراف الشبكة (الرجل)
+	bendMode: 'none' | 'all' | 'alternate';
+	bendLegLength: number;   // 0 = تلقائي (عمق القاعدة ناقص الأغطية)
 	// حديد الفرش القصير (سفلي)
 	bottomShortDiameter: number;
 	bottomShortBarsPerMeter: number;
@@ -165,6 +168,8 @@ export const getDefaultFormData = (config?: StructuralBuildingConfig | null): Fo
 		: 0.6,
 	cover: 0.075,
 	hookLength: 0.10,
+	bendMode: 'none',
+	bendLegLength: 0,
 	// فرش قصير سفلي
 	bottomShortDiameter: 16,
 	bottomShortBarsPerMeter: 5,
@@ -282,6 +287,8 @@ export function populateFormFromItem(item: FoundationsSectionProps["items"][0]):
 		height: item.dimensions?.height || 0.6,
 		cover: item.dimensions?.cover || 0.075,
 		hookLength: item.dimensions?.hookLength || 0.10,
+		bendMode: (item.dimensions?.bendMode as any) || 'none',
+		bendLegLength: item.dimensions?.bendLegLength || 0,
 		bottomShortDiameter: item.dimensions?.bottomShortDiameter || 16,
 		bottomShortBarsPerMeter: item.dimensions?.bottomShortBarsPerMeter || 5,
 		bottomLongDiameter: item.dimensions?.bottomLongDiameter || 16,

@@ -15,6 +15,7 @@ import {
 	DimensionsCard,
 	RebarMeshInput,
 } from "../../../shared";
+import { BendFields } from "./BendFields";
 import type { FoundationFieldsProps } from "../types";
 
 export function RaftFields({
@@ -90,6 +91,17 @@ export function RaftFields({
 				</div>
 			</div>
 
+
+			<BendFields
+				mode={formData.bendMode}
+				onModeChange={(m) => setFormData({ ...formData, bendMode: m })}
+				legLength={formData.bendLegLength}
+				onLegLengthChange={(v) => setFormData({ ...formData, bendLegLength: v })}
+				thickness={formData.thickness}
+				coverBottom={formData.coverBottom}
+				coverTop={formData.coverTop}
+				maxBarDiameter={Math.max(formData.bottomXDiameter, formData.bottomYDiameter, formData.hasTopMesh ? formData.topXDiameter : 0, formData.hasTopMesh ? formData.topYDiameter : 0)}
+			/>
 			{/* إعدادات متقدمة */}
 			<div className="border-t pt-4 space-y-4">
 				{/* الأغطية */}

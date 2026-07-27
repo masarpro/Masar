@@ -211,6 +211,39 @@ export function recalculateBeamCutting(
 	return aggregateResult(itemName, details);
 }
 
+/**
+ * ثني أطراف شبكة القاعدة (الرجل) — يجب أن يطابق
+ * resolveFoundationLeg / splitFoundationBarGroups في structural-calculations.ts
+ */
+function foundationLeg(dims: any, thickness: number, coverBottom: number, coverTop: number): number {
+	const mode = dims.bendMode as string | undefined;
+	if (!mode || mode === "none") return 0;
+	const geometricMax = Math.max(0, thickness - coverBottom - coverTop);
+	const manual = Number(dims.bendLegLength) || 0;
+	return manual > 0 ? Math.min(manual, geometricMax) : geometricMax;
+}
+
+/** يقسم أسياخ اتجاه واحد إلى مجموعات قص حسب وضع الثني */
+function bendGroups(
+	dims: any,
+	clear: number,
+	hookLength: number,
+	leg: number,
+	count: number,
+): Array<{ length: number; count: number; bent: boolean }> {
+	const mode = dims.bendMode as string | undefined;
+	const hooked = clear + 2 * hookLength;
+	if (!leg || !mode || mode === "none" || count <= 0) {
+		return [{ length: hooked, count, bent: false }];
+	}
+	const bentLength = clear + 2 * leg;
+	if (mode === "all") return [{ length: bentLength, count, bent: true }];
+	const bentCount = Math.ceil(count / 2);
+	const out = [{ length: bentLength, count: bentCount, bent: true }];
+	if (count - bentCount > 0) out.push({ length: hooked, count: count - bentCount, bent: false });
+	return out;
+}
+
 export function recalculateFoundationCutting(
 	dims: Record<string, number>,
 	quantity: number,
@@ -233,28 +266,27 @@ export function recalculateFoundationCutting(
 		const barCountOf = (dimension: number, barsPerMeter: number) =>
 			Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
 
-		// Bottom short direction
-		const bottomShortBarLength = width - 2 * coverSide + 2 * hookLength;
-		const bottomShortCount = barCountOf(length, dims.bottomShortBarsPerMeter || 5);
-		details.push(calcCutting(itemName, "فرش سفلي - قصير", dims.bottomShortDiameter, bottomShortBarLength, bottomShortCount * quantity));
+		// ثني أطراف الشبكة (الرجل)
+		const isoLeg = foundationLeg(
+			dims, dims.height || 0,
+			dims.foundationCoverBottom ?? cover,
+			dims.foundationCoverTop ?? 0.05,
+		);
+		const pushMesh = (label: string, diameter: number, dimension: number, count: number) => {
+			const groups = bendGroups(dims, dimension - 2 * coverSide, hookLength, isoLeg, count);
+			for (const g of groups) {
+				const nm = groups.length > 1 ? `${label} (${g.bent ? "مثني" : "بخطاف"})` : label;
+				details.push(calcCutting(itemName, nm, diameter, g.length, g.count * quantity));
+			}
+		};
 
-		// Bottom long direction
-		const bottomLongBarLength = length - 2 * coverSide + 2 * hookLength;
-		const bottomLongCount = barCountOf(width, dims.bottomLongBarsPerMeter || 5);
-		details.push(calcCutting(itemName, "فرش سفلي - طويل", dims.bottomLongDiameter || dims.bottomShortDiameter, bottomLongBarLength, bottomLongCount * quantity));
-
-		// Top short
+		pushMesh("فرش سفلي - قصير", dims.bottomShortDiameter, width, barCountOf(length, dims.bottomShortBarsPerMeter || 5));
+		pushMesh("فرش سفلي - طويل", dims.bottomLongDiameter || dims.bottomShortDiameter, length, barCountOf(width, dims.bottomLongBarsPerMeter || 5));
 		if (dims.hasTopShort) {
-			const topShortBarLength = width - 2 * coverSide + 2 * hookLength;
-			const topShortCount = barCountOf(length, dims.topShortBarsPerMeter || 4);
-			details.push(calcCutting(itemName, "غطاء علوي - قصير", dims.topShortDiameter || 12, topShortBarLength, topShortCount * quantity));
+			pushMesh("غطاء علوي - قصير", dims.topShortDiameter || 12, width, barCountOf(length, dims.topShortBarsPerMeter || 4));
 		}
-
-		// Top long
 		if (dims.hasTopLong) {
-			const topLongBarLength = length - 2 * coverSide + 2 * hookLength;
-			const topLongCount = barCountOf(width, dims.topLongBarsPerMeter || 4);
-			details.push(calcCutting(itemName, "غطاء علوي - طويل", dims.topLongDiameter || 12, topLongBarLength, topLongCount * quantity));
+			pushMesh("غطاء علوي - طويل", dims.topLongDiameter || 12, length, barCountOf(width, dims.topLongBarsPerMeter || 4));
 		}
 	} else if (subCategory === "strip") {
 		// يطابق المحرك (calculateStripFoundation): وضعان حسب العرض
@@ -298,20 +330,25 @@ export function recalculateFoundationCutting(
 			const meshCountOf = (dimension: number, barsPerMeter: number) =>
 				Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
 
-			const bxBarLength = width - 2 * coverSide + 2 * hookLength;
-			const bxCount = meshCountOf(segmentLength, dims.stripBottomMeshXBarsPerMeter || 5) * quantity;
-			details.push(calcCutting(itemName, "سفلي اتجاه X", dims.stripBottomMeshXDiameter, bxBarLength, bxCount));
+			// ثني أطراف الشبكة (الرجل)
+			const stripLeg = foundationLeg(dims, height, coverBottom, coverTop);
+			const pushStripMesh = (label: string, diameter: number, dimension: number, count: number) => {
+				const groups = bendGroups(dims, dimension - 2 * coverSide, hookLength, stripLeg, count);
+				for (const g of groups) {
+					const nm = groups.length > 1 ? `${label} (${g.bent ? "مثني" : "بخطاف"})` : label;
+					details.push(calcCutting(itemName, nm, diameter, g.length, g.count));
+				}
+			};
 
-			const byBarLength = segmentLength - 2 * coverSide + 2 * hookLength;
-			const byCount = meshCountOf(width, dims.stripBottomMeshYBarsPerMeter || 5) * quantity;
-			details.push(calcCutting(itemName, "سفلي اتجاه Y", dims.stripBottomMeshYDiameter || dims.stripBottomMeshXDiameter, byBarLength, byCount));
-
+			pushStripMesh("سفلي اتجاه X", dims.stripBottomMeshXDiameter, width,
+				meshCountOf(segmentLength, dims.stripBottomMeshXBarsPerMeter || 5) * quantity);
+			pushStripMesh("سفلي اتجاه Y", dims.stripBottomMeshYDiameter || dims.stripBottomMeshXDiameter, segmentLength,
+				meshCountOf(width, dims.stripBottomMeshYBarsPerMeter || 5) * quantity);
 			if (dims.stripHasTopMesh) {
-				const txCount = meshCountOf(segmentLength, dims.stripTopMeshXBarsPerMeter || 4) * quantity;
-				details.push(calcCutting(itemName, "علوي اتجاه X", dims.stripTopMeshXDiameter || 12, bxBarLength, txCount));
-
-				const tyCount = meshCountOf(width, dims.stripTopMeshYBarsPerMeter || 4) * quantity;
-				details.push(calcCutting(itemName, "علوي اتجاه Y", dims.stripTopMeshYDiameter || 12, byBarLength, tyCount));
+				pushStripMesh("علوي اتجاه X", dims.stripTopMeshXDiameter || 12, width,
+					meshCountOf(segmentLength, dims.stripTopMeshXBarsPerMeter || 4) * quantity);
+				pushStripMesh("علوي اتجاه Y", dims.stripTopMeshYDiameter || 12, segmentLength,
+					meshCountOf(width, dims.stripTopMeshYBarsPerMeter || 4) * quantity);
 			}
 		}
 	} else if (subCategory === "raft") {
@@ -326,23 +363,25 @@ export function recalculateFoundationCutting(
 		const meshCountOf = (dimension: number, barsPerMeter: number) =>
 			Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
 
-		// Bottom X bars (تمتد بالعرض)
-		const bxBarLength = width - 2 * coverSide + 2 * hookLength;
-		const bxCount = meshCountOf(length, dims.bottomXBarsPerMeter || 5);
-		details.push(calcCutting(itemName, "سفلي اتجاه X", dims.bottomXDiameter, bxBarLength, bxCount));
+		// ثني أطراف الشبكة (الرجل)
+		const raftLeg = foundationLeg(
+			dims, dims.thickness || dims.height || 0,
+			dims.coverBottom ?? cover,
+			dims.coverTop ?? cover,
+		);
+		const pushRaftMesh = (label: string, diameter: number, dimension: number, count: number) => {
+			const groups = bendGroups(dims, dimension - 2 * coverSide, hookLength, raftLeg, count);
+			for (const g of groups) {
+				const nm = groups.length > 1 ? `${label} (${g.bent ? "مثني" : "بخطاف"})` : label;
+				details.push(calcCutting(itemName, nm, diameter, g.length, g.count));
+			}
+		};
 
-		// Bottom Y bars (تمتد بالطول)
-		const byBarLength = length - 2 * coverSide + 2 * hookLength;
-		const byCount = meshCountOf(width, dims.bottomYBarsPerMeter || 5);
-		details.push(calcCutting(itemName, "سفلي اتجاه Y", dims.bottomYDiameter || dims.bottomXDiameter, byBarLength, byCount));
-
-		// Top mesh
+		pushRaftMesh("سفلي اتجاه X", dims.bottomXDiameter, width, meshCountOf(length, dims.bottomXBarsPerMeter || 5));
+		pushRaftMesh("سفلي اتجاه Y", dims.bottomYDiameter || dims.bottomXDiameter, length, meshCountOf(width, dims.bottomYBarsPerMeter || 5));
 		if (dims.hasTopMesh) {
-			const txCount = meshCountOf(length, dims.topXBarsPerMeter || 4);
-			details.push(calcCutting(itemName, "علوي اتجاه X", dims.topXDiameter || 12, bxBarLength, txCount));
-
-			const tyCount = meshCountOf(width, dims.topYBarsPerMeter || 4);
-			details.push(calcCutting(itemName, "علوي اتجاه Y", dims.topYDiameter || 12, byBarLength, tyCount));
+			pushRaftMesh("علوي اتجاه X", dims.topXDiameter || 12, width, meshCountOf(length, dims.topXBarsPerMeter || 4));
+			pushRaftMesh("علوي اتجاه Y", dims.topYDiameter || 12, length, meshCountOf(width, dims.topYBarsPerMeter || 4));
 		}
 	} else {
 		return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };

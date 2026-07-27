@@ -19,6 +19,7 @@ import {
 	RebarBarsInput,
 	StirrupsInput,
 } from "../../../shared";
+import { BendFields } from "./BendFields";
 import type { FoundationFieldsProps } from "../types";
 
 export function StripFields({
@@ -240,6 +241,17 @@ export function StripFields({
 				</div>
 			)}
 
+
+			<BendFields
+				mode={formData.bendMode}
+				onModeChange={(m) => setFormData({ ...formData, bendMode: m })}
+				legLength={formData.bendLegLength}
+				onLegLengthChange={(v) => setFormData({ ...formData, bendLegLength: v })}
+				thickness={formData.height}
+				coverBottom={formData.stripCoverBottom}
+				coverTop={formData.stripCoverTop}
+				maxBarDiameter={Math.max(formData.stripBottomMeshXDiameter, formData.stripBottomMeshYDiameter, formData.stripHasTopMesh ? formData.stripTopMeshXDiameter : 0, formData.stripHasTopMesh ? formData.stripTopMeshYDiameter : 0)}
+			/>
 			{/* إعدادات متقدمة */}
 			<div className="border-t pt-4 space-y-4">
 				<button type="button"

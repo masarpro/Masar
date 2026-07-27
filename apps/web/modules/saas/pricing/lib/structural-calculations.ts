@@ -34,6 +34,8 @@ import type {
 	RaftFoundationInput,
 	FoundationRebarCalculation,
 	FoundationSummary,
+	FoundationBend,
+	FoundationBendMode,
 } from '../types/foundations';
 import type {
 	SolidSlab,
@@ -148,6 +150,83 @@ function calcFoundationBarLength(
 	hookLength: number,
 ): number {
 	return dimension - 2 * cover + 2 * hookLength;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ثني أطراف شبكة القاعدة (الرجل)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * الحد الأدنى الكودي لطول الرجل (م).
+ *
+ * SBC 304 / ACI 318 — الخطاف القياسي 90°: الامتداد المستقيم بعد الثنية
+ * لا يقل عن 12db. والعرف التنفيذي السعودي (وملاحظة لوحات هذا المشروع)
+ * يشترط ألا تقل الرجل عن 30 سم.
+ */
+export function foundationBendCodeMinimum(barDiameterMm: number): number {
+	return Math.max(0.30, 12 * (barDiameterMm / 1000));
+}
+
+/**
+ * طول الرجل الفعلي (م).
+ *
+ * هندسياً الرجل تصعد على وجه القاعدة الجانبي، فأقصى طول ممكن هو
+ * عمق القاعدة ناقص الغطاءين. إن أدخل المستخدم طولاً يدوياً استُخدم كما هو
+ * (مع القص عند العمق المتاح)، وإلا حُسب تلقائياً = العمق الصافي.
+ *
+ * تُرجع 0 إن كان الوضع 'none' — أي يعود الحساب للخطاف القصير المعتاد.
+ */
+export function resolveFoundationLeg(
+	bend: FoundationBend | undefined,
+	thickness: number,
+	coverBottom: number,
+	coverTop: number,
+): number {
+	if (!bend || !bend.mode || bend.mode === 'none') return 0;
+	const geometricMax = Math.max(0, thickness - coverBottom - coverTop);
+	if (bend.legLength && bend.legLength > 0) {
+		return Math.min(bend.legLength, geometricMax);
+	}
+	return geometricMax;
+}
+
+/**
+ * تقسيم أسياخ اتجاه واحد من الشبكة إلى مجموعات قص حسب وضع الثني.
+ *
+ * لا يُجمع الخطاف مع الرجل — الرجل تحلّ محلّ الخطاف. لذلك:
+ *   سيخ مثني  = البعد الصافي + 2 × الرجل
+ *   سيخ بخطاف = البعد الصافي + 2 × الخطاف
+ *
+ * في وضع 'alternate' تُقسم الأسياخ فعلياً إلى مجموعتين بطولين مختلفين
+ * بدل استخدام متوسط، لأن التقطيع من السيخ القياسي 12م غير خطّي:
+ * متوسط الطول يعطي عدد أسياخ مشتراة خاطئاً.
+ */
+export function splitFoundationBarGroups(
+	dimension: number,
+	coverSide: number,
+	hookLength: number,
+	leg: number,
+	mode: FoundationBendMode | undefined,
+	count: number,
+): Array<{ length: number; count: number; bent: boolean }> {
+	const clear = dimension - 2 * coverSide;
+	const hooked = clear + 2 * hookLength;
+	if (!leg || !mode || mode === 'none' || count <= 0) {
+		return [{ length: hooked, count, bent: false }];
+	}
+	const bentLength = clear + 2 * leg;
+	if (mode === 'all') {
+		return [{ length: bentLength, count, bent: true }];
+	}
+	// alternate — سيخ وسيخ
+	const bentCount = Math.ceil(count / 2);
+	const groups: Array<{ length: number; count: number; bent: boolean }> = [
+		{ length: bentLength, count: bentCount, bent: true },
+	];
+	if (count - bentCount > 0) {
+		groups.push({ length: hooked, count: count - bentCount, bent: false });
+	}
+	return groups;
 }
 
 /**
@@ -378,33 +457,59 @@ export function calculateIsolatedFoundation(
 	// حسابات الحديد
 	const rebarDetails: FoundationRebarCalculation[] = [];
 
-	// فرش قصير (سفلي)
-	const shortBarLength = calcFoundationBarLength(width, effectiveCoverSide, effectiveHookLength);
-	const shortBarCount = calcFoundationBarCount(length, bottomShort.barsPerMeter, effectiveCoverSide);
-	rebarDetails.push(
-		calcFoundationRebarAuto('فرش قصير', bottomShort.diameter, shortBarLength, shortBarCount, quantity)
+	// ثني أطراف الشبكة (الرجل) — تصعد على وجه القاعدة الجانبي
+	const isoLeg = resolveFoundationLeg(
+		input.bend,
+		height,
+		coverBottom ?? cover,
+		coverTop ?? 0.05,
+	);
+	const isoBendMode = input.bend?.mode;
+	/** يدفع مجموعات القص لاتجاه واحد من الشبكة */
+	const pushMeshDir = (
+		label: string,
+		diameter: number,
+		dimension: number,
+		count: number,
+	) => {
+		const groups = splitFoundationBarGroups(
+			dimension, effectiveCoverSide, effectiveHookLength, isoLeg, isoBendMode, count,
+		);
+		for (const g of groups) {
+			const name = groups.length > 1
+				? `${label} (${g.bent ? 'مثني' : 'بخطاف'})`
+				: label;
+			rebarDetails.push(
+				calcFoundationRebarAuto(name, diameter, g.length, g.count, quantity)
+			);
+		}
+	};
+
+	// فرش قصير (سفلي) — أسياخ بعرض القاعدة موزعة على الطول
+	pushMeshDir(
+		'فرش قصير', bottomShort.diameter, width,
+		calcFoundationBarCount(length, bottomShort.barsPerMeter, effectiveCoverSide),
 	);
 
 	// فرش طويل (سفلي)
-	const longBarLength = calcFoundationBarLength(length, effectiveCoverSide, effectiveHookLength);
-	const longBarCount = calcFoundationBarCount(width, bottomLong.barsPerMeter, effectiveCoverSide);
-	rebarDetails.push(
-		calcFoundationRebarAuto('فرش طويل', bottomLong.diameter, longBarLength, longBarCount, quantity)
+	pushMeshDir(
+		'فرش طويل', bottomLong.diameter, length,
+		calcFoundationBarCount(width, bottomLong.barsPerMeter, effectiveCoverSide),
 	);
 
 	// غطاء قصير (علوي) — uses topShort's own barsPerMeter
 	if (topShort) {
-		const topShortBarCount = calcFoundationBarCount(length, topShort.barsPerMeter, effectiveCoverSide);
-		rebarDetails.push(
-			calcFoundationRebarAuto('غطاء قصير', topShort.diameter, shortBarLength, topShortBarCount, quantity)
+		pushMeshDir(
+			'غطاء قصير', topShort.diameter, width,
+			calcFoundationBarCount(length, topShort.barsPerMeter, effectiveCoverSide),
 		);
 	}
 
 	// غطاء طويل (علوي) — uses topLong's own barsPerMeter
 	if (topLong) {
-		const topLongBarCount = calcFoundationBarCount(width, topLong.barsPerMeter, effectiveCoverSide);
-		rebarDetails.push(
-			calcFoundationRebarAuto('غطاء طويل', topLong.diameter, longBarLength, topLongBarCount, quantity)
+		pushMeshDir(
+			'غطاء طويل', topLong.diameter, length,
+			calcFoundationBarCount(width, topLong.barsPerMeter, effectiveCoverSide),
 		);
 	}
 
@@ -726,40 +831,50 @@ export function calculateStripFoundation(
 	} else {
 		// ─── وضع الشبكة (mesh) — mirrors raft pattern ───
 
+		// ثني أطراف الشبكة (الرجل)
+		const stripLeg = resolveFoundationLeg(input.bend, height, coverBottom, coverTop);
+		const stripBendMode = input.bend?.mode;
+		const pushStripMesh = (
+			label: string,
+			diameter: number,
+			dimension: number,
+			count: number,
+		) => {
+			const groups = splitFoundationBarGroups(
+				dimension, coverSide, hookLength, stripLeg, stripBendMode, count,
+			);
+			for (const g of groups) {
+				const name = groups.length > 1
+					? `${label} (${g.bent ? 'مثني' : 'بخطاف'})`
+					: label;
+				const r = calcRaftRebar(name, diameter, g.length, g.count, lapSpliceMethod, customLapLength);
+				rebarDetails.push(r);
+				raftRebarResults.push(r);
+			}
+		};
+
 		// شبكة سفلية — اتجاه X (أسياخ بعرض الشريط، موزعة على الطول)
 		if (bottomMeshX) {
-			const bxBarLength = calcFoundationBarLength(width, coverSide, hookLength);
-			const bxBarCount = calcFoundationBarCount(totalLength, bottomMeshX.barsPerMeter, coverSide) * quantity;
-			const bxResult = calcRaftRebar('سفلي اتجاه X', bottomMeshX.diameter, bxBarLength, bxBarCount, lapSpliceMethod, customLapLength);
-			rebarDetails.push(bxResult);
-			raftRebarResults.push(bxResult);
+			pushStripMesh('سفلي اتجاه X', bottomMeshX.diameter, width,
+				calcFoundationBarCount(totalLength, bottomMeshX.barsPerMeter, coverSide) * quantity);
 		}
 
 		// شبكة سفلية — اتجاه Y (أسياخ بطول الشريط، موزعة على العرض)
 		if (bottomMeshY) {
-			const byBarLength = calcFoundationBarLength(totalLength, coverSide, hookLength);
-			const byBarCount = calcFoundationBarCount(width, bottomMeshY.barsPerMeter, coverSide) * quantity;
-			const byResult = calcRaftRebar('سفلي اتجاه Y', bottomMeshY.diameter, byBarLength, byBarCount, lapSpliceMethod, customLapLength);
-			rebarDetails.push(byResult);
-			raftRebarResults.push(byResult);
+			pushStripMesh('سفلي اتجاه Y', bottomMeshY.diameter, totalLength,
+				calcFoundationBarCount(width, bottomMeshY.barsPerMeter, coverSide) * quantity);
 		}
 
 		// شبكة علوية — اتجاه X
 		if (topMeshX) {
-			const txBarLength = calcFoundationBarLength(width, coverSide, hookLength);
-			const txBarCount = calcFoundationBarCount(totalLength, topMeshX.barsPerMeter, coverSide) * quantity;
-			const txResult = calcRaftRebar('علوي اتجاه X', topMeshX.diameter, txBarLength, txBarCount, lapSpliceMethod, customLapLength);
-			rebarDetails.push(txResult);
-			raftRebarResults.push(txResult);
+			pushStripMesh('علوي اتجاه X', topMeshX.diameter, width,
+				calcFoundationBarCount(totalLength, topMeshX.barsPerMeter, coverSide) * quantity);
 		}
 
 		// شبكة علوية — اتجاه Y
 		if (topMeshY) {
-			const tyBarLength = calcFoundationBarLength(totalLength, coverSide, hookLength);
-			const tyBarCount = calcFoundationBarCount(width, topMeshY.barsPerMeter, coverSide) * quantity;
-			const tyResult = calcRaftRebar('علوي اتجاه Y', topMeshY.diameter, tyBarLength, tyBarCount, lapSpliceMethod, customLapLength);
-			rebarDetails.push(tyResult);
-			raftRebarResults.push(tyResult);
+			pushStripMesh('علوي اتجاه Y', topMeshY.diameter, totalLength,
+				calcFoundationBarCount(width, topMeshY.barsPerMeter, coverSide) * quantity);
 		}
 
 		// كراسي حديد (mesh only)
@@ -996,36 +1111,46 @@ export function calculateRaftFoundation(
 	const rebarDetails: FoundationRebarCalculation[] = [];
 	const raftRebarResults: RaftRebarResult[] = [];
 
+	// ثني أطراف الشبكة (الرجل)
+	const raftLeg = resolveFoundationLeg(input.bend, thickness, coverBottom, coverTop);
+	const raftBendMode = input.bend?.mode;
+	const pushRaftMesh = (
+		label: string,
+		diameter: number,
+		dimension: number,
+		count: number,
+	) => {
+		const groups = splitFoundationBarGroups(
+			dimension, coverSide, hookLength, raftLeg, raftBendMode, count,
+		);
+		for (const g of groups) {
+			const name = groups.length > 1
+				? `${label} (${g.bent ? 'مثني' : 'بخطاف'})`
+				: label;
+			const r = calcRaftRebar(name, diameter, g.length, g.count, lapSpliceMethod, customLapLength);
+			rebarDetails.push(r);
+			raftRebarResults.push(r);
+		}
+	};
+
 	// شبكة سفلية - اتجاه X (bars run along width, spaced along length)
-	const bottomXBarLength = calcFoundationBarLength(width, coverSide, hookLength);
-	const bottomXBarCount = calcFoundationBarCount(length, bottomX.barsPerMeter, coverSide);
-	const bottomXResult = calcRaftRebar('سفلي اتجاه X', bottomX.diameter, bottomXBarLength, bottomXBarCount, lapSpliceMethod, customLapLength);
-	rebarDetails.push(bottomXResult);
-	raftRebarResults.push(bottomXResult);
+	pushRaftMesh('سفلي اتجاه X', bottomX.diameter, width,
+		calcFoundationBarCount(length, bottomX.barsPerMeter, coverSide));
 
 	// شبكة سفلية - اتجاه Y (bars run along length, spaced along width)
-	const bottomYBarLength = calcFoundationBarLength(length, coverSide, hookLength);
-	const bottomYBarCount = calcFoundationBarCount(width, bottomY.barsPerMeter, coverSide);
-	const bottomYResult = calcRaftRebar('سفلي اتجاه Y', bottomY.diameter, bottomYBarLength, bottomYBarCount, lapSpliceMethod, customLapLength);
-	rebarDetails.push(bottomYResult);
-	raftRebarResults.push(bottomYResult);
+	pushRaftMesh('سفلي اتجاه Y', bottomY.diameter, length,
+		calcFoundationBarCount(width, bottomY.barsPerMeter, coverSide));
 
 	// شبكة علوية - اتجاه X (BUG FIX: uses topX's own barsPerMeter)
 	if (topX) {
-		const topXBarLength = calcFoundationBarLength(width, coverSide, hookLength);
-		const topXBarCount = calcFoundationBarCount(length, topX.barsPerMeter, coverSide);
-		const topXResult = calcRaftRebar('علوي اتجاه X', topX.diameter, topXBarLength, topXBarCount, lapSpliceMethod, customLapLength);
-		rebarDetails.push(topXResult);
-		raftRebarResults.push(topXResult);
+		pushRaftMesh('علوي اتجاه X', topX.diameter, width,
+			calcFoundationBarCount(length, topX.barsPerMeter, coverSide));
 	}
 
 	// شبكة علوية - اتجاه Y (BUG FIX: uses topY's own barsPerMeter)
 	if (topY) {
-		const topYBarLength = calcFoundationBarLength(length, coverSide, hookLength);
-		const topYBarCount = calcFoundationBarCount(width, topY.barsPerMeter, coverSide);
-		const topYResult = calcRaftRebar('علوي اتجاه Y', topY.diameter, topYBarLength, topYBarCount, lapSpliceMethod, customLapLength);
-		rebarDetails.push(topYResult);
-		raftRebarResults.push(topYResult);
+		pushRaftMesh('علوي اتجاه Y', topY.diameter, length,
+			calcFoundationBarCount(width, topY.barsPerMeter, coverSide));
 	}
 
 	// حديد تسميك الحواف — تقدير بنسبة تسليح (كمرة طرفية: أسياخ رئيسية + كانات)

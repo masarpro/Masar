@@ -12,6 +12,29 @@ export type FoundationType =
 	| 'raft';       // لبشة
 
 /**
+ * وضع ثني أطراف شبكة القاعدة (الرجل)
+ *
+ * في القواعد والشرائح واللبشات تُثنى أطراف أسياخ الشبكة لأعلى على وجه
+ * القاعدة الجانبي بدل الاكتفاء بخطاف قصير. الرجل تُطيل السيخ المقطوع
+ * بمقدار ضعف طولها، وهذا يغيّر التقطيع جذرياً: سيخ الشبكة الذي كان
+ * يُقطع قطعتين من السيخ القياسي 12م قد يستهلك سيخاً كاملاً بعد الثني.
+ *
+ * - none      : خطاف قصير فقط (السلوك الافتراضي القديم)
+ * - all       : رجل على كل سيخ
+ * - alternate : رجل بالتبادل سيخ وسيخ (نصف الأسياخ برجل والنصف بخطاف)
+ */
+export type FoundationBendMode = 'none' | 'all' | 'alternate';
+
+/**
+ * إعدادات ثني أطراف الشبكة
+ */
+export interface FoundationBend {
+	mode?: FoundationBendMode;   // افتراضي 'none'
+	/** طول الرجل (م). إن تُرك فارغاً يُحسب تلقائياً من عمق القاعدة */
+	legLength?: number;
+}
+
+/**
  * بيانات القاعدة المنفصلة (المدخلات)
  */
 export interface IsolatedFoundationInput {
@@ -27,6 +50,8 @@ export interface IsolatedFoundationInput {
 	// الإعدادات
 	cover?: number;       // غطاء خرساني (م) - افتراضي 0.075
 	hookLength?: number;  // طول الرجوع (م) - افتراضي 0.10
+	/** ثني أطراف الشبكة (الرجل) — يُطيل السيخ ويغيّر التقطيع */
+	bend?: FoundationBend;
 
 	// أغطية منفصلة (اختياري — تستبدل cover الموحد)
 	coverBottom?: number;  // افتراضي 0.075م
@@ -80,6 +105,8 @@ export interface CombinedFoundationInput {
 	// الإعدادات
 	cover?: number;
 	hookLength?: number;
+	/** ثني أطراف الشبكة (الرجل) — يُطيل السيخ ويغيّر التقطيع */
+	bend?: FoundationBend;
 
 	// أغطية منفصلة (اختياري)
 	coverBottom?: number;  // افتراضي 0.075م
@@ -129,6 +156,8 @@ export interface StripFoundationInput {
 	// الإعدادات
 	cover?: number;
 	hookLength?: number;
+	/** ثني أطراف الشبكة (الرجل) — يُطيل السيخ ويغيّر التقطيع */
+	bend?: FoundationBend;
 
 	// أغطية منفصلة
 	coverBottom?: number;  // افتراضي 0.075م
@@ -201,6 +230,8 @@ export interface RaftFoundationInput {
 	// الإعدادات
 	cover?: number;
 	hookLength?: number;           // default 0.10m
+	/** ثني أطراف الشبكة (الرجل) — يُطيل السيخ ويغيّر التقطيع */
+	bend?: FoundationBend;
 	coverBottom?: number;          // default 0.075m
 	coverTop?: number;             // default 0.075m
 	coverSide?: number;            // default 0.075m
