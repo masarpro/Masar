@@ -117,7 +117,7 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 		activeTab === "summary"
 			? buildSummaryHTML(summary, t)
 			: activeTab === "factory"
-				? buildFactoryHTML(summary.factoryOrder, t)
+				? buildFactoryHTML(summary.factoryOrder, t, summary.unscheduledSteelWeight)
 				: buildCuttingHTML(summary.allCuttingDetails, t);
 
 	return `<!DOCTYPE html>
@@ -364,9 +364,11 @@ function buildSummaryHTML(summary: BOQSummary, t: Translator): string {
 function buildFactoryHTML(
 	factoryOrder: FactoryOrderEntry[],
 	t: Translator,
+	unscheduledSteelWeight = 0,
 ): string {
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
-	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
+	const totalWeight =
+		factoryOrder.reduce((s, e) => s + e.weight, 0) + unscheduledSteelWeight;
 
 	let html = `<div class="section">
     <table>
@@ -386,6 +388,14 @@ function buildFactoryHTML(
       <td>${entry.count}</td>
       <td class="number">${fmt(entry.weight)}</td>
       <td class="number">${fmt(entry.weight / 1000, 3)}</td>
+    </tr>`;
+	}
+
+	if (unscheduledSteelWeight > 0) {
+		html += `<tr>
+      <td colspan="3">${esc(t("boq.unscheduledSteelRow"))}</td>
+      <td class="number">${fmt(unscheduledSteelWeight)}</td>
+      <td class="number">${fmt(unscheduledSteelWeight / 1000, 3)}</td>
     </tr>`;
 	}
 

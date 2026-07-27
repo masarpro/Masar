@@ -201,26 +201,9 @@ export function BOQSummaryTable({
 
 	const summary = useMemo(() => aggregateBOQ(filteredItems), [filteredItems]);
 
-	// وزن الحديد المخزّن لعناصر لا تنتج صفوف تقطيع (فئة غير مدعومة في المُعيد
-	// الحسابي مثل otherStructural أو بيانات تسليح ناقصة) — يُعرض كتحذير في
-	// تبويبي طلبية المصنع والتقطيع لأن مجاميعهما تستثنيه (Audit F14)
-	const excludedSteelWeight = useMemo(() => {
-		let total = 0;
-		for (const section of summary.sections) {
-			for (const group of section.subGroups) {
-				for (const detail of group.items) {
-					if (
-						detail.item.steelWeight > 0 &&
-						(!detail.recalc.hasRebarParams ||
-							detail.recalc.cuttingDetails.length === 0)
-					) {
-						total += detail.item.steelWeight;
-					}
-				}
-			}
-		}
-		return total;
-	}, [summary]);
+	// حديد محسوب بالنِسَب بلا جدول أسياخ (قباب/مآذن…) — يُضاف كسطر مستقل
+	// في طلبية المصنع ويُذكر في تبويب التقطيع لأن صفوف القص لا تشمله
+	const unscheduledSteelWeight = summary.unscheduledSteelWeight;
 
 	const selectedFloorLabel = floorOptions.find((o) => o.value === selectedFloor)?.label;
 	const selectedSectionLabel = sectionOptions.find((o) => o.value === effectiveSection)?.label;
@@ -308,7 +291,7 @@ export function BOQSummaryTable({
 						if (activeTab === "cost") {
 							if (costReport) exportCostReport(costReport, studyName);
 						} else if (activeTab === "factory") {
-							exportFactoryOrder(summary.factoryOrder, label);
+							exportFactoryOrder(summary.factoryOrder, label, unscheduledSteelWeight);
 						} else if (activeTab === "cutting") {
 							exportCuttingDetails(summary.allCuttingDetails, label);
 						} else {
@@ -432,7 +415,7 @@ export function BOQSummaryTable({
 					factoryOrder={summary.factoryOrder}
 					studyName={studyName}
 					onPrint={handlePrint}
-					excludedSteelWeight={excludedSteelWeight}
+					unscheduledSteelWeight={unscheduledSteelWeight}
 				/>
 			)}
 
@@ -441,7 +424,7 @@ export function BOQSummaryTable({
 					cuttingDetails={summary.allCuttingDetails}
 					studyName={studyName}
 					onPrint={handlePrint}
-					excludedSteelWeight={excludedSteelWeight}
+					unscheduledSteelWeight={unscheduledSteelWeight}
 				/>
 			)}
 
@@ -1251,28 +1234,25 @@ function FactoryOrderTab({
 	factoryOrder,
 	studyName,
 	onPrint,
-	excludedSteelWeight,
+	unscheduledSteelWeight,
 }: {
 	factoryOrder: FactoryOrderEntry[];
 	studyName?: string;
 	onPrint: () => void;
-	excludedSteelWeight: number;
+	unscheduledSteelWeight: number;
 }) {
 	const t = useTranslations("pricing.studies");
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
-	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
+	// الحديد المحسوب بالنِسَب يدخل الإجمالي — هو حديد يُشترى فعلاً
+	const totalWeight =
+		factoryOrder.reduce((s, e) => s + e.weight, 0) + unscheduledSteelWeight;
 
-	if (factoryOrder.length === 0) {
+	if (factoryOrder.length === 0 && unscheduledSteelWeight <= 0) {
 		return (
 			<Card className="p-8 text-center text-muted-foreground">
 				<Factory className="h-12 w-12 mx-auto mb-3 opacity-30" />
 				<p>{t("boq.noFactoryData")}</p>
 				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
-				{excludedSteelWeight > 0 && (
-					<p className="text-xs mt-2">
-						⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
-					</p>
-				)}
 			</Card>
 		);
 	}
@@ -1285,16 +1265,18 @@ function FactoryOrderTab({
 					<h4 className="font-semibold">{t("boq.factoryOrderTitle")}</h4>
 				</div>
 				<BOQExportDropdown
-					onExcelExport={() => exportFactoryOrder(factoryOrder, studyName)}
+					onExcelExport={() =>
+						exportFactoryOrder(factoryOrder, studyName, unscheduledSteelWeight)
+					}
 					onPrint={onPrint}
 					label={t("boq.export")}
 				/>
 			</div>
 
-			{/* تحذير: حديد مخزّن لعناصر لا يدعمها المُعيد الحسابي (Audit F14) */}
-			{excludedSteelWeight > 0 && (
+			{/* حديد محسوب بالنِسَب — مشمول في الإجمالي بلا أقطار/أطوال */}
+			{unscheduledSteelWeight > 0 && (
 				<p className="text-xs text-muted-foreground">
-					⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+					{t("boq.unscheduledSteelNote")}
 				</p>
 			)}
 
@@ -1329,6 +1311,24 @@ function FactoryOrderTab({
 								</TableRow>
 							))}
 
+							{/* حديد بالنِسَب — بلا قطر/طول سيخ، لكنه ضمن الإجمالي */}
+							{unscheduledSteelWeight > 0 && (
+								<TableRow>
+									<TableCell
+										colSpan={3}
+										className="text-sm text-muted-foreground"
+									>
+										{t("boq.unscheduledSteelRow")}
+									</TableCell>
+									<TableCell>
+										{formatNumber(unscheduledSteelWeight)}
+									</TableCell>
+									<TableCell className="font-bold text-chart-1">
+										{formatNumber(unscheduledSteelWeight / 1000, 3)}
+									</TableCell>
+								</TableRow>
+							)}
+
 							{/* Total row */}
 							<TableRow className="bg-muted/50 font-bold border-t-2">
 								<TableCell>{t("structural.boq.subtotal")}</TableCell>
@@ -1355,12 +1355,12 @@ function CuttingWorkshopTab({
 	cuttingDetails,
 	studyName,
 	onPrint,
-	excludedSteelWeight,
+	unscheduledSteelWeight,
 }: {
 	cuttingDetails: CuttingDetailRow[];
 	studyName?: string;
 	onPrint: () => void;
-	excludedSteelWeight: number;
+	unscheduledSteelWeight: number;
 }) {
 	const t = useTranslations("pricing.studies");
 	if (cuttingDetails.length === 0) {
@@ -1369,9 +1369,11 @@ function CuttingWorkshopTab({
 				<Scissors className="h-12 w-12 mx-auto mb-3 opacity-30" />
 				<p>{t("boq.noCuttingData")}</p>
 				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
-				{excludedSteelWeight > 0 && (
+				{unscheduledSteelWeight > 0 && (
 					<p className="text-xs mt-2">
-						⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+						{t("boq.unscheduledSteelCuttingNote", {
+							weight: formatNumber(unscheduledSteelWeight),
+						})}
 					</p>
 				)}
 			</Card>
@@ -1402,10 +1404,12 @@ function CuttingWorkshopTab({
 				/>
 			</div>
 
-			{/* تحذير: حديد مخزّن لعناصر لا يدعمها المُعيد الحسابي (Audit F14) */}
-			{excludedSteelWeight > 0 && (
+			{/* حديد بالنِسَب — لا يدخل جداول القص لكنه مُدرج في طلبية المصنع */}
+			{unscheduledSteelWeight > 0 && (
 				<p className="text-xs text-muted-foreground">
-					⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+					{t("boq.unscheduledSteelCuttingNote", {
+						weight: formatNumber(unscheduledSteelWeight),
+					})}
 				</p>
 			)}
 
@@ -1484,7 +1488,17 @@ function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
 								{d.barLength}
 							</TableCell>
 							<TableCell className="text-sm">{d.barCount}</TableCell>
-							<TableCell className="text-sm">{d.stocksNeeded}</TableCell>
+							<TableCell className="text-sm">
+								{d.stocksNeeded}
+								{(d.reusedPieces ?? 0) > 0 && (
+									<span
+										className="ms-1 text-xs text-muted-foreground"
+										title={t("boq.reusedFromRemnantsHint")}
+									>
+										({t("boq.reusedFromRemnants", { count: d.reusedPieces ?? 0 })})
+									</span>
+								)}
+							</TableCell>
 							<TableCell className="text-sm">
 								<span
 									className={

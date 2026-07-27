@@ -2,7 +2,13 @@
 // BOQ Aggregator - تجميع بيانات جدول الكميات
 // ═══════════════════════════════════════════════════════════════
 
-import { recalculateItem, computeOptimizedFactoryOrder, type CuttingDetailRow, type RecalcResult } from "./boq-recalculator";
+import {
+	recalculateItem,
+	reconcileCuttingWithFactoryOrder,
+	refreshRecalcTotals,
+	type CuttingDetailRow,
+	type RecalcResult,
+} from "./boq-recalculator";
 import type { OtherStructuralResult } from "../types/other-structural";
 
 // ─────────────────────────────────────────────────────────────
@@ -105,6 +111,12 @@ export interface BOQSummary {
 	};
 	factoryOrder: FactoryOrderEntry[];
 	allCuttingDetails: CuttingDetailRow[];
+	/**
+	 * وزن حديد (كجم) محسوب بالنِسَب (كجم/م³) لا بجدول أسياخ — عناصر مثل
+	 * القباب والمآذن. مستثنى من صفوف التقطيع لأنه بلا أقطار/أطوال، لكنه
+	 * حديد حقيقي يجب شراؤه وتسعيره، فيُضاف كسطر مستقل في طلبية المصنع.
+	 */
+	unscheduledSteelWeight: number;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -563,6 +575,7 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 	let grandRebar = 0;
 	let grandBlocks = 0;
 	let grandFormwork = 0;
+	let unscheduledSteel = 0;
 
 	for (const category of SECTION_ORDER) {
 		const categoryItems = categoryMap.get(category);
@@ -592,6 +605,15 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 
 			// Collect cutting details
 			allCuttingDetails.push(...recalc.cuttingDetails);
+
+			// حديد مخزّن بلا جدول أسياخ (محسوب بالنِسَب) — يُجمع ليُضاف
+			// كسطر مستقل في طلبية المصنع وتسعير المواد بدل أن يسقط
+			if (
+				item.steelWeight > 0 &&
+				(!recalc.hasRebarParams || recalc.cuttingDetails.length === 0)
+			) {
+				unscheduledSteel += item.steelWeight;
+			}
 		}
 
 		// Build sub-groups
@@ -687,8 +709,15 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 		});
 	}
 
-	// Compute factory order with cross-operation remnant reuse
-	const optimizedStocks = computeOptimizedFactoryOrder(allCuttingDetails);
+	// طلبية المصنع بإعادة استخدام البواقي — ويُعاد كتابة صفوف التقطيع
+	// بنفس التخصيص حتى يتطابق التبويبان بدل رقمين مختلفين لنفس الحديد
+	const optimizedStocks = reconcileCuttingWithFactoryOrder(allCuttingDetails);
+	for (const section of sections) {
+		for (const group of section.subGroups) {
+			for (const detail of group.items) refreshRecalcTotals(detail.recalc);
+		}
+	}
+
 	const factoryOrder = optimizedStocks
 		.map((stock) => ({
 			diameter: stock.diameter,
@@ -708,6 +737,7 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 		},
 		factoryOrder,
 		allCuttingDetails,
+		unscheduledSteelWeight: Number(unscheduledSteel.toFixed(2)),
 	};
 }
 

@@ -146,7 +146,7 @@ export async function exportBOQToExcel(summary: BOQSummary, studyName?: string) 
 	const wb = XLSX.utils.book_new();
 
 	buildSummarySheet(XLSX, wb, summary);
-	buildFactorySheet(XLSX, wb, summary.factoryOrder);
+	buildFactorySheet(XLSX, wb, summary.factoryOrder, summary.unscheduledSteelWeight);
 	buildCuttingSheet(XLSX, wb, summary.allCuttingDetails);
 
 	const fileName = studyName
@@ -251,7 +251,12 @@ function buildSummarySheet(XLSX: any, wb: any, summary: BOQSummary) {
 // Sheet 2: Factory Order
 // ─────────────────────────────────────────────────────────────
 
-function buildFactorySheet(XLSX: any, wb: any, factoryOrder: FactoryOrderEntry[]) {
+function buildFactorySheet(
+	XLSX: any,
+	wb: any,
+	factoryOrder: FactoryOrderEntry[],
+	unscheduledSteelWeight = 0,
+) {
 	const ws: any = {};
 	const colCount = 5;
 	const cols = ["القطر (مم)", "طول السيخ (م)", "عدد الأسياخ", "الوزن (كجم)", "الوزن (طن)"];
@@ -279,9 +284,20 @@ function buildFactorySheet(XLSX: any, wb: any, factoryOrder: FactoryOrderEntry[]
 		row++;
 	}
 
+	// حديد محسوب بالنِسَب (قباب/مآذن…) — بلا قطر/طول سيخ لكنه ضمن الطلبية
+	if (unscheduledSteelWeight > 0) {
+		setCell(ws, row, 0, "حديد بالنِسَب", STYLES.cell);
+		setCell(ws, row, 1, "—", STYLES.cell);
+		setCell(ws, row, 2, "—", STYLES.cell);
+		setCell(ws, row, 3, fmt(unscheduledSteelWeight), STYLES.cellNumber);
+		setCell(ws, row, 4, fmt(unscheduledSteelWeight / 1000, 3), STYLES.cellNumber);
+		row++;
+	}
+
 	// Total row
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
-	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
+	const totalWeight =
+		factoryOrder.reduce((s, e) => s + e.weight, 0) + unscheduledSteelWeight;
 	row++;
 	setCell(ws, row, 0, "الإجمالي", STYLES.grandTotal);
 	setCell(ws, row, 1, "", STYLES.grandTotal);
@@ -407,11 +423,15 @@ function buildCuttingSheet(XLSX: any, wb: any, allCuttingDetails: CuttingDetailR
 // Standalone Factory Order Export
 // ─────────────────────────────────────────────────────────────
 
-export async function exportFactoryOrder(factoryOrder: FactoryOrderEntry[], studyName?: string) {
+export async function exportFactoryOrder(
+	factoryOrder: FactoryOrderEntry[],
+	studyName?: string,
+	unscheduledSteelWeight = 0,
+) {
 	const XLSX = await import("xlsx-js-style");
 
 	const wb = XLSX.utils.book_new();
-	buildFactorySheet(XLSX, wb, factoryOrder);
+	buildFactorySheet(XLSX, wb, factoryOrder, unscheduledSteelWeight);
 
 	const fileName = studyName
 		? `طلبية_مصنع_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`

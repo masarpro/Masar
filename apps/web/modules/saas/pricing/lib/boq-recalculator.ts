@@ -22,6 +22,11 @@ export interface CuttingDetailRow {
 	wastePercentage: number;
 	netWeight: number;
 	grossWeight: number;
+	/**
+	 * قطع مقصوصة من بواقي عمليات أخرى بعد تحسين الطلبية
+	 * (تُملأ في reconcileCuttingWithFactoryOrder — 0 قبل التحسين)
+	 */
+	reusedPieces?: number;
 }
 
 export interface RecalcResult {
@@ -636,6 +641,21 @@ export function recalculateItem(
 
 const MIN_USABLE_REMNANT = 0.3; // metres
 
+export interface FactoryStockEntry {
+	diameter: number;
+	stockLength: number;
+	count: number;
+}
+
+export interface FactoryAllocation {
+	stocks: FactoryStockEntry[];
+	/**
+	 * التخصيص لكل صف قص: كم سيخ جديد اشتُري له فعلياً بعد إعادة استخدام
+	 * البواقي، وكم قطعة قُصّت من بواقي عمليات أخرى (بمفتاح مرجع الصف).
+	 */
+	perRow: Map<CuttingDetailRow, { stocks: number; reusedPieces: number }>;
+}
+
 /**
  * Computes factory order with cross-operation remnant reuse.
  * Groups all cutting details by diameter, sorts longest-first,
@@ -644,7 +664,19 @@ const MIN_USABLE_REMNANT = 0.3; // metres
  */
 export function computeOptimizedFactoryOrder(
 	details: CuttingDetailRow[],
-): { diameter: number; stockLength: number; count: number }[] {
+): FactoryStockEntry[] {
+	return allocateFactoryStocks(details).stocks;
+}
+
+/**
+ * نفس حساب طلبية المصنع لكن مع إرجاع التخصيص لكل صف قص — حتى يمكن
+ * لتبويب "تفاصيل التفصيل" أن يعرض نفس أعداد الأسياخ التي يعرضها تبويب
+ * "طلبية المصنع" بدلاً من العدد قبل إعادة استخدام البواقي.
+ */
+export function allocateFactoryStocks(
+	details: CuttingDetailRow[],
+): FactoryAllocation {
+	const perRow: FactoryAllocation["perRow"] = new Map();
 	// Group by diameter + stockLength
 	const groups = new Map<string, CuttingDetailRow[]>();
 	for (const d of details) {
@@ -654,7 +686,7 @@ export function computeOptimizedFactoryOrder(
 		groups.set(key, list);
 	}
 
-	const result: { diameter: number; stockLength: number; count: number }[] = [];
+	const stocks: FactoryStockEntry[] = [];
 
 	for (const [, group] of groups) {
 		const diameter = group[0].diameter;
@@ -670,6 +702,7 @@ export function computeOptimizedFactoryOrder(
 			if (row.barLength > stockLen) {
 				// Long bars already computed with lap splices — no remnant reuse possible
 				totalStocks += row.stocksNeeded;
+				perRow.set(row, { stocks: row.stocksNeeded, reusedPieces: 0 });
 				continue;
 			}
 
@@ -691,11 +724,14 @@ export function computeOptimizedFactoryOrder(
 				if (remnants[i] < MIN_USABLE_REMNANT) remnants.splice(i, 1);
 			}
 
+			const reusedPieces = row.barCount - remaining;
+
 			// Cut remaining pieces from new stock bars
 			if (remaining > 0) {
 				const cutsPerStock = Math.floor(stockLen / row.barLength) || 1;
 				const newStocks = Math.ceil(remaining / cutsPerStock);
 				totalStocks += newStocks;
+				perRow.set(row, { stocks: newStocks, reusedPieces });
 
 				// Track remnants from new stocks
 				const fullStocks = Math.floor(remaining / cutsPerStock);
@@ -709,11 +745,57 @@ export function computeOptimizedFactoryOrder(
 					const lastRemnant = stockLen - lastStockCuts * row.barLength;
 					if (lastRemnant >= MIN_USABLE_REMNANT) remnants.push(lastRemnant);
 				}
+			} else {
+				// كل القطع خرجت من بواقي عمليات سابقة — لا شراء لهذا الصف
+				perRow.set(row, { stocks: 0, reusedPieces });
 			}
 		}
 
-		result.push({ diameter, stockLength: stockLen, count: totalStocks });
+		stocks.push({ diameter, stockLength: stockLen, count: totalStocks });
 	}
 
-	return result;
+	return { stocks, perRow };
+}
+
+/**
+ * يوحّد "تفاصيل التفصيل" مع "طلبية المصنع": يعيد كتابة كل صف قص بعدد
+ * الأسياخ المخصّص له فعلياً بعد إعادة استخدام البواقي، ويعيد حساب وزنه
+ * وهالكه على هذا الأساس. النتيجة: مجموع أسياخ/أوزان صفوف التقطيع يساوي
+ * تماماً طلبية المصنع (كانا رقمين مختلفين لنفس الحديد).
+ *
+ * يُرجع طلبية المصنع (أسياخ لكل قطر) حتى لا يُحسب التحسين مرتين.
+ */
+export function reconcileCuttingWithFactoryOrder(
+	details: CuttingDetailRow[],
+): FactoryStockEntry[] {
+	const { stocks, perRow } = allocateFactoryStocks(details);
+
+	for (const row of details) {
+		const alloc = perRow.get(row);
+		if (!alloc) continue;
+
+		const weight = REBAR_WEIGHTS[row.diameter] || row.diameter * row.diameter * 0.00617;
+		const purchased = alloc.stocks * row.stockLength;
+		const used = row.barCount * row.barLength;
+		const waste = Math.max(0, purchased - used);
+
+		row.stocksNeeded = alloc.stocks;
+		row.reusedPieces = alloc.reusedPieces;
+		row.grossWeight = Number((purchased * weight).toFixed(2));
+		row.totalWaste = Number(waste.toFixed(2));
+		row.wastePerStock = alloc.stocks > 0 ? Number((waste / alloc.stocks).toFixed(3)) : 0;
+		row.wastePercentage = purchased > 0 ? Number(((waste / purchased) * 100).toFixed(1)) : 0;
+	}
+
+	return stocks;
+}
+
+/**
+ * يعيد بناء مجاميع عنصر واحد من صفوف التقطيع الخاصة به — يُستدعى بعد
+ * reconcileCuttingWithFactoryOrder حتى تطابق تفاصيل العنصر داخل الملخص
+ * نفس أرقام تبويبي الطلبية والتقطيع.
+ */
+export function refreshRecalcTotals(result: RecalcResult): void {
+	if (result.cuttingDetails.length === 0) return;
+	result.totals = aggregateResult("", result.cuttingDetails).totals;
 }

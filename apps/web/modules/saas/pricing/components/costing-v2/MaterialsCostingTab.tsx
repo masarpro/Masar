@@ -178,6 +178,10 @@ export function MaterialsCostingTab({
 				}
 			}
 
+			// حديد محسوب بالنِسَب (قباب/مآذن…) لا يظهر في طلبية المصنع لأنه
+			// بلا أقطار — كان يسقط من التسعير كلياً، يُسعَّر الآن بسعر الحديد الرئيسي
+			mainTons += (boqResult.unscheduledSteelWeight ?? 0) / 1000;
+
 			const groups: SteelGroupAgg[] = [];
 			if (d6Tons > 0) groups.push({ label: "حديد Ø6", key: "d6", tons: d6Tons });
 			if (d8Tons > 0) groups.push({ label: "حديد Ø8", key: "d8", tons: d8Tons });

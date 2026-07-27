@@ -8836,6 +8836,11 @@
         "addItemsWithRebarFirst": "أضف عناصر إنشائية مع بيانات التسليح أولاً",
         "cutOperationsCount": "{count} عملية قص",
         "factoryBarsCount": "{count} سيخ مصنع",
+        "unscheduledSteelRow": "حديد بالنِسَب (بلا جدول تقطيع)",
+        "unscheduledSteelNote": "الحديد المحسوب بالنِسَب (قباب، مآذن…) مُدرج في الإجمالي كوزن فقط — بلا أقطار أو أطوال أسياخ.",
+        "unscheduledSteelCuttingNote": "لا تشمل جداول القص الحديد المحسوب بالنِسَب ({weight} كجم) — وهو مُدرج في طلبية المصنع كوزن.",
+        "reusedFromRemnants": "+{count} من البواقي",
+        "reusedFromRemnantsHint": "قطع قُصّت من بواقي أسياخ عمليات أخرى — لا تحتاج أسياخاً جديدة",
         "export": "تصدير",
         "print": {
           "reportTitle": "تقرير الكميات",

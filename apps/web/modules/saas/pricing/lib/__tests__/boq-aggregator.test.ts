@@ -131,6 +131,77 @@ describe("aggregateBOQ", () => {
 		expect(categories).toContain("beams");
 		expect(categories).toContain("groundBeams");
 	});
+
+	// ─── تطابق تبويبي "طلبية المصنع" و"تفاصيل التفصيل" ───
+	// كانا يعرضان رقمين مختلفين لنفس الحديد: الطلبية بعد إعادة استخدام
+	// البواقي، والتقطيع قبلها.
+	it("cutting details totals match the factory order exactly", () => {
+		const items = [
+			makeItem({ id: "c1", quantity: 12 }),
+			makeItem({
+				id: "b1",
+				category: "beams",
+				subCategory: "beam",
+				name: "كمرة K1",
+				quantity: 6,
+				dimensions: { width: 30, height: 60, length: 5, topBarsCount: 3, topBarDiameter: 16, bottomBarsCount: 4, bottomBarDiameter: 18, stirrupDiameter: 8, stirrupSpacing: 150 },
+			}),
+			makeItem({
+				id: "f1",
+				category: "foundations",
+				subCategory: "isolated",
+				name: "ق1",
+				quantity: 8,
+				dimensions: { length: 2, width: 2, height: 0.6, bottomShortDiameter: 16, bottomLongDiameter: 16, bottomShortBarsPerMeter: 5, bottomLongBarsPerMeter: 5 },
+			}),
+		];
+		const result = aggregateBOQ(items);
+
+		expect(result.allCuttingDetails.length).toBeGreaterThan(0);
+
+		const factoryBars = result.factoryOrder.reduce((s, e) => s + e.count, 0);
+		const cuttingBars = result.allCuttingDetails.reduce((s, d) => s + d.stocksNeeded, 0);
+		expect(cuttingBars).toBe(factoryBars);
+
+		const factoryWeight = result.factoryOrder.reduce((s, e) => s + e.weight, 0);
+		const cuttingWeight = result.allCuttingDetails.reduce((s, d) => s + d.grossWeight, 0);
+		expect(cuttingWeight).toBeCloseTo(factoryWeight, 0);
+
+		// وكذلك لكل قطر على حدة
+		for (const entry of result.factoryOrder) {
+			const perDiameter = result.allCuttingDetails
+				.filter((d) => d.diameter === entry.diameter)
+				.reduce((s, d) => s + d.stocksNeeded, 0);
+			expect(perDiameter).toBe(entry.count);
+		}
+	});
+
+	it("reports ratio-based steel that has no cutting schedule", () => {
+		const items = [
+			makeItem({ id: "c1" }),
+			makeItem({
+				id: "dome-1",
+				category: "otherStructural",
+				subCategory: "otherStructural",
+				name: "قبة",
+				quantity: 1,
+				concreteVolume: 111.6,
+				steelWeight: 7106.26,
+				dimensions: { elementType: "DOME" } as any,
+			}),
+		];
+		const result = aggregateBOQ(items);
+
+		// حديد القبة محسوب بالنِسَب — لا صفوف قص له، فيُبلَّغ عنه منفصلاً
+		expect(result.unscheduledSteelWeight).toBeCloseTo(7106.26, 2);
+		// وحديد الأعمدة له صفوف قص فلا يُحتسب ضمنه
+		expect(result.allCuttingDetails.length).toBeGreaterThan(0);
+	});
+
+	it("reports zero unscheduled steel when every item has a cutting schedule", () => {
+		const result = aggregateBOQ([makeItem()]);
+		expect(result.unscheduledSteelWeight).toBe(0);
+	});
 });
 
 describe("getItemFloorGroup", () => {
