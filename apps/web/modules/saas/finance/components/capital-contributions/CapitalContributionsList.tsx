@@ -89,11 +89,7 @@ export function CapitalContributionsList({
 							<TrendingUp className="h-4 w-4 text-success shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalContributions")}</span>
 						</div>
-<<<<<<< HEAD
 						<div className="mt-1 text-base sm:text-2xl font-bold text-success tabular-nums">
-=======
-						<div className="mt-1 text-lg sm:text-2xl font-bold text-green-600 tabular-nums break-words">
->>>>>>> claude/confident-mendeleev
 							<Currency amount={totalAmount} />
 						</div>
 					</CardContent>
@@ -104,11 +100,7 @@ export function CapitalContributionsList({
 							<Landmark className="h-4 w-4 shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalCount")}</span>
 						</div>
-<<<<<<< HEAD
 						<div className="mt-1 text-base sm:text-2xl font-bold tabular-nums">
-=======
-						<div className="mt-1 text-lg sm:text-2xl font-bold tabular-nums break-words">
->>>>>>> claude/confident-mendeleev
 							{total}
 						</div>
 					</CardContent>
@@ -189,7 +181,6 @@ export function CapitalContributionsList({
 					</CardContent>
 				</Card>
 			) : (
-<<<<<<< HEAD
 				<>
 					{/* الجوال: صفوف مستندات بسطرين بدل الجدول متعدد الأعمدة */}
 					<MobileDocList className="sm:hidden">
@@ -218,11 +209,6 @@ export function CapitalContributionsList({
 					{/* الديسكتوب: الجدول كما هو */}
 					<Card className="hidden sm:block">
 					<Table>
-=======
-				<Card className="overflow-hidden">
-					<div className="overflow-x-auto">
-					<Table className="min-w-[800px]">
->>>>>>> claude/confident-mendeleev
 						<TableHeader>
 							<TableRow>
 								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.contributionNo")}</TableHead>
@@ -250,13 +236,8 @@ export function CapitalContributionsList({
 											{t(`finance.capitalContributions.types.${c.type}`)}
 										</Badge>
 									</TableCell>
-<<<<<<< HEAD
 									<TableCell className="hidden md:table-cell">
 										<StatusChip status={c.status}>
-=======
-									<TableCell className="whitespace-nowrap">
-										<Badge className={STATUS_COLORS[c.status] ?? ""}>
->>>>>>> claude/confident-mendeleev
 											{t(`finance.capitalContributions.statuses.${c.status}`)}
 										</StatusChip>
 									</TableCell>
@@ -267,13 +248,8 @@ export function CapitalContributionsList({
 							))}
 						</TableBody>
 					</Table>
-<<<<<<< HEAD
 					</Card>
 				</>
-=======
-					</div>
-				</Card>
->>>>>>> claude/confident-mendeleev
 			)}
 
 			<div className="text-sm text-muted-foreground">

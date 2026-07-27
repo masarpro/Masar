@@ -162,11 +162,7 @@ export function PartnersComparisonReport({
 									<TableCell className="text-end tabular-nums whitespace-nowrap">
 										<Currency amount={r.shareOfProfit} />
 									</TableCell>
-<<<<<<< HEAD
-									<TableCell className="text-end text-destructive">
-=======
-									<TableCell className="text-end tabular-nums text-red-600 whitespace-nowrap">
->>>>>>> claude/confident-mendeleev
+									<TableCell className="text-end tabular-nums text-destructive whitespace-nowrap">
 										<Currency amount={r.totalDrawings} />
 									</TableCell>
 									<TableCell
@@ -204,15 +200,9 @@ function SummaryCard({
 		<Card className="rounded-2xl">
 			<CardContent className="p-4">
 				<div className="flex items-center gap-3">
-<<<<<<< HEAD
-					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
-					<div>
-						<p className="text-sm text-muted-foreground">
-=======
 					<div className={`p-2 ${bg} rounded-xl shrink-0`}>{icon}</div>
 					<div className="min-w-0">
-						<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
->>>>>>> claude/confident-mendeleev
+						<p className="text-sm text-muted-foreground truncate">
 							{label}
 						</p>
 						<p className="text-base sm:text-xl font-semibold tabular-nums break-words">

@@ -218,13 +218,8 @@ export function PartnerFinanceDetail({
 														{d.drawingNo}
 													</Link>
 												</TableCell>
-<<<<<<< HEAD
 												<TableCell>
 													<div className="flex items-center gap-2 text-muted-foreground">
-=======
-												<TableCell className="whitespace-nowrap">
-													<div className="flex items-center gap-2 text-slate-600">
->>>>>>> claude/confident-mendeleev
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(d.date))}
 													</div>
@@ -246,11 +241,7 @@ export function PartnerFinanceDetail({
 														)}
 													</Badge>
 												</TableCell>
-<<<<<<< HEAD
 												<TableCell className="text-end font-semibold text-destructive">
-=======
-												<TableCell className="text-end font-semibold text-red-600 whitespace-nowrap">
->>>>>>> claude/confident-mendeleev
 													<Currency amount={d.amount} />
 												</TableCell>
 											</TableRow>
@@ -298,13 +289,8 @@ export function PartnerFinanceDetail({
 												<TableCell className="font-mono whitespace-nowrap">
 													{c.contributionNo}
 												</TableCell>
-<<<<<<< HEAD
 												<TableCell>
 													<div className="flex items-center gap-2 text-muted-foreground">
-=======
-												<TableCell className="whitespace-nowrap">
-													<div className="flex items-center gap-2 text-slate-600">
->>>>>>> claude/confident-mendeleev
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(c.date))}
 													</div>
@@ -322,11 +308,7 @@ export function PartnerFinanceDetail({
 												<TableCell className="whitespace-nowrap">
 													{c.bankAccount?.name ?? "-"}
 												</TableCell>
-<<<<<<< HEAD
 												<TableCell className="text-end font-semibold text-success">
-=======
-												<TableCell className="text-end font-semibold text-emerald-600 whitespace-nowrap">
->>>>>>> claude/confident-mendeleev
 													<Currency amount={c.amount} />
 												</TableCell>
 											</TableRow>
@@ -365,11 +347,7 @@ export function PartnerFinanceDetail({
 												<TableCell className="text-end whitespace-nowrap">
 													{row.count}
 												</TableCell>
-<<<<<<< HEAD
 												<TableCell className="text-end font-semibold text-destructive">
-=======
-												<TableCell className="text-end font-semibold text-red-600 whitespace-nowrap">
->>>>>>> claude/confident-mendeleev
 													<Currency amount={row.total} />
 												</TableCell>
 											</TableRow>
@@ -405,15 +383,9 @@ function SummaryCard({
 		<Card className="rounded-2xl">
 			<CardContent className="p-4">
 				<div className="flex items-center gap-3">
-<<<<<<< HEAD
 					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
 					<div>
 						<p className="text-sm text-muted-foreground">
-=======
-					<div className={`p-2 ${bg} rounded-xl shrink-0`}>{icon}</div>
-					<div className="min-w-0">
-						<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
->>>>>>> claude/confident-mendeleev
 							{label}
 						</p>
 						<p

@@ -244,11 +244,7 @@ export function PartnersOverviewTab({
 									<TableCell className="text-end tabular-nums whitespace-nowrap">
 										<Currency amount={p.totalContributions} />
 									</TableCell>
-<<<<<<< HEAD
-									<TableCell className="text-end tabular-nums text-destructive hidden md:table-cell">
-=======
-									<TableCell className="text-end tabular-nums text-red-600 dark:text-red-400 whitespace-nowrap">
->>>>>>> claude/confident-mendeleev
+									<TableCell className="text-end tabular-nums text-destructive whitespace-nowrap">
 										<Currency amount={p.totalDrawings} />
 									</TableCell>
 									{canViewProfits && (
