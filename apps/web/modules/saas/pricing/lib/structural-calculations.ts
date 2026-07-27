@@ -1781,13 +1781,18 @@ export function calculateSolidSlab(slab: SolidSlab): EnhancedSlabResult {
 			)
 		);
 
-		// علوي (إن وجد)
+		// علوي (إن وجد) — بتباعد الشبكة العلوية كما أدخله المستخدم.
+		// كان يُعاد استخدام عدد أسياخ الشبكة السفلية فيُهمَل تباعد العلوية
+		// تماماً (وزن خاطئ + اختلاف عن جدول التقطيع وطلبية المصنع)
 		if (grid.top?.xDirection) {
 			rebarDetails.push(
 				calculateRebarLayer(
 					grid.top.xDirection.diameter,
 					bottomXLength,
-					bottomXCount,
+					calculateBarCount(
+						dimensions.length - 2 * cover,
+						grid.top.xDirection.spacing,
+					),
 					'علوي - اتجاه X',
 					'البلاطة'
 				)
@@ -1798,7 +1803,10 @@ export function calculateSolidSlab(slab: SolidSlab): EnhancedSlabResult {
 				calculateRebarLayer(
 					grid.top.yDirection.diameter,
 					bottomYLength,
-					bottomYCount,
+					calculateBarCount(
+						dimensions.width - 2 * cover,
+						grid.top.yDirection.spacing,
+					),
 					'علوي - اتجاه Y',
 					'البلاطة'
 				)
@@ -2114,13 +2122,16 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 			)
 		);
 
-		// علوي X (اختياري)
+		// علوي X (اختياري) — بتباعد الشبكة العلوية لا السفلية
 		if (grid.top?.xDirection) {
 			rebarDetails.push(
 				calculateRebarLayer(
 					grid.top.xDirection.diameter,
 					bottomXLength,
-					bottomXCount,
+					calculateBarCount(
+						dimensions.length - 2 * cover,
+						grid.top.xDirection.spacing,
+					),
 					'علوي - اتجاه X',
 					'الفلات سلاب'
 				)
@@ -2132,7 +2143,10 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 				calculateRebarLayer(
 					grid.top.yDirection.diameter,
 					bottomYLength,
-					bottomYCount,
+					calculateBarCount(
+						dimensions.width - 2 * cover,
+						grid.top.yDirection.spacing,
+					),
 					'علوي - اتجاه Y',
 					'الفلات سلاب'
 				)

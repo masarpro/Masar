@@ -187,6 +187,49 @@ describe("calculateSolidSlab", () => {
 		expect(result.concreteVolume).toBeCloseTo(4.5, 1);
 		expect(result.rebarDetails.length).toBeGreaterThan(0);
 	});
+
+	// الشبكة العلوية كانت تُحسب بعدد أسياخ الشبكة السفلية، فيُهمَل تباعدها
+	// الذي أدخله المستخدم ويختلف الوزن عن جدول التقطيع وطلبية المصنع
+	it("uses the top mesh spacing, not the bottom mesh count", () => {
+		const build = (topSpacing: number) =>
+			calculateSolidSlab({
+				id: "top-mesh",
+				name: "سقف صلب",
+				type: "solid",
+				subType: "two_way",
+				floorName: "أرضي",
+				quantity: 1,
+				isComplete: false,
+				dimensions: { length: 6, width: 5, grossArea: 30 },
+				openings: [],
+				thickness: 0.15,
+				reinforcement: {
+					inputMethod: "grid",
+					grid: {
+						bottom: {
+							xDirection: { diameter: 12, spacing: 1 / 7 },
+							yDirection: { diameter: 10, spacing: 1 / 5 },
+						},
+						top: {
+							xDirection: { diameter: 10, spacing: topSpacing },
+							yDirection: { diameter: 8, spacing: 1 / 4 },
+						},
+					},
+				},
+			} as any);
+
+		const cover = 0.025;
+		const dense = build(1 / 7); // تباعد الشبكة العلوية = السفلية
+		const sparse = build(1 / 5); // أوسع → أسياخ أقل
+
+		const topX = (r: ReturnType<typeof build>) =>
+			r.rebarDetails.find((d) => d.description === "علوي - اتجاه X")!;
+
+		expect(topX(dense).barCount).toBe(Math.ceil((6 - 2 * cover) * 7) + 1);
+		expect(topX(sparse).barCount).toBe(Math.ceil((6 - 2 * cover) * 5) + 1);
+		// تباعد أوسع يجب أن ينتج وزناً أقل — كان الوزنان متطابقين
+		expect(sparse.totals.netWeight).toBeLessThan(dense.totals.netWeight);
+	});
 });
 
 // ─── Regression: audit fixes 2026-07 ───

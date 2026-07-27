@@ -8841,6 +8841,8 @@
         "unscheduledSteelCuttingNote": "Cutting schedules exclude ratio-based steel ({weight} kg) — it is included in the factory order by weight.",
         "reusedFromRemnants": "+{count} from offcuts",
         "reusedFromRemnantsHint": "Pieces cut from offcuts of other operations — no new stock bars required",
+        "materialSyncDone": "Material costs synced to the costing items",
+        "materialSyncFailed": "Could not sync material costs",
         "export": "Export",
         "print": {
           "reportTitle": "Quantities Report",

@@ -23,7 +23,7 @@ import {
 	SAND_VOLUME_PER_BLOCK,
 } from "@saas/pricing/lib/block-materials";
 import {
-	computeItemMaterialCost,
+	buildMaterialCostUpdates,
 	type MaterialPrices,
 } from "@saas/pricing/lib/cost-report";
 
@@ -154,13 +154,24 @@ export function MaterialsCostingTab({
 			});
 	}, [nonBlockItems]);
 
+	// تقطيع مُحسَّن مرة واحدة — يغذّي مجموعات الحديد وتكلفة كل بند عند الحفظ
+	// حتى يخرج الرقمان من أساس واحد (طلبية المصنع بعد إعادة استخدام البواقي)
+	const boqResult = useMemo(() => {
+		if (nonBlockItems.length === 0) return null;
+		try {
+			return aggregateBOQ(nonBlockItems as any);
+		} catch {
+			return null;
+		}
+	}, [nonBlockItems]);
+
 	// ─── Aggregate steel by diameter groups using aggregateBOQ ───
 	const steelGroups = useMemo<SteelGroupAgg[]>(() => {
 		const structItems = nonBlockItems;
 		if (structItems.length === 0) return [];
 
 		try {
-			const boqResult = aggregateBOQ(structItems);
+			if (!boqResult) throw new Error("no boq");
 			const factoryOrder = boqResult.factoryOrder ?? [];
 
 			let d6Tons = 0;
@@ -210,7 +221,7 @@ export function MaterialsCostingTab({
 			}
 			return [];
 		}
-	}, [nonBlockItems]);
+	}, [nonBlockItems, boqResult]);
 
 	// ─── Initialize from saved data ───
 	useEffect(() => {
@@ -503,24 +514,11 @@ export function MaterialsCostingTab({
 			storagePercent: storagePct,
 		};
 
-		const updateItems = cItems.map((ci: any) => {
-			const matchItem = structItems.find(
-				(it: any) => it.name === ci.description || it.id === ci.sourceItemId,
-			);
-
-			if (!matchItem) {
-				return { id: ci.id, materialUnitCost: 0 };
-			}
-
-			const cost = computeItemMaterialCost(matchItem, itemPrices);
-			const qty = Number(ci.quantity) || 1;
-
-			return {
-				id: ci.id,
-				materialUnitCost: qty > 0 ? cost.total / qty : 0,
-				storageCostPercent: storagePct,
-			};
-		});
+		const updateItems = buildMaterialCostUpdates(
+			structItems as any,
+			cItems as any,
+			itemPrices,
+		);
 
 		// Scale per-item costs so their sum matches materialSubtotal (without storage)
 		let rawSum = 0;

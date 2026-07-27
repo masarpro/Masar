@@ -10,7 +10,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { AlertCircle, Coins, Receipt, Tags, Wallet } from "lucide-react";
+import { Button } from "@ui/components/button";
+import {
+	AlertCircle,
+	Coins,
+	Loader2,
+	Receipt,
+	RefreshCw,
+	Tags,
+	Wallet,
+} from "lucide-react";
 import { formatNumber } from "../../lib/utils";
 import type {
 	CostReport,
@@ -24,11 +33,18 @@ import type {
 
 interface CostReportViewProps {
 	report: CostReport;
+	/** يعيد كتابة تكلفة المواد على بنود التكلفة في الخادم لمطابقة التفاصيل */
+	onSyncMaterials?: () => void;
+	isSyncing?: boolean;
 }
 
 const money = (n: number) => formatNumber(n, 2);
 
-export function CostReportView({ report }: CostReportViewProps) {
+export function CostReportView({
+	report,
+	onSyncMaterials,
+	isSyncing,
+}: CostReportViewProps) {
 	const {
 		materialSections,
 		unitPriceRows,
@@ -48,14 +64,30 @@ export function CostReportView({ report }: CostReportViewProps) {
 		<div className="space-y-4">
 			{/* تنبيه عدم التزامن مع الملخص المعتمد */}
 			{hasDrift && (
-				<div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400 print:hidden">
+				<div className="flex flex-wrap items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400 print:hidden">
 					<AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-					<span>
-						التفاصيل أدناه محسوبة من الأسعار المحفوظة ({money(materialTotalComputed)}{" "}
-						ر.س) بينما الملخص المعتمد يقرأ بنود التكلفة على الخادم. احفظ تبويب
-						«المواد» في تسعير التكلفة لمزامنة الرقمين (الفارق{" "}
-						{money(Math.abs(materialDrift))} ر.س).
+					<span className="flex-1 min-w-[16rem]">
+						تكلفة المواد في التفاصيل ({money(materialTotalComputed)} ر.س) لا
+						تطابق الملخص المعتمد الذي يقرأ بنود التكلفة على الخادم — والفارق{" "}
+						{money(Math.abs(materialDrift))} ر.س يدخل عرض السعر. يحدث هذا عند
+						إضافة بنود بعد آخر حفظ لتسعير التكلفة.
 					</span>
+					{onSyncMaterials && (
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={onSyncMaterials}
+							disabled={isSyncing}
+							className="shrink-0"
+						>
+							{isSyncing ? (
+								<Loader2 className="h-3.5 w-3.5 animate-spin" />
+							) : (
+								<RefreshCw className="h-3.5 w-3.5" />
+							)}
+							مزامنة الآن
+						</Button>
+					)}
 				</div>
 			)}
 

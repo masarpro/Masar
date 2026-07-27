@@ -14,13 +14,14 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import {
+	aggregateBOQ,
 	buildFloorFilterOptions,
 	getItemFloorGroup,
 	REBAR_WEIGHTS_MAP,
 	SECTION_LABELS,
 	type StructuralItem,
 } from "./boq-aggregator";
-import { recalculateItem } from "./boq-recalculator";
+import { recalculateItem, type RecalcResult } from "./boq-recalculator";
 import {
 	blockGroupLabel,
 	deriveBlockMaterials,
@@ -221,6 +222,11 @@ const EMPTY_ITEM_COST: ItemMaterialCost = {
  * تكلفة مواد بند إنشائي واحد بالأسعار المحفوظة.
  * البلوك: حبات + مونة (بطحة وأسمنت) + أعتاب الفتحات.
  * غير البلوك: خرسانة بسعر الرتبة + حديد بسعر القطر (من التقطيع).
+ *
+ * `recalc` — نتيجة التقطيع الجاهزة للبند. مرّرها دائماً من `aggregateBOQ`
+ * حتى يكون الحديد على أساس طلبية المصنع المُحسَّنة (بعد إعادة استخدام
+ * البواقي)، وهو نفس الأساس الذي يُسعّر به تبويب «المواد». احتسابها هنا
+ * لكل بند على حدة يتجاهل التحسين فيخرج رقم أعلى لا يطابق التبويب.
  */
 export function computeItemMaterialCost(
 	item: {
@@ -234,6 +240,7 @@ export function computeItemMaterialCost(
 		concreteType?: string | null;
 	},
 	prices: MaterialPrices,
+	recalc?: RecalcResult,
 ): ItemMaterialCost {
 	if (item.category === "blocks") {
 		const m: BlockMaterials = deriveBlockMaterials(item as any);
@@ -269,26 +276,35 @@ export function computeItemMaterialCost(
 	// الحديد بسعر القطر — من أسياخ التقطيع، وإلا الوزن المخزّن بالسعر الرئيسي
 	let steelCost = 0;
 	let steelTons = 0;
+	// وجود جدول تقطيع للبند — الشرط نفسه المستخدم في unscheduledSteelWeight.
+	// لا يصح الاستدلال بـ steelTons === 0: بند قُصّت كل قطعه من بواقي عمليات
+	// أخرى يخرج بصفر أسياخ جديدة (تكلفته صفر فعلاً)، فكان يُسعَّر مرة ثانية
+	// بوزنه المخزّن ويُضخّم تكلفة المواد
+	let hasSchedule = false;
 	try {
-		const recalc = recalculateItem(
-			item.category ?? "",
-			item.subCategory,
-			(item.dimensions ?? {}) as Record<string, number>,
-			num(item.quantity) || 1,
-			item.name ?? "",
-		);
-		for (const stock of recalc.totals.stocksNeeded) {
+		const cutting =
+			recalc ??
+			recalculateItem(
+				item.category ?? "",
+				item.subCategory,
+				(item.dimensions ?? {}) as Record<string, number>,
+				num(item.quantity) || 1,
+				item.name ?? "",
+			);
+		hasSchedule = cutting.hasRebarParams && cutting.cuttingDetails.length > 0;
+		for (const stock of cutting.totals.stocksNeeded) {
 			const weightPerMeter = REBAR_WEIGHTS_MAP[stock.diameter] ?? 0;
 			const tons = (stock.count * stock.length * weightPerMeter) / 1000;
 			steelTons += tons;
 			steelCost += tons * steelPriceFor(stock.diameter, prices);
 		}
 	} catch {
+		hasSchedule = false;
 		steelTons = 0;
 		steelCost = 0;
 	}
 
-	if (steelTons === 0) {
+	if (!hasSchedule) {
 		steelTons = num(item.steelWeight) / 1000;
 		steelCost = steelTons * prices.steelPriceMain;
 	}
@@ -302,6 +318,84 @@ export function computeItemMaterialCost(
 		steelCost,
 		total: concreteCost + steelCost,
 	};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// مزامنة تكلفة المواد مع بنود التكلفة على الخادم
+// ═══════════════════════════════════════════════════════════════
+
+export interface CostingItemLike {
+	id: string;
+	sourceItemId?: string | null;
+	description?: string | null;
+	quantity: number | string;
+}
+
+export interface MaterialCostUpdate {
+	id: string;
+	materialUnitCost: number;
+	storageCostPercent: number;
+}
+
+/**
+ * يحسب تكلفة مواد الوحدة لكل صف من بنود التكلفة (CostingItem) من البنود
+ * الإنشائية الحية والأسعار المحفوظة — بأساس طلبية المصنع المُحسَّن نفسه.
+ *
+ * مصدر واحد لتبويب «المواد» وزر المزامنة في تقرير التكلفة، حتى لا يبقى
+ * الملخص المعتمد (ومنه عرض السعر) أقل من التكلفة الحقيقية لأن بنوداً
+ * أُضيفت بعد آخر حفظ فبقيت بتكلفة مواد صفر.
+ */
+export function buildMaterialCostUpdates(
+	items: StructuralItem[],
+	costingItems: CostingItemLike[],
+	prices: MaterialPrices,
+): MaterialCostUpdate[] {
+	const boq = aggregateBOQ(items);
+	const recalcByItemId = new Map<string, RecalcResult>();
+	for (const section of boq.sections) {
+		for (const group of section.subGroups) {
+			for (const detail of group.items) {
+				recalcByItemId.set(detail.item.id, detail.recalc);
+			}
+		}
+	}
+
+	const byId = new Map(items.map((it) => [it.id, it]));
+	const byName = new Map(items.map((it) => [it.name, it]));
+
+	return costingItems.map((ci) => {
+		// الربط بالمعرّف أولاً — الوصف المخزّن هو "الفئة — الاسم" فلا يطابق
+		// الاسم مباشرة إلا في صفوف قديمة
+		const description = String(ci.description ?? "");
+		const nameFromDescription = description.includes("—")
+			? description.slice(description.indexOf("—") + 1).trim()
+			: description;
+		const match =
+			(ci.sourceItemId ? byId.get(ci.sourceItemId) : undefined) ??
+			byName.get(nameFromDescription) ??
+			byName.get(description);
+
+		if (!match) {
+			return {
+				id: ci.id,
+				materialUnitCost: 0,
+				storageCostPercent: prices.storagePercent,
+			};
+		}
+
+		const cost = computeItemMaterialCost(
+			match as any,
+			prices,
+			recalcByItemId.get(match.id),
+		);
+		const qty = Number(ci.quantity) || 1;
+
+		return {
+			id: ci.id,
+			materialUnitCost: qty > 0 ? cost.total / qty : 0,
+			storageCostPercent: prices.storagePercent,
+		};
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -386,6 +480,19 @@ export function buildCostReport(input: BuildCostReportInput): CostReport {
 	const prices = readMaterialPrices(laborBreakdown);
 	const bd = (laborBreakdown ?? {}) as Record<string, any>;
 
+	// تقطيع مُحسَّن مرة واحدة للدراسة كلها — نفس أساس طلبية المصنع وتبويب
+	// «المواد»، فلا يخرج التقرير برقم حديد أعلى بسبب تجاهل إعادة استخدام
+	// البواقي عند حساب كل بند على حدة
+	const boq = aggregateBOQ(items);
+	const recalcByItemId = new Map<string, RecalcResult>();
+	for (const section of boq.sections) {
+		for (const group of section.subGroups) {
+			for (const detail of group.items) {
+				recalcByItemId.set(detail.item.id, detail.recalc);
+			}
+		}
+	}
+
 	// ─── خريطة تسميات الأدوار ───
 	const floorOptions = buildFloorFilterOptions(items, enabledFloors);
 	const floorLabelMap = new Map<string, string>();
@@ -420,7 +527,11 @@ export function buildCostReport(input: BuildCostReportInput): CostReport {
 	const lintelSteelMap = new Map<string, RowAccumulator>();
 
 	for (const item of items) {
-		const cost = computeItemMaterialCost(item as any, prices);
+		const cost = computeItemMaterialCost(
+			item as any,
+			prices,
+			recalcByItemId.get(item.id),
+		);
 		const floorGroup = getItemFloorGroup(item, enabledFloors);
 		const floorLabel = floorLabelMap.get(floorGroup) ?? "غير مصنّف";
 		const catLabel = SECTION_LABELS[item.category] ?? item.category;

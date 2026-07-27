@@ -67,12 +67,17 @@ import {
 	exportCostReport,
 } from "../../lib/boq-export";
 import { formatNumber } from "../../lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { BOQExportDropdown } from "./BOQExportDropdown";
 import { printBOQ } from "./BOQPrintView";
-import { buildCostReport } from "../../lib/cost-report";
+import {
+	buildCostReport,
+	buildMaterialCostUpdates,
+	readMaterialPrices,
+} from "../../lib/cost-report";
 import { CostReportView } from "./CostReportView";
 import { printCostReport } from "./CostReportPrintView";
 
@@ -106,6 +111,7 @@ export function BOQSummaryTable({
 	enabledFloors,
 }: BOQSummaryTableProps) {
 	const t = useTranslations("pricing.studies");
+	const queryClient = useQueryClient();
 	const [activeTab, setActiveTab] = useState<TabKey>("summary");
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
@@ -149,6 +155,54 @@ export function BOQSummaryTable({
 	const costReportLoading =
 		costTabActive &&
 		(costSummaryLoading || costBreakdownLoading || profitLoading);
+
+	// ─── مزامنة تكلفة المواد مع بنود التكلفة على الخادم ───
+	// الملخص المعتمد (ومنه عرض السعر) يقرأ CostingItem.materialTotal، وهي
+	// لا تُكتب إلا عند حفظ تبويب «المواد». بنود تُضاف بعد آخر حفظ تبقى
+	// بتكلفة مواد صفر، فيخرج عرض السعر أقل من التكلفة الحقيقية.
+	const generateCostingItems = useMutation(
+		orpc.pricing.studies.costing.generate.mutationOptions({}),
+	);
+	const bulkUpdateCosting = useMutation(
+		orpc.pricing.studies.costing.bulkUpdate.mutationOptions({}),
+	);
+	const [isSyncingMaterials, setIsSyncingMaterials] = useState(false);
+
+	const handleSyncMaterials = async () => {
+		setIsSyncingMaterials(true);
+		try {
+			// إنشاء الصفوف الناقصة للبنود المضافة حديثاً قبل تسعيرها
+			await (generateCostingItems as any).mutateAsync({ organizationId, studyId });
+
+			const costingItems = await queryClient.fetchQuery(
+				orpc.pricing.studies.costing.getItems.queryOptions({
+					input: { organizationId, studyId, section: "STRUCTURAL" },
+				}),
+			);
+
+			const updates = buildMaterialCostUpdates(
+				items,
+				(costingItems as any[]) ?? [],
+				readMaterialPrices(costBreakdown),
+			);
+			if (updates.length > 0) {
+				await (bulkUpdateCosting as any).mutateAsync({
+					organizationId,
+					studyId,
+					items: updates,
+				});
+			}
+
+			await queryClient.invalidateQueries({
+				queryKey: orpc.pricing.studies.costing.key(),
+			});
+			toast.success(t("boq.materialSyncDone"));
+		} catch (error: any) {
+			toast.error(error?.message || t("boq.materialSyncFailed"));
+		} finally {
+			setIsSyncingMaterials(false);
+		}
+	};
 
 	const costReport = useMemo(() => {
 		if (!costTabActive || !costSummary) return null;
@@ -434,7 +488,11 @@ export function BOQSummaryTable({
 						<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 					</div>
 				) : (
-					<CostReportView report={costReport} />
+					<CostReportView
+						report={costReport}
+						onSyncMaterials={handleSyncMaterials}
+						isSyncing={isSyncingMaterials}
+					/>
 				)
 			)}
 
