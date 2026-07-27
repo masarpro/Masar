@@ -152,6 +152,15 @@ export function BOQSummaryTable({
 		enabled: costTabActive,
 	});
 
+	// تفعيل حديد الأساسات المعزول (إيبوكسي) — يُسعَّر بسعره الخاص
+	const { data: structuralSpecs } = useQuery({
+		...orpc.pricing.studies.structuralSpecs.get.queryOptions({
+			input: { organizationId, studyId },
+		}),
+		enabled: costTabActive,
+	});
+	const hasIsolatedSteel = !!(structuralSpecs as any)?.hasIsolatedSteel;
+
 	const costReportLoading =
 		costTabActive &&
 		(costSummaryLoading || costBreakdownLoading || profitLoading);
@@ -183,7 +192,7 @@ export function BOQSummaryTable({
 			const updates = buildMaterialCostUpdates(
 				items,
 				(costingItems as any[]) ?? [],
-				readMaterialPrices(costBreakdown),
+				readMaterialPrices(costBreakdown, hasIsolatedSteel),
 			);
 			if (updates.length > 0) {
 				await (bulkUpdateCosting as any).mutateAsync({
@@ -212,8 +221,17 @@ export function BOQSummaryTable({
 			laborBreakdown: costBreakdown,
 			summary: costSummary,
 			profit: profitAnalysis,
+			hasIsolatedSteel,
 		});
-	}, [costTabActive, items, enabledFloors, costBreakdown, costSummary, profitAnalysis]);
+	}, [
+		costTabActive,
+		items,
+		enabledFloors,
+		costBreakdown,
+		costSummary,
+		profitAnalysis,
+		hasIsolatedSteel,
+	]);
 
 	const floorOptions = useMemo(
 		() => buildFloorFilterOptions(items, enabledFloors),

@@ -45,12 +45,37 @@ export interface MaterialPrices {
 	steelPriceD6: number;
 	steelPriceD8: number;
 	steelPriceMain: number;
+	/** سعر طن الحديد المعزول (إيبوكسي) — يُطبَّق على حديد الأساسات فقط */
+	steelPriceIsolated: number;
+	/** مفعّل من مواصفات الأعمال الإنشائية (structuralSpecs.hasIsolatedSteel) */
+	hasIsolatedSteel: boolean;
 	blockPrices: Record<string, number>;
 	mortarSandPrice: number;
 	mortarCementPrice: number;
 	lintelConcretePrice: number;
 	lintelSteelPrice: number;
 	storagePercent: number;
+}
+
+/** تسمية موحّدة لصف/مجموعة حديد الأساسات المعزول */
+export const ISOLATED_STEEL_LABEL = "حديد الأساسات معزول (إيبوكسي)";
+
+/**
+ * حديد الأساسات — النطاق الذي يُغطّيه الحديد المعزول (إيبوكسي):
+ * القواعد والميدة ورقاب الأعمدة، وهو نفس ما تعرضه شاشة المواصفات.
+ */
+export function isIsolatedSteelItem(item: {
+	category?: string | null;
+	subCategory?: string | null;
+}): boolean {
+	const category = item.category ?? "";
+	const subCategory = item.subCategory ?? "";
+	if (category === "foundations") return true;
+	if (category === "beams" && subCategory === "groundBeam") return true;
+	if (category === "columns") {
+		return subCategory.endsWith("_neck") || subCategory === "neck";
+	}
+	return false;
 }
 
 export interface CostReportRow {
@@ -132,8 +157,15 @@ const num = (v: unknown): number => {
 	return Number.isFinite(n) ? n : 0;
 };
 
-/** يقرأ الأسعار من laborBreakdown مع قيم افتراضية آمنة. */
-export function readMaterialPrices(breakdown: unknown): MaterialPrices {
+/**
+ * يقرأ الأسعار من laborBreakdown مع قيم افتراضية آمنة.
+ * `hasIsolatedSteel` يأتي من مواصفات الأعمال الإنشائية — يُمرَّر صراحةً عند
+ * توفّره، وإلا يُقرأ من النسخة المحفوظة داخل laborBreakdown عند آخر حفظ.
+ */
+export function readMaterialPrices(
+	breakdown: unknown,
+	hasIsolatedSteel?: boolean,
+): MaterialPrices {
 	const bd = (breakdown ?? {}) as Record<string, any>;
 
 	const concretePrices: Record<string, number> = {};
@@ -160,6 +192,8 @@ export function readMaterialPrices(breakdown: unknown): MaterialPrices {
 		steelPriceD8: bd.steelPriceD8 != null ? num(bd.steelPriceD8) : legacySteel,
 		steelPriceMain:
 			bd.steelPriceMain != null ? num(bd.steelPriceMain) : legacySteel,
+		steelPriceIsolated: num(bd.steelPriceIsolated),
+		hasIsolatedSteel: hasIsolatedSteel ?? !!bd.hasIsolatedSteel,
 		blockPrices,
 		mortarSandPrice: num(bd.mortarSandPrice),
 		mortarCementPrice: num(bd.mortarCementPrice),
@@ -172,7 +206,13 @@ export function readMaterialPrices(breakdown: unknown): MaterialPrices {
 	};
 }
 
-function steelPriceFor(diameter: number, prices: MaterialPrices): number {
+function steelPriceFor(
+	diameter: number,
+	prices: MaterialPrices,
+	isolated = false,
+): number {
+	// حديد الأساسات المعزول يُشترى بسعر واحد بغض النظر عن القطر
+	if (isolated && prices.hasIsolatedSteel) return prices.steelPriceIsolated;
 	if (diameter <= 6) return prices.steelPriceD6;
 	if (diameter <= 8) return prices.steelPriceD8;
 	return prices.steelPriceMain;
@@ -267,6 +307,7 @@ export function computeItemMaterialCost(
 		};
 	}
 
+	const isolated = isIsolatedSteelItem(item);
 	const grade = item.concreteType || "C30";
 	const concreteVolume = num(item.concreteVolume);
 	const gradePrice =
@@ -296,7 +337,7 @@ export function computeItemMaterialCost(
 			const weightPerMeter = REBAR_WEIGHTS_MAP[stock.diameter] ?? 0;
 			const tons = (stock.count * stock.length * weightPerMeter) / 1000;
 			steelTons += tons;
-			steelCost += tons * steelPriceFor(stock.diameter, prices);
+			steelCost += tons * steelPriceFor(stock.diameter, prices, isolated);
 		}
 	} catch {
 		hasSchedule = false;
@@ -306,7 +347,11 @@ export function computeItemMaterialCost(
 
 	if (!hasSchedule) {
 		steelTons = num(item.steelWeight) / 1000;
-		steelCost = steelTons * prices.steelPriceMain;
+		steelCost =
+			steelTons *
+			(isolated && prices.hasIsolatedSteel
+				? prices.steelPriceIsolated
+				: prices.steelPriceMain);
 	}
 
 	return {
@@ -465,6 +510,8 @@ export interface BuildCostReportInput {
 	summary: any;
 	/** ناتج markup.getProfitAnalysis */
 	profit: any;
+	/** structuralSpecs.hasIsolatedSteel — يفصل سعر حديد الأساسات المعزول */
+	hasIsolatedSteel?: boolean;
 }
 
 const SECTION_LABEL_AR: Record<string, string> = {
@@ -477,7 +524,7 @@ const SECTION_LABEL_AR: Record<string, string> = {
 
 export function buildCostReport(input: BuildCostReportInput): CostReport {
 	const { items, enabledFloors, laborBreakdown, summary, profit } = input;
-	const prices = readMaterialPrices(laborBreakdown);
+	const prices = readMaterialPrices(laborBreakdown, input.hasIsolatedSteel);
 	const bd = (laborBreakdown ?? {}) as Record<string, any>;
 
 	// تقطيع مُحسَّن مرة واحدة للدراسة كلها — نفس أساس طلبية المصنع وتبويب
@@ -552,10 +599,12 @@ export function buildCostReport(input: BuildCostReportInput): CostReport {
 		}
 
 		if (cost.steelTons > 0) {
+			// حديد الأساسات المعزول يُفصل بصفّه ليطابق سعره الخاص
+			const isolated = prices.hasIsolatedSteel && isIsolatedSteelItem(item);
 			pushRow(
 				steelMap,
-				`${item.category}|${floorGroup}`,
-				`حديد ${catLabel}`,
+				`${item.category}|${floorGroup}|${isolated ? "iso" : "std"}`,
+				isolated ? `حديد ${catLabel} — معزول (إيبوكسي)` : `حديد ${catLabel}`,
 				floorLabel,
 				cost.steelTons,
 				cost.steelCost,
@@ -717,6 +766,11 @@ export function buildCostReport(input: BuildCostReportInput): CostReport {
 		["حديد Ø6", prices.steelPriceD6],
 		["حديد Ø8", prices.steelPriceD8],
 		["حديد تسليح (Ø10+)", prices.steelPriceMain],
+		...(prices.hasIsolatedSteel
+			? ([[ISOLATED_STEEL_LABEL, prices.steelPriceIsolated]] as Array<
+					[string, number]
+				>)
+			: []),
 	];
 	for (const [label, price] of steelPriceRows) {
 		if (price > 0) {

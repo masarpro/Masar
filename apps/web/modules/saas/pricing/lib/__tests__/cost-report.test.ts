@@ -3,6 +3,7 @@ import { aggregateBOQ, type StructuralItem } from "../boq-aggregator";
 import type { RecalcResult } from "../boq-recalculator";
 import {
 	computeItemMaterialCost,
+	isIsolatedSteelItem,
 	readMaterialPrices,
 	type MaterialPrices,
 } from "../cost-report";
@@ -115,6 +116,57 @@ describe("computeItemMaterialCost — steel basis", () => {
 
 		// لو أُعيد تسعير البند بوزنه المخزّن (5 طن × 3550) لتضخّم الفرق
 		expect(perItem).toBeCloseTo(fromFactory, 2);
+	});
+
+	// حديد الأساسات المعزول (إيبوكسي) — سعر واحد بغض النظر عن القطر،
+	// ولا يُطبَّق إلا عند تفعيله في مواصفات الأعمال الإنشائية
+	describe("isolated (epoxy) foundation steel", () => {
+		const foundation: StructuralItem = {
+			id: "f1",
+			category: "foundations",
+			subCategory: "isolated",
+			name: "ق1",
+			quantity: 8,
+			dimensions: {
+				length: 2,
+				width: 2,
+				height: 0.6,
+				bottomShortDiameter: 16,
+				bottomLongDiameter: 16,
+				bottomShortBarsPerMeter: 5,
+				bottomLongBarsPerMeter: 5,
+			},
+			concreteVolume: 19.2,
+			steelWeight: 1200,
+			totalCost: 0,
+		};
+
+		it("classifies foundations, ground beams and column necks", () => {
+			expect(isIsolatedSteelItem({ category: "foundations", subCategory: "raft" })).toBe(true);
+			expect(isIsolatedSteelItem({ category: "beams", subCategory: "groundBeam" })).toBe(true);
+			expect(isIsolatedSteelItem({ category: "columns", subCategory: "ground_neck" })).toBe(true);
+			expect(isIsolatedSteelItem({ category: "columns", subCategory: "ground" })).toBe(false);
+			expect(isIsolatedSteelItem({ category: "beams", subCategory: "beam" })).toBe(false);
+			expect(isIsolatedSteelItem({ category: "slabs", subCategory: "solid" })).toBe(false);
+		});
+
+		it("applies the isolated price only when the toggle is on", () => {
+			const items = [foundation, column("c1")];
+			const { map } = recalcMap(items);
+
+			const off = computeItemMaterialCost(foundation as any, PRICES, map.get("f1"));
+			const onPrices = { ...PRICES, hasIsolatedSteel: true, steelPriceIsolated: 5200 };
+			const on = computeItemMaterialCost(foundation as any, onPrices, map.get("f1"));
+
+			expect(on.steelTons).toBeCloseTo(off.steelTons, 6);
+			expect(on.steelCost).toBeCloseTo(on.steelTons * 5200, 2);
+			expect(on.steelCost).toBeGreaterThan(off.steelCost);
+
+			// الأعمدة العادية لا تتأثر
+			const columnOn = computeItemMaterialCost(items[1] as any, onPrices, map.get("c1"));
+			const columnOff = computeItemMaterialCost(items[1] as any, PRICES, map.get("c1"));
+			expect(columnOn.steelCost).toBeCloseTo(columnOff.steelCost, 2);
+		});
 	});
 
 	// الحديد المحسوب بالنِسَب (قباب/مآذن) لا جدول قص له — يُسعَّر بوزنه المخزّن

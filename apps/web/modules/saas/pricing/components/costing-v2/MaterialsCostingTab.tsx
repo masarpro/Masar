@@ -16,7 +16,7 @@ import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
-import { aggregateBOQ } from "@saas/pricing/lib/boq-aggregator";
+import { aggregateBOQ, REBAR_WEIGHTS_MAP } from "@saas/pricing/lib/boq-aggregator";
 import {
 	aggregateBlockMaterials,
 	CEMENT_BAGS_PER_BLOCK,
@@ -24,6 +24,8 @@ import {
 } from "@saas/pricing/lib/block-materials";
 import {
 	buildMaterialCostUpdates,
+	isIsolatedSteelItem,
+	ISOLATED_STEEL_LABEL,
 	type MaterialPrices,
 } from "@saas/pricing/lib/cost-report";
 
@@ -66,6 +68,8 @@ export function MaterialsCostingTab({
 	const [steelPriceD6, setSteelPriceD6] = useState("");
 	const [steelPriceD8, setSteelPriceD8] = useState("");
 	const [steelPriceMain, setSteelPriceMain] = useState("");
+	// سعر حديد الأساسات المعزول (إيبوكسي) — يظهر عند تفعيله في المواصفات
+	const [steelPriceIsolated, setSteelPriceIsolated] = useState("");
 	const [storagePercent, setStoragePercent] = useState("2");
 	const [initialized, setInitialized] = useState(false);
 
@@ -101,6 +105,14 @@ export function MaterialsCostingTab({
 			input: { organizationId, studyId },
 		}),
 	);
+
+	// مواصفات الأعمال الإنشائية — منها تفعيل الحديد المعزول (إيبوكسي)
+	const { data: structuralSpecs } = useQuery(
+		orpc.pricing.studies.structuralSpecs.get.queryOptions({
+			input: { organizationId, studyId },
+		}),
+	);
+	const hasIsolatedSteel = !!(structuralSpecs as any)?.hasIsolatedSteel;
 
 	// ─── Mutations ───
 	const bulkUpdateMutation = useMutation(
@@ -193,7 +205,39 @@ export function MaterialsCostingTab({
 			// بلا أقطار — كان يسقط من التسعير كلياً، يُسعَّر الآن بسعر الحديد الرئيسي
 			mainTons += (boqResult.unscheduledSteelWeight ?? 0) / 1000;
 
+			// حديد الأساسات المعزول (إيبوكسي) يُسعَّر بسعره الخاص، فيُفصل
+			// من مجموعات الأقطار بأطنانه الفعلية من نفس التقطيع المُحسَّن
+			let isolatedTons = 0;
+			if (hasIsolatedSteel) {
+				for (const section of boqResult.sections) {
+					for (const group of section.subGroups) {
+						for (const detail of group.items) {
+							if (!isIsolatedSteelItem(detail.item)) continue;
+							const stocks = detail.recalc.totals.stocksNeeded;
+							if (stocks.length === 0) {
+								isolatedTons += detail.item.steelWeight / 1000;
+								mainTons -= detail.item.steelWeight / 1000;
+								continue;
+							}
+							for (const stock of stocks) {
+								const tons =
+									(stock.count *
+										stock.length *
+										(REBAR_WEIGHTS_MAP[stock.diameter] ?? 0)) /
+									1000;
+								isolatedTons += tons;
+								if (stock.diameter === 6) d6Tons -= tons;
+								else if (stock.diameter === 8) d8Tons -= tons;
+								else mainTons -= tons;
+							}
+						}
+					}
+				}
+			}
+
 			const groups: SteelGroupAgg[] = [];
+			if (isolatedTons > 0)
+				groups.push({ label: ISOLATED_STEEL_LABEL, key: "isolated", tons: isolatedTons });
 			if (d6Tons > 0) groups.push({ label: "حديد Ø6", key: "d6", tons: d6Tons });
 			if (d8Tons > 0) groups.push({ label: "حديد Ø8", key: "d8", tons: d8Tons });
 			if (mainTons > 0) groups.push({ label: "حديد تسليح (Ø10+)", key: "main", tons: mainTons });
@@ -221,7 +265,7 @@ export function MaterialsCostingTab({
 			}
 			return [];
 		}
-	}, [nonBlockItems, boqResult]);
+	}, [nonBlockItems, boqResult, hasIsolatedSteel]);
 
 	// ─── Initialize from saved data ───
 	useEffect(() => {
@@ -247,6 +291,8 @@ export function MaterialsCostingTab({
 
 			if (bd.steelPriceD6 != null) setSteelPriceD6(String(bd.steelPriceD6));
 			if (bd.steelPriceD8 != null) setSteelPriceD8(String(bd.steelPriceD8));
+			if (bd.steelPriceIsolated != null)
+				setSteelPriceIsolated(String(bd.steelPriceIsolated));
 			if (bd.steelPriceMain != null) setSteelPriceMain(String(bd.steelPriceMain));
 			else if (bd.steelPrice != null) {
 				// Legacy: single steel price — apply to all groups
@@ -332,6 +378,7 @@ export function MaterialsCostingTab({
 		for (const sg of steelGroups) {
 			const tons = getSteelTons(sg.key, sg.tons);
 			const price =
+				sg.key === "isolated" ? Number(steelPriceIsolated) || 0 :
 				sg.key === "d6" ? Number(steelPriceD6) || 0 :
 				sg.key === "d8" ? Number(steelPriceD8) || 0 :
 				Number(steelPriceMain) || 0;
@@ -341,10 +388,12 @@ export function MaterialsCostingTab({
 				quantity: tons,
 				unit: "طن",
 				priceState:
+					sg.key === "isolated" ? steelPriceIsolated :
 					sg.key === "d6" ? steelPriceD6 :
 					sg.key === "d8" ? steelPriceD8 :
 					steelPriceMain,
 				setPrice:
+					sg.key === "isolated" ? setSteelPriceIsolated :
 					sg.key === "d6" ? setSteelPriceD6 :
 					sg.key === "d8" ? setSteelPriceD8 :
 					setSteelPriceMain,
@@ -426,6 +475,7 @@ export function MaterialsCostingTab({
 		steelPriceD6,
 		steelPriceD8,
 		steelPriceMain,
+		steelPriceIsolated,
 		concreteOverrides,
 		steelOverrides,
 		blockAgg,
@@ -481,6 +531,9 @@ export function MaterialsCostingTab({
 				steelPriceD6: Number(steelPriceD6) || 0,
 				steelPriceD8: Number(steelPriceD8) || 0,
 				steelPriceMain: Number(steelPriceMain) || 0,
+				steelPriceIsolated: Number(steelPriceIsolated) || 0,
+				// نسخة من حالة التفعيل حتى يقرأها تقرير التكلفة من الأسعار مباشرة
+				hasIsolatedSteel,
 				storagePercent: storagePct,
 				blockPrices: blockPricesNum,
 				mortarSandPrice: sandPriceNum,
@@ -506,6 +559,8 @@ export function MaterialsCostingTab({
 			steelPriceD6: Number(steelPriceD6) || 0,
 			steelPriceD8: Number(steelPriceD8) || 0,
 			steelPriceMain: Number(steelPriceMain) || 0,
+			steelPriceIsolated: Number(steelPriceIsolated) || 0,
+			hasIsolatedSteel,
 			blockPrices: blockPricesNum,
 			mortarSandPrice: sandPriceNum,
 			mortarCementPrice: cementPriceNum,
