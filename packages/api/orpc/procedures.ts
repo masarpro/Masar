@@ -1,5 +1,6 @@
 import { ORPCError, os } from "@orpc/server";
 import { auth } from "@repo/auth";
+import { serializeDecimals } from "../lib/decimal-helpers";
 
 type ResolvedSession = Awaited<ReturnType<typeof auth.api.getSession>>;
 
@@ -27,7 +28,12 @@ const baseProcedure = os.$context<{
 // (Prisma, network, bugs) are re-thrown as-is so they still reach Sentry as 500s.
 export const publicProcedure = baseProcedure.use(async ({ next }) => {
 	try {
-		return await next();
+		const result = await next();
+		// كائنات Prisma Decimal لا تعبر حدود التسلسل: عبر HTTP تصل كنص، وعبر
+		// نداء SSR داخل العملية تصل ككائن فتحذّر React عند تمريرها لمكوّن
+		// عميل عبر HydrationBoundary. تحويلها هنا — أعمق نقطة مشتركة — يجعل
+		// كل الإجراءات تخرج بأرقام على المسارين معاً.
+		return { ...result, output: serializeDecimals(result.output) };
 	} catch (err) {
 		if (err instanceof ORPCError) throw err;
 		const message = err instanceof Error ? err.message : "";
