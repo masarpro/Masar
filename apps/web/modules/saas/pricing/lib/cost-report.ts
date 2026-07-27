@@ -394,8 +394,9 @@ export function buildMaterialCostUpdates(
 	items: StructuralItem[],
 	costingItems: CostingItemLike[],
 	prices: MaterialPrices,
+	enabledFloors?: EnabledFloor[],
 ): MaterialCostUpdate[] {
-	const boq = aggregateBOQ(items);
+	const boq = aggregateBOQ(items, enabledFloors);
 	const recalcByItemId = new Map<string, RecalcResult>();
 	for (const section of boq.sections) {
 		for (const group of section.subGroups) {
@@ -530,7 +531,7 @@ export function buildCostReport(input: BuildCostReportInput): CostReport {
 	// تقطيع مُحسَّن مرة واحدة للدراسة كلها — نفس أساس طلبية المصنع وتبويب
 	// «المواد»، فلا يخرج التقرير برقم حديد أعلى بسبب تجاهل إعادة استخدام
 	// البواقي عند حساب كل بند على حدة
-	const boq = aggregateBOQ(items);
+	const boq = aggregateBOQ(items, enabledFloors);
 	const recalcByItemId = new Map<string, RecalcResult>();
 	for (const section of boq.sections) {
 		for (const group of section.subGroups) {

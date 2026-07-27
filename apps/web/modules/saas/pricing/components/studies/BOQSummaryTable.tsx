@@ -193,6 +193,7 @@ export function BOQSummaryTable({
 				items,
 				(costingItems as any[]) ?? [],
 				readMaterialPrices(costBreakdown, hasIsolatedSteel),
+				enabledFloors,
 			);
 			if (updates.length > 0) {
 				await (bulkUpdateCosting as any).mutateAsync({
@@ -271,7 +272,10 @@ export function BOQSummaryTable({
 		[sectionFilteredItems, effectiveItemId],
 	);
 
-	const summary = useMemo(() => aggregateBOQ(filteredItems), [filteredItems]);
+	const summary = useMemo(
+		() => aggregateBOQ(filteredItems, enabledFloors),
+		[filteredItems, enabledFloors],
+	);
 
 	// حديد محسوب بالنِسَب بلا جدول أسياخ (قباب/مآذن…) — يُضاف كسطر مستقل
 	// في طلبية المصنع ويُذكر في تبويب التقطيع لأن صفوف القص لا تشمله

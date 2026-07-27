@@ -517,6 +517,90 @@ export function filterItemsById(
 }
 
 // ─────────────────────────────────────────────────────────────
+// مراحل التنفيذ — نطاق إعادة استخدام بواقي الأسياخ
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * تسلسل الصبّ في الموقع، ومنه نطاق إعادة استخدام البواقي:
+ *
+ *   1. الأساسات   : صبة النظافة + القواعد + رقاب الأعمدة
+ *   2. الميدة     : الميدة + أعمدة الدور الأرضي
+ *   3. سقف الأرضي : سقف الدور الأرضي + أعمدة الدور الأول
+ *   4. سقف الأول  : سقف الدور الأول + أعمدة الدور الثاني
+ *   … وهكذا لكل الأدوار مهما كان عددها
+ *
+ * كل مرحلة تستهلك بواقيها وبواقي المراحل السابقة، ولا تعود بواقي مرحلة
+ * لاحقة لتخدم مرحلة صُبّت قبلها.
+ */
+const STAGE_FOUNDATIONS = 1;
+const STAGE_GROUND_FLOOR = 2;
+
+/** ترتيب الأدوار تنازلياً من الأرضي — مستخدم حين لا تتوفر أدوار المبنى */
+const FALLBACK_FLOOR_ORDER = [
+	"ground",
+	"mezzanine",
+	"first",
+	"repeated",
+	"annex",
+	"roof",
+];
+
+function buildFloorRankMap(enabledFloors?: EnabledFloor[]): Map<string, number> {
+	const ranks = new Map<string, number>();
+	if (enabledFloors && enabledFloors.length > 0) {
+		[...enabledFloors]
+			.sort((a, b) => a.sortOrder - b.sortOrder)
+			.forEach((floor, index) => ranks.set(floor.id, index));
+		return ranks;
+	}
+	FALLBACK_FLOOR_ORDER.forEach((id, index) => ranks.set(id, index));
+	return ranks;
+}
+
+/**
+ * مرحلة تنفيذ البند — تحدد أي البواقي متاحة له.
+ * الأعمدة تُصبّ مع سقف الدور الذي تحته، لذلك عمود الدور رقم i يقع في
+ * نفس مرحلة سقف الدور i−1.
+ */
+export function resolveConstructionStage(
+	item: StructuralItem,
+	enabledFloors?: EnabledFloor[],
+	ranks: Map<string, number> = buildFloorRankMap(enabledFloors),
+): number {
+	const lastStage = STAGE_GROUND_FLOOR + ranks.size + 1;
+	const { category, subCategory } = item;
+
+	if (category === "plainConcrete" || category === "foundations") {
+		return STAGE_FOUNDATIONS;
+	}
+	// رقاب الأعمدة تُصبّ مع القواعد
+	if (
+		category === "columns" &&
+		subCategory &&
+		(subCategory.endsWith("_neck") || subCategory === "neck")
+	) {
+		return STAGE_FOUNDATIONS;
+	}
+	// الميدة مع أعمدة الدور الأرضي
+	if (category === "beams" && subCategory === "groundBeam") {
+		return STAGE_GROUND_FLOOR;
+	}
+
+	const group = getItemFloorGroup(item, enabledFloors);
+	const rank = ranks.get(group);
+
+	if (category === "columns") {
+		return rank == null ? lastStage : STAGE_GROUND_FLOOR + rank;
+	}
+
+	// الأسقف والسلالم والكمرات والبلوك تتبع دورها، وتُصبّ مع أعمدة الدور التالي
+	if (rank != null) return STAGE_GROUND_FLOOR + rank + 1;
+
+	// عناصر بلا دور معروف (مشتركة/غير مصنّفة/عناصر أخرى) — آخر المراحل
+	return lastStage;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Aggregation
 // ─────────────────────────────────────────────────────────────
 
@@ -554,7 +638,13 @@ function getSubGroupLabel(category: string, key: string): string {
 	}
 }
 
-export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
+export function aggregateBOQ(
+	items: StructuralItem[],
+	enabledFloors?: EnabledFloor[],
+): BOQSummary {
+	// ترتيب الأدوار — يحدد مراحل التنفيذ ومنها نطاق إعادة استخدام البواقي
+	const floorRanks = buildFloorRankMap(enabledFloors);
+
 	// Group by category, splitting beams into groundBeams vs regular beams
 	const categoryMap = new Map<string, StructuralItem[]>();
 	items.forEach((item) => {
@@ -603,7 +693,10 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 
 			subGroupMap.get(key)!.push({ item, recalc });
 
-			// Collect cutting details
+			// Collect cutting details — موسومة بمرحلة التنفيذ حتى تنتقل
+			// البواقي للأمام فقط عند تحسين الطلبية
+			const stage = resolveConstructionStage(item, enabledFloors, floorRanks);
+			for (const row of recalc.cuttingDetails) row.stage = stage;
 			allCuttingDetails.push(...recalc.cuttingDetails);
 
 			// حديد مخزّن بلا جدول أسياخ (محسوب بالنِسَب) — يُجمع ليُضاف

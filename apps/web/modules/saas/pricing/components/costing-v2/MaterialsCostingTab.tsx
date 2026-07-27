@@ -114,6 +114,23 @@ export function MaterialsCostingTab({
 	);
 	const hasIsolatedSteel = !!(structuralSpecs as any)?.hasIsolatedSteel;
 
+	// أدوار المبنى — تحدد مراحل التنفيذ ونطاق إعادة استخدام بواقي الأسياخ.
+	// لا بد أن تكون نفسها المستخدمة في جدول الكميات وتقرير التكلفة، وإلا
+	// اختلف التقطيع المُحسَّن فاختلفت أطنان الحديد بين الشاشات.
+	const enabledFloors = useMemo(() => {
+		const floors = (structuralSpecs as any)?.buildingConfig?.floors;
+		if (!Array.isArray(floors)) return undefined;
+		return floors
+			.filter((f: any) => f?.enabled)
+			.sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+			.map((f: any) => ({
+				id: String(f.id),
+				label: String(f.label ?? ""),
+				icon: f.icon,
+				sortOrder: Number(f.sortOrder ?? 0),
+			}));
+	}, [structuralSpecs]);
+
 	// ─── Mutations ───
 	const bulkUpdateMutation = useMutation(
 		orpc.pricing.studies.costing.bulkUpdate.mutationOptions({
@@ -171,11 +188,11 @@ export function MaterialsCostingTab({
 	const boqResult = useMemo(() => {
 		if (nonBlockItems.length === 0) return null;
 		try {
-			return aggregateBOQ(nonBlockItems as any);
+			return aggregateBOQ(nonBlockItems as any, enabledFloors);
 		} catch {
 			return null;
 		}
-	}, [nonBlockItems]);
+	}, [nonBlockItems, enabledFloors]);
 
 	// ─── Aggregate steel by diameter groups using aggregateBOQ ───
 	const steelGroups = useMemo<SteelGroupAgg[]>(() => {
@@ -573,6 +590,7 @@ export function MaterialsCostingTab({
 			structItems as any,
 			cItems as any,
 			itemPrices,
+			enabledFloors,
 		);
 
 		// Scale per-item costs so their sum matches materialSubtotal (without storage)

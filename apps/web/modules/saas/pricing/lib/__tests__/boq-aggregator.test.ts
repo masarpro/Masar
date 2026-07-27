@@ -4,8 +4,10 @@ import {
 	getItemFloorGroup,
 	buildFloorFilterOptions,
 	filterItemsByFloor,
+	resolveConstructionStage,
 	type StructuralItem,
 } from "../boq-aggregator";
+import { reconcileCuttingWithFactoryOrder } from "../boq-recalculator";
 
 const makeItem = (overrides: Partial<StructuralItem> = {}): StructuralItem => ({
 	id: "item-1",
@@ -201,6 +203,162 @@ describe("aggregateBOQ", () => {
 	it("reports zero unscheduled steel when every item has a cutting schedule", () => {
 		const result = aggregateBOQ([makeItem()]);
 		expect(result.unscheduledSteelWeight).toBe(0);
+	});
+});
+
+// ─── مراحل التنفيذ ونطاق إعادة استخدام البواقي ───
+
+describe("resolveConstructionStage", () => {
+	const floors = [
+		{ id: "ground", label: "الأرضي", sortOrder: 0 },
+		{ id: "first", label: "الأول", sortOrder: 1 },
+		{ id: "roof", label: "السطح", sortOrder: 2 },
+	];
+
+	const at = (item: Partial<StructuralItem>) =>
+		resolveConstructionStage(makeItem(item), floors);
+
+	it("pours foundations, blinding and column necks together", () => {
+		expect(at({ category: "plainConcrete", subCategory: "blinding" })).toBe(1);
+		expect(at({ category: "foundations", subCategory: "raft" })).toBe(1);
+		expect(at({ category: "columns", subCategory: "ground_neck" })).toBe(1);
+	});
+
+	it("pours ground beams with the ground floor columns", () => {
+		expect(at({ category: "beams", subCategory: "groundBeam" })).toBe(2);
+		expect(at({ category: "columns", subCategory: "ground" })).toBe(2);
+	});
+
+	it("pours each slab with the columns of the floor above it", () => {
+		const slabGround = at({
+			category: "slabs",
+			subCategory: "solid",
+			dimensions: { floor: "الأرضي" } as any,
+		});
+		expect(slabGround).toBe(3);
+		expect(at({ category: "columns", subCategory: "first" })).toBe(3);
+
+		const slabFirst = at({
+			category: "slabs",
+			subCategory: "solid",
+			dimensions: { floor: "الأول" } as any,
+		});
+		expect(slabFirst).toBe(4);
+		expect(at({ category: "columns", subCategory: "roof" })).toBe(4);
+	});
+
+	it("keeps the chain going for any number of floors", () => {
+		const many = Array.from({ length: 12 }, (_, i) => ({
+			id: i === 0 ? "ground" : `upper_${i - 1}`,
+			label: `دور ${i}`,
+			sortOrder: i,
+		}));
+		const top = resolveConstructionStage(
+			makeItem({ category: "columns", subCategory: "upper_10" }),
+			many,
+		);
+		expect(top).toBe(2 + 11);
+	});
+});
+
+describe("staged remnant reuse", () => {
+	const floors = [
+		{ id: "ground", label: "الأرضي", sortOrder: 0 },
+		{ id: "first", label: "الأول", sortOrder: 1 },
+	];
+
+	// بواقي مرحلة لاحقة لا تعود لتخدم مرحلة صُبّت قبلها، فعدد الأسياخ
+	// المطلوب مع المراحل لا يقل أبداً عن حساب البركة الواحدة
+	it("never orders fewer bars than unrestricted reuse", () => {
+		const items: StructuralItem[] = [
+			makeItem({
+				id: "f1",
+				category: "foundations",
+				subCategory: "raft",
+				name: "لبشة",
+				quantity: 1,
+				dimensions: {
+					length: 12,
+					width: 10,
+					thickness: 0.8,
+					bottomXDiameter: 16,
+					bottomYDiameter: 16,
+					bottomXBarsPerMeter: 5,
+					bottomYBarsPerMeter: 5,
+				},
+			}),
+			makeItem({
+				id: "c-ground",
+				category: "columns",
+				subCategory: "ground",
+				quantity: 20,
+			}),
+			makeItem({
+				id: "s-ground",
+				category: "slabs",
+				subCategory: "solid",
+				name: "سقف الأرضي",
+				quantity: 1,
+				dimensions: {
+					floor: "الأرضي",
+					length: 11,
+					width: 9,
+					cover: 0.025,
+					bottomMainDiameter: 16,
+					bottomMainBarsPerMeter: 5,
+					bottomSecondaryDiameter: 12,
+					bottomSecondaryBarsPerMeter: 5,
+				} as any,
+			}),
+			makeItem({
+				id: "c-first",
+				category: "columns",
+				subCategory: "first",
+				quantity: 20,
+			}),
+		];
+
+		const staged = aggregateBOQ(items, floors);
+		const stagedBars = staged.factoryOrder.reduce((s, e) => s + e.count, 0);
+
+		// نفس البنود لكن بمرحلة واحدة للجميع (إعادة استخدام بلا قيد)
+		const pooled = aggregateBOQ(items.map((i) => ({ ...i })), floors);
+		for (const row of pooled.allCuttingDetails) row.stage = 0;
+		const pooledStocks = reconcileCuttingWithFactoryOrder(pooled.allCuttingDetails);
+		const pooledBars = pooledStocks.reduce((s, e) => s + e.count, 0);
+
+		expect(stagedBars).toBeGreaterThanOrEqual(pooledBars);
+	});
+
+	// التطابق بين تبويبي الطلبية والتقطيع يبقى قائماً بعد التقييد
+	it("keeps cutting details in sync with the factory order", () => {
+		const items: StructuralItem[] = [
+			makeItem({ id: "c1", subCategory: "ground", quantity: 10 }),
+			makeItem({ id: "c2", subCategory: "first", quantity: 10 }),
+			makeItem({
+				id: "f1",
+				category: "foundations",
+				subCategory: "isolated",
+				quantity: 6,
+				dimensions: {
+					length: 2,
+					width: 2,
+					height: 0.6,
+					bottomShortDiameter: 16,
+					bottomLongDiameter: 16,
+					bottomShortBarsPerMeter: 5,
+					bottomLongBarsPerMeter: 5,
+				},
+			}),
+		];
+		const result = aggregateBOQ(items, floors);
+
+		for (const entry of result.factoryOrder) {
+			const fromRows = result.allCuttingDetails
+				.filter((d) => d.diameter === entry.diameter)
+				.reduce((s, d) => s + d.stocksNeeded, 0);
+			expect(fromRows).toBe(entry.count);
+		}
 	});
 });
 

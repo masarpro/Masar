@@ -27,6 +27,12 @@ export interface CuttingDetailRow {
 	 * (تُملأ في reconcileCuttingWithFactoryOrder — 0 قبل التحسين)
 	 */
 	reusedPieces?: number;
+	/**
+	 * مرحلة التنفيذ (أساسات → ميدة وأعمدة أرضي → سقف وأعمدة الدور التالي…).
+	 * البواقي تنتقل للأمام فقط: مرحلة لاحقة تستفيد من بواقي السابقة، ولا
+	 * تعود بواقي مرحلة متأخرة لتخدم مرحلة صُبّت قبلها.
+	 */
+	stage?: number;
 }
 
 export interface RecalcResult {
@@ -692,8 +698,13 @@ export function allocateFactoryStocks(
 		const diameter = group[0].diameter;
 		const stockLen = group[0].stockLength;
 
-		// Sort by barLength descending — longest first uses new stock, shorter may reuse remnants
-		const sorted = [...group].sort((a, b) => b.barLength - a.barLength);
+		// الترتيب: مرحلة التنفيذ أولاً ثم الأطول فالأقصر داخل المرحلة.
+		// المعالجة بهذا الترتيب تجعل البواقي تنتقل للأمام فقط — الأساسات لا
+		// تستهلك بواقي سقف يُصبّ بعدها بأشهر (كان الترتيب عالمياً بالطول
+		// فيسمح بإعادة استخدام مستحيلة زمنياً)
+		const sorted = [...group].sort(
+			(a, b) => (a.stage ?? 0) - (b.stage ?? 0) || b.barLength - a.barLength,
+		);
 
 		const remnants: number[] = [];
 		let totalStocks = 0;
