@@ -19,7 +19,6 @@ import {
 	BOQSummaryPanel,
 } from "../boq/BOQPanels";
 import { BOQTablesProvider } from "../boq/BOQTablesContext";
-import { ConvertToQuotationButton } from "../ConvertToQuotationButton";
 import { QuantitiesEntryPanel } from "./QuantitiesEntryPanel";
 import { TablesToolbar } from "./TablesToolbar";
 import { WorkspaceNav, type WorkspaceView } from "./WorkspaceNav";
@@ -146,20 +145,12 @@ export function StudyWorkspace({
 			enabledFloors={floorOptions}
 		>
 			<div className="space-y-4" dir="rtl">
+				{/* التحويل لعرض سعر يعيش في تبويب «التسعير والأرباح» داخل
+				    التكلفة والتسعير — لا زر عائم هنا */}
 				<WorkspaceNav
 					value={view}
 					onChange={handleViewChange}
 					itemsCount={items.length}
-					// زر التحويل لعرض سعر — متاح من كل التبويبات
-					action={
-						<ConvertToQuotationButton
-							organizationId={organizationId}
-							organizationSlug={organizationSlug}
-							studyId={studyId}
-							studyType={study?.studyType ?? "FULL_PROJECT"}
-							clientName={study?.customerName}
-						/>
-					}
 				/>
 
 				{/* ─── اللوحات: كلها مركّبة، تُخفى غير النشطة ─── */}

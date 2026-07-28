@@ -56,9 +56,11 @@ export function TablesToolbar({
 
 	return (
 		<div className="space-y-3">
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<h3 className="font-bold text-base">{title}</h3>
-				<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+				<h3 className="min-w-0 flex-1 font-bold text-sm sm:text-base">
+					{title}
+				</h3>
+				<div className="flex shrink-0 items-center gap-1 sm:gap-2">
 					{hasActiveFilters && (
 						<Button
 							variant="ghost"
@@ -78,14 +80,14 @@ export function TablesToolbar({
 			</div>
 
 			{showFilters && (
-				<div className="flex flex-wrap items-center gap-2 rounded-xl border bg-muted/20 px-3 py-2 print:hidden">
+				<div className="flex flex-col gap-2 rounded-xl border bg-muted/20 px-2 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:px-3 print:hidden">
 					{floorOptions.length > 2 && (
 						<FilterSelect
 							label={t("structural.boq.floorFilter")}
 							value={selectedFloor}
 							onChange={setSelectedFloor}
 							options={floorOptions}
-							width="w-[170px]"
+							width="sm:w-[170px]"
 						/>
 					)}
 					{sectionOptions.length > 2 && (
@@ -94,7 +96,7 @@ export function TablesToolbar({
 							value={selectedSection}
 							onChange={setSelectedSection}
 							options={sectionOptions}
-							width="w-[170px]"
+							width="sm:w-[170px]"
 						/>
 					)}
 					{itemOptions.length > 2 && (
@@ -103,12 +105,12 @@ export function TablesToolbar({
 							value={selectedItemId}
 							onChange={setSelectedItemId}
 							options={itemOptions}
-							width="w-[220px]"
+							width="sm:w-[220px]"
 						/>
 					)}
 
 					{/* حالة التحديد بالصح */}
-					<div className="ms-auto flex items-center gap-2">
+					<div className="flex items-center justify-between gap-2 sm:ms-auto sm:justify-start">
 						<Badge
 							variant={selectedIds ? "default" : "secondary"}
 							className="gap-1 font-normal text-[11px]"
@@ -161,11 +163,11 @@ function FilterSelect({
 }) {
 	return (
 		<div className="flex items-center gap-1.5">
-			<span className="font-medium text-muted-foreground text-xs">
+			<span className="w-20 shrink-0 font-medium text-[11px] text-muted-foreground sm:w-auto sm:text-xs">
 				{label}
 			</span>
 			<Select value={value} onValueChange={onChange}>
-				<SelectTrigger className={`h-8 text-xs ${width}`}>
+				<SelectTrigger className={`h-8 flex-1 text-xs ${width}`}>
 					<SelectValue />
 				</SelectTrigger>
 				<SelectContent>
